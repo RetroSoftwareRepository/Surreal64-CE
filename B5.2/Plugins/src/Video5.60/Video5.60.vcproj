@@ -76,7 +76,7 @@
 				EnableFunctionLevelLinking="TRUE"
 				EnableEnhancedInstructionSet="1"
 				UsePrecompiledHeader="0"
-				PrecompiledHeaderFile="obj\Release\$(ProjectName).pch"
+				PrecompiledHeaderFile="obj\Debug\$(ProjectName).pch"
 				BrowseInformation="1"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"

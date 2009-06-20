@@ -5,7 +5,7 @@
 #define PLUGIN_TYPE_CONTROLLER	4
 #define SYSTEM_NTSC					1
 #define SYSTEM_PAL					0
-#define SYSTEM_MPAL					0
+#define SYSTEM_MPAL					2
 
 
 #if defined(__cplusplus)

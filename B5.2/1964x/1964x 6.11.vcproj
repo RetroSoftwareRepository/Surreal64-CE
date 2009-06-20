@@ -14,7 +14,7 @@
 		<Configuration
 			Name="Release|Xbox"
 			OutputDirectory="$(SolutionDir)Release"
-			IntermediateDirectory="obj/Release"
+			IntermediateDirectory="obj\Release"
 			ConfigurationType="1"
 			CharacterSet="2">
 			<Tool
@@ -35,6 +35,7 @@
 				EnableFunctionLevelLinking="TRUE"
 				EnableEnhancedInstructionSet="1"
 				UsePrecompiledHeader="0"
+				PrecompiledHeaderFile="obj\Release\$(ProjectName).pch"
 				BrowseInformation="1"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
@@ -45,7 +46,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xacteng.lib xboxkrnl.lib zlib\xzlib.lib AudioBasic.lib AudioJttl.lib AudioNone.lib Input.lib RSP.lib Video611.lib"
+				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xacteng.lib xboxkrnl.lib zlib\xzlib.lib AudioBasic.lib AudioJttl.lib AudioMusyX.lib AudioNone.lib Input.lib RSP.lib Video611.lib"
 				OutputFile="$(OutDir)/1964-611.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\Plugins\lib\"
@@ -73,36 +74,43 @@
 				FileName="$(TargetDir)1964-611.xbe"
 				StackSize="65536"
 				TitleID="0xA64FEA57"
-				TitleName="Surreal 64 - 1964x"/>
+				TitleName="Surreal 64 XXX CE - 1964x"/>
 		</Configuration>
 		<Configuration
 			Name="Debug|Xbox"
 			OutputDirectory="$(SolutionDir)Debug"
-			IntermediateDirectory="obj/Debug"
+			IntermediateDirectory="obj\Debug"
 			ConfigurationType="1"
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="0"
+				Optimization="2"
+				GlobalOptimizations="TRUE"
+				InlineFunctionExpansion="2"
+				EnableIntrinsicFunctions="TRUE"
+				FavorSizeOrSpeed="1"
+				OmitFramePointers="TRUE"
+				EnableFiberSafeOptimizations="TRUE"
 				OptimizeForProcessor="2"
 				AdditionalIncludeDirectories="..\Plugins\include\;&quot;D:\Program Files\Microsoft Xbox SDK\Samples\Xbox\Common\Include&quot;"
 				PreprocessorDefinitions="DEBUG;_XBOX;DYNAREC;ENABLE_64BIT_FPU;WIN32;_WIN32;_WINDOWS;EXTERNAL_RELEASE"
 				StringPooling="TRUE"
 				RuntimeLibrary="0"
-				EnableFunctionLevelLinking="FALSE"
-				EnableEnhancedInstructionSet="0"
-				UsePrecompiledHeader="2"
+				EnableFunctionLevelLinking="TRUE"
+				EnableEnhancedInstructionSet="1"
+				UsePrecompiledHeader="0"
+				PrecompiledHeaderFile="obj\Debug\$(ProjectName).pch"
 				BrowseInformation="1"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
-				DebugInformationFormat="4"
+				DebugInformationFormat="3"
 				CallingConvention="1"
-				CompileAs="0"/>
+				CompileAs="1"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xacteng.lib xboxkrnl.lib zlib\xzlib.lib AudioBasic.lib AudioJttl.lib AudioNone.lib Input.lib RSP.lib Video611.lib"
+				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xacteng.lib xboxkrnl.lib zlib\xzlib.lib AudioBasic.lib AudioJttl.lib AudioMusyX.lib AudioNone.lib Input.lib RSP.lib Video611.lib"
 				OutputFile="$(OutDir)/1964-611.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\Plugins\lib\"
@@ -130,7 +138,7 @@
 				FileName="$(TargetDir)1964-611.xbe"
 				StackSize="65536"
 				TitleID="0xA64FEA57"
-				TitleName="Surreal 64 - 1964x"/>
+				TitleName="Surreal 64 XXX CE - 1964x"/>
 		</Configuration>
 	</Configurations>
 	<References>

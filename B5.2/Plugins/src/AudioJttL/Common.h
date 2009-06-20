@@ -25,4 +25,4 @@ typedef struct
 
 #define SYSTEM_NTSC					1
 #define SYSTEM_PAL					0
-#define SYSTEM_MPAL					0
+#define SYSTEM_MPAL					2

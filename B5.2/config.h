@@ -38,7 +38,7 @@ extern int iAudioPlugin;
 //extern int dwFreeMem;
 extern int dwMaxVideoMem;
 
-
+extern bool HideLaunchScreens;
 
 extern int FlickerFilter;
 extern bool SoftDisplayFilter;

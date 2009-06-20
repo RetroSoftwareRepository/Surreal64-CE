@@ -36,10 +36,14 @@ extern int ConfigAppLoad3();
 extern bool has128ram;
 extern int iAudioPlugin;
 string GetAudioPluginName(int iAudioPlugin);
+string GetVideoPluginName(int iVideoPlugin);
+string GetEmulatorName(int iEmulator);
 
-//void ToggleAudioPlugin();
 void ToggleAudioPlugin(bool inc); // replace usellersp bool with iAudioPlugin
+void ToggleVideoPlugin(bool inc);
+void ToggleEmulator(bool inc);
 
+void ToggleHideLaunchScreens();
 
 
 void ToggleMaxVideoMem(bool inc);
@@ -90,6 +94,10 @@ extern int defilement;
 //void ToggleAudioPlugin();
 void incAudioPlugin(){ ToggleAudioPlugin(true); }
 void decAudioPlugin(){ ToggleAudioPlugin(false); }
+void incVideoPlugin(){ ToggleVideoPlugin(true); }
+void decVideoPlugin(){ ToggleVideoPlugin(false); }
+void incEmulator(){ ToggleEmulator(true); }
+void decEmulator(){ ToggleEmulator(false); }
 
 //
 void incflicker(){ ToggleFlickerFilter(true); }
@@ -138,6 +146,40 @@ string GetAudioPluginName(int iAudioPluginNum)
 
 	return szAudioPlugin;
 }
+
+// Ez0n3 - get the video plugins name from int
+string GetVideoPluginName(int iVideoPlugin)
+{
+	string szVideoPlugin;
+
+	switch (iVideoPlugin) {
+		case _VideoPluginRice510 : szVideoPlugin = "Rice 5.1.0"; break;
+		case _VideoPluginRice531 : szVideoPlugin = "Rice 5.3.1"; break;
+		case _VideoPluginRice560 : szVideoPlugin = "Rice 5.6.0"; break;
+		case _VideoPluginRice610 : szVideoPlugin = "Rice 6.1.0"; break;
+		case _VideoPluginMissing : 
+		default : szVideoPlugin = "Unknown"; break;
+	}	
+
+	return szVideoPlugin;
+}
+
+// Ez0n3 - get the video plugins name from int
+string GetEmulatorName(int iEmulator)
+{
+	string szEmulator;
+
+	switch (iEmulator) {
+		case _1964 : szEmulator = "1964"; break;
+		case _Project64 : szEmulator = "Project64"; break;
+		case _UltraHLE : szEmulator = "UltraHLE"; break;
+		case _None : 
+		default : szEmulator = "Unknown"; break;
+	}	
+
+	return szEmulator;
+}
+
 
 
 void MainMenu(void)
@@ -419,7 +461,9 @@ void SettingsMenu(void)
 
     WCHAR currentname[120];
 
-	m_pSettingsMenu = XLMenu_Init(60,80,8, MENU_LEFT|MENU_WRAP, NULL);
+	// Ez0n3 - more items
+	//m_pSettingsMenu = XLMenu_Init(60,80,8, MENU_LEFT|MENU_WRAP, NULL);
+	m_pSettingsMenu = XLMenu_Init(60,80,10, MENU_LEFT|MENU_WRAP, NULL);
 
 	m_pSettingsMenu->topcolor = 0x40254365;
 	m_pSettingsMenu->bottomcolor = 0x40556486;
@@ -430,6 +474,19 @@ void SettingsMenu(void)
 
 	XLMenu_SetTitle(m_pSettingsMenu,L"Settings",0xFF8080FF);
 
+	
+	
+	
+	// Ez0n3 - emulator selector in menu
+	swprintf(currentname, L"Emulator : %S", GetEmulatorName(preferedemu).c_str());
+	XLMenu_AddItem2(m_pSettingsMenu,MITEM_ROUTINE,currentname,incEmulator,decEmulator);
+	
+	// Ez0n3 - video plugin selector in menu
+	swprintf(currentname, L"Video Plugin : %S", GetVideoPluginName(videoplugin).c_str());
+	XLMenu_AddItem2(m_pSettingsMenu,MITEM_ROUTINE,currentname,incVideoPlugin,decVideoPlugin);
+
+
+	
 	
 	// Ez0n3 - use iAudioPlugin instead to replace bool
 	//if (bUseLLERSP)
@@ -463,7 +520,7 @@ void SettingsMenu(void)
 
 	swprintf(currentname,L"Paging Memory : %d Mbytes",dwPJ64PagingMem);
 	XLMenu_AddItem2(m_pSettingsMenu,MITEM_ROUTINE,currentname,incPJ64PagingMem,decPJ64PagingMem);
-
+	
 	
 	XLMenu_Activate(m_pSettingsMenu);
 
@@ -503,24 +560,55 @@ void ToggleAudioPlugin(bool inc)
 	// Ez0n3 - audio plugins
 	swprintf(currentname, L"Audio Plugin : %S", GetAudioPluginName(iAudioPlugin).c_str());
 	XLMenu_SetItemText(&m_pSettingsMenu->items[currentItem], currentname);
-
 }
-/*
-void ToggleAudioPlugin(void)
-{
 
+// Ez0n3 - video plugin toggle
+void ToggleVideoPlugin(bool inc)
+{	
+    WCHAR currentname[120];
 	currentItem = m_pSettingsMenu->curitem;
+	if (inc)
+	{
+		videoplugin++;
+		if (videoplugin > (_VideoPluginMissing - 1)) videoplugin=0;
+	}
+	else
+	{
+		videoplugin--;
+		if (videoplugin < 0) videoplugin=(_VideoPluginMissing - 1);
+	}
 
-	bUseLLERSP = !bUseLLERSP;
 	XLMenu_CurRoutine = NULL;
 	
-	if (bUseLLERSP)
-		XLMenu_SetItemText(&m_pSettingsMenu->items[currentItem], L"Audio Plugin : Basic Audio");
+	// Ez0n3 - video plugins
+	swprintf(currentname, L"Video Plugin : %S", GetVideoPluginName(videoplugin).c_str());
+	XLMenu_SetItemText(&m_pSettingsMenu->items[currentItem], currentname);
+}
+
+// Ez0n3 - emulator toggle
+void ToggleEmulator(bool inc)
+{	
+    WCHAR currentname[120];
+	currentItem = m_pSettingsMenu->curitem;
+	if (inc)
+	{
+		preferedemu++;
+		if (preferedemu > (_None - 1)) preferedemu=0;
+	}
 	else
-		XLMenu_SetItemText(&m_pSettingsMenu->items[currentItem], L"Audio Plugin : JttL");
+	{
+		preferedemu--;
+		if (preferedemu < 0) preferedemu=(_None - 1);
+	}
+
+	XLMenu_CurRoutine = NULL;
+	
+	// Ez0n3 - video plugins
+	swprintf(currentname, L"Emulator : %S", GetEmulatorName(preferedemu).c_str());
+	XLMenu_SetItemText(&m_pSettingsMenu->items[currentItem], currentname);
 
 }
-*/
+
 
 
 void ToggleMaxVideoMem(bool inc)
@@ -852,6 +940,46 @@ ConfigAppSave2();
 Launch();
 }
 
+
+// Ez0n3 - launch rom without emulator and video plugin selectors
+void LaunchHideScreens(void)
+{
+	//XLMenu_Activate(NULL);            // kill the current menu
+    //XLMenu_CurRoutine = NULL; 
+
+	ConfigAppLoad3();
+	
+	// just to be safe
+	switch (videoplugin) {
+		case _VideoPluginRice510 : videoplugin = _VideoPluginRice510; //5.1.0
+			break;
+		case _VideoPluginRice531 : videoplugin = _VideoPluginRice531; //5.3.1
+			break;
+		case _VideoPluginRice560 : videoplugin = _VideoPluginRice560; //5.6.0
+			break;
+		case _VideoPluginRice610 : videoplugin = _VideoPluginRice610; //6.1.1
+			break;
+		default : videoplugin = _VideoPluginRice560; // launch with 560 if no plugin is set or unrecognized
+			break;
+	}
+
+	// don't really need to re-set preferedemu - just to be safe
+	switch (preferedemu) {
+		case _1964 : m_emulator = _1964; preferedemu = _1964;
+			break;
+		case _Project64 : m_emulator = _Project64; preferedemu = _Project64;
+			break;
+		case _UltraHLE : m_emulator = _UltraHLE; preferedemu = _UltraHLE;
+			break;
+		default : m_emulator = _1964; preferedemu = _1964; // launch with 1964 if no preferred emulator is set
+			break;
+	}
+	
+	ConfigAppSave2();
+	Launch();
+}
+
+
 void VideoSettingsMenu(void)
 {
 	DWORD dwMenuCommand = 0;
@@ -862,7 +990,9 @@ void VideoSettingsMenu(void)
 
     WCHAR currentname[120];
 
-	m_pSettingsMenu = XLMenu_Init(60,80,4, MENU_LEFT|MENU_WRAP, NULL);
+	// Ez0n3 - more items
+	//m_pSettingsMenu = XLMenu_Init(60,80,4, MENU_LEFT|MENU_WRAP, NULL);
+	m_pSettingsMenu = XLMenu_Init(60,80,6, MENU_LEFT|MENU_WRAP, NULL);
 
 	m_pSettingsMenu->topcolor = 0x40254365;
 	m_pSettingsMenu->bottomcolor = 0x40556486;
@@ -913,6 +1043,20 @@ void VideoSettingsMenu(void)
 		break;	}
 	XLMenu_AddItem2(m_pSettingsMenu,MITEM_ROUTINE,currentname,incVertexMode,decVertexMode);
 
+	
+	// Ez0n3 - more emulator settings
+	XLMenu_AddItem(m_pSettingsMenu,MITEM_DISABLED,L"More",NULL);
+	
+	// Ez0n3 - launch screens enable / disable
+	if (HideLaunchScreens)
+		swprintf(currentname,L"Hide Launch Screens : True");
+	else
+		swprintf(currentname,L"Hide Launch Screens : False");
+		
+	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,currentname,ToggleHideLaunchScreens);
+	
+	
+	
 	XLMenu_Activate(m_pSettingsMenu);
 
 	while( XLMenu_CurMenu == m_pSettingsMenu)
@@ -927,6 +1071,23 @@ void VideoSettingsMenu(void)
 		XLMenu_Delete(m_pSettingsMenu);
 
 }
+
+// Ez0n3 - enable / disable launch screens
+void ToggleHideLaunchScreens()
+{
+	currentItem = m_pSettingsMenu->curitem;
+
+	HideLaunchScreens = !HideLaunchScreens;
+	XLMenu_CurRoutine = NULL;
+	
+	if (HideLaunchScreens)
+		XLMenu_SetItemText(&m_pSettingsMenu->items[currentItem], L"Hide Launch Screens : True");
+	else
+		XLMenu_SetItemText(&m_pSettingsMenu->items[currentItem], L"Hide Launch Screens : False");
+		
+	ConfigAppSave();	
+}
+
 
 void ToggleFlickerFilter(bool inc)
 {

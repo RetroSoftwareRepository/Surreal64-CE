@@ -46,7 +46,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xacteng.lib xboxkrnl.lib AudioBasic.lib AudioJttl.lib AudioNone.lib Input.lib RSP.lib Video510.lib"
+				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xacteng.lib xboxkrnl.lib AudioBasic.lib AudioJttl.lib AudioMusyX.lib AudioNone.lib Input.lib RSP.lib Video510.lib"
 				OutputFile="$(OutDir)/Pj64-510.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\Plugins\lib"
@@ -74,7 +74,7 @@
 				DontMountUD="FALSE"
 				NoLibWarn="TRUE"
 				TitleID="0xA64FEA57"
-				TitleName="Surreal 64 - Pj64x"/>
+				TitleName="Surreal 64 XXX CE - Pj64x"/>
 		</Configuration>
 		<Configuration
 			Name="Debug|Xbox"
@@ -111,7 +111,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xacteng.lib xboxkrnl.lib AudioBasic.lib AudioJttl.lib AudioNone.lib Input.lib RSP.lib Video510.lib"
+				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xacteng.lib xboxkrnl.lib AudioBasic.lib AudioJttl.lib AudioMusyX.lib AudioNone.lib Input.lib RSP.lib Video510.lib"
 				OutputFile="$(OutDir)/Pj64-510.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\Plugins\lib"
@@ -139,7 +139,7 @@
 				DontMountUD="FALSE"
 				NoLibWarn="TRUE"
 				TitleID="0xA64FEA57"
-				TitleName="Surreal 64 - Pj64x"/>
+				TitleName="Surreal 64 XXX CE - Pj64x"/>
 		</Configuration>
 	</Configurations>
 	<References>

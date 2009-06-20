@@ -79,8 +79,11 @@ extern int preferedemu;
 extern int videoplugin;
 extern int iAudioPlugin;
 extern void Launch();
-int ConfigAppLoad3();
+extern int ConfigAppLoad3();
 extern bool has128ram;
+
+extern void LaunchHideScreens(); // launch rom no screens
+
 
 
 class CXBoxSample :	public CXBApplication

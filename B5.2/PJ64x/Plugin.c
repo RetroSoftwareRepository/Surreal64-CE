@@ -92,6 +92,18 @@ extern void _AUDIO_NONE_AiUpdate(BOOL Wait);
 extern BOOL _AUDIO_NONE_InitiateAudio (AUDIO_INFO Audio_Info);
 extern void _AUDIO_NONE_ProcessAList(void);
 
+// freakdave - New MusyX audio plugin
+extern void _AUDIO_MUSYX_CloseDLL (void);
+extern void _AUDIO_MUSYX_RomClosed(void);
+extern void _AUDIO_MUSYX_DllConfig ( HWND hParent );
+extern void _AUDIO_MUSYX_GetDllInfo(PLUGIN_INFO *PluginInfo);
+extern void _AUDIO_MUSYX_AiDacrateChanged(int SystemType);
+extern void _AUDIO_MUSYX_AiLenChanged(void);
+extern void _AUDIO_MUSYX_AiReadLength(void);
+extern void _AUDIO_MUSYX_AiUpdate(BOOL Wait);
+extern BOOL _AUDIO_MUSYX_InitiateAudio (AUDIO_INFO Audio_Info);
+extern void _AUDIO_MUSYX_ProcessAList(void);
+
 
 // Ez0n3 - old Azimer
 /*
@@ -152,7 +164,7 @@ void GetPluginDir( char * Directory )
 
 void GetSnapShotDir( char * Directory ) 
 {
- 
+
 }
 
 BOOL LoadAudioBasicDll(void) {
@@ -309,6 +321,39 @@ BOOL LoadAudioNoneDll(void) {
 
 	AiDllConfig = (void ( *)(HWND))_AUDIO_NONE_DllConfig;
 	AiUpdate = (void ( *)(BOOL))_AUDIO_NONE_AiUpdate;
+	return TRUE;
+}
+
+// freakdave - MusyX Audio plugin
+BOOL LoadAudioMusyXDll(void) {
+	PLUGIN_INFO PluginInfo;
+	 
+	hAudioDll = (HANDLE)100;
+	if (hAudioDll == NULL) {  return FALSE; }
+
+	GetDllInfo = (void *)_AUDIO_MUSYX_GetDllInfo;
+	if (GetDllInfo == NULL) { return FALSE; }
+
+	GetDllInfo(&PluginInfo);
+	if (!ValidPluginVersion(&PluginInfo) || PluginInfo.MemoryBswaped == FALSE) { return FALSE; }
+
+	AiCloseDLL = (void *)_AUDIO_MUSYX_CloseDLL;
+	if (AiCloseDLL == NULL) { return FALSE; }
+	AiDacrateChanged = (void *)(int)_AUDIO_MUSYX_AiDacrateChanged;
+	if (AiDacrateChanged == NULL) { return FALSE; }
+	AiLenChanged = (void *)_AUDIO_MUSYX_AiLenChanged;
+	if (AiLenChanged == NULL) { return FALSE; }
+	AiReadLength = (DWORD ( *)(void))_AUDIO_MUSYX_AiReadLength;
+	if (AiReadLength == NULL) { return FALSE; }
+	InitiateAudio = (BOOL ( *)(AUDIO_INFO))_AUDIO_MUSYX_InitiateAudio;
+	if (InitiateAudio == NULL) { return FALSE; }
+	AiRomClosed = (void ( *)(void))_AUDIO_MUSYX_RomClosed;
+	if (AiRomClosed == NULL) { return FALSE; }
+	ProcessAList = (void ( *)(void))_AUDIO_MUSYX_ProcessAList;	
+	if (ProcessAList == NULL) { return FALSE; }
+
+	AiDllConfig = (void ( *)(HWND))_AUDIO_MUSYX_DllConfig;
+	AiUpdate = (void ( *)(BOOL))_AUDIO_MUSYX_AiUpdate;
 	return TRUE;
 }
 
@@ -538,6 +583,10 @@ void SetupPlugins (HWND hWnd) {
 	else if (g_iAudioPlugin == _AudioPluginJttl)
 	{
 		success = LoadAudioJttLDll();
+	}
+	else if (g_iAudioPlugin == _AudioPluginMusyX)
+	{
+		success = LoadAudioMusyXDll();
 	}
 	/*
 	else if (g_iAudioPlugin == _AudioPluginAzimer)

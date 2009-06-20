@@ -64,4 +64,6 @@ int ConfigAppLoad3(); // load user pref func
 bool PhysRam128(); // determine if the current phys ram is greater than 100MB
 bool FileExists(char *szFilename); // check if file exists
 
+extern bool HideLaunchScreens;
+
 extern bool g_bQuit;

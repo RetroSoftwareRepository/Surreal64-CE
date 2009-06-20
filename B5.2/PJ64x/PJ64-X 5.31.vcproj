@@ -14,7 +14,7 @@
 		<Configuration
 			Name="Release|Xbox"
 			OutputDirectory="$(SolutionDir)Release"
-			IntermediateDirectory="obj/Release"
+			IntermediateDirectory="obj\Release"
 			ConfigurationType="1"
 			CharacterSet="2"
 			WholeProgramOptimization="FALSE">
@@ -38,6 +38,7 @@
 				EnableFunctionLevelLinking="FALSE"
 				EnableEnhancedInstructionSet="1"
 				UsePrecompiledHeader="0"
+				PrecompiledHeaderFile="obj\Release\$(ProjectName).pch"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
 				DebugInformationFormat="3"
@@ -46,7 +47,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xacteng.lib xboxkrnl.lib AudioBasic.lib AudioJttl.lib AudioNone.lib Input.lib RSP.lib Video531.lib"
+				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xacteng.lib xboxkrnl.lib AudioBasic.lib AudioJttl.lib AudioMusyX.lib AudioNone.lib Input.lib RSP.lib Video531.lib"
 				OutputFile="$(OutDir)/Pj64-531.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\Plugins\lib"
@@ -74,12 +75,12 @@
 				DontMountUD="FALSE"
 				NoLibWarn="TRUE"
 				TitleID="0xA64FEA57"
-				TitleName="Surreal 64 - Pj64x"/>
+				TitleName="Surreal 64 XXX CE - Pj64x"/>
 		</Configuration>
 		<Configuration
 			Name="Debug|Xbox"
 			OutputDirectory="$(SolutionDir)Debug"
-			IntermediateDirectory="obj/Debug"
+			IntermediateDirectory="obj\Debug"
 			ConfigurationType="1"
 			CharacterSet="2"
 			WholeProgramOptimization="FALSE">
@@ -103,6 +104,7 @@
 				EnableFunctionLevelLinking="FALSE"
 				EnableEnhancedInstructionSet="1"
 				UsePrecompiledHeader="0"
+				PrecompiledHeaderFile="obj\Debug\$(ProjectName).pch"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
 				DebugInformationFormat="3"
@@ -111,12 +113,14 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xacteng.lib xboxkrnl.lib AudioBasic.lib AudioJttl.lib AudioNone.lib Input.lib RSP.lib Video531.lib"
+				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xacteng.lib xboxkrnl.lib AudioBasic.lib AudioJttl.lib AudioMusyX.lib AudioNone.lib Input.lib RSP.lib Video531.lib"
 				OutputFile="$(OutDir)/Pj64-531.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\Plugins\lib"
 				GenerateDebugInformation="TRUE"
+				AssemblyDebug="1"
 				ProgramDatabaseFile="$(OutDir)/$(ProjectName).pdb"
+				MapLines="TRUE"
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
@@ -139,7 +143,7 @@
 				DontMountUD="FALSE"
 				NoLibWarn="TRUE"
 				TitleID="0xA64FEA57"
-				TitleName="Surreal 64 - Pj64x"/>
+				TitleName="Surreal 64 XXX CE - Pj64x"/>
 		</Configuration>
 	</Configurations>
 	<References>

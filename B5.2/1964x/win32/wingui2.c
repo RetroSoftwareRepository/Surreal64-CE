@@ -350,7 +350,7 @@ void UpdateCIC(void)
 	Init_VI_Counter(game_country_tvsystem);
 }
 
-LPDIRECTSOUND lpds;
+//LPDIRECTSOUND lpds;
 void LoadPlugins()
 {
 	SetDefaultOptions();

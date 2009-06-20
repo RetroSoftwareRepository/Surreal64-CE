@@ -38,7 +38,8 @@ int iAudioPlugin = _AudioPluginJttl; // 2=JttL
 int dwMaxVideoMem=5;
 bool has128ram; // determine if the current phys ram is greater than 100MB: 128MB = true, 64MB = false
 
-
+// Ez0n3 - launch screens enable / disable
+bool HideLaunchScreens=0;
 
 int videoplugin = _VideoPluginRice560; // Ez0n3 - 2=rice560
 char romCRC[32];
@@ -173,6 +174,9 @@ int ConfigAppLoad()
 		BOL(onhd);
 		STR(skinname);
 
+		// Ez0n3 - show launch screens
+		BOL(HideLaunchScreens);
+
 #undef STR
 #undef FLT
 #undef VAR
@@ -215,6 +219,9 @@ int ConfigAppSave()
 	VAR(romcounter);
 	BOL(onhd);
 	STR(skinname);
+
+	// Ez0n3 - show launch screens
+	BOL(HideLaunchScreens);
 
 #undef STR
 #undef FLT

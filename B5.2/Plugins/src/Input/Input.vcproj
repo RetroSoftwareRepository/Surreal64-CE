@@ -69,7 +69,7 @@
 				OmitFramePointers="TRUE"
 				EnableFiberSafeOptimizations="TRUE"
 				OptimizeForProcessor="2"
-				AdditionalIncludeDirectories="$(SolutionDir)\Include"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)\Include&quot;"
 				PreprocessorDefinitions="DEBUG;_XBOX;_LIB"
 				StringPooling="TRUE"
 				RuntimeLibrary="0"

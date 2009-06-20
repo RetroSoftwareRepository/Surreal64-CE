@@ -13,19 +13,29 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Xbox"
-			OutputDirectory="$(SolutionDir)Debug"
-			IntermediateDirectory="obj\Debug"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
+				GlobalOptimizations="FALSE"
+				InlineFunctionExpansion="0"
+				EnableIntrinsicFunctions="TRUE"
+				ImproveFloatingPointConsistency="TRUE"
+				FavorSizeOrSpeed="1"
+				OmitFramePointers="TRUE"
+				EnableFiberSafeOptimizations="TRUE"
 				OptimizeForProcessor="2"
 				AdditionalIncludeDirectories="$(SolutionDir)Include; ..\lib"
 				PreprocessorDefinitions="DEBUG;_XBOX"
-				MinimalRebuild="TRUE"
-				BasicRuntimeChecks="3"
+				StringPooling="TRUE"
+				MinimalRebuild="FALSE"
+				BasicRuntimeChecks="0"
 				RuntimeLibrary="1"
+				BufferSecurityCheck="TRUE"
+				EnableFunctionLevelLinking="TRUE"
 				EnableEnhancedInstructionSet="1"
 				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="0"
@@ -39,13 +49,16 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="xapilibd.lib d3d8d.lib d3dx8d.lib xgraphicsd.lib dsoundd.lib dmusicd.lib xactengd.lib xsndtrkd.lib xvoiced.lib xonlined.lib xboxkrnl.lib xbdm.lib xzlib.lib"
-				OutputFile="$(OutDir)/default.exe"
+				OutputFile="$(OutDir)/$(ProjectName).exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="zlib\"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(OutDir)/$(ProjectName).pdb"
 				SubSystem="2"
+				OptimizeReferences="0"
+				EnableCOMDATFolding="0"
 				OptimizeForWindows98="1"
+				SetChecksum="FALSE"
 				TargetMachine="1"/>
 			<Tool
 				Name="VCPostBuildEventTool"/>
@@ -60,7 +73,10 @@
 				Name="XboxImageTool"
 				StackSize="65536"
 				IncludeDebugInfo="TRUE"
-				NoLibWarn="TRUE"/>
+				NoLibWarn="TRUE"
+				TitleID="0xA64FEA57"
+				TitleName="Surreal64 XXX CE"
+				TitleImage="titleimage.xpr"/>
 		</Configuration>
 		<Configuration
 			Name="Release|Xbox"
@@ -122,7 +138,7 @@
 				Name="XboxImageTool"
 				StackSize="65536"
 				TitleID="0xA64FEA57"
-				TitleName="Surreal64 XXX B5.2 CE"
+				TitleName="Surreal64 XXX CE"
 				TitleImage="titleimage.xpr"/>
 		</Configuration>
 	</Configurations>

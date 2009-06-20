@@ -134,6 +134,22 @@ BOOL LoadAudioPlugin()
 		_AUDIO_LINK_RomClosed		 	= _AUDIO_RomClosed;
 
 	}
+	else if (g_iAudioPlugin == _AudioPluginMusyX)
+	{
+		// freakdave - new MusyX Audio plugin
+		_AUDIO_LINK_AiDacrateChanged 	= _AUDIO_MUSYX_AiDacrateChanged;
+		_AUDIO_LINK_AiLenChanged	 	= _AUDIO_MUSYX_AiLenChanged;
+		_AUDIO_LINK_AiReadLength	 	= _AUDIO_MUSYX_AiReadLength;
+		_AUDIO_LINK_AiUpdate		 	= _AUDIO_MUSYX_AiUpdate;
+		_AUDIO_LINK_CloseDLL		 	= _AUDIO_MUSYX_CloseDLL;
+		_AUDIO_LINK_DllAbout		 	= _AUDIO_MUSYX_DllAbout;
+		_AUDIO_LINK_DllConfig		 	= _AUDIO_MUSYX_DllConfig;
+		_AUDIO_LINK_DllTest			 	= _AUDIO_MUSYX_DllTest;
+		_AUDIO_LINK_GetDllInfo		 	= _AUDIO_MUSYX_GetDllInfo;
+		_AUDIO_LINK_InitiateAudio	 	= _AUDIO_MUSYX_InitiateAudio;
+		_AUDIO_LINK_ProcessAList	 	= _AUDIO_MUSYX_ProcessAList;
+		_AUDIO_LINK_RomClosed		 	= _AUDIO_MUSYX_RomClosed;
+	}
 	/*
 	else if (g_iAudioPlugin == _AudioPluginAzimer)
 	{
