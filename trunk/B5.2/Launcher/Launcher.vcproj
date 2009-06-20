@@ -73,6 +73,7 @@
 				RemotePath="xe:\Surreal64 XXX CE\default.xbe"/>
 			<Tool
 				Name="XboxImageTool"
+				FileName="$(TargetDir)default.xbe"
 				StackSize="65536"
 				IncludeDebugInfo="TRUE"
 				NoLibWarn="TRUE"
@@ -138,6 +139,7 @@
 				RemotePath="xe:\Surreal64 XXX CE\default.xbe"/>
 			<Tool
 				Name="XboxImageTool"
+				FileName="$(TargetDir)default.xbe"
 				StackSize="65536"
 				TitleID="0xA64FEA57"
 				TitleName="Surreal64 XXX CE"
