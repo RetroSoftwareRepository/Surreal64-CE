@@ -3,6 +3,7 @@
 #include <xbfont.h>
 #include "musicmanager.h"
 
+#define VERSION L"Surreal64 XXX CE B5.2"
 extern CMusicManager  music;
 extern int actualrom;
 CPanel m_BgPanel;
@@ -44,7 +45,8 @@ void DrawLogo(bool Menu)
 	
 	// Ez0n3 - update the version: unofficial "community edition"
 	//m_Font.DrawText(320, 35, 0xFFFF7F7f, L"Surreal64 XXX B5", XBFONT_CENTER_X);
-	m_Font.DrawText(320, 35, 0xFFFF7F7f, L"Surreal64 XXX B5.1 CE", XBFONT_CENTER_X);
+	//freakdave - Version is now defined
+	m_Font.DrawText(320, 35, 0xFFFF7F7f, VERSION, XBFONT_CENTER_X);
 
 	m_Font.End();
 
