@@ -17,6 +17,7 @@ extern BOOL IsXboxConnected();
 extern BOOL UpdateIni(int Version);
 
 extern CMusicManager  music;
+extern bool bMusicPlaying;
 XBGAMEPAD gamepad;
 extern int preferedemu;
 XLMenu    *m_pMainMenu;
@@ -242,6 +243,17 @@ void MainMenu(void)
 		DrawLogo(true);
 		dwMenuCommand = getAllGamepadsCommand(&gamepad);
 		XLMenu_Routine(dwMenuCommand);
+
+		//freakdave - check for music playing
+		if(gamepad.wPressedButtons&XINPUT_GAMEPAD_RIGHT_THUMB){
+			bMusicPlaying = !bMusicPlaying;
+			if(!bMusicPlaying){
+				music.Pause();
+			}else{
+				music.Play();
+			}
+		}
+
 		g_pd3dDevice->Present( NULL, NULL, NULL, NULL );
 	}
 	
@@ -529,6 +541,15 @@ void SettingsMenu(void)
 		DrawLogo(true);
 		dwMenuCommand = getAllGamepadsCommand(&gamepad);
 		XLMenu_Routine(dwMenuCommand);
+		//freakdave - check for music playing
+		if(gamepad.wPressedButtons&XINPUT_GAMEPAD_RIGHT_THUMB){
+			bMusicPlaying = !bMusicPlaying;
+			if(!bMusicPlaying){
+				music.Pause();
+			}else{
+				music.Play();
+			}
+		}
 		g_pd3dDevice->Present( NULL, NULL, NULL, NULL );
 	}
 
@@ -822,6 +843,15 @@ void selectvideomode(void)
 		DrawLogo(true);
 		dwMenuCommand = getAllGamepadsCommand(&gamepad);
 		XLMenu_Routine(dwMenuCommand);
+		//freakdave - check for music playing
+		if(gamepad.wPressedButtons&XINPUT_GAMEPAD_RIGHT_THUMB){
+			bMusicPlaying = !bMusicPlaying;
+			if(!bMusicPlaying){
+				music.Pause();
+			}else{
+				music.Play();
+			}
+		}
 		g_pd3dDevice->Present( NULL, NULL, NULL, NULL );
 	}
 	
@@ -877,6 +907,15 @@ void LaunchMenu(void)
 		//display_compatible();  //- not needed for the moment, nothing in the inifile?
 		dwMenuCommand = getAllGamepadsCommand(&gamepad);
 		XLMenu_Routine(dwMenuCommand);
+		//freakdave - check for music playing
+		if(gamepad.wPressedButtons&XINPUT_GAMEPAD_RIGHT_THUMB){
+			bMusicPlaying = !bMusicPlaying;
+			if(!bMusicPlaying){
+				music.Pause();
+			}else{
+				music.Play();
+			}
+		}
 		g_pd3dDevice->Present( NULL, NULL, NULL, NULL );
 	}
 	
@@ -1045,13 +1084,15 @@ void VideoSettingsMenu(void)
 
 	
 	// Ez0n3 - more emulator settings
-	XLMenu_AddItem(m_pSettingsMenu,MITEM_DISABLED,L"More",NULL);
+	// freakdave - actually a launcher setting
+	XLMenu_AddItem(m_pSettingsMenu,MITEM_DISABLED,L"Launcher Settings",NULL);
 	
 	// Ez0n3 - launch screens enable / disable
+	// freakdave - should be yes or no
 	if (HideLaunchScreens)
-		swprintf(currentname,L"Hide Launch Screens : True");
+		swprintf(currentname,L"Hide Launch Screens : Yes");
 	else
-		swprintf(currentname,L"Hide Launch Screens : False");
+		swprintf(currentname,L"Hide Launch Screens : No");
 		
 	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,currentname,ToggleHideLaunchScreens);
 	
@@ -1064,6 +1105,15 @@ void VideoSettingsMenu(void)
 		DrawLogo(true);
 		dwMenuCommand = getAllGamepadsCommand(&gamepad);
 		XLMenu_Routine(dwMenuCommand);
+		//freakdave - check for music playing
+		if(gamepad.wPressedButtons&XINPUT_GAMEPAD_RIGHT_THUMB){
+			bMusicPlaying = !bMusicPlaying;
+			if(!bMusicPlaying){
+				music.Pause();
+			}else{
+				music.Play();
+			}
+		}
 		g_pd3dDevice->Present( NULL, NULL, NULL, NULL );
 	}
 
@@ -1073,6 +1123,7 @@ void VideoSettingsMenu(void)
 }
 
 // Ez0n3 - enable / disable launch screens
+// freakdave - same here, should be yes or no
 void ToggleHideLaunchScreens()
 {
 	currentItem = m_pSettingsMenu->curitem;
@@ -1081,9 +1132,9 @@ void ToggleHideLaunchScreens()
 	XLMenu_CurRoutine = NULL;
 	
 	if (HideLaunchScreens)
-		XLMenu_SetItemText(&m_pSettingsMenu->items[currentItem], L"Hide Launch Screens : True");
+		XLMenu_SetItemText(&m_pSettingsMenu->items[currentItem], L"Hide Launch Screens : Yes");
 	else
-		XLMenu_SetItemText(&m_pSettingsMenu->items[currentItem], L"Hide Launch Screens : False");
+		XLMenu_SetItemText(&m_pSettingsMenu->items[currentItem], L"Hide Launch Screens : No");
 		
 	ConfigAppSave();	
 }
@@ -1268,6 +1319,15 @@ void ControllerSettingsMenu()
 		DrawLogo(true);
 		dwMenuCommand = getAllGamepadsCommand(&gamepad);
 		XLMenu_Routine(dwMenuCommand);
+		//freakdave - check for music playing
+		if(gamepad.wPressedButtons&XINPUT_GAMEPAD_RIGHT_THUMB){
+			bMusicPlaying = !bMusicPlaying;
+			if(!bMusicPlaying){
+				music.Pause();
+			}else{
+				music.Play();
+			}
+		}
 		g_pd3dDevice->Present( NULL, NULL, NULL, NULL );
 	}
 
@@ -1432,6 +1492,15 @@ void ControllerMenu(void)
 		DrawLogo(true);
 		dwMenuCommand = getAllGamepadsCommand(&gamepad);
 		XLMenu_Routine(dwMenuCommand);
+		//freakdave - check for music playing
+		if(gamepad.wPressedButtons&XINPUT_GAMEPAD_RIGHT_THUMB){
+			bMusicPlaying = !bMusicPlaying;
+			if(!bMusicPlaying){
+				music.Pause();
+			}else{
+				music.Play();
+			}
+		}
 		g_pd3dDevice->Present( NULL, NULL, NULL, NULL );
 	}
 

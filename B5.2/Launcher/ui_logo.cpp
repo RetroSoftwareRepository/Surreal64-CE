@@ -66,9 +66,9 @@ void DrawLogo(bool Menu)
 
 	if (Menu){
 	m_Font.Begin();
-
-	m_Font.DrawText(480, 300, 0xFFEEEEEE, L"\400 Action", XBFONT_LEFT);
-	m_Font.DrawText(480, 325, 0xFFEEEEEE, L"\402 Action2", XBFONT_LEFT);
+	//freakdave - yeah, gimme some Action ^^
+	m_Font.DrawText(480, 300, 0xFFEEEEEE, L"\400 Select / Next", XBFONT_LEFT);
+	m_Font.DrawText(480, 325, 0xFFEEEEEE, L"\402 Select / Prev", XBFONT_LEFT);
 	m_Font.DrawText(480, 350, 0xFFEEEEEE, L"\401 Back", XBFONT_LEFT);
 
 	m_Font.End();}
@@ -133,7 +133,7 @@ void DrawLogo(bool Menu)
 			//case  : sprintf( country2, "Beta" ); break;
 			case 74 : sprintf( country2, "Japan" ); break; //0x4A
 			case 65 : sprintf( country2, "USA/Japan" ); break; //0x41
-			case 68 : sprintf( country2, "German" ); break; //0x44
+			case 68 : sprintf( country2, "Germany" ); break; //0x44
 			case 69 : sprintf( country2, "America" ); break; //0x45
 			case 70 : sprintf( country2, "France" ); break; //0x46
 			case 73 : sprintf( country2, "Italy" ); break; //0x49
