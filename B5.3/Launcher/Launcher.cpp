@@ -84,6 +84,9 @@ extern bool has128ram;
 
 extern void LaunchHideScreens(); // launch rom no screens
 
+WIN32_FIND_DATA wfd;
+HANDLE hFind;
+
 
 
 class CXBoxSample :	public CXBApplication
@@ -171,13 +174,29 @@ HRESULT	CXBoxSample::Initialize()
 	sprintf(fontname,"D:\\Skins\\%s\\main.wma",skinname);
 	g_aGameSoundtrack[0][0].strFilename = fontname;
 
+	//Make sure Surreal10.ini does not exist
+	hFind = FindFirstFile("T:\\Surreal10.ini", &wfd);
+	if (hFind == INVALID_HANDLE_VALUE)
+		{
+		OutputDebugString("Could not find Surreal10.ini");
+		}
+	else
+		if (DeleteFile("T:\\Surreal10.ini") == NULL)
+		{
+		OutputDebugString("Could not delete Surreal10.ini");
+		}
+		FindClose(hFind);
+
+
 	// load the ini file
+	//FIXME: needs testing
 	if (!onhd)
 	{
-	if (!g_iniFile.Load("T:\\Surreal10.ini"))
+	if (!g_iniFile.Load("T:\\Surreal.ini"))
 		g_iniFile.Load("D:\\Surreal.ini");
 	}
 	else g_iniFile.Load("D:\\Surreal.ini");
+
 
 	InitLogo();
 
