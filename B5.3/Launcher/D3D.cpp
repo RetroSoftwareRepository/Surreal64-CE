@@ -62,12 +62,72 @@ bool D3D::Create()
 	if (FAILED(g_hResult))
 		return false;
 
+
+	//TESTME! HDTV Modes (Launcher only!), Skins should be modified accordingly
+	//Parts of code by XPORT and nes6502
+	DWORD videoFlags = XGetVideoFlags();
+
+	if(XGetVideoStandard() == XC_VIDEO_STANDARD_PAL_I)
+    {
+        // Set pal60 if available.
+        if(videoFlags & XC_VIDEO_FLAGS_PAL_60Hz) d3dpp.FullScreen_RefreshRateInHz = 60;
+        else d3dpp.FullScreen_RefreshRateInHz = 50;
+    }
+    else d3dpp.FullScreen_RefreshRateInHz = 60;
+
+
+    if(XGetAVPack() == XC_AV_PACK_HDTV)
+        {
+                if(videoFlags & XC_VIDEO_FLAGS_HDTV_1080i)
+                {
+                        d3dpp.Flags            = D3DPRESENTFLAG_WIDESCREEN | D3DPRESENTFLAG_INTERLACED;
+                        d3dpp.BackBufferWidth  = 1920;
+                        d3dpp.BackBufferHeight = 1080;
+                }
+                else if(videoFlags & XC_VIDEO_FLAGS_HDTV_720p)
+                {
+                        d3dpp.Flags            = D3DPRESENTFLAG_PROGRESSIVE | D3DPRESENTFLAG_WIDESCREEN;
+                        d3dpp.BackBufferFormat = D3DFMT_A8R8G8B8;
+                        d3dpp.BackBufferWidth  = 1280;
+                        d3dpp.BackBufferHeight = 720;
+                }
+				 else if(videoFlags & XC_VIDEO_FLAGS_HDTV_480p)
+                {
+                        d3dpp.Flags            = D3DPRESENTFLAG_PROGRESSIVE;
+                        d3dpp.BackBufferFormat = D3DFMT_A8R8G8B8;
+                        d3dpp.BackBufferWidth  = 640;
+                        d3dpp.BackBufferHeight = 480;
+                }
+		}
+
 	m_pd3dDevice = g_pd3dDevice;
 
     // use an orthogonal matrix for the projection matrix
     D3DXMATRIX mat;
+	
+	if(XGetAVPack() == XC_AV_PACK_HDTV)
+	{
+          if(videoFlags & XC_VIDEO_FLAGS_HDTV_1080i)
+		  {
+				D3DXMatrixOrthoOffCenterLH(&mat, 0, 1920, 1080, 0, 0.0f, 1.0f);
+		  }
+		  else
+		  if(videoFlags & XC_VIDEO_FLAGS_HDTV_720p)
+		  {
+				D3DXMatrixOrthoOffCenterLH(&mat, 0, 1280, 720, 0, 0.0f, 1.0f);
+		  }
+		  else
+		  if(videoFlags & XC_VIDEO_FLAGS_HDTV_480p)
+		  {
+				D3DXMatrixOrthoOffCenterLH(&mat, 0, 640, 480, 0, 0.0f, 1.0f);
+		  }
+	}
+	else
+	{
     D3DXMatrixOrthoOffCenterLH(&mat, 0, 640, 480, 0, 0.0f, 1.0f);
-    m_pd3dDevice->SetTransform(D3DTS_PROJECTION, &mat);
+	}
+
+	m_pd3dDevice->SetTransform(D3DTS_PROJECTION, &mat);
 
 	// use an identity matrix for the world and view matrices
 	D3DXMatrixIdentity(&mat);
