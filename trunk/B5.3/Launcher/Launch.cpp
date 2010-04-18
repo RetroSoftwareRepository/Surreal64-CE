@@ -21,6 +21,7 @@ extern void CreateProgress();
 extern void RenderProgress(int progress);
 extern int ConfigAppSaveTemp();
 extern int videoplugin;
+extern bool onhd;
 
 // Ez0n3 - use iAudioPlugin instead to determine which audio plugin is used
 extern int iAudioPlugin;
@@ -73,7 +74,16 @@ DWORD WINAPI PrepareRomThread(Rom *rom)
 	byte *pBuffer = static_cast<byte *>(VirtualAlloc(NULL, BUFFER_SIZE, MEM_COMMIT, PAGE_READWRITE));
 	
 	// save the ini file
-	g_iniFile.Save("T:\\Surreal10.ini");
+	//Only save to T: if we're on CD/DVD
+	//We should only have one Surreal.ini
+	//g_iniFile.Save("T:\\Surreal10.ini");
+	//FIXME: needs testing
+
+	if (!onhd)
+	{
+		g_iniFile.Save("T:\\Surreal.ini");
+	}
+	else g_iniFile.Save("D:\\Surreal.ini");
 
 	// open the destination rom
 	ofstream destRom;
