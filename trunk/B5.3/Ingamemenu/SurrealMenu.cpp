@@ -112,6 +112,7 @@ extern bool showdebug;
 
 enum Pak
 {
+NoPak,
 MemPak,
 RumblePak,
 };
@@ -665,11 +666,21 @@ void ControllerSettingsMenu()
 	swprintf(currentname,L"Analog Sensitivity : %d %%",Sensitivity);
 	XLMenu_AddItem2(m_pSettingsMenu,MITEM_ROUTINE,currentname,incSensitivity,decSensitivity);
 
-	//Mempak/RumblePak
+	//Mempak/RumblePak/NoPak
+	if (DefaultPak == NoPak)
+	{
+	swprintf(currentname,L"Default Pak : None");
+	}
+	
 	if (DefaultPak == MemPak)
+	{
 	swprintf(currentname,L"Default Pak : MemPak");
-	else 
+	}
+
+	if (DefaultPak == RumblePak)
+	{
 	swprintf(currentname,L"Default Pak : RumblePak");
+	}
 	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,currentname,TogglePak);
 
 
@@ -719,15 +730,24 @@ void TogglePak()
 WCHAR currentname[120];
 currentItem = m_pSettingsMenu->curitem;
 DefaultPak++;
-if (DefaultPak > 1) DefaultPak = 0;
+if (DefaultPak > 2) DefaultPak = 0;
 
 XLMenu_CurRoutine = NULL;
-//Mempak/RumblePak
-if (DefaultPak == MemPak)
-	swprintf(currentname,L"Default Pak : MemPak");
-else 
-	swprintf(currentname,L"Default Pak : RumblePak");
+//Mempak/RumblePak/NoPak
+if (DefaultPak == NoPak)
+{
+	swprintf(currentname,L"Default Pak : None");
+}
 
+if (DefaultPak == MemPak)
+{
+	swprintf(currentname,L"Default Pak : MemPak");
+}
+
+if (DefaultPak == RumblePak)
+{
+	swprintf(currentname,L"Default Pak : RumblePak");
+}
 XLMenu_SetItemText(&m_pSettingsMenu->items[currentItem], currentname);
 ConfigAppSave2();
 

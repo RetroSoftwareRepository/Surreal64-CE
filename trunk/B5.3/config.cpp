@@ -76,11 +76,12 @@ int ControllerReset[18]  =
 
 enum Pak
 {
+NoPak,
 MemPak,
 RumblePak,
 };
 
-int DefaultPak = RumblePak;
+int DefaultPak = MemPak;
 
 //freakdave - now all controllers are enabled by default, users don't seem to know how to change it in Surreal's Menu
 bool EnableController1 = true;
@@ -107,7 +108,7 @@ bUseLLERSP=false; // leave this in case it's set in ini
 //int dwFreeMem=9;
 dwMaxVideoMem=5;
 
-DefaultPak = RumblePak;
+DefaultPak = MemPak;
 EnableController1 = true;
 EnableController2 = true;
 EnableController3 = true;
