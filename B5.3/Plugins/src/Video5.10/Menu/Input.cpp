@@ -134,19 +134,19 @@ void Input::GetInput()
             // put xbox device input for the gamepad into our custom format
             float fX1 = (m_gamepads[i].sThumbLX + 0.5f) / 32767.5f;
             m_gamepads[i].fX1 = (fX1 >= 0.0f ? 1.0f : -1.0f) *
-                               max(0.0f, (fabsf(fX1) - XBINPUT_DEADZONE) / (1.0f - XBINPUT_DEADZONE));
+                               max(0.0f, (fabsf(fX1)) / (1.0f));
 
             float fY1 = (m_gamepads[i].sThumbLY + 0.5f) / 32767.5f;
             m_gamepads[i].fY1 = (fY1 >= 0.0f ? 1.0f : -1.0f) *
-                               max(0.0f, (fabsf(fY1) - XBINPUT_DEADZONE) / (1.0f - XBINPUT_DEADZONE));
+                               max(0.0f, (fabsf(fY1)) / (1.0f));
 
             float fX2 = (m_gamepads[i].sThumbRX + 0.5f) / 32767.5f;
             m_gamepads[i].fX2 = (fX2 >= 0.0f ? 1.0f : -1.0f) *
-                               max(0.0f, (fabsf(fX2) - XBINPUT_DEADZONE) / (1.0f - XBINPUT_DEADZONE));
+                               max(0.0f, (fabsf(fX2)) / (1.0f));
 
             float fY2 = (m_gamepads[i].sThumbRY + 0.5f) / 32767.5f;
             m_gamepads[i].fY2 = (fY2 >= 0.0f ? 1.0f : -1.0f) *
-                               max(0.0f, (fabsf(fY2) - XBINPUT_DEADZONE) / (1.0f - XBINPUT_DEADZONE));
+                               max(0.0f, (fabsf(fY2)) / (1.0f));
 
             // get the boolean buttons that have been pressed since the last
             // call. each button is represented by one bit.

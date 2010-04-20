@@ -184,19 +184,19 @@ VOID XBInput_GetInput( XBGAMEPAD* pGamepads )
             // Put Xbox device input for the gamepad into our custom format
             FLOAT fX1 = (pGamepads[i].sThumbLX+0.5f)/32767.5f;
             pGamepads[i].fX1 = ( fX1 >= 0.0f ? 1.0f : -1.0f ) *
-                               max( 0.0f, (fabsf(fX1)-XBINPUT_DEADZONE)/(1.0f-XBINPUT_DEADZONE) );
+                               max( 0.0f, (fabsf(fX1))/(1.0f) );
 
             FLOAT fY1 = (pGamepads[i].sThumbLY+0.5f)/32767.5f;
             pGamepads[i].fY1 = ( fY1 >= 0.0f ? 1.0f : -1.0f ) *
-                               max( 0.0f, (fabsf(fY1)-XBINPUT_DEADZONE)/(1.0f-XBINPUT_DEADZONE) );
+                               max( 0.0f, (fabsf(fY1))/(1.0f) );
 
             FLOAT fX2 = (pGamepads[i].sThumbRX+0.5f)/32767.5f;
             pGamepads[i].fX2 = ( fX2 >= 0.0f ? 1.0f : -1.0f ) *
-                               max( 0.0f, (fabsf(fX2)-XBINPUT_DEADZONE)/(1.0f-XBINPUT_DEADZONE) );
+                               max( 0.0f, (fabsf(fX2))/(1.0f) );
 
             FLOAT fY2 = (pGamepads[i].sThumbRY+0.5f)/32767.5f;
             pGamepads[i].fY2 = ( fY2 >= 0.0f ? 1.0f : -1.0f ) *
-                               max( 0.0f, (fabsf(fY2)-XBINPUT_DEADZONE)/(1.0f-XBINPUT_DEADZONE) );
+                               max( 0.0f, (fabsf(fY2))/(1.0f) );
 
             // Get the boolean buttons that have been pressed since the last
             // call. Each button is represented by one bit.
