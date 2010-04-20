@@ -314,7 +314,7 @@ DWORD Config::GetN64ButtonValue(DWORD controller, byte n64Button)
 			// slowly increment the axis when the button is down
 			if (GetXboxButtonValue(controller, xboxButton))
 			{
-				m_cur64ThumbVal[controller][n64Button] += 16;
+				m_cur64ThumbVal[controller][n64Button] += 1;
 
 				if (m_cur64ThumbVal[controller][n64Button] > 115)
 					m_cur64ThumbVal[controller][n64Button] = 115;

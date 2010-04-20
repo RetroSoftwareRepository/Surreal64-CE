@@ -715,7 +715,7 @@ void ToggleSensitivity(bool inc)
     Sensitivity -= 5;
 	if(Sensitivity < -100) Sensitivity = 100;
 	}
-	XBOX_CONTROLLER_DEAD_ZONE = float(8600) - (float(8600) * (float(Sensitivity) / 100));
+	XBOX_CONTROLLER_DEAD_ZONE = float(6500) * ((float(Sensitivity) - 25) / 100);
 	
 	XLMenu_CurRoutine = NULL;
 	
