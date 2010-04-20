@@ -68,16 +68,30 @@ void _INPUT_GetKeys(int Control, BUTTONS * Keys)
 //		char msg[100];
 		dwLastChange = GetTickCount();
 
-		if (gControls[Control].Plugin == PLUGIN_RUMBLE_PAK)
+		//freakdave- Change or Remove Paks
+
+		//Switch to MemPak if no Pak is detected
+		if (gControls[Control].Plugin == PLUGIN_NONE)
 		{
 			gControls[Control].Plugin  = PLUGIN_MEMPAK;
 //			sprintf(msg, "Controller %i switched to Mempak", Control+1);
 		}
-		else
+
+		//Switch to RumblePak if MemPak is already inserted
+		if (gControls[Control].Plugin == PLUGIN_MEMPAK)
 		{
 			gControls[Control].Plugin  = PLUGIN_RUMBLE_PAK;
 //			sprintf(msg, "Controller %i switched to Rumblepak", Control+1);
 		}
+
+		 //Remove Pak
+		if (gControls[Control].Plugin == PLUGIN_RUMBLE_PAK)
+		{
+			gControls[Control].Plugin  = PLUGIN_NONE;
+//			sprintf(msg, "Controller %i removed Pak", Control+1);
+		}
+		
+		
 
 	}
 }
@@ -96,19 +110,19 @@ void _INPUT_InitiateControllers(HWND hMainWindow, CONTROL Controls[4])
 	// what controllers are plugged in
 	Controls[0].Present = EnableController1;
 	Controls[0].RawData = FALSE;
-	Controls[0].Plugin = DefaultPak + 2;
+	Controls[0].Plugin = DefaultPak + 1;
 
 	Controls[1].Present = EnableController2;
 	Controls[1].RawData = FALSE;
-	Controls[1].Plugin = DefaultPak + 2;
+	Controls[1].Plugin = DefaultPak + 1;
 
 	Controls[2].Present = EnableController3;
 	Controls[2].RawData = FALSE;
-	Controls[2].Plugin = DefaultPak + 2;
+	Controls[2].Plugin = DefaultPak + 1;
 
 	Controls[3].Present = EnableController4;
 	Controls[3].RawData = FALSE;
-	Controls[3].Plugin = DefaultPak + 2;
+	Controls[3].Plugin = DefaultPak + 1;
 
 	gControls = Controls;
 }
@@ -160,10 +174,10 @@ BOOL _INPUT_IsIngameMenuWaiting()
 //This function works 100%
 BOOL _INPUT_UpdatePaks()
 {
-	gControls[0].Plugin  = DefaultPak + 2;
-	gControls[1].Plugin  = DefaultPak + 2;
-	gControls[2].Plugin  = DefaultPak + 2;
-	gControls[3].Plugin  = DefaultPak + 2;
+	gControls[0].Plugin  = DefaultPak + 1;
+	gControls[1].Plugin  = DefaultPak + 1;
+	gControls[2].Plugin  = DefaultPak + 1;
+	gControls[3].Plugin  = DefaultPak + 1;
 
 	return TRUE;
 }

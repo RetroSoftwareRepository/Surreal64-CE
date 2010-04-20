@@ -114,8 +114,8 @@ HRESULT Controller_Initialise()
 	g_bControllerPresent[2] = EnableController3;
 	g_bControllerPresent[3] = EnableController4;
 
-	if(DefaultPak == 0){
-	g_bMemPackPresent[0] = TRUE;//0 = MemPak, 1 = RumblePak : Default = 1
+	if(DefaultPak == 1){
+	g_bMemPackPresent[0] = TRUE;//0 = NoPak, 1 = MemPak, 2 = RumblePak : Default = 2
 	g_bMemPackPresent[1] = TRUE;
 	g_bMemPackPresent[2] = TRUE;
 	g_bMemPackPresent[3] = TRUE;
