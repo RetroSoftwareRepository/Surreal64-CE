@@ -826,12 +826,20 @@ void ConstructCredits()
 FILE *fp;
 if (onhd) fp=fopen("D:\\Credits.txt","w+");
 else fp=fopen("T:\\Credits.txt","w+");
+fprintf(fp,"Surreal64 XXX CE 'Community Edition' Modification\n");
+fprintf(fp,"Authors:\n");
+fprintf(fp,"Ez0n3, freakdave\n");
+fprintf(fp,"Testing / Ideas / Support\n");
+fprintf(fp,"Bomb Bloke, greatant, edwardar, Darknior\n");
+fprintf(fp,"Visit us at:\n");
+fprintf(fp,"http://sourceforge.net/projects/surreal64xxxce\n");
+fprintf(fp,"\n\n");
 fprintf(fp,"Surreal64 XXX Modification\n");
 fprintf(fp,"\n");
 fprintf(fp,"Authors:\n");
 fprintf(fp,"Team XXX\n");
 fprintf(fp,"GogoAckman, freakdave, Artik\n");
-fprintf(fp,"http://www.fbaxxx.fr.st\n");
+fprintf(fp,"http://www.logic-sunrise.com/forums\n");
 fprintf(fp,"http://freakdave.xbox-scene.com\n");
 fprintf(fp,"\n");
 fprintf(fp,"Skin by:\n");
@@ -942,11 +950,6 @@ fprintf(fp,"Author\n");
 fprintf(fp,"Hacktarux\n");
 fprintf(fp,"Copyright (C) 2001 Jabo and Zilmar\n");
 fprintf(fp,"\n\n");
-fprintf(fp,"Surreal64 XXX CE 'Community Edition' Modifications\n");
-fprintf(fp,"Authors\n");
-fprintf(fp,"Ez0n3\n");
-fprintf(fp,"Testing / Ideas / Support\n");
-fprintf(fp,"Bomb Bloke, greatant, edwardar, Darknior\n");
 fclose(fp);
 }
 
