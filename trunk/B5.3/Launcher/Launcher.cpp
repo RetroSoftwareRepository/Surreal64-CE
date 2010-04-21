@@ -545,7 +545,14 @@ HRESULT	CXBoxSample::FrameMove()
 			}
 		if(m_DefaultGamepad.bPressedAnalogButtons[XINPUT_GAMEPAD_A])
 		{
-           LaunchMenu();
+			if(!HideLaunchScreens)
+			{
+				LaunchMenu();
+			}
+			else
+			{
+				LaunchHideScreens();
+			}
 		}
 	
 		if(m_DefaultGamepad.bPressedAnalogButtons[XINPUT_GAMEPAD_X])
