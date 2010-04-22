@@ -74,6 +74,7 @@
 				StackSize="131072"
 				DontMountUD="FALSE"
 				NoLibWarn="TRUE"
+				UDCluster="3"
 				TitleID="0xA64FEA57"
 				TitleName="Surreal 64 XXX CE- Pj64x"/>
 		</Configuration>

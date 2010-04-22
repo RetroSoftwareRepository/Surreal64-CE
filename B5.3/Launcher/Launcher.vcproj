@@ -141,6 +141,7 @@
 				Name="XboxImageTool"
 				FileName="$(TargetDir)default.xbe"
 				StackSize="65536"
+				UDCluster="3"
 				TitleID="0xA64FEA57"
 				TitleName="Surreal64 XXX CE"
 				TitleImage="titleimage.xpr"/>

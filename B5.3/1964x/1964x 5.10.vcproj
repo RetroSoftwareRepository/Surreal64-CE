@@ -72,6 +72,7 @@
 				Name="XboxImageTool"
 				FileName="$(TargetDir)1964-510.xbe"
 				StackSize="65536"
+				UDCluster="3"
 				TitleID="0xA64FEA57"
 				TitleName="Surreal 64 XXX CE - 1964x"/>
 		</Configuration>

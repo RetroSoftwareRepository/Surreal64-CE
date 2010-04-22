@@ -71,6 +71,7 @@
 				StackSize="65536"
 				LimitAvailableMemoryTo64MB="TRUE"
 				DontMountUD="FALSE"
+				UDCluster="3"
 				TitleID="0xA64FEA57"
 				TitleName="Surreal 64 - UltraXLE"/>
 		</Configuration>
