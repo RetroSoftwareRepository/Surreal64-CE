@@ -44,6 +44,7 @@
 #include <xgraphics.h>
 #include <stdio.h>
 #include "XBFont.h"
+#include "XBApp.h"
 
 extern CXBFont		m_MSFont;
 
@@ -815,7 +816,7 @@ LPDIRECT3DTEXTURE8 CXBFont::CreateTexture( const WCHAR* strText,
     DrawText( 0, 0, dwTextColor, strText, 0L );
 
     // Restore the render target
-    D3DVIEWPORT8 vpBackBuffer = { 0, 0, 640, 480, 0.0f, 1.0f };
+    D3DVIEWPORT8 vpBackBuffer = { 0, 0, g_Width, g_Height, 0.0f, 1.0f };
     D3DDevice::SetRenderTarget( pBackBuffer, pZBuffer );
     D3DDevice::SetViewport( &vpBackBuffer );
     SAFE_RELEASE( pBackBuffer );

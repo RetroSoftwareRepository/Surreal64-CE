@@ -2,13 +2,14 @@
 #include <xtl.h>
 #include "../config.h"
 extern void MainMenu();
+#include "XBApp.h"
 
 extern IDirect3DDevice8	*g_pDevice;
 
 void SetupD3D()
 {
 	D3DXMATRIX mat;
-	D3DXMatrixOrthoOffCenterLH(&mat, 0, 640, 480, 0, 0.0f, 1.0f);
+	D3DXMatrixOrthoOffCenterLH(&mat, 0, g_Width, g_Height, 0, 0.0f, 1.0f);
 	g_pDevice->SetTransform(D3DTS_PROJECTION, &mat);
 
 	// use an identity matrix for the world and view matrices

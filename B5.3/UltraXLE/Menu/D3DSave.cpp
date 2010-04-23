@@ -6,7 +6,7 @@
 D3DSave g_d3dSave;
 
 D3DSave::D3DSave(void)
-{	
+{
 }
 
 D3DSave::~D3DSave(void)
