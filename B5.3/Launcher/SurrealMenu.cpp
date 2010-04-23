@@ -142,7 +142,7 @@ string GetAudioPluginName(int iAudioPluginNum)
 		case _AudioPluginBasic : szAudioPlugin = "Basic"; break;
 		case _AudioPluginJttl : szAudioPlugin = "JttL"; break;
 		//case _AudioPluginAzimer : szAudioPlugin = "Azimer"; break;
-		case _AudioPluginMissing : 
+		//case _AudioPluginMissing : 
 		default : szAudioPlugin = "JttL"; break;//freakdave - set JttL plugin as default
 	}	
 
@@ -569,12 +569,12 @@ void ToggleAudioPlugin(bool inc)
 	if (inc)
 	{
 		iAudioPlugin++;
-		if (iAudioPlugin > (_AudioPluginMissing - 1)) iAudioPlugin=0;
+		if (iAudioPlugin > (_AudioPluginMissing - 2)) iAudioPlugin=0;
 	}
 	else
 	{
 		iAudioPlugin--;
-		if (iAudioPlugin < 0) iAudioPlugin=(_AudioPluginMissing - 1);
+		if (iAudioPlugin < 0) iAudioPlugin=(_AudioPluginMissing - 2);
 	}
 
 	XLMenu_CurRoutine = NULL;
