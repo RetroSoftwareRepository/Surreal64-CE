@@ -156,7 +156,7 @@ bool D3D::Create()
 void D3D::BeginRender()
 {
 
-	/*
+	
 	D3DVIEWPORT8 viewport;
 
 		viewport.X = 0;
@@ -165,13 +165,13 @@ void D3D::BeginRender()
 		viewport.Height = g_Height;
 		viewport.MinZ = 0.0f;
 		viewport.MaxZ = 1.0f;
-*/
+
 
     m_pd3dDevice->Clear(0, NULL, D3DCLEAR_TARGET, 
                       D3DCOLOR_XRGB(0,0,0), 
 						1.0f, 0);
 
-//	m_pd3dDevice->SetViewport(&viewport);
+	m_pd3dDevice->SetViewport(&viewport);
 
     m_pd3dDevice->BeginScene();
 	m_pd3dDevice->SetFlickerFilter(FlickerFilter);
