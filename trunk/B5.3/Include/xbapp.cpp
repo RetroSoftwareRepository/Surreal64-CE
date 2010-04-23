@@ -20,6 +20,8 @@
 //-----------------------------------------------------------------------------
 CXBApplication*    g_pXBApp     = NULL;
 LPDIRECT3DDEVICE8  g_pd3dDevice = NULL;
+DWORD g_Width;
+DWORD g_Height;
 
 // Deadzone for the gamepad inputs
 const SHORT XINPUT_DEADZONE = (SHORT)( 0.24f * FLOAT(0x7FFF) );
@@ -61,6 +63,85 @@ CXBApplication::CXBApplication()
     m_d3dpp.AutoDepthStencilFormat = D3DFMT_D24S8;
     m_d3dpp.SwapEffect             = D3DSWAPEFFECT_DISCARD;
 	//m_d3dpp.Flags                  |= D3DPRESENTFLAG_WIDESCREEN; 
+
+
+	//TESTME! HDTV Modes (Launcher only!), Skins should be modified accordingly
+	//Parts of code by XPORT and nes6502
+	DWORD videoFlags = XGetVideoFlags();
+
+	if(XGetVideoStandard() == XC_VIDEO_STANDARD_PAL_I)
+    {
+        // Set pal60 if available.
+        if(videoFlags & XC_VIDEO_FLAGS_PAL_60Hz) m_d3dpp.FullScreen_RefreshRateInHz = 60;
+        else m_d3dpp.FullScreen_RefreshRateInHz = 50;
+    }
+    else m_d3dpp.FullScreen_RefreshRateInHz = 60;
+
+
+    if(XGetAVPack() == XC_AV_PACK_HDTV)
+        {
+                if(videoFlags & XC_VIDEO_FLAGS_HDTV_1080i)
+                {
+                        m_d3dpp.Flags            = D3DPRESENTFLAG_WIDESCREEN | D3DPRESENTFLAG_INTERLACED;
+                        m_d3dpp.BackBufferWidth  = 1920;
+                        m_d3dpp.BackBufferHeight = 1080;
+                }
+                else if(videoFlags & XC_VIDEO_FLAGS_HDTV_720p)
+                {
+                        m_d3dpp.Flags            = D3DPRESENTFLAG_PROGRESSIVE | D3DPRESENTFLAG_WIDESCREEN;
+                        m_d3dpp.BackBufferFormat = D3DFMT_A8R8G8B8;
+                        m_d3dpp.BackBufferWidth  = 1280;
+                        m_d3dpp.BackBufferHeight = 720;
+                }
+				 else if(videoFlags & XC_VIDEO_FLAGS_HDTV_480p)
+                {
+                        m_d3dpp.Flags            = D3DPRESENTFLAG_PROGRESSIVE;
+                        m_d3dpp.BackBufferFormat = D3DFMT_A8R8G8B8;
+                        m_d3dpp.BackBufferWidth  = 640;
+                        m_d3dpp.BackBufferHeight = 480;
+                }
+		}
+
+
+
+	// use an orthogonal matrix for the projection matrix
+    D3DXMATRIX mat;
+
+	if(XGetAVPack() == XC_AV_PACK_HDTV)
+	{
+          if(videoFlags & XC_VIDEO_FLAGS_HDTV_1080i)
+		  {
+			    g_Width = 1920;
+				g_Height = 1080;
+				D3DXMatrixOrthoOffCenterLH(&mat, 0, g_Width, g_Height, 0, 0.0f, 1.0f);
+		  }
+		  else
+		  if(videoFlags & XC_VIDEO_FLAGS_HDTV_720p)
+		  {
+				g_Width = 1280;
+				g_Height = 720;
+				D3DXMatrixOrthoOffCenterLH(&mat, 0, g_Width, g_Height, 0, 0.0f, 1.0f);
+		  }
+		  else
+		  if(videoFlags & XC_VIDEO_FLAGS_HDTV_480p)
+		  {
+				g_Width = 640;
+				g_Height = 480;
+				D3DXMatrixOrthoOffCenterLH(&mat, 0, g_Width, g_Height, 0, 0.0f, 1.0f);
+		  }
+	}
+	else
+	{
+    //if HDTV is not supported
+				g_Width = 640;
+				g_Height = 480;
+				D3DXMatrixOrthoOffCenterLH(&mat, 0, g_Width, g_Height, 0, 0.0f, 1.0f);
+	}
+
+
+
+
+
 
     // Specify number and type of input devices this app will be using. By
     // default, you can use 0 and NULL, which triggers XInputDevices() to
@@ -343,12 +424,20 @@ HRESULT CXBApplication::RenderGradientBackground( DWORD dwTopColor,
     D3DDevice::SetVertexShader( D3DFVF_XYZRHW|D3DFVF_DIFFUSE );
 
     // Draw a background-filling quad
+
+	/*
     D3DDISPLAYMODE mode;
     D3DDevice::GetDisplayMode( &mode );
     FLOAT fX1 = -0.5f;
     FLOAT fY1 = -0.5f;
     FLOAT fX2 = (FLOAT)mode.Width - 0.5f;
     FLOAT fY2 = (FLOAT)mode.Height - 0.5f;
+*/
+
+	FLOAT fX1 = -0.5f;
+	FLOAT fY1 = -0.5f;
+	FLOAT fX2 = (FLOAT)g_Width - 0.5f;
+	FLOAT fY2 = (FLOAT)g_Height - 0.5f;
 
     D3DDevice::Begin( D3DPT_QUADLIST );
     D3DDevice::SetVertexDataColor( D3DVSDE_DIFFUSE, dwTopColor );

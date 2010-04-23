@@ -38,6 +38,7 @@ D3D::~D3D(void)
 
 bool D3D::Create()
 {
+	
 	// create the direct 3d object
 	m_pD3D = Direct3DCreate8(D3D_SDK_VERSION);
 
@@ -57,11 +58,11 @@ bool D3D::Create()
 
 /*	g_hResult = m_pD3D->CreateDevice(0, D3DDEVTYPE_HAL, NULL, 
 									 D3DCREATE_HARDWARE_VERTEXPROCESSING,
-									 &d3dpp, &m_pd3dDevice);*/
+									 &d3dpp, &m_pd3dDevice);
 
 	if (FAILED(g_hResult))
 		return false;
-
+*/
 
 	//TESTME! HDTV Modes (Launcher only!), Skins should be modified accordingly
 	//Parts of code by XPORT and nes6502
@@ -100,32 +101,43 @@ bool D3D::Create()
                 }
 		}
 
-	m_pd3dDevice = g_pd3dDevice;
 
-    // use an orthogonal matrix for the projection matrix
+
+	// use an orthogonal matrix for the projection matrix
     D3DXMATRIX mat;
-	
+
 	if(XGetAVPack() == XC_AV_PACK_HDTV)
 	{
           if(videoFlags & XC_VIDEO_FLAGS_HDTV_1080i)
 		  {
-				D3DXMatrixOrthoOffCenterLH(&mat, 0, 1920, 1080, 0, 0.0f, 1.0f);
+			    g_Width = 1920;
+				g_Height = 1080;
+				D3DXMatrixOrthoOffCenterLH(&mat, 0, g_Width, g_Height, 0, 0.0f, 1.0f);
 		  }
 		  else
 		  if(videoFlags & XC_VIDEO_FLAGS_HDTV_720p)
 		  {
-				D3DXMatrixOrthoOffCenterLH(&mat, 0, 1280, 720, 0, 0.0f, 1.0f);
+				g_Width = 1280;
+				g_Height = 720;
+				D3DXMatrixOrthoOffCenterLH(&mat, 0, g_Width, g_Height, 0, 0.0f, 1.0f);
 		  }
 		  else
 		  if(videoFlags & XC_VIDEO_FLAGS_HDTV_480p)
 		  {
-				D3DXMatrixOrthoOffCenterLH(&mat, 0, 640, 480, 0, 0.0f, 1.0f);
+				g_Width = 640;
+				g_Height = 480;
+				D3DXMatrixOrthoOffCenterLH(&mat, 0, g_Width, g_Height, 0, 0.0f, 1.0f);
 		  }
 	}
 	else
 	{
-    D3DXMatrixOrthoOffCenterLH(&mat, 0, 640, 480, 0, 0.0f, 1.0f);
+    //if HDTV is not supported
+				g_Width = 640;
+				g_Height = 480;
+				D3DXMatrixOrthoOffCenterLH(&mat, 0, g_Width, g_Height, 0, 0.0f, 1.0f);
 	}
+	
+	m_pd3dDevice = g_pd3dDevice;
 
 	m_pd3dDevice->SetTransform(D3DTS_PROJECTION, &mat);
 
@@ -143,9 +155,23 @@ bool D3D::Create()
 
 void D3D::BeginRender()
 {
+
+	/*
+	D3DVIEWPORT8 viewport;
+
+		viewport.X = 0;
+		viewport.Y = 0;
+		viewport.Width = g_Width;
+		viewport.Height = g_Height;
+		viewport.MinZ = 0.0f;
+		viewport.MaxZ = 1.0f;
+*/
+
     m_pd3dDevice->Clear(0, NULL, D3DCLEAR_TARGET, 
                       D3DCOLOR_XRGB(0,0,0), 
 						1.0f, 0);
+
+//	m_pd3dDevice->SetViewport(&viewport);
 
     m_pd3dDevice->BeginScene();
 	m_pd3dDevice->SetFlickerFilter(FlickerFilter);
