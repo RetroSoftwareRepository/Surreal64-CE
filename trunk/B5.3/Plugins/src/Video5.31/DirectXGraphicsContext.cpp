@@ -397,6 +397,28 @@ HRESULT CDirectXGraphicsContext::InitializeD3DEnvironment()
 	m_d3dpp.FullScreen_RefreshRateInHz = D3DPRESENT_RATE_DEFAULT;
 	//m_d3dpp.Flags = D3DPRESENTFLAG_EMULATE_REFRESH_RATE;
 
+
+	DWORD videoFlags = XGetVideoFlags();
+	if(XGetVideoStandard() == XC_VIDEO_STANDARD_PAL_I)
+	{
+		if(videoFlags & XC_VIDEO_FLAGS_PAL_60Hz)		// PAL 60 user
+			m_d3dpp.FullScreen_RefreshRateInHz = 60;
+		else
+			m_d3dpp.FullScreen_RefreshRateInHz = 50;
+	}
+
+	if( videoFlags & XC_VIDEO_FLAGS_HDTV_480p)
+	{
+		m_d3dpp.Flags = D3DPRESENTFLAG_PROGRESSIVE ;
+	}
+
+	//Widescreen support ?
+	if((videoFlags & XC_VIDEO_FLAGS_WIDESCREEN) !=0)
+	{
+		m_d3dpp.Flags = D3DPRESENTFLAG_WIDESCREEN;
+	}
+
+
     //m_d3dpp.BackBufferWidth  = pModeInfo->Width;
     //m_d3dpp.BackBufferHeight = pModeInfo->Height;
 	m_d3dpp.BackBufferWidth = 640;

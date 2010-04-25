@@ -486,14 +486,24 @@ HRESULT CDirectXGraphicsContext::InitializeD3DEnvironment()
 	
 	m_d3dpp.FullScreen_RefreshRateInHz = /*D3DPRESENT_RATE_DEFAULT*/60;
 
+	DWORD videoFlags = XGetVideoFlags();
 	if(XGetVideoStandard() == XC_VIDEO_STANDARD_PAL_I)
 	{
-		DWORD videoFlags = XGetVideoFlags();
-		
 		if(videoFlags & XC_VIDEO_FLAGS_PAL_60Hz)		// PAL 60 user
 			m_d3dpp.FullScreen_RefreshRateInHz = 60;
 		else
 			m_d3dpp.FullScreen_RefreshRateInHz = 50;
+	}
+
+	if( videoFlags & XC_VIDEO_FLAGS_HDTV_480p)
+	{
+		m_d3dpp.Flags = D3DPRESENTFLAG_PROGRESSIVE ;
+	}
+
+	//Widescreen support ?
+	if((videoFlags & XC_VIDEO_FLAGS_WIDESCREEN) !=0)
+	{
+		m_d3dpp.Flags = D3DPRESENTFLAG_WIDESCREEN;
 	}
 
 	//m_d3dpp.Flags = D3DPRESENTFLAG_EMULATE_REFRESH_RATE;
@@ -502,13 +512,14 @@ HRESULT CDirectXGraphicsContext::InitializeD3DEnvironment()
     //m_d3dpp.BackBufferHeight = pModeInfo->Height;
 	m_d3dpp.BackBufferWidth = 640;
 	m_d3dpp.BackBufferHeight = 480;
-    //m_d3dpp.BackBufferFormat = D3DFMT_X1R5G5B5;
-	m_d3dpp.BackBufferFormat = D3DFMT_A8R8G8B8;
+    m_d3dpp.BackBufferFormat = D3DFMT_X1R5G5B5;
+	//m_d3dpp.BackBufferFormat = D3DFMT_A8R8G8B8;
     
 	windowSetting.uDisplayWidth = m_d3dpp.BackBufferWidth;
 	windowSetting.uDisplayHeight = m_d3dpp.BackBufferHeight;
 
-	m_desktopFormat = D3DFMT_A8R8G8B8/*D3DFMT_X1R5G5B5*/;
+	//m_desktopFormat = D3DFMT_A8R8G8B8/*D3DFMT_X1R5G5B5*/;
+	m_desktopFormat = D3DFMT_X1R5G5B5;
 
 	//freakdave
 	if(VertexMode == 0){
