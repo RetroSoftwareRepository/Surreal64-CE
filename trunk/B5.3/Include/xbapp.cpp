@@ -57,10 +57,10 @@ CXBApplication::CXBApplication()
     ZeroMemory( &m_d3dpp, sizeof(m_d3dpp) );
     m_d3dpp.BackBufferWidth        = 640;
     m_d3dpp.BackBufferHeight       = 480;
-    m_d3dpp.BackBufferFormat       = /*D3DFMT_A8R8G8B8*/D3DFMT_X1R5G5B5;
+    m_d3dpp.BackBufferFormat       = D3DFMT_A8R8G8B8;
     m_d3dpp.BackBufferCount        = 1;
     m_d3dpp.EnableAutoDepthStencil = TRUE;
-    m_d3dpp.AutoDepthStencilFormat = /*D3DFMT_D24S8*/D3DFMT_D16;
+    m_d3dpp.AutoDepthStencilFormat = D3DFMT_D24S8;
     m_d3dpp.SwapEffect             = D3DSWAPEFFECT_DISCARD;
 	//m_d3dpp.Flags                  |= D3DPRESENTFLAG_WIDESCREEN; 
 
@@ -78,19 +78,8 @@ CXBApplication::CXBApplication()
     else m_d3dpp.FullScreen_RefreshRateInHz = 60;
 
 
-	//Widescreen support ?
-	if((videoFlags & XC_VIDEO_FLAGS_WIDESCREEN) !=0)
-	{
-		m_d3dpp.Flags = D3DPRESENTFLAG_WIDESCREEN;
-	}
-
-
-
-//Disable this for now in ingame menu
-	
     if(XGetAVPack() == XC_AV_PACK_HDTV)
         {
-			/*
                 if(videoFlags & XC_VIDEO_FLAGS_HDTV_1080i)
                 {
                         m_d3dpp.Flags            = D3DPRESENTFLAG_WIDESCREEN | D3DPRESENTFLAG_INTERLACED;
@@ -104,7 +93,7 @@ CXBApplication::CXBApplication()
                         m_d3dpp.BackBufferWidth  = 1280;
                         m_d3dpp.BackBufferHeight = 720;
                 }
-				 else*/ if(videoFlags & XC_VIDEO_FLAGS_HDTV_480p)
+				 else if(videoFlags & XC_VIDEO_FLAGS_HDTV_480p)
                 {
                         m_d3dpp.Flags            = D3DPRESENTFLAG_PROGRESSIVE;
                         m_d3dpp.BackBufferFormat = D3DFMT_A8R8G8B8;
@@ -117,10 +106,9 @@ CXBApplication::CXBApplication()
 
 	// use an orthogonal matrix for the projection matrix
     D3DXMATRIX mat;
-/*
+
 	if(XGetAVPack() == XC_AV_PACK_HDTV)
 	{
-		
           if(videoFlags & XC_VIDEO_FLAGS_HDTV_1080i)
 		  {
 			    g_Width = 1920;
@@ -143,12 +131,12 @@ CXBApplication::CXBApplication()
 		  }
 	}
 	else
-	{*/
+	{
     //if HDTV is not supported
 				g_Width = 640;
 				g_Height = 480;
 				D3DXMatrixOrthoOffCenterLH(&mat, 0, g_Width, g_Height, 0, 0.0f, 1.0f);
-	//}
+	}
 
 
 
