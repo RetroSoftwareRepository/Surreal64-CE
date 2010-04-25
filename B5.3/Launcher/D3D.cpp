@@ -51,10 +51,8 @@ bool D3D::Create()
 
     d3dpp.BackBufferWidth					= 640;
     d3dpp.BackBufferHeight					= 480;
-    d3dpp.BackBufferFormat					= /*D3DFMT_A8R8G8B8*/D3DFMT_X1R5G5B5;
+    d3dpp.BackBufferFormat					= D3DFMT_A8R8G8B8;
     d3dpp.BackBufferCount					= 1;
-	d3dpp.EnableAutoDepthStencil			= TRUE;
-    d3dpp.AutoDepthStencilFormat			= /*D3DFMT_D24S8*/D3DFMT_D16;
     d3dpp.SwapEffect						= D3DSWAPEFFECT_DISCARD;
     d3dpp.FullScreen_PresentationInterval	= D3DPRESENT_INTERVAL_ONE_OR_IMMEDIATE;
 
@@ -77,12 +75,6 @@ bool D3D::Create()
         else d3dpp.FullScreen_RefreshRateInHz = 50;
     }
     else d3dpp.FullScreen_RefreshRateInHz = 60;
-
-	//Widescreen support ?
-	if((videoFlags & XC_VIDEO_FLAGS_WIDESCREEN) !=0)
-	{
-		d3dpp.Flags = D3DPRESENTFLAG_WIDESCREEN;
-	}
 
 
     if(XGetAVPack() == XC_AV_PACK_HDTV)

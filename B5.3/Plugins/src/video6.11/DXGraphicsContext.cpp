@@ -707,7 +707,7 @@ HRESULT CDXGraphicsContext::InitializeD3D()
 	m_d3dpp.hDeviceWindow          = m_hWnd;
 	m_d3dpp.FullScreen_PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
 
-	m_d3dpp.FullScreen_RefreshRateInHz = 60;
+	m_d3dpp.FullScreen_RefreshRateInHz = D3DPRESENT_RATE_DEFAULT;
 
 	DWORD videoFlags = XGetVideoFlags();
 	if(XGetVideoStandard() == XC_VIDEO_STANDARD_PAL_I)
@@ -718,15 +718,9 @@ HRESULT CDXGraphicsContext::InitializeD3D()
 			m_d3dpp.FullScreen_RefreshRateInHz = 50;
 	}
 
-	if( videoFlags & XC_VIDEO_FLAGS_HDTV_480p)
+	if( videoFlags&XC_VIDEO_FLAGS_HDTV_480p )
 	{
 		m_d3dpp.Flags = D3DPRESENTFLAG_PROGRESSIVE ;
-	}
-
-	//Widescreen support ?
-	if((videoFlags & XC_VIDEO_FLAGS_WIDESCREEN) !=0)
-	{
-		m_d3dpp.Flags = D3DPRESENTFLAG_WIDESCREEN;
 	}
 
 	m_d3dpp.BackBufferWidth = 640;

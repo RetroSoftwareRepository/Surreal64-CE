@@ -14,7 +14,7 @@
 		<Configuration
 			Name="Release|Xbox"
 			OutputDirectory="$(SolutionDir)Release"
-			IntermediateDirectory="$(SolutionDir)tmpRelease"
+			IntermediateDirectory="obj\Release"
 			ConfigurationType="1"
 			CharacterSet="2">
 			<Tool
@@ -40,7 +40,7 @@
 				BrowseInformation="1"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
-				DebugInformationFormat="0"
+				DebugInformationFormat="3"
 				CallingConvention="1"
 				CompileAs="1"/>
 			<Tool
@@ -81,7 +81,7 @@
 		<Configuration
 			Name="Debug|Xbox"
 			OutputDirectory="$(SolutionDir)Debug"
-			IntermediateDirectory="$(SolutionDir)tmpDebug"
+			IntermediateDirectory="obj\Debug"
 			ConfigurationType="1"
 			CharacterSet="2">
 			<Tool
