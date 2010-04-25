@@ -12,8 +12,8 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Xbox"
-			OutputDirectory="obj\Debug"
-			IntermediateDirectory="obj\Debug"
+			OutputDirectory="$(SolutionDir)Debug"
+			IntermediateDirectory="$(SolutionDir)tmpDebug"
 			ConfigurationType="4"
 			CharacterSet="2">
 			<Tool
@@ -116,8 +116,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Xbox"
-			OutputDirectory="Release"
-			IntermediateDirectory="Release"
+			OutputDirectory="$(SolutionDir)Release"
+			IntermediateDirectory="$(SolutionDir)tmpRelease"
 			ConfigurationType="4"
 			CharacterSet="2">
 			<Tool
@@ -140,7 +140,7 @@
 				PrecompiledHeaderFile="$(OutDir)/$(ProjectName).pch"
 				WarningLevel="0"
 				Detect64BitPortabilityProblems="FALSE"
-				DebugInformationFormat="3"
+				DebugInformationFormat="0"
 				CallingConvention="1"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
