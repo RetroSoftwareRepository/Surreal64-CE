@@ -129,38 +129,38 @@ void ChangeControl()
 	Sleep(500);
 	XBInput_GetInput();
     float tempdeadzone = XBOX_CONTROLLER_DEAD_ZONE;
-	XBOX_CONTROLLER_DEAD_ZONE = 15000;
+//	XBOX_CONTROLLER_DEAD_ZONE = 15000;
 	while (!quitcontrol){
 	XBInput_GetInput();
-	if (g_Gamepads[controller].sThumbLX < -XBOX_CONTROLLER_DEAD_ZONE)
+	if (g_Gamepads[controller].sThumbLX < -15000)
 	    {
         ControllerConfig[(controller*18)+selectedelement]=0;
 		quitcontrol=true;}
-	if (g_Gamepads[controller].sThumbLX > XBOX_CONTROLLER_DEAD_ZONE)
+	if (g_Gamepads[controller].sThumbLX > 15000)
 	    {
         ControllerConfig[(controller*18)+selectedelement]=1;
 		quitcontrol=true;}
-	if (g_Gamepads[controller].sThumbLY > XBOX_CONTROLLER_DEAD_ZONE)
+	if (g_Gamepads[controller].sThumbLY > 15000)
 	    {
         ControllerConfig[(controller*18)+selectedelement]=2;
 		quitcontrol=true;}
-	if (g_Gamepads[controller].sThumbLY < -XBOX_CONTROLLER_DEAD_ZONE)
+	if (g_Gamepads[controller].sThumbLY < -15000)
 	    {
         ControllerConfig[(controller*18)+selectedelement]=3;
 		quitcontrol=true;}
-	if (g_Gamepads[controller].sThumbRX < -XBOX_CONTROLLER_DEAD_ZONE)
+	if (g_Gamepads[controller].sThumbRX < -15000)
 	    {
         ControllerConfig[(controller*18)+selectedelement]=4;
 		quitcontrol=true;}
-	if (g_Gamepads[controller].sThumbRX > XBOX_CONTROLLER_DEAD_ZONE)
+	if (g_Gamepads[controller].sThumbRX > 15000)
 	    {
         ControllerConfig[(controller*18)+selectedelement]=5;
 		quitcontrol=true;}
-	if (g_Gamepads[controller].sThumbRY > XBOX_CONTROLLER_DEAD_ZONE)
+	if (g_Gamepads[controller].sThumbRY > 15000)
 	    {
         ControllerConfig[(controller*18)+selectedelement]=6;
 		quitcontrol=true;}
-	if (g_Gamepads[controller].sThumbRY < -XBOX_CONTROLLER_DEAD_ZONE)
+	if (g_Gamepads[controller].sThumbRY < -15000)
 	    {
         ControllerConfig[(controller*18)+selectedelement]=7;
 		quitcontrol=true;}
@@ -230,7 +230,7 @@ void ChangeControl()
 	    quitcontrol=true;}
 	}
 	changebutton=false;
-	XBOX_CONTROLLER_DEAD_ZONE = tempdeadzone;
+	//XBOX_CONTROLLER_DEAD_ZONE = tempdeadzone;
 }
 
 void ControllerReset(){

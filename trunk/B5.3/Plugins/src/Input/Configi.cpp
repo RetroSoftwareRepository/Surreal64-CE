@@ -307,7 +307,8 @@ DWORD Config::GetN64ButtonValue(DWORD controller, byte n64Button)
 		{
 			// diving by 128 reduces 0-32768 to 0-127 which the n64 uses
 			// GogoAckman s note : it was divising by 258 :? , I setted 256 -> 32768/256=128
-			return GetXboxButtonValue(controller, xboxButton) / 256;
+			//thx to weinerschnitzel
+				return (GetXboxButtonValue(controller, xboxButton) / 259) * (Sensitivity * .1f);
 		}
 		else // if we are mapping this axis to an xbox button
 		{

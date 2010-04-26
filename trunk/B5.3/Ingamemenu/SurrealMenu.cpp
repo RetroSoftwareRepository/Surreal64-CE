@@ -663,7 +663,7 @@ void ControllerSettingsMenu()
 	XLMenu_SetTitle(m_pSettingsMenu,L"Controller Settings",0xFF8080FF);
 	
 	//Sensitivity
-	swprintf(currentname,L"Analog Sensitivity : %d %%",Sensitivity);
+	swprintf(currentname,L"Analog Sensitivity : %d",Sensitivity);
 	XLMenu_AddItem2(m_pSettingsMenu,MITEM_ROUTINE,currentname,incSensitivity,decSensitivity);
 
 	//Mempak/RumblePak/NoPak
@@ -705,21 +705,21 @@ void ToggleSensitivity(bool inc)
 	currentItem = m_pSettingsMenu->curitem;
 	if (inc)
 	{
-	Sensitivity += 5;
-	if(Sensitivity > 100) Sensitivity = -100;
+	Sensitivity += 1;
+	if(Sensitivity > 10) Sensitivity = 10;
 	//freakdave
 	//Don't forget to alter the floats in the brackets accordingly if you change XBOX_CONTROLLER_DEAD_ZONE
 	}
 	else
 	{
-    Sensitivity -= 5;
-	if(Sensitivity < -100) Sensitivity = 100;
+    Sensitivity -= 1;
+	if(Sensitivity < 1) Sensitivity = 1;
 	}
-	XBOX_CONTROLLER_DEAD_ZONE = float(6500) * ((float(Sensitivity) - 25) / 100);
+	//XBOX_CONTROLLER_DEAD_ZONE = float(6500) * ((float(Sensitivity) - 25) / 100);
 	
 	XLMenu_CurRoutine = NULL;
 	
-	swprintf(currentname,L"Analog Sensitivity : %d %%",Sensitivity);
+	swprintf(currentname,L"Analog Sensitivity : %d",Sensitivity);
 	XLMenu_SetItemText(&m_pSettingsMenu->items[currentItem], currentname);
 
 	ConfigAppSave2();
