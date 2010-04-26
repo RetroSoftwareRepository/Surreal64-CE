@@ -830,7 +830,7 @@ fprintf(fp,"Surreal64 XXX CE 'Community Edition' Modification\n");
 fprintf(fp,"Authors:\n");
 fprintf(fp,"Ez0n3, freakdave\n");
 fprintf(fp,"Testing / Ideas / Support\n");
-fprintf(fp,"Bomb Bloke, greatant, edwardar, Darknior\n");
+fprintf(fp,"weinerschnitzel, Bomb Bloke, greatant, edwardar, Darknior\n");
 fprintf(fp,"Visit us at:\n");
 fprintf(fp,"http://sourceforge.net/projects/surreal64xxxce\n");
 fprintf(fp,"\n\n");

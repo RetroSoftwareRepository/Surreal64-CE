@@ -49,8 +49,8 @@ int FlickerFilter = 1;
 bool SoftDisplayFilter = 0;
 int TextureMode = 3;
 int VertexMode = 1;
-float XBOX_CONTROLLER_DEAD_ZONE = 6500; // also change in SurrealMenu.cpp
-int Sensitivity = 0;
+//float XBOX_CONTROLLER_DEAD_ZONE = 6500; // also change in SurrealMenu.cpp
+unsigned int Sensitivity = 5;
 char skinname[32] = "default";
 
 char romname[256];
@@ -111,8 +111,8 @@ EnableController1 = true;
 EnableController2 = true;
 EnableController3 = true;
 EnableController4 = true;
-XBOX_CONTROLLER_DEAD_ZONE = 6500;
-Sensitivity = 0;
+//XBOX_CONTROLLER_DEAD_ZONE = 6500;
+Sensitivity = 5;
 videoplugin = _VideoPluginRice560; // Ez0n3 - 2=rice560
 
 //Ez0n3 - plugins
@@ -251,7 +251,7 @@ int ConfigAppSave2()
 
 	VAR(preferedemu);
 
-	FLT(XBOX_CONTROLLER_DEAD_ZONE);
+	//FLT(XBOX_CONTROLLER_DEAD_ZONE);
 	VAR(Sensitivity);
 	VAR(DefaultPak);
 	BOL(EnableController1);
@@ -396,7 +396,7 @@ int ConfigAppLoad2()
 
 	
 		VAR(preferedemu);
-		FLT(XBOX_CONTROLLER_DEAD_ZONE);
+		//FLT(XBOX_CONTROLLER_DEAD_ZONE);
 		VAR(Sensitivity);
 		VAR(DefaultPak);
 		BOL(EnableController1);
