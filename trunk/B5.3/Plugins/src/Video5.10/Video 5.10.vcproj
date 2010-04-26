@@ -73,7 +73,7 @@
 				BrowseInformation="1"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
-				DebugInformationFormat="3"
+				DebugInformationFormat="0"
 				CallingConvention="1"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
