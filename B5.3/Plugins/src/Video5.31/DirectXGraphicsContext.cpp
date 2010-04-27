@@ -97,7 +97,8 @@ CDirectXGraphicsContext::CDirectXGraphicsContext() :
 	m_dwCreateFlags(0),
 	m_dwMinDepthBits(16),
 	m_dwMinStencilBits(0),
-	m_desktopFormat(D3DFMT_A8R8G8B8),
+	//m_desktopFormat(D3DFMT_A8R8G8B8),
+	m_desktopFormat(D3DFMT_X1R5G5B5),
 	pBackBufferSave(NULL),
 	m_pBackColorBuffer(NULL),
 	m_pBackDepthBuffer(NULL),
@@ -408,6 +409,29 @@ HRESULT CDirectXGraphicsContext::InitializeD3DEnvironment()
 	windowSetting.uDisplayHeight = m_d3dpp.BackBufferHeight;
 
 	m_desktopFormat = D3DFMT_X1R5G5B5;
+
+
+	DWORD videoFlags = XGetVideoFlags();
+	if(XGetVideoStandard() == XC_VIDEO_STANDARD_PAL_I)
+	{
+		if(videoFlags & XC_VIDEO_FLAGS_PAL_60Hz)		// PAL 60 user
+			m_d3dpp.FullScreen_RefreshRateInHz = 60;
+		else
+			m_d3dpp.FullScreen_RefreshRateInHz = 50;
+	}
+
+	//Widescreen
+	if((videoFlags & XC_VIDEO_FLAGS_WIDESCREEN) !=0)
+	 {
+		m_d3dpp.Flags = D3DPRESENTFLAG_WIDESCREEN;
+	 }
+
+		//480p
+	 if(XGetAVPack() == XC_AV_PACK_HDTV){
+		if( videoFlags & XC_VIDEO_FLAGS_HDTV_480p){
+			m_d3dpp.Flags = D3DPRESENTFLAG_PROGRESSIVE ;
+		}
+	 }
 
 	
     // Create the device

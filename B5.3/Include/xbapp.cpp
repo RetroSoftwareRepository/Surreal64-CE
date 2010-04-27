@@ -57,10 +57,10 @@ CXBApplication::CXBApplication()
     ZeroMemory( &m_d3dpp, sizeof(m_d3dpp) );
     m_d3dpp.BackBufferWidth        = 640;
     m_d3dpp.BackBufferHeight       = 480;
-    m_d3dpp.BackBufferFormat       = D3DFMT_A8R8G8B8;
+    m_d3dpp.BackBufferFormat       = D3DFMT_X1R5G5B5/*D3DFMT_A8R8G8B8*/;
     m_d3dpp.BackBufferCount        = 1;
     m_d3dpp.EnableAutoDepthStencil = TRUE;
-    m_d3dpp.AutoDepthStencilFormat = D3DFMT_D24S8;
+    m_d3dpp.AutoDepthStencilFormat = D3DFMT_D16/*D3DFMT_D24S8*/;
     m_d3dpp.SwapEffect             = D3DSWAPEFFECT_DISCARD;
 	//m_d3dpp.Flags                  |= D3DPRESENTFLAG_WIDESCREEN; 
 
@@ -68,16 +68,15 @@ CXBApplication::CXBApplication()
 	//TESTME! HDTV Modes (Launcher only!), Skins should be modified accordingly
 	//Parts of code by XPORT and nes6502
 	DWORD videoFlags = XGetVideoFlags();
-
 	if(XGetVideoStandard() == XC_VIDEO_STANDARD_PAL_I)
-    {
-        // Set pal60 if available.
-        if(videoFlags & XC_VIDEO_FLAGS_PAL_60Hz) m_d3dpp.FullScreen_RefreshRateInHz = 60;
-        else m_d3dpp.FullScreen_RefreshRateInHz = 50;
-    }
-    else m_d3dpp.FullScreen_RefreshRateInHz = 60;
+	{
+		if(videoFlags & XC_VIDEO_FLAGS_PAL_60Hz)		// PAL 60 user
+			m_d3dpp.FullScreen_RefreshRateInHz = 60;
+		else
+			m_d3dpp.FullScreen_RefreshRateInHz = 50;
+	}
 
-
+/*
     if(XGetAVPack() == XC_AV_PACK_HDTV)
         {
                 if(videoFlags & XC_VIDEO_FLAGS_HDTV_1080i)
@@ -101,12 +100,27 @@ CXBApplication::CXBApplication()
                         m_d3dpp.BackBufferHeight = 480;
                 }
 		}
+*/
+	//Widescreen
+	if((videoFlags & XC_VIDEO_FLAGS_WIDESCREEN) !=0)
+	 {
+		m_d3dpp.Flags = D3DPRESENTFLAG_WIDESCREEN;
+	 }
 
+		//480p
+	 if(XGetAVPack() == XC_AV_PACK_HDTV){
+		if( videoFlags & XC_VIDEO_FLAGS_HDTV_480p){
+			m_d3dpp.Flags = D3DPRESENTFLAG_PROGRESSIVE ;
+		}
+	 }
 
 
 	// use an orthogonal matrix for the projection matrix
     D3DXMATRIX mat;
-
+	g_Width = 640;
+	g_Height = 480;
+	D3DXMatrixOrthoOffCenterLH(&mat, 0, g_Width, g_Height, 0, 0.0f, 1.0f);
+/*
 	if(XGetAVPack() == XC_AV_PACK_HDTV)
 	{
           if(videoFlags & XC_VIDEO_FLAGS_HDTV_1080i)
@@ -137,10 +151,7 @@ CXBApplication::CXBApplication()
 				g_Height = 480;
 				D3DXMatrixOrthoOffCenterLH(&mat, 0, g_Width, g_Height, 0, 0.0f, 1.0f);
 	}
-
-
-
-
+*/
 
 
     // Specify number and type of input devices this app will be using. By

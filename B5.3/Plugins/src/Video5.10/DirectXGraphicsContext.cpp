@@ -64,9 +64,9 @@ BufferSettingInfo DirectXDepthBufferSetting[] =
 	"Default",					D3DFMT_D16,				D3DFMT_D16,
 	"16-bit",					D3DFMT_D16,				D3DFMT_D16,
 //	"16-bit signed",			D3DFMT_D15S1,			D3DFMT_D15S1,
-	"16-bit lockable",			D3DFMT_D16_LOCKABLE,	D3DFMT_D16_LOCKABLE,
+//	"16-bit lockable",			D3DFMT_D16_LOCKABLE,	D3DFMT_D16_LOCKABLE,
 //	"32-bit Depth Buffer",		D3DFMT_D32,				D3DFMT_D32,
-	"32-bit signed",			D3DFMT_D24S8,			D3DFMT_D24S8,
+//	"32-bit signed",			D3DFMT_D24S8,			D3DFMT_D24S8,
 //	"32-bit D24X8",				D3DFMT_D24X4S4,			D3DFMT_D24X4S4,
 //	"32-bit D24X4S4",			D3DFMT_D24X8,			D3DFMT_D24X8,
 };
@@ -99,7 +99,8 @@ CDirectXGraphicsContext::CDirectXGraphicsContext() :
 	m_dwCreateFlags(0),
 	m_dwMinDepthBits(16),
 	m_dwMinStencilBits(0),
-	m_desktopFormat(D3DFMT_A8R8G8B8),
+	//m_desktopFormat(D3DFMT_A8R8G8B8),
+	m_desktopFormat(D3DFMT_X1R5G5B5),
 	pCurrentRenderBuffer(NULL)
 {
 	m_strDeviceStats[0] = '\0';
@@ -484,32 +485,44 @@ HRESULT CDirectXGraphicsContext::InitializeD3DEnvironment()
     m_d3dpp.hDeviceWindow          = m_hWnd;
 	m_d3dpp.FullScreen_PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE/*D3DPRESENT_INTERVAL_ONE*/;
 	
-	m_d3dpp.FullScreen_RefreshRateInHz = /*D3DPRESENT_RATE_DEFAULT*/60;
-
-	if(XGetVideoStandard() == XC_VIDEO_STANDARD_PAL_I)
-	{
-		DWORD videoFlags = XGetVideoFlags();
-		
-		if(videoFlags & XC_VIDEO_FLAGS_PAL_60Hz)		// PAL 60 user
-			m_d3dpp.FullScreen_RefreshRateInHz = 60;
-		else
-			m_d3dpp.FullScreen_RefreshRateInHz = 50;
-	}
-
+	m_d3dpp.FullScreen_RefreshRateInHz = D3DPRESENT_RATE_DEFAULT;
 	//m_d3dpp.Flags = D3DPRESENTFLAG_EMULATE_REFRESH_RATE;
 
     //m_d3dpp.BackBufferWidth  = pModeInfo->Width;
     //m_d3dpp.BackBufferHeight = pModeInfo->Height;
 	m_d3dpp.BackBufferWidth = 640;
 	m_d3dpp.BackBufferHeight = 480;
-    //m_d3dpp.BackBufferFormat = D3DFMT_X1R5G5B5;
-	m_d3dpp.BackBufferFormat = D3DFMT_A8R8G8B8;
-    
+    m_d3dpp.BackBufferFormat = D3DFMT_X1R5G5B5;
+	//m_d3dpp.BackBufferFormat = D3DFMT_A8R8G8B8;
+
 	windowSetting.uDisplayWidth = m_d3dpp.BackBufferWidth;
 	windowSetting.uDisplayHeight = m_d3dpp.BackBufferHeight;
 
-	m_desktopFormat = D3DFMT_A8R8G8B8/*D3DFMT_X1R5G5B5*/;
+	//m_desktopFormat = D3DFMT_A8R8G8B8/*D3DFMT_X1R5G5B5*/;
+	m_desktopFormat = D3DFMT_X1R5G5B5;
 
+DWORD videoFlags = XGetVideoFlags();
+	if(XGetVideoStandard() == XC_VIDEO_STANDARD_PAL_I)
+	{
+		if(videoFlags & XC_VIDEO_FLAGS_PAL_60Hz)		// PAL 60 user
+			m_d3dpp.FullScreen_RefreshRateInHz = 60;
+		else
+			m_d3dpp.FullScreen_RefreshRateInHz = 50;
+	}
+
+	//Widescreen
+	if((videoFlags & XC_VIDEO_FLAGS_WIDESCREEN) !=0)
+	 {
+		m_d3dpp.Flags = D3DPRESENTFLAG_WIDESCREEN;
+	 }
+
+		//480p
+	 if(XGetAVPack() == XC_AV_PACK_HDTV){
+		if( videoFlags & XC_VIDEO_FLAGS_HDTV_480p){
+			m_d3dpp.Flags = D3DPRESENTFLAG_PROGRESSIVE ;
+		}
+	 }
+    
 	//freakdave
 	if(VertexMode == 0){
     // Create the device
@@ -543,9 +556,6 @@ HRESULT CDirectXGraphicsContext::InitializeD3DEnvironment()
 								&m_pd3dDevice );
 
 	}
-
-
-
 
 
 

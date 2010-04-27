@@ -69,23 +69,37 @@ HRESULT Direct3DInit()
     ZeroMemory( &d3dpp, sizeof(d3dpp) );
     d3dpp.BackBufferWidth        = 640;
     d3dpp.BackBufferHeight       = 480;
-    d3dpp.BackBufferFormat       = D3DFMT_A8R8G8B8;
+    d3dpp.BackBufferFormat       = D3DFMT_X1R5G5B5/*D3DFMT_A8R8G8B8*/;
     d3dpp.BackBufferCount        = 1;
     d3dpp.EnableAutoDepthStencil = TRUE;
-    d3dpp.AutoDepthStencilFormat = D3DFMT_D24S8;
+    d3dpp.AutoDepthStencilFormat = D3DFMT_D16/*D3DFMT_D24S8*/;
     d3dpp.SwapEffect             = D3DSWAPEFFECT_DISCARD;
 	//d3dpp.MultiSampleType		 = D3DMULTISAMPLE_4_SAMPLES_SUPERSAMPLE_LINEAR;
     d3dpp.FullScreen_PresentationInterval = D3DPRESENT_INTERVAL_ONE;
 	//d3dpp.FullScreen_RefreshRateInHz = 50;
+
+
+	DWORD videoFlags = XGetVideoFlags();
 	if(XGetVideoStandard() == XC_VIDEO_STANDARD_PAL_I)
 	{
-		DWORD videoFlags = XGetVideoFlags();
-		
 		if(videoFlags & XC_VIDEO_FLAGS_PAL_60Hz)		// PAL 60 user
 			d3dpp.FullScreen_RefreshRateInHz = 60;
 		else
 			d3dpp.FullScreen_RefreshRateInHz = 50;
 	}
+
+	 if((videoFlags & XC_VIDEO_FLAGS_WIDESCREEN) !=0)
+	 {
+		d3dpp.Flags = D3DPRESENTFLAG_WIDESCREEN;
+	 }
+
+		//480p
+	 if(XGetAVPack() == XC_AV_PACK_HDTV){
+		if( videoFlags & XC_VIDEO_FLAGS_HDTV_480p){
+			d3dpp.Flags = D3DPRESENTFLAG_PROGRESSIVE ;
+		}
+	 }
+
 
 //The user can now choose between different vertex processing modes - freakdave
 
