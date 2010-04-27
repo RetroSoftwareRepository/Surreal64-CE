@@ -62,6 +62,7 @@ int FormatToSize(D3DFORMAT fmt)
 {
 	switch(fmt)
 	{
+		/*
 #ifdef _XBOX
 	case D3DFMT_A8R8G8B8:
 	case D3DFMT_X8R8G8B8:
@@ -81,7 +82,7 @@ int FormatToSize(D3DFORMAT fmt)
 	case TEXTURE_FMT_A8R8G8B8:
 #endif
 		return 32;
-	default:
+	default:*/
 		/*
 		case D3DFMT_R5G6B5:
 		case D3DFMT_X1R5G5B5:
@@ -101,6 +102,8 @@ int FormatToSize(D3DFORMAT fmt)
 		case D3DFMT_D15S1:
 		case D3DFMT_D16:
 		*/
+	case D3DFMT_X1R5G5B5:
+	case D3DFMT_D16:
 		return 16;
 	}
 }
@@ -133,7 +136,8 @@ CDXGraphicsContext::CDXGraphicsContext() :
 	m_dwCreateFlags(0),
 	m_dwMinDepthBits(16),
 	m_dwMinStencilBits(0),
-	m_desktopFormat(D3DFMT_A8R8G8B8),
+	//m_desktopFormat(D3DFMT_A8R8G8B8),
+	m_desktopFormat(D3DFMT_X1R5G5B5),
 	m_FSAAIsEnabled(false)
 {
 	m_strDeviceStats[0] = '\0';
@@ -706,8 +710,11 @@ HRESULT CDXGraphicsContext::InitializeD3D()
 	m_d3dpp.AutoDepthStencilFormat = D3DFMT_D16;
 	m_d3dpp.hDeviceWindow          = m_hWnd;
 	m_d3dpp.FullScreen_PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
-
 	m_d3dpp.FullScreen_RefreshRateInHz = D3DPRESENT_RATE_DEFAULT;
+	m_d3dpp.BackBufferWidth = 640;
+	m_d3dpp.BackBufferHeight = 480;
+	m_d3dpp.BackBufferFormat = D3DFMT_X1R5G5B5;
+	//m_d3dpp.BackBufferFormat = D3DFMT_A8R8G8B8;
 
 	DWORD videoFlags = XGetVideoFlags();
 	if(XGetVideoStandard() == XC_VIDEO_STANDARD_PAL_I)
@@ -718,15 +725,18 @@ HRESULT CDXGraphicsContext::InitializeD3D()
 			m_d3dpp.FullScreen_RefreshRateInHz = 50;
 	}
 
-	if( videoFlags&XC_VIDEO_FLAGS_HDTV_480p )
-	{
-		m_d3dpp.Flags = D3DPRESENTFLAG_PROGRESSIVE ;
-	}
+	//Widescreen
+	if((videoFlags & XC_VIDEO_FLAGS_WIDESCREEN) !=0)
+	 {
+		m_d3dpp.Flags = D3DPRESENTFLAG_WIDESCREEN;
+	 }
 
-	m_d3dpp.BackBufferWidth = 640;
-	m_d3dpp.BackBufferHeight = 480;
-	m_d3dpp.BackBufferFormat = D3DFMT_X1R5G5B5;
-	//m_d3dpp.BackBufferFormat = D3DFMT_A8R8G8B8;
+		//480p
+	 if(XGetAVPack() == XC_AV_PACK_HDTV){
+		if( videoFlags & XC_VIDEO_FLAGS_HDTV_480p){
+			m_d3dpp.Flags = D3DPRESENTFLAG_PROGRESSIVE ;
+		}
+	 }
 
 	windowSetting.uDisplayWidth = m_d3dpp.BackBufferWidth;
 	windowSetting.uDisplayHeight = m_d3dpp.BackBufferHeight;

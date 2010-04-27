@@ -51,32 +51,26 @@ bool D3D::Create()
 
     d3dpp.BackBufferWidth					= 640;
     d3dpp.BackBufferHeight					= 480;
-    d3dpp.BackBufferFormat					= D3DFMT_A8R8G8B8;
+    d3dpp.BackBufferFormat					= D3DFMT_X1R5G5B5;
     d3dpp.BackBufferCount					= 1;
+	d3dpp.EnableAutoDepthStencil			= TRUE;
+    d3dpp.AutoDepthStencilFormat			= D3DFMT_D16;
     d3dpp.SwapEffect						= D3DSWAPEFFECT_DISCARD;
     d3dpp.FullScreen_PresentationInterval	= D3DPRESENT_INTERVAL_ONE_OR_IMMEDIATE;
-
-/*	g_hResult = m_pD3D->CreateDevice(0, D3DDEVTYPE_HAL, NULL, 
-									 D3DCREATE_HARDWARE_VERTEXPROCESSING,
-									 &d3dpp, &m_pd3dDevice);
-
-	if (FAILED(g_hResult))
-		return false;
-*/
 
 	//TESTME! HDTV Modes (Launcher only!), Skins should be modified accordingly
 	//Parts of code by XPORT and nes6502
 	DWORD videoFlags = XGetVideoFlags();
 
 	if(XGetVideoStandard() == XC_VIDEO_STANDARD_PAL_I)
-    {
-        // Set pal60 if available.
-        if(videoFlags & XC_VIDEO_FLAGS_PAL_60Hz) d3dpp.FullScreen_RefreshRateInHz = 60;
-        else d3dpp.FullScreen_RefreshRateInHz = 50;
-    }
-    else d3dpp.FullScreen_RefreshRateInHz = 60;
+	{
+		if(videoFlags & XC_VIDEO_FLAGS_PAL_60Hz)		// PAL 60 user
+			d3dpp.FullScreen_RefreshRateInHz = 60;
+		else
+			d3dpp.FullScreen_RefreshRateInHz = 50;
+	}
 
-
+/*
     if(XGetAVPack() == XC_AV_PACK_HDTV)
         {
                 if(videoFlags & XC_VIDEO_FLAGS_HDTV_1080i)
@@ -100,12 +94,21 @@ bool D3D::Create()
                         d3dpp.BackBufferHeight = 480;
                 }
 		}
-
-
-
-	// use an orthogonal matrix for the projection matrix
+*/
+	
+		//480p
+	 if(XGetAVPack() == XC_AV_PACK_HDTV){
+		if( videoFlags & XC_VIDEO_FLAGS_HDTV_480p){
+			d3dpp.Flags = D3DPRESENTFLAG_PROGRESSIVE ;
+		}
+	 }
+// use an orthogonal matrix for the projection matrix
     D3DXMATRIX mat;
-
+	g_Width = 640;
+	g_Height = 480;
+	D3DXMatrixOrthoOffCenterLH(&mat, 0, g_Width, g_Height, 0, 0.0f, 1.0f);
+	
+/*
 	if(XGetAVPack() == XC_AV_PACK_HDTV)
 	{
           if(videoFlags & XC_VIDEO_FLAGS_HDTV_1080i)
@@ -136,7 +139,7 @@ bool D3D::Create()
 				g_Height = 480;
 				D3DXMatrixOrthoOffCenterLH(&mat, 0, g_Width, g_Height, 0, 0.0f, 1.0f);
 	}
-	
+	*/
 	m_pd3dDevice = g_pd3dDevice;
 
 	m_pd3dDevice->SetTransform(D3DTS_PROJECTION, &mat);
