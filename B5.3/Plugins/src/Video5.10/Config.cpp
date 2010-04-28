@@ -267,7 +267,7 @@ void ReadConfiguration(void)
 	//defaultRomOptions.dwEnableObjBG = ReadRegistryDwordVal(MAIN_RICE_DAEDALUS_4, "EnableObjBG");
 	options.enableFog = 1;
 	options.enableSSE = 1;
-	options.skipFrame = 0;
+	options.skipFrame = FrameSkip;
 	options.RenderBufferSetting = 0;
 	options.gamma_correction = 0;
 	options.textureEnhancement = 0;

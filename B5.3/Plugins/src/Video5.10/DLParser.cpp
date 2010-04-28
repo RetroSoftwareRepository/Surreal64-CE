@@ -25,6 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 extern BOOL _INPUT_IsIngameMenuWaiting();
 extern "C" void ReInitVirtualDynaMemory(boolean charge);
 extern int TextureMode;
+extern bool FrameSkip;
 
 //BOOL g_bTempMessage = FALSE;
 //DWORD g_dwTempMessageStart = 0;
@@ -866,7 +867,7 @@ void DLParser_Process(OSTask * pTask)
 	static int skipframe=0;
 	BOOL menuWaiting = FALSE;
 
-	if( options.skipFrame )
+	if( FrameSkip )
 	{
 		if(skipframe>1)
 		{

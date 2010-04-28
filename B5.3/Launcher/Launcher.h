@@ -65,5 +65,6 @@ bool PhysRam128(); // determine if the current phys ram is greater than 100MB
 bool FileExists(char *szFilename); // check if file exists
 
 extern bool HideLaunchScreens;
+extern bool FrameSkip;
 
 extern bool g_bQuit;

@@ -102,6 +102,8 @@ m_RenderPanel.Destroy();
 bool tookscreenshot=false;
 void TakeScreenshot()
 {
+	//This is broken - freakdave
+	/*
 	//Ez0n3 - remove invalid chars from romname for screenshot path - fixes problem with ss dir using ftp (exists, but not accessible)
 	int trimchk = 0;
 	int namecnt = 0;
@@ -115,7 +117,7 @@ void TakeScreenshot()
 			namecnt++;
 		}
 	}
-
+*/
 	if(onhd)
     CreateDirectory("D:\\Screenshots",NULL);
 	else 
@@ -126,17 +128,17 @@ void TakeScreenshot()
 	int actualscreen;
 
 	if (onhd)
-	sprintf(screen,"D:\\Screenshots\\%s",romnamess);
+	sprintf(screen,"D:\\Screenshots\\%s",romname);
 	else
-	sprintf(screen,"T:\\Screenshots\\%s",romnamess);
+	sprintf(screen,"T:\\Screenshots\\%s",romname);
 
 	CreateDirectory(screen,NULL);
 	for (int i=0;i<100;i++) {
 
 		if(onhd)
-		sprintf(screen,"D:\\Screenshots\\%s\\screenshot%d.bmp",romnamess,i);
+		sprintf(screen,"D:\\Screenshots\\%s\\screenshot%d.bmp",romname,i);
 		else
-		sprintf(screen,"T:\\Screenshots\\%s\\screenshot%d.bmp",romnamess,i);
+		sprintf(screen,"T:\\Screenshots\\%s\\screenshot%d.bmp",romname,i);
 
 		if ((fp=fopen(screen,"r")) == NULL)
 		{
@@ -145,9 +147,9 @@ void TakeScreenshot()
 		}
 	}
 if (onhd)
-sprintf(screen,"D:\\Screenshots\\%s\\screenshot%d.bmp",romnamess,actualscreen);
+sprintf(screen,"D:\\Screenshots\\%s\\screenshot%d.bmp",romname,actualscreen);
 else
-sprintf(screen,"T:\\Screenshots\\%s\\screenshot%d.bmp",romnamess,actualscreen);
+sprintf(screen,"T:\\Screenshots\\%s\\screenshot%d.bmp",romname,actualscreen);
 
 D3DSurface *surface = NULL;
 m_RenderPanel.Render(0,0);

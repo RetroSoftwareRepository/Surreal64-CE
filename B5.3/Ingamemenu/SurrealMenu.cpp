@@ -62,6 +62,7 @@ void ToggleFlickerFilter(bool inc);
 void VideoSettingsMenu();
 void ToggleTextureFilter(bool inc);
 void ToggleSoftDisplayFilter();
+void ToggleFrameSkip();
 void ToggleSensitivity(bool inc);
 void ControllerSettingsMenu();
 void TogglePak();
@@ -506,7 +507,7 @@ void VideoSettingsMenu(void)
 
     WCHAR currentname[120];
 
-	m_pSettingsMenu = XLMenu_Init(60,80,4, MENU_LEFT|MENU_WRAP, NULL);
+	m_pSettingsMenu = XLMenu_Init(60,80,5, MENU_LEFT|MENU_WRAP, NULL);
 
 	m_pSettingsMenu->topcolor = 0x40254365;
 	m_pSettingsMenu->bottomcolor = 0x40556486;
@@ -541,6 +542,13 @@ void VideoSettingsMenu(void)
 		case 5 : 	swprintf(currentname,L"Texture Filter : GAUSSIAN-CUBIC");
 			break;	}
 	XLMenu_AddItem2(m_pSettingsMenu,MITEM_ROUTINE,currentname,incTextureFilter,decTextureFilter);
+
+	//FrameSkip
+	if (!FrameSkip)
+	swprintf(currentname,L"Skip Frames : No");
+	else 
+	swprintf(currentname,L"Skip Frames : Yes");
+	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,currentname,ToggleFrameSkip);
 
 	XLMenu_Activate(m_pSettingsMenu);
 
@@ -593,13 +601,29 @@ void ToggleSoftDisplayFilter()
 	SoftDisplayFilter =! SoftDisplayFilter;
 	D3DDevice::SetSoftDisplayFilter(SoftDisplayFilter);
 
-	
 	XLMenu_CurRoutine = NULL;
 	
   	if (!SoftDisplayFilter)
 	swprintf(currentname,L"Soft Display Filter : Disabled");
 	else 
 	swprintf(currentname,L"Soft Display Filter : Enabled");
+	XLMenu_SetItemText(&m_pSettingsMenu->items[currentItem], currentname);
+
+	ConfigAppSave();
+}
+
+void ToggleFrameSkip()
+{
+    WCHAR currentname[120];
+	currentItem = m_pSettingsMenu->curitem;
+	FrameSkip =! FrameSkip;
+	
+	XLMenu_CurRoutine = NULL;
+	
+  	if (!FrameSkip)
+	swprintf(currentname,L"Skip Frames : No");
+	else 
+	swprintf(currentname,L"Skip Frames : Yes");
 	XLMenu_SetItemText(&m_pSettingsMenu->items[currentItem], currentname);
 
 	ConfigAppSave();

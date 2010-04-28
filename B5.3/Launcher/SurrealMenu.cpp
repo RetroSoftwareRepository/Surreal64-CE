@@ -62,6 +62,7 @@ void VideoSettingsMenu();
 void ToggleVertexMode(bool inc);
 void ToggleTextureFilter(bool inc);
 void ToggleSoftDisplayFilter();
+void ToggleFrameSkip();
 void ToggleSensitivity(bool inc);
 void ControllerSettingsMenu();
 void TogglePak();
@@ -1032,7 +1033,7 @@ void VideoSettingsMenu(void)
 
 	// Ez0n3 - more items
 	//m_pSettingsMenu = XLMenu_Init(60,80,4, MENU_LEFT|MENU_WRAP, NULL);
-	m_pSettingsMenu = XLMenu_Init(60,80,6, MENU_LEFT|MENU_WRAP, NULL);
+	m_pSettingsMenu = XLMenu_Init(60,80,7, MENU_LEFT|MENU_WRAP, NULL);
 
 	m_pSettingsMenu->topcolor = 0x40254365;
 	m_pSettingsMenu->bottomcolor = 0x40556486;
@@ -1082,6 +1083,14 @@ void VideoSettingsMenu(void)
 			swprintf(currentname,L"Vertex : Mixed Vertex");
 		break;	}
 	XLMenu_AddItem2(m_pSettingsMenu,MITEM_ROUTINE,currentname,incVertexMode,decVertexMode);
+
+
+	//FrameSkip
+	if (!FrameSkip)
+	swprintf(currentname,L"Skip Frames : No");
+	else 
+	swprintf(currentname,L"Skip Frames : Yes");
+	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,currentname,ToggleFrameSkip);
 
 	
 	// Ez0n3 - more emulator settings
@@ -1181,6 +1190,23 @@ void ToggleSoftDisplayFilter()
 	swprintf(currentname,L"Soft Display Filter : Disabled");
 	else 
 	swprintf(currentname,L"Soft Display Filter : Enabled");
+	XLMenu_SetItemText(&m_pSettingsMenu->items[currentItem], currentname);
+
+	ConfigAppSave();
+}
+
+void ToggleFrameSkip()
+{
+    WCHAR currentname[120];
+	currentItem = m_pSettingsMenu->curitem;
+	FrameSkip =! FrameSkip;
+	
+	XLMenu_CurRoutine = NULL;
+	
+  	if (!FrameSkip)
+	swprintf(currentname,L"Skip Frames : No");
+	else 
+	swprintf(currentname,L"Skip Frames : Yes");
 	XLMenu_SetItemText(&m_pSettingsMenu->items[currentItem], currentname);
 
 	ConfigAppSave();
