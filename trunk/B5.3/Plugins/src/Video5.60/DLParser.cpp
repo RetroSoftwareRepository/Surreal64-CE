@@ -839,6 +839,7 @@ extern BOOL _INPUT_UpdatePaks();
 extern BOOL _INPUT_UpdateControllerStates();
 extern "C" void ReInitVirtualDynaMemory(boolean charge);
 extern int TextureMode;
+extern bool FrameSkip;
 
 void DLParser_Process(OSTask * pTask)
 {
@@ -847,7 +848,7 @@ void DLParser_Process(OSTask * pTask)
 	dlistMtxCount = 0;
 	bHalfTxtScale = false;
 
-	if( options.bSkipFrame )
+	if( FrameSkip )
 	{
 		skipframe++;
 		if(skipframe%2)

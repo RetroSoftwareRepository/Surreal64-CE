@@ -49,6 +49,7 @@ int FlickerFilter = 1;
 bool SoftDisplayFilter = 0;
 int TextureMode = 3;
 int VertexMode = 1;
+bool FrameSkip = 0;
 //float XBOX_CONTROLLER_DEAD_ZONE = 6500; // also change in SurrealMenu.cpp
 unsigned int Sensitivity = 5;
 char skinname[32] = "default";
@@ -167,6 +168,7 @@ int ConfigAppLoad()
 		VAR(FlickerFilter);
 		BOL(SoftDisplayFilter);
 		VAR(TextureMode);
+		BOL(FrameSkip);
 		VAR(romcounter);
 		BOL(onhd);
 		STR(skinname);
@@ -213,6 +215,7 @@ int ConfigAppSave()
 	VAR(FlickerFilter);
 	BOL(SoftDisplayFilter);
 	VAR(TextureMode);
+	BOL(FrameSkip);
 	VAR(romcounter);
 	BOL(onhd);
 	STR(skinname);

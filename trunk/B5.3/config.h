@@ -39,11 +39,13 @@ extern int iAudioPlugin;
 extern int dwMaxVideoMem;
 
 extern bool HideLaunchScreens;
+extern bool FrameSkip;
 
 extern int FlickerFilter;
 extern bool SoftDisplayFilter;
 extern int TextureMode;
 extern int VertexMode;
+extern bool FrameSkip;
 //extern float XBOX_CONTROLLER_DEAD_ZONE;
 #define XBOX_CONTROLLER_DEAD_ZONE 8600
 extern unsigned int Sensitivity;

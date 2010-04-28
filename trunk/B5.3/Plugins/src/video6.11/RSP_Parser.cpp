@@ -33,6 +33,7 @@ extern BOOL _INPUT_UpdatePaks();
 extern BOOL _INPUT_UpdateControllerStates();
 extern "C" void ReInitVirtualDynaMemory(boolean charge);
 extern int TextureMode;
+extern bool FrameSkip;
 #endif
 
 //////////////////////////////////////////////////////////
@@ -808,7 +809,7 @@ void DLParser_Process(OSTask * pTask)
 	}
 
 	status.bScreenIsDrawn = true;
-	if( options.bSkipFrame )
+	if( FrameSkip )
 	{
 		skipframe++;
 		if(skipframe%2)

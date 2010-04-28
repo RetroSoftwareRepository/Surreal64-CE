@@ -19,7 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "stdafx.h"
 #include "_BldNum.h"
-//#include "../../../config.h"
+#include "../../../config.h"
 
 WindowSettingStruct windowSetting;
 GlobalOptions options;
@@ -335,7 +335,7 @@ void ReadConfiguration(void)
 		options.textureEnhancement = 0;
 		options.textureEnhancementControl = 0;
 		options.OpenglRenderSetting = OGL_DEVICE;
-		options.skipFrame = FALSE;
+		options.skipFrame = FrameSkip;
 		options.bDisplayTooltip = FALSE;
 
 		defaultRomOptions.N64FrameBufferEmuType = FRM_NONE;

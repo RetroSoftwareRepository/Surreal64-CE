@@ -55,6 +55,7 @@ extern int FlickerFilter;
 extern bool SoftDisplayFilter;
 extern int TextureMode;
 extern int VertexMode;
+extern bool FrameSkip;
 extern float XBINPUT_DEADZONE;
 extern float XBINPUT_SUMMAND;
 //extern float XBOX_CONTROLLER_DEAD_ZONE;
