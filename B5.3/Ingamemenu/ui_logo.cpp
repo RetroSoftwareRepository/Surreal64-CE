@@ -62,13 +62,13 @@ void InitLogo(void)
 
 void DrawLogo()
 {
-	m_BgPanel.Render(15,15);
-	m_RenderPanel.Render(320 ,80 , 267 , 200 , false, 0);
+	m_BgPanel.Render(0,0);
+	m_RenderPanel.Render(305 ,65 , 267 , 200 , false, 0);
 
 	m_Font.Begin();
 
 	// Title
-	m_Font.DrawText(320, 35, 0xFFFF7F7f, L"Surreal64 XXX CE B5.3", XBFONT_CENTER_X);
+	m_Font.DrawText(305, 20, 0xFFFF7F7f, L"Surreal64 XXX CE B5.3", XBFONT_CENTER_X);
 
 	if (showdebug) {
 	MEMORYSTATUS memStat;
@@ -93,7 +93,7 @@ void DestroyLogo()
 m_BgPanel.Destroy();
 D3DXCreateTextureFromFileEx( g_pd3dDevice, "D:\\Media\\black.jpg",D3DX_DEFAULT, D3DX_DEFAULT,	1, 0, D3DFMT_LIN_A8R8G8B8 ,	D3DPOOL_MANAGED,D3DX_FILTER_NONE , D3DX_FILTER_NONE, 0x00000000,NULL, NULL,&bgTexture);		
 m_BgPanel.Create(g_pd3dDevice,	bgTexture, true);
-m_BgPanel.Render(15,15);
+m_BgPanel.Render(0,0);
 
 m_BgPanel.Destroy();
 m_RenderPanel.Destroy();

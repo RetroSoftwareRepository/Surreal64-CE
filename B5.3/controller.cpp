@@ -82,7 +82,7 @@ bool changebutton=false;
 
 void Drawcontrol()
 {
-	m_BgPanel.Render(15,15);
+	m_BgPanel.Render(0,0);
 	WCHAR m_currentname[99];
 	Fillcorrectcontrols();
 	m_Font.Begin();

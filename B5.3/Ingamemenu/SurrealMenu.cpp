@@ -145,7 +145,7 @@ void MainMenu(void)
 	while ((x != 320) || (y != 80) || (nx != 267) || (ny != 200))
 	{
 		g_pd3dDevice->Clear( 0, NULL, D3DCLEAR_TARGET|D3DCLEAR_ZBUFFER , D3DCOLOR_XRGB(0,0,0), 1.0f, 0 );
-		m_BgPanel.Render(15,15);
+		m_BgPanel.Render(0,0);
 
 		x = x + 32;
 		y = y + 8;
