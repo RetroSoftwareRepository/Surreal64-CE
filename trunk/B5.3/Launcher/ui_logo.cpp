@@ -38,7 +38,7 @@ void DrawLogo(bool Menu)
 	DirectSoundDoWork();
 	music.Process();
 
-	m_BgPanel.Render(15,15);
+	m_BgPanel.Render(0,0);
 
 	m_Font.Begin();
 	// Title
@@ -46,7 +46,7 @@ void DrawLogo(bool Menu)
 	// Ez0n3 - update the version: unofficial "community edition"
 	//m_Font.DrawText(320, 35, 0xFFFF7F7f, L"Surreal64 XXX B5", XBFONT_CENTER_X);
 	//freakdave - Version is now defined
-	m_Font.DrawText(320, 35, 0xFFFF7F7f, VERSION, XBFONT_CENTER_X);
+	m_Font.DrawText(305, 20, 0xFFFF7F7f, VERSION, XBFONT_CENTER_X);
 
 	m_Font.End();
 
@@ -89,7 +89,7 @@ void DrawLogo(bool Menu)
 		m_BoxPanel.Destroy();
 		D3DXCreateTextureFromFileEx( g_pd3dDevice, imagename,D3DX_DEFAULT, D3DX_DEFAULT,	1, 0, D3DFMT_LIN_A8R8G8B8 ,	D3DPOOL_MANAGED,D3DX_FILTER_NONE , D3DX_FILTER_NONE, 0x00000000,NULL, NULL,&BoxTexture);		
 		m_BoxPanel.Create(g_pd3dDevice,	BoxTexture, true);
-		m_BoxPanel.Render(450,50);
+		m_BoxPanel.Render(435,35);
 		
 	}
 	
@@ -196,7 +196,7 @@ void DrawCredits()
 DirectSoundDoWork();
 music.Process();//BGMProgress();
 
-m_BgPanel.Render(15,15);
+m_BgPanel.Render(0,0);
 WCHAR	   m_currentname[99];	// Game	name written to	a string
 char name[99];
 FILE *fp;
@@ -260,7 +260,7 @@ void RenderProgress(int progress)
 {
 g_d3d.BeginRender();
 
-m_BgPanel.Render(15,15);
+m_BgPanel.Render(0,0);
 m_Font.Begin();
 m_Font.DrawText(320, 200, 0xFFFFFFFF,L"Loading Rom" , XBFONT_CENTER_X);
 m_Font.End();

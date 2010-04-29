@@ -653,7 +653,7 @@ HRESULT	CXBoxSample::Render()
 		swprintf( m_currentname, L"%S",nameofgame );
 
 			if (iGameidx==iCursorPos){
-                m_Font.DrawText( 60, 60+(20*iGameidx), 0xFFFF7F7f, m_currentname, XBFONT_TRUNCATED,	530);
+                m_Font.DrawText( 45, 45+(20*iGameidx), 0xFFFF7F7f, m_currentname, XBFONT_TRUNCATED,	530);
 				sprintf(romCRC,"%x",rom->m_dwCrc1);
 				sprintf(romname,"%S",m_currentname);
 				for (int i=0;i<3;i++){
@@ -661,7 +661,7 @@ HRESULT	CXBoxSample::Render()
 			}
 			else
 			{
-				m_Font.DrawText( 60, 60+(20*iGameidx), 0xFFEEEEEE, m_currentname, XBFONT_TRUNCATED,	530);
+				m_Font.DrawText( 45, 45+(20*iGameidx), 0xFFEEEEEE, m_currentname, XBFONT_TRUNCATED,	530);
 			}
 
 		}
