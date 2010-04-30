@@ -133,7 +133,7 @@ BOOL LoadAudioPlugin()
 		_AUDIO_LINK_ProcessAList	 	= _AUDIO_ProcessAList;
 		_AUDIO_LINK_RomClosed		 	= _AUDIO_RomClosed;
 
-	}
+	}/*
 	else if (g_iAudioPlugin == _AudioPluginMusyX)
 	{
 		// freakdave - new MusyX Audio plugin
