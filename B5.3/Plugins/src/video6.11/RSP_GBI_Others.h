@@ -53,6 +53,7 @@ void RDP_GFX_DLInMem(Gfx *gfx)
 }
 
 extern Matrix dkrMatrixTransposed;
+
 void RSP_Mtx_DKR(Gfx *gfx)
 {	
 	uint32 dwAddr = RSPSegmentAddr((gfx->words.w1));
@@ -130,7 +131,6 @@ void RSP_Mtx_DKR(Gfx *gfx)
 	LOG_UCODE("    DKR Loading Mtx: %d, command=%d", index, dwCommand);
 	DEBUGGER_PAUSE_AND_DUMP(NEXT_MATRIX_CMD,{TRACE0("Paused at DKR Matrix Cmd");});
 }
-
 void RSP_Vtx_DKR(Gfx *gfx)
 {
 	uint32 dwAddr = RSPSegmentAddr((gfx->words.w1));
@@ -187,9 +187,6 @@ void RSP_Vtx_DKR(Gfx *gfx)
 
 void RSP_Vtx_Gemini(Gfx *gfx)
 {
-	
-	
-
 	uint32 dwAddr = RSPSegmentAddr((gfx->words.w1));
 	uint32 dwV0 =  (((gfx->words.w0)>>9)&0x1F);
 	uint32 dwN  = (((gfx->words.w0) >>19 )&0x1F);
@@ -289,17 +286,19 @@ void DLParser_Set_Addr_Ucode6(Gfx *gfx)
 	gRSP.DKRVtxCount=0;
 }
 
-
-
 void RSP_Vtx_WRUS(Gfx *gfx)
 {
-	uint32 dwAddr = RSPSegmentAddr((gfx->words.w1));
-	uint32 dwLength = ((gfx->words.w0))&0xFFFF;
+	uint32 dwAddr = RSPSegmentAddr(gfx->words.w1);
+	//uint32 dwLength = (gfx->words.w0)&0xFFFF;
 
-	uint32 dwN= (dwLength + 1) / 0x210;
+	uint32 dwV0		 = ((gfx->words.w0 >>16 ) & 0xff) / 5;
+	uint32 dwN		 =  (gfx->words.w0 >>9  ) & 0x7f;
+	uint32 dwLength  =  (gfx->words.w0      ) & 0x1ff;
+
+	//uint32 dwN= (dwLength + 1) / 0x210;
 	//uint32 dwN= (dwLength >> 9);
 	//uint32 dwV0 = (((gfx->words.w0)>>16)&0x3f)/5;
-	uint32 dwV0 = (((gfx->words.w0)>>16)&0xFF)/5;
+	//uint32 dwV0 = (((gfx->words.w0)>>16)&0xFF)/5;
 
 	LOG_UCODE("    Address 0x%08x, v0: %d, Num: %d, Length: 0x%04x", dwAddr, dwV0, dwN, dwLength);
 
@@ -319,11 +318,131 @@ void RSP_Vtx_WRUS(Gfx *gfx)
 	DisplayVertexInfo(dwAddr, dwV0, dwN);
 }
 
+void RSP_Quad3d_ShadowOfEmpire(Gfx *gfx)
+{
+	status.primitiveType = PRIM_TRI2;
+	bool bTrisAdded = false;
+	bool bTexturesAreEnabled = CRender::g_pRender->IsTextureEnabled();
+
+	// While the next command pair is Tri2, add vertices
+	uint32 dwPC = gDlistStack[gDlistStackPointer].pc;
+
+	do {
+		uint32 dwV0 = ((gfx->words.w1 >> 24) & 0xFF) / 5;
+		uint32 dwV1 = ((gfx->words.w1 >> 16) & 0xFF) / 5;
+		uint32 dwV2 = ((gfx->words.w1 >>  8) & 0xFF) / 5;
+
+		uint32 dwV3 = ((gfx->words.w1 >> 24) & 0xFF) / 5;
+		uint32 dwV4 = ((gfx->words.w1 >>  8) & 0xFF) / 5;
+		uint32 dwV5 = ((gfx->words.w1      ) & 0xFF) / 5;
+
+		// Do first tri
+		if (IsTriangleVisible(dwV0, dwV1, dwV2))
+		{
+			DEBUG_DUMP_VERTEXES("Tri2 1/2", dwV0, dwV1, dwV2);
+			if (!bTrisAdded)
+			{
+				if( bTexturesAreEnabled )
+			{
+				PrepareTextures();
+				InitVertexTextureConstants();
+			}
+				CRender::g_pRender->SetCombinerAndBlender();
+				bTrisAdded = true;
+			}
+			PrepareTriangle(dwV0, dwV1, dwV2);
+		}
+
+		// Do second tri
+		if (IsTriangleVisible(dwV3, dwV4, dwV5))
+		{
+			DEBUG_DUMP_VERTEXES("Tri2 2/2", dwV3, dwV4, dwV5);
+			if (!bTrisAdded)
+			{
+				if( bTexturesAreEnabled )
+			{
+				PrepareTextures();
+				InitVertexTextureConstants();
+			}
+				CRender::g_pRender->SetCombinerAndBlender();
+				bTrisAdded = true;
+			}
+			PrepareTriangle(dwV3, dwV4, dwV5);
+		}
+		
+		gfx++;
+		dwPC += 8;
+#ifdef _DEBUG
+	} while (!(pauseAtNext && eventToPause==NEXT_TRIANGLE) && gfx->words.cmd == (uint8)RSP_TRI2);
+#else
+	} while( gfx->words.cmd == (uint8)RSP_TRI2);
+#endif
+
+
+	gDlistStack[gDlistStackPointer].pc = dwPC-8;
+
+
+	if (bTrisAdded)	
+	{
+		CRender::g_pRender->DrawTriangles();
+	}
+
+	DEBUG_TRIANGLE(TRACE0("Pause at GBI1 TRI1"));
+}
+
+void RSP_Tri1_ShadowOfEmpire(Gfx *gfx)
+{
+	status.primitiveType = PRIM_TRI1;
+	bool bTrisAdded = false;
+	bool bTexturesAreEnabled = CRender::g_pRender->IsTextureEnabled();
+
+	// While the next command pair is Tri1, add vertices
+	uint32 dwPC = gDlistStack[gDlistStackPointer].pc;
+	uint32 * pCmdBase = (uint32 *)(g_pRDRAMu8 + dwPC);
+	
+	do
+	{
+		uint32 dwV0 = ((gfx->words.w1 >> 16) & 0xFF) / 5;
+		uint32 dwV1 = ((gfx->words.w1 >> 8) & 0xFF) / 5;
+		uint32 dwV2 = (gfx->words.w1 & 0xFF) / 5;
+
+		if (IsTriangleVisible(dwV0, dwV1, dwV2))
+		{
+			DEBUG_DUMP_VERTEXES("Tri1", dwV0, dwV1, dwV2);
+			LOG_UCODE("    Tri1: 0x%08x 0x%08x %d,%d,%d", gfx->words.w0, gfx->words.w1, dwV0, dwV1, dwV2);
+
+			if (!bTrisAdded)
+			{
+				if( bTexturesAreEnabled )
+				{
+					PrepareTextures();
+					InitVertexTextureConstants();
+				}
+				CRender::g_pRender->SetCombinerAndBlender();
+				bTrisAdded = true;
+			}
+			PrepareTriangle(dwV0, dwV1, dwV2);
+		}
+
+		gfx++;
+		dwPC += 8;
+
+#ifdef _DEBUG
+	} while (!(pauseAtNext && eventToPause==NEXT_TRIANGLE) && gfx->words.cmd == (uint8)RSP_TRI1);
+#else
+	} while (gfx->words.cmd == (uint8)RSP_TRI1);
+#endif
+
+	gDlistStack[gDlistStackPointer].pc = dwPC-8;
+
+	if (bTrisAdded)	
+	{
+		CRender::g_pRender->DrawTriangles();
+	}
+}
+
 void RSP_Vtx_ShadowOfEmpire(Gfx *gfx)
 {
-
-	
-
 	uint32 dwAddr = RSPSegmentAddr((gfx->words.w1));
 	uint32 dwLength = ((gfx->words.w0))&0xFFFF;
 
@@ -351,9 +470,6 @@ void RSP_Vtx_ShadowOfEmpire(Gfx *gfx)
 
 void RSP_DL_In_MEM_DKR(Gfx *gfx)
 {
-	
-	
-
 	// This cmd is likely to execute number of ucode at the given address
 	uint32 dwAddr = (gfx->words.w1);//RSPSegmentAddr((gfx->words.w1));
 	{
@@ -609,9 +725,6 @@ void RSP_Vtx_PD(Gfx *gfx)
 
 void RSP_Set_Vtx_CI_PD(Gfx *gfx)
 {
-	
-	
-
 	// Color index buf address
 	dwPDCIAddr = RSPSegmentAddr((gfx->words.w1));
 }
@@ -680,7 +793,7 @@ void RSP_Tri4_PD(Gfx *gfx)
 }
 
 
-void DLParser_Tri4_Conker(Gfx *gfx)
+void RSP_Tri4_Conker(Gfx *gfx)
 {
 	uint32 w0 = gfx->words.w0;
 	uint32 w1 = gfx->words.w1;
@@ -778,9 +891,9 @@ void RDP_GFX_Force_Vertex_Z_Conker(uint32 dwAddr)
 
 
 
-void DLParser_MoveMem_Conker(Gfx *gfx)
+void RSP_MoveMem_Conker(Gfx *gfx)
 {
-	uint32 dwType    = ((gfx->words.w0)     ) & 0xFE;
+	uint32 dwType = ((gfx->words.w0)     ) & 0xFE;
 	uint32 dwAddr = RSPSegmentAddr((gfx->words.w1));
 	if( dwType == RSP_GBI2_MV_MEM__MATRIX )
 	{
@@ -832,9 +945,29 @@ void RSP_Vtx_Conker(Gfx *gfx)
 	status.dwNumVertices += dwN;
 	DisplayVertexInfo(dwAddr, dwV0, dwN);
 }
+void RSP_Quad_Conker (Gfx *gfx)
+{
+	if ((gfx->words.w0 & 0x00FFFFFF) == 0x2F)
+	{
+		uint32 command = gfx->words.w0>>24;
+		if (command == 0x6)
+		{
+			RSP_S2DEX_SPObjLoadTxSprite(gfx);
+			return;
+		}
+		if (command == 0x7)
+		{
+			RSP_S2DEX_SPObjLoadTxSprite(gfx);
+			return;
+		}
+	}
+	uint32 v0 = ((gfx->words.w0 >> 17) & 0x7F);
+	uint32 v1 = ((gfx->words.w0 >> 9) & 0x7F);
+	uint32 v2 = ((gfx->words.w0 >> 1) & 0x7F);
+	PrepareTriangle(v0,v1,v2);
+}
 
-
-void DLParser_MoveWord_Conker(Gfx *gfx)
+void RSP_MoveWord_Conker(Gfx *gfx)
 {
 	uint32 dwType   = ((gfx->words.w0) >> 16) & 0xFF;
 	if( dwType != RSP_MOVE_WORD_NUMLIGHT )
@@ -1538,6 +1671,7 @@ void DLParser_RDPHalf_1_0xb4_GoldenEye(Gfx *gfx)
 		float yscale = g_textures[0].m_pCTexture->m_dwHeight / (float)(y1-y0);
 		float fs0 = (short)(dw3&0xFFFF)/32768.0f*g_textures[0].m_pCTexture->m_dwWidth;
 		float ft0 = (short)(dw3>>16)/32768.0f*256;
+
 		CRender::g_pRender->TexRect(x0,y0,x1,y1,0,0,xscale,yscale,true,color);
 
 		gDlistStack[gDlistStackPointer].pc += 312;
@@ -1588,17 +1722,12 @@ void DLParser_RSP_Pop_DL_WorldDriver(Gfx *gfx)
 void DLParser_RSP_Last_Legion_0x80(Gfx *gfx)
 {
 	
-	
-
 	gDlistStack[gDlistStackPointer].pc += 16;
 	LOG_UCODE("DLParser_RSP_Last_Legion_0x80");
 }
 
 void DLParser_RSP_Last_Legion_0x00(Gfx *gfx)
 {
-	
-	
-
 	LOG_UCODE("DLParser_RSP_Last_Legion_0x00");
 	gDlistStack[gDlistStackPointer].pc += 16;
 

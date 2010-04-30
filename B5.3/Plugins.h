@@ -25,7 +25,7 @@ enum VideoPlugins
 	_VideoPluginRice510,
 	_VideoPluginRice531,
 	_VideoPluginRice560,
-	_VideoPluginRice610,
+	_VideoPluginRice612,
 	_VideoPluginMissing
 };
 

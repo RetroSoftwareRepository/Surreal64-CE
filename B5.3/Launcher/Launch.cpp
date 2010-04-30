@@ -281,7 +281,7 @@ void Launch()
 					     break;
 				case 2 : XLaunchNewImage("D:\\1964-560.xbe", NULL);
 					break;
-				case 3 : XLaunchNewImage("D:\\1964-611.xbe", NULL);
+				case 3 : XLaunchNewImage("D:\\1964-612.xbe", NULL);
 					break;}
 					break;
 				}
@@ -294,7 +294,7 @@ void Launch()
 					     break;
 				case 2 : XLaunchNewImage("D:\\Pj64-560.xbe", NULL);
 					break;
-				case 3 : XLaunchNewImage("D:\\Pj64-611.xbe", NULL);
+				case 3 : XLaunchNewImage("D:\\Pj64-612.xbe", NULL);
 					break;}
 					break;
 				}

@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.10"
-	Name="PJ64x 6.11"
+	Name="PJ64x 6.12"
 	ProjectGUID="{A6BD6CA7-B31E-4A0C-B621-E1AEA47F5AD9}"
 	RootNamespace="PJ64-X"
 	Keyword="XboxProj">
@@ -48,8 +48,8 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xacteng.lib xboxkrnl.lib AudioBasic.lib AudioJttl.lib AudioNone.lib Input.lib RSP.lib Video611.lib"
-				OutputFile="$(OutDir)/Pj64-611.exe"
+				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xacteng.lib xboxkrnl.lib AudioBasic.lib AudioJttl.lib AudioNone.lib Input.lib RSP.lib Video612.lib"
+				OutputFile="$(OutDir)/Pj64-612.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\Plugins\lib"
 				GenerateDebugInformation="FALSE"
@@ -68,10 +68,10 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="XboxDeploymentTool"
-				RemotePath="xe:\Surreal64 XXX CE\Pj64-611.xbe"/>
+				RemotePath="xe:\Surreal64 XXX CE\Pj64-612.xbe"/>
 			<Tool
 				Name="XboxImageTool"
-				FileName="$(TargetDir)/PJ64-611.xbe"
+				FileName="$(TargetDir)/PJ64-612.xbe"
 				StackSize="131072"
 				DontMountUD="FALSE"
 				NoLibWarn="TRUE"

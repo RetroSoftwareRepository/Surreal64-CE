@@ -159,7 +159,7 @@ string GetVideoPluginName(int iVideoPlugin)
 		case _VideoPluginRice510 : szVideoPlugin = "Rice 5.1.0"; break;
 		case _VideoPluginRice531 : szVideoPlugin = "Rice 5.3.1"; break;
 		case _VideoPluginRice560 : szVideoPlugin = "Rice 5.6.0"; break;
-		case _VideoPluginRice610 : szVideoPlugin = "Rice 6.1.0"; break;
+		case _VideoPluginRice612 : szVideoPlugin = "Rice 6.1.2"; break;
 		case _VideoPluginMissing : 
 		default : szVideoPlugin = "Unknown"; break;
 	}	
@@ -793,7 +793,7 @@ void UltraHLELaunch();
 void launch510();
 void launch531();
 void launch560();
-void launch611();
+void launch612();
 extern int actualrom;
 extern void display_compatible();
 
@@ -825,7 +825,7 @@ void selectvideomode(void)
 	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,L"Rice 5.10",launch510);
 	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,L"Rice 5.31",launch531);
 	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,L"Rice 5.60",launch560);
-	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,L"Rice 6.11",launch611);
+	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,L"Rice 6.12",launch612);
 
 	XLMenu_Activate(m_pSettingsMenu);
 
@@ -974,7 +974,7 @@ ConfigAppSave2();
 Launch();
 }
 
-void launch611()
+void launch612()
 {
 videoplugin = 3;
 ConfigAppSave2();
@@ -998,7 +998,7 @@ void LaunchHideScreens(void)
 			break;
 		case _VideoPluginRice560 : videoplugin = _VideoPluginRice560; //5.6.0
 			break;
-		case _VideoPluginRice610 : videoplugin = _VideoPluginRice610; //6.1.1
+		case _VideoPluginRice612 : videoplugin = _VideoPluginRice612; //6.1.2
 			break;
 		default : videoplugin = _VideoPluginRice560; // launch with 560 if no plugin is set or unrecognized
 			break;

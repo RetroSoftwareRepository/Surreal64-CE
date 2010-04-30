@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.10"
-	Name="Video 6.11"
+	Name="Video 6.12"
 	ProjectGUID="{B03134F1-3846-4D16-B5F3-3F69C54DE23A}"
 	Keyword="XboxProj">
 	<Platforms>
@@ -44,7 +44,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="../../lib/Video611.lib"/>
+				OutputFile="../../lib/Video612.lib"/>
 			<Tool
 				Name="VCPostBuildEventTool"/>
 			<Tool

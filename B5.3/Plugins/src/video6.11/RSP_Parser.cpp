@@ -64,19 +64,19 @@ UcodeMap *ucodeMaps[] =
 	&ucodeMap1,				// ucode 1 - GBI1
 	NULL,					// ucode 2 - Golden Eye
 	&ucodeMap3,				// ucode 3 - S2DEX GBI2
-	NULL,					// ucode 4 - Wave Racer
+	&ucodeMap4,				// ucode 4 - Wave Racer
 	&ucodeMap5,				// ucode 5 - BGI2
-	NULL,					// ucode 6 - DKR
+	&ucodeMap6,				// ucode 6 - DKR
 	&ucodeMap7,				// ucode 7 - S2DEX
 	NULL,					// ucode 8 - ucode 0 with sprite2D, for Demo Puzzle Master 64
-	NULL,					// ucode 9 - Perfect Dark
+	&ucodeMap9,				// ucode 9 - Perfect Dark
 	NULL,					// ucode 10 - Conker
-	NULL,					// ucode 11 - Gemini
+	&ucodeMap11,			// ucode 11 - Gemini
 	NULL,					// ucode 12 - Silicon Valley, Spacestation
 	NULL,					// ucode 13 - modified ucode S2DEX
 	NULL,					// ucode 14 - OgreBattle Background
 	NULL,					// ucode 15 - ucode 0 with sprite2D
-	NULL,					// ucode 16 - Star War, Shadow of Empire
+	&ucodeMap16,			// ucode 16 - Star War, Shadow of Empire
 	NULL,					// ucode 17 - Star Wars - Rogue Squadron, 
 	NULL,					// ucode 18 - World Driver Championship
 	NULL,					// ucode 19 - Last Legion UX
@@ -379,21 +379,22 @@ void RDP_SetUcodeMap(int ucode)
 		break;
 	case 3:	// S2DEX GBI2
 		break;
-	case 4:
-		memcpy( &LoadedUcodeMap, &ucodeMap0, sizeof(UcodeMap));
+	case 4: //Wave Race
+		/*memcpy( &LoadedUcodeMap, &ucodeMap0, sizeof(UcodeMap));
 		LoadedUcodeMap[4]=RSP_Vtx_WRUS;
 		LoadedUcodeMap[0xb1]=RSP_GBI1_Tri2;
 		//LoadedUcodeMap[9]=RSP_GBI1_Sprite2DBase;
 		//LoadedUcodeMap[0xaf]=RSP_GBI1_LoadUCode;
 		//LoadedUcodeMap[0xb0]=RSP_GBI1_BranchZ;
 		//LoadedUcodeMap[0xb2]=RSP_GBI1_ModifyVtx;
-		status.bUseModifiedUcodeMap = true;
+		status.bUseModifiedUcodeMap = true;*/
 		break;
 	case 5:	// F3DEX GBI2
 		break;
 	case 6: // DKR, Jet Force Gemini, Mickey
+		break;
 	case 11: // DKR, Jet Force Gemini, Mickey
-		memcpy( &LoadedUcodeMap, &ucodeMap0, sizeof(UcodeMap));
+		/*memcpy( &LoadedUcodeMap, &ucodeMap0, sizeof(UcodeMap));
 		LoadedUcodeMap[1]=RSP_Mtx_DKR;
 		LoadedUcodeMap[4]=RSP_Vtx_DKR;
 		if( ucode == 11 )	LoadedUcodeMap[4]=RSP_Vtx_Gemini;
@@ -404,7 +405,7 @@ void RDP_SetUcodeMap(int ucode)
 		//LoadedUcodeMap[9]=RSP_GBI1_Sprite2DBase;
 		//LoadedUcodeMap[0xb0]=RSP_GBI1_BranchZ;
 		//LoadedUcodeMap[0xb2]=RSP_GBI1_ModifyVtx;
-		status.bUseModifiedUcodeMap = true;
+		status.bUseModifiedUcodeMap = true;*/
 		break;
 	case 7: // S2DEX GBI1
 		break;
@@ -416,34 +417,34 @@ void RDP_SetUcodeMap(int ucode)
 		status.bUseModifiedUcodeMap = true;
 		break;
 	case 9:	// Perfect Dark
-		memcpy( &LoadedUcodeMap, &ucodeMap0, sizeof(UcodeMap));
+		/*memcpy( &LoadedUcodeMap, &ucodeMap0, sizeof(UcodeMap));
 		LoadedUcodeMap[4]=RSP_Vtx_PD;
 		LoadedUcodeMap[7]=RSP_Set_Vtx_CI_PD;
 		LoadedUcodeMap[0xb1]=RSP_Tri4_PD;
 		LoadedUcodeMap[0xb4]=DLParser_RDPHalf_1_0xb4_GoldenEye;
-		status.bUseModifiedUcodeMap = true;
+		status.bUseModifiedUcodeMap = true;*/
 		break;
 	case 10: // Conker BFD
 		memcpy( &LoadedUcodeMap, &ucodeMap5, sizeof(UcodeMap));
 		LoadedUcodeMap[1]=RSP_Vtx_Conker;
-		LoadedUcodeMap[0x10]=DLParser_Tri4_Conker;
-		LoadedUcodeMap[0x11]=DLParser_Tri4_Conker;
-		LoadedUcodeMap[0x12]=DLParser_Tri4_Conker;
-		LoadedUcodeMap[0x13]=DLParser_Tri4_Conker;
-		LoadedUcodeMap[0x14]=DLParser_Tri4_Conker;
-		LoadedUcodeMap[0x15]=DLParser_Tri4_Conker;
-		LoadedUcodeMap[0x16]=DLParser_Tri4_Conker;
-		LoadedUcodeMap[0x17]=DLParser_Tri4_Conker;
-		LoadedUcodeMap[0x18]=DLParser_Tri4_Conker;
-		LoadedUcodeMap[0x19]=DLParser_Tri4_Conker;
-		LoadedUcodeMap[0x1a]=DLParser_Tri4_Conker;
-		LoadedUcodeMap[0x1b]=DLParser_Tri4_Conker;
-		LoadedUcodeMap[0x1c]=DLParser_Tri4_Conker;
-		LoadedUcodeMap[0x1d]=DLParser_Tri4_Conker;
-		LoadedUcodeMap[0x1e]=DLParser_Tri4_Conker;
-		LoadedUcodeMap[0x1f]=DLParser_Tri4_Conker;
-		LoadedUcodeMap[0xdb]=DLParser_MoveWord_Conker;
-		LoadedUcodeMap[0xdc]=DLParser_MoveMem_Conker;
+		LoadedUcodeMap[0x10]=RSP_Tri4_Conker;
+		LoadedUcodeMap[0x11]=RSP_Tri4_Conker;
+		LoadedUcodeMap[0x12]=RSP_Tri4_Conker;
+		LoadedUcodeMap[0x13]=RSP_Tri4_Conker;
+		LoadedUcodeMap[0x14]=RSP_Tri4_Conker;
+		LoadedUcodeMap[0x15]=RSP_Tri4_Conker;
+		LoadedUcodeMap[0x16]=RSP_Tri4_Conker;
+		LoadedUcodeMap[0x17]=RSP_Tri4_Conker;
+		LoadedUcodeMap[0x18]=RSP_Tri4_Conker;
+		LoadedUcodeMap[0x19]=RSP_Tri4_Conker;
+		LoadedUcodeMap[0x1a]=RSP_Tri4_Conker;
+		LoadedUcodeMap[0x1b]=RSP_Tri4_Conker;
+		LoadedUcodeMap[0x1c]=RSP_Tri4_Conker;
+		LoadedUcodeMap[0x1d]=RSP_Tri4_Conker;
+		LoadedUcodeMap[0x1e]=RSP_Tri4_Conker;
+		LoadedUcodeMap[0x1f]=RSP_Tri4_Conker;
+		LoadedUcodeMap[0xdb]=RSP_MoveWord_Conker;
+		LoadedUcodeMap[0xdc]=RSP_MoveMem_Conker;
 		status.bUseModifiedUcodeMap = true;
 		break;
 	case 12: // Silicon Velley, Space Station
@@ -475,9 +476,9 @@ void RDP_SetUcodeMap(int ucode)
 		status.bUseModifiedUcodeMap = true;
 		break;
 	case 16: // Star War, Shadow Of Empire
-		memcpy( &LoadedUcodeMap, &ucodeMap0, sizeof(UcodeMap));
-		LoadedUcodeMap[4]=RSP_Vtx_ShadowOfEmpire;
-		status.bUseModifiedUcodeMap = true;
+		//memcpy( &LoadedUcodeMap, &ucodeMap0, sizeof(UcodeMap));
+		//LoadedUcodeMap[4]=RSP_Vtx_ShadowOfEmpire;
+		//status.bUseModifiedUcodeMap = true;
 		break;
 	case 17:	//Indiana Jones, does not work anyway
 		memcpy( &LoadedUcodeMap, &ucodeMap1, sizeof(UcodeMap));
