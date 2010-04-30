@@ -11,10 +11,10 @@
 #include "zlib/unzip.h"
 #include "../Ingamemenu/xlmenu.h"
 #include "musicmanager.h"
-#include "Network.h"
+//#include "Network.h"
 
-extern BOOL IsXboxConnected();
-extern BOOL UpdateIni(int Version);
+//extern BOOL IsXboxConnected();
+//extern BOOL UpdateIni(int Version);
 
 extern CMusicManager  music;
 extern bool bMusicPlaying;

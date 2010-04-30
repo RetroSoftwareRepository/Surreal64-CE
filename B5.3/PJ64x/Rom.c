@@ -675,7 +675,7 @@ void SetRomDirectory ( char * Directory, BOOL IgnoreDefaultDir ) {
 
 char * GetIniFileName(void) {
 	 
-	return "D:\\Project64X.rdb";
+	return "D:\\Project64.rdb";
 }
 
 
