@@ -45,7 +45,6 @@ extern int FlickerFilter;
 extern bool SoftDisplayFilter;
 extern int TextureMode;
 extern int VertexMode;
-extern bool FrameSkip;
 //extern float XBOX_CONTROLLER_DEAD_ZONE;
 #define XBOX_CONTROLLER_DEAD_ZONE 8600
 extern unsigned int Sensitivity;
