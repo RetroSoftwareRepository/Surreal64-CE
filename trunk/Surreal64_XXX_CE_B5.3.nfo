@@ -1,0 +1,33 @@
+Changelog for Surreal64 XXX CE B5.3 (including all changes since B5.1)
+-----------------------------------------------------------------------
+
+Changed: Load/Save Surreal.ini directly from/to D: instead of T: if running from HDD
+Changed: Load/Save Surreal.ini directly from/to T: if running from CD/DVD. Launcher loads Surreal.ini from D: in case it doesn't exist on T:
+Changed: No more Surreal10.ini in T:
+Changed: Removed XBINPUT_DEADZONE and XBINPUT_SUMMAND. These settings are no longer valid for any ini.
+Changed: Some smaller changes regarding menu appearance
+Changed: RiceVideo6.1.2.ini is based on http://code.google.com/p/emu-1964/source/browse/bin/Release/plugin/1964Video.ini
+Fixed: Music could not be paused / resumed in all menus
+Fixed: MemPak/RumblePak detection code in Launcher and Ingame menu (1964/PJ64/UHLE)
+Fixed: JttL audio plugin showed up twice and did not work (Launcher)
+Fixed: HDTV 480p detection missing in some video plugins
+Fixed: Video plugins had different Backbuffer / DepthStencil formats, changed all to 16 Bit
+Fixed: Controller sensitivity settings are now properly implemented (thanks to weinerschnitzel)
+Fixed: Updated Surreal.ini (Super Mario 64 - The Missing Stars now showing up properly)
+Fixed: Screenshot function was broken -> reverted
+Added: Menu option to enable / disable launch screens (by ez0n3)
+Added: Monkeys69's edited Surreal.ini (http://forums.xbox-scene.com/index.php?showtopic=695621)
+Added: New DefaultPak option -> "None" (All Paks removed)
+Added: New Frameskip option in Launcher / Ingame menu (Rice plugins only, UHLE not supported)
+Added: New default skin (thanks to DarkNior)
+Added: New uCodes (Star Wars - Shadows of the Empire, Perfect Dark, Wave Rave, Jet Force Gemini, Diddy Kong Racing) and smaller fixes from http://code.google.com/p/emu-1964/source/list (r1-r65). This actually upgrades RiceVideo6.1.1 to 6.1.2
+Added: uCode entry for Zelda Master Quest in 1964.ini
+
+Note: Surreal64xxx CE B6.0 svn-03-Jan-2010 is outdated. Please upgrade to B5.3!
+Note: Delete your ini folder before upgrading to B5.3
+Note: For even greater compatibility you might want to experiment with the Rice ini files, ultra.ini, 1964.ini, Project64.rdb, take a look into to the Docs folder to find out more!
+
+----------------------------------------------
+http://sourceforge.net/projects/surreal64xxxce
+http://forums.xbox-scene.com/index.php?showforum=17
+http://freakdave.xbox-scene.com
