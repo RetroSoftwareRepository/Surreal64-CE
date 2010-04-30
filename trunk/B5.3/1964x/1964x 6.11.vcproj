@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.10"
-	Name="1964x 6.11"
+	Name="1964x 6.12"
 	ProjectGUID="{1FDAFD09-DCC7-484D-87A8-EDE51A36AA60}"
 	RootNamespace="1964x"
 	Keyword="XboxProj">
@@ -46,8 +46,8 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xacteng.lib xboxkrnl.lib zlib\xzlib.lib AudioBasic.lib AudioJttl.lib AudioNone.lib Input.lib RSP.lib Video611.lib"
-				OutputFile="$(OutDir)/1964-611.exe"
+				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xacteng.lib xboxkrnl.lib zlib\xzlib.lib AudioBasic.lib AudioJttl.lib AudioNone.lib Input.lib RSP.lib Video612.lib"
+				OutputFile="$(OutDir)/1964-612.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\Plugins\lib\"
 				IgnoreAllDefaultLibraries="FALSE"
@@ -68,10 +68,10 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="XboxDeploymentTool"
-				RemotePath="xe:\Surreal64 XXX CE\1964-611.xbe"/>
+				RemotePath="xe:\Surreal64 XXX CE\1964-612.xbe"/>
 			<Tool
 				Name="XboxImageTool"
-				FileName="$(TargetDir)1964-611.xbe"
+				FileName="$(TargetDir)1964-612.xbe"
 				StackSize="65536"
 				UDCluster="3"
 				TitleID="0xA64FEA57"

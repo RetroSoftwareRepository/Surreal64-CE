@@ -129,7 +129,7 @@ bool D3DRender::InitDeviceObjects()
 //#ifdef _XBOX
 	gD3DDevWrapper.SetRenderState( D3DRS_FOGTABLEMODE, D3DFOG_NONE );
 //#else
-//	gD3DDevWrapper.SetRenderState( D3DRS_FOGTABLEMODE, D3DFOG_LINEAR );
+	//gD3DDevWrapper.SetRenderState( D3DRS_FOGTABLEMODE, D3DFOG_LINEAR );
 //#endif
 
 	// Dafault is ZBuffer disabled

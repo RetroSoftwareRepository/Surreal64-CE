@@ -27,8 +27,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 extern int TextureMode;
 extern bool FrameSkip;
 
-#define MAIN_KEY		"Software\\RICEVIDEO\\Version610"
-#define INI_FILE		"RiceVideo6.1.0.ini"
+#define MAIN_KEY		"Software\\RICEVIDEO\\Version612"
+#define INI_FILE		"RiceVideo6.1.2.ini"
 char *project_name =	"Rice's Video Plugin";
 
 // Disable the config dialog box to allow Vtune call graph feature to work
@@ -112,7 +112,7 @@ char	szIniFileName[300];
 const RenderEngineSetting RenderEngineSettings[] =
 {
 	"DirectX",	DIRECTX_DEVICE,
-	"OpenGL", OGL_DEVICE,
+	//"OpenGL", OGL_DEVICE,
 };
 
 const SettingInfo TextureQualitySettings[] =
@@ -140,13 +140,13 @@ const SettingInfo ForceTextureFilterSettings[] =
 const SettingInfo TextureEnhancementSettings[] =
 {
 	"N64 original texture (No enhancement)",	TEXTURE_NO_ENHANCEMENT,
-	"2x (Double the texture size)",	TEXTURE_2X_ENHANCEMENT,
-	"2xSaI", TEXTURE_2XSAI_ENHANCEMENT,
-	"hq2x", TEXTURE_HQ2X_ENHANCEMENT,
-	"lq2x", TEXTURE_LQ2X_ENHANCEMENT,
-	"hq4x", TEXTURE_HQ4X_ENHANCEMENT,
-	"Sharpen", TEXTURE_SHARPEN_ENHANCEMENT,
-	"Sharpen More", TEXTURE_SHARPEN_MORE_ENHANCEMENT,
+	//"2x (Double the texture size)",	TEXTURE_2X_ENHANCEMENT,
+	//"2xSaI", TEXTURE_2XSAI_ENHANCEMENT,
+	//"hq2x", TEXTURE_HQ2X_ENHANCEMENT,
+	//"lq2x", TEXTURE_LQ2X_ENHANCEMENT,
+	//"hq4x", TEXTURE_HQ4X_ENHANCEMENT,
+	//"Sharpen", TEXTURE_SHARPEN_ENHANCEMENT,
+	//"Sharpen More", TEXTURE_SHARPEN_MORE_ENHANCEMENT,
 };
 
 const SettingInfo TextureEnhancementControlSettings[] =
@@ -161,7 +161,7 @@ const SettingInfo TextureEnhancementControlSettings[] =
 const SettingInfo colorQualitySettings[] =
 {
 	"16-bit",	TEXTURE_FMT_A4R4G4B4,
-	"32-bit (def)",	TEXTURE_FMT_A8R8G8B8,
+	//"32-bit (def)",	TEXTURE_FMT_A8R8G8B8,
 };
 
 const char*	strDXDeviceDescs[] = { "HAL", "REF" };
@@ -737,8 +737,8 @@ void ReadConfiguration(void)
 		options.bHideAdvancedOptions = TRUE;
 		options.bDisplayOnscreenFPS = FALSE;
 		options.DirectXAntiAliasingValue = 0;
-		options.DirectXCombiner = DX_BEST_FIT;
-		options.DirectXDevice = 0;	// HAL device
+		options.DirectXCombiner = DX_PIXEL_SHADER;
+		options.DirectXDevice = DIRECTX_DEVICE;	// HAL device
 		options.DirectXAnisotropyValue = 0;
 		options.DirectXMaxFSAA = 16;
 		options.FPSColor = 0xFFFFFFFF;
@@ -1912,10 +1912,23 @@ char * left(char * src, int nchars)
 }
 
 char * right(char *src, int nchars)
-{
+{/*
 	static char dst[300];			// BUGFIX (STRMNNRM)
 	strncpy(dst, src + strlen(src) - nchars, nchars);
 	dst[nchars]=0;
+	return dst;*/
+	static char dst[300];
+
+	int srclen = strlen(src);
+	if (nchars >= srclen)
+	{
+		strcpy(dst, src);
+	}
+	else
+	{
+		strncpy(dst, src + srclen - nchars, nchars);
+		dst[nchars]=0;
+	}
 	return dst;
 }
 

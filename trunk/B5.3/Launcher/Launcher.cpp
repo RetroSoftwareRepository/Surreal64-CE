@@ -406,7 +406,7 @@ HRESULT	CXBoxSample::Initialize()
 							break;
 						case _VideoPluginRice560 : videoplugin = _VideoPluginRice560; //5.6.0
 							break;
-						case _VideoPluginRice610 : videoplugin = _VideoPluginRice610; //6.1.1
+						case _VideoPluginRice612 : videoplugin = _VideoPluginRice612; //6.1.2
 							break;
 						default : videoplugin = _VideoPluginRice560; // launch with 560 if no plugin is set or unrecognized
 							break;

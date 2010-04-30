@@ -102,6 +102,7 @@ int FormatToSize(D3DFORMAT fmt)
 		case D3DFMT_D15S1:
 		case D3DFMT_D16:
 		*/
+	default:
 	case D3DFMT_X1R5G5B5:
 	case D3DFMT_D16:
 		return 16;
@@ -508,7 +509,7 @@ bool CDXGraphicsContext::Initialize(HWND hWnd, HWND hWndStatus,
 
 	//CreateRenderTarget();
 	_INPUT_LoadButtonMap(ControllerConfig);
-    strcat(emuname," Video 6.11");
+    strcat(emuname," Video 6.12");
 
 	return hr==S_OK;
 }
@@ -2002,6 +2003,7 @@ HRESULT CD3DDevWrapper::SetRenderState(D3DRENDERSTATETYPE State,DWORD Value)
 	if( m_pD3DDev != NULL )
 	{
 		///if( m_savedRenderStates[State] != Value )
+		if (m_savedRenderStates[State] != Value || !m_savedRenderStates[State])
 		{
 			m_savedRenderStates[State] = Value;
 			return m_pD3DDev->SetRenderState(State, Value);
@@ -2020,6 +2022,7 @@ HRESULT CD3DDevWrapper::SetTextureStageState(DWORD Stage,D3DTEXTURESTAGESTATETYP
 #endif
 	{
 		//if( m_savedTextureStageStates[Stage][Type] != Value )
+		if (m_savedTextureStageStates[Stage][Type] != Value || !m_savedTextureStageStates[Stage][Type])
 		{
 			switch( Type )
 			{
