@@ -3,7 +3,7 @@
 #include <xbfont.h>
 #include "musicmanager.h"
 
-#define VERSION L"Surreal64 XXX CE B5.3"
+#define VERSION L"Surreal64 XXX CE B5.31"
 extern CMusicManager  music;
 extern int actualrom;
 CPanel m_BgPanel;
