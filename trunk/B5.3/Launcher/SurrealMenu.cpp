@@ -570,12 +570,12 @@ void ToggleAudioPlugin(bool inc)
 	if (inc)
 	{
 		iAudioPlugin++;
-		if (iAudioPlugin > (_AudioPluginMissing - 2)) iAudioPlugin=0;
+		if (iAudioPlugin > (_AudioPluginMissing - 1)) iAudioPlugin=0;
 	}
 	else
 	{
 		iAudioPlugin--;
-		if (iAudioPlugin < 0) iAudioPlugin=(_AudioPluginMissing - 2);
+		if (iAudioPlugin < 0) iAudioPlugin=(_AudioPluginMissing - 1);
 	}
 
 	XLMenu_CurRoutine = NULL;
