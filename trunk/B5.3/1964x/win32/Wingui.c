@@ -132,12 +132,12 @@ void __cdecl main()
 	
 	
 	
-	
+	//weinerschnitzel - reverted for 128mb users
 	// Ez0n3 - old method of rom paging - but still using 128MB var
 	//g_dwNumFrames = 64; //default 64 set in rompaging.h at and assigned in 128meg.c
-	Enable128MegCaching();
-	g_frameTable = (Frame *)VirtualAlloc(NULL, g_dwNumFrames * sizeof(Frame *), MEM_COMMIT, PAGE_EXECUTE_READWRITE);
-	g_memory = (uint8 *)VirtualAlloc(NULL, RP_PAGE_SIZE * g_dwNumFrames, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+	//Enable128MegCaching();
+	//g_frameTable = (Frame *)VirtualAlloc(NULL, g_dwNumFrames * sizeof(Frame *), MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+	//g_memory = (uint8 *)VirtualAlloc(NULL, RP_PAGE_SIZE * g_dwNumFrames, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
 
 	
 	

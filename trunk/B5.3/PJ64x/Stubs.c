@@ -7,6 +7,7 @@
 DWORD g_dwNumFrames = 64; // default 4mb of memory
 
 
+/*---------------Doesnt work for 128mb-------------------
 // Ez0n3 - old method of rom paging
 #define PAGE_NOT_IN_MEMORY	(g_dwNumFrames+1)
 #define FRAME_FREE			0xFFFFFFFF
@@ -17,6 +18,7 @@ Frame *g_frameTable;
 
 // Memory
 //uint8 g_memory[RP_PAGE_SIZE*64];
+*/
 uint8 *g_memory;
 
 #define SHIFTER1_READ	2				/* Shifts off insignificant bits from memory_read_functions array size. The
@@ -35,6 +37,7 @@ uint8 *g_memory;
 // is your standard page table. each entry in the array contains a number indicating
 // the frame that stores its page in memory
 
+/*---------------Doesnt work for 128mb-------------------
 // Ez0n3 - old method of rom paging
 uint8 *g_pageTable;
 uint32 g_pageTableSize;
@@ -43,6 +46,7 @@ uint32 g_memFunctionHits;
 uint32 g_pageHits;
 uint32 g_pageMisses;
 uint32 g_dynaHits;
+*/
 
 
 
@@ -204,6 +208,7 @@ BOOL ByteSwap2(uint32 Size, uint8 *Image, uint8 bswaptype)
 BOOL InitVirtualRomData(char *rompath)
 {
 	
+	/*---------------Doesnt work for 128mb-------------------
 	// Ez0n3 - old method of rom paging
 	//FILE *temporaryFile = NULL; //lets be consistent here...
 
@@ -228,10 +233,10 @@ BOOL InitVirtualRomData(char *rompath)
 	fclose(g_temporaryRomFile);
 
 	return TRUE;
-	
+	*/
 	
 // freakdave - new method of rom paging
-/*
+
 	FILE *temporaryFile = NULL;
 
 	strcpy(g_temporaryRomPath, "Z:\\TemporaryRom.dat");
@@ -256,7 +261,7 @@ BOOL InitVirtualRomData(char *rompath)
 	fclose(temporaryFile);
 
 	return TRUE;
-*/
+
 	
 }
 
@@ -332,26 +337,29 @@ void CloseVirtualRomData()
 		g_temporaryRomFile = NULL;
 
 		
+		/*---------------Doesnt work for 128mb-------------------
 		// Ez0n3 - old method of rom paging
-		free(g_pageTable);
+		//free(g_pageTable);
+		*/
 		
 	}
 }
 
 
 // freakdave - new method of rom paging
-/*static BOOL indic[256];
+static BOOL indic[256];
 static uint8 adress[256];
 static uint8 adfix[256];
 uint32 pagesize;  // 256*1024 -> uint32
 uint16 nombreframes; // 256 max -> uint8 = 255 max -> uint16
 static uint8 plusgrand;
 uint32 poubelle = 0;
-BOOL pause = 0;*/
+BOOL pause = 0;
 
 
 void InitPageAndFrameTables()
 {
+	/*---------------Doesnt work for 128mb-------------------
 	// Ez0n3 - old method of rom paging
 	uint32 i;
 
@@ -373,10 +381,11 @@ void InitPageAndFrameTables()
 		g_frameTable[i].pageNum				= FRAME_FREE;
 		g_frameTable[i].lastUsed.QuadPart	= NEVER;
 	}
+	*/
 
 
 // freakdave - new method of rom paging
-/*
+
 	uint16 i;
 	pagesize = 256*1024;
 	nombreframes = g_dwNumFrames;
@@ -399,12 +408,13 @@ void InitPageAndFrameTables()
 	adfix[i] = i;
 	} 
 	plusgrand = nombreframes-1;
-*/
+
 
 }
 
 uint32 ReadUWORDFromROM(uint32 location)
 {
+	/*---------------Doesnt work for 128mb-------------------
 	// Ez0n3 - old method of rom paging
 	uint32 i;
 	uint32 pageNumberOfLocation;
@@ -495,10 +505,10 @@ uint32 ReadUWORDFromROM(uint32 location)
 			return *(uint32 *)(g_memory + (g_pageTable[pageNumberOfLocation]*RP_PAGE_SIZE) + offsetFromPage);
 		}
 	}
-	
+	*/
 
 // freakdave - new method of rom paging
-/*
+
 	uint32 location2 = location & 0x7ffffff;
 
 	uint8 numero = (location2/pagesize);
@@ -522,13 +532,14 @@ uint32 ReadUWORDFromROM(uint32 location)
 	}
 	// return information
 	return *(uint32*) (g_memory + (adress[numero] * pagesize) + adresstemp);
-*/
+
 	
 }
 
 uint16 ReadUHALFFromROM(uint32 location)
 {
 
+	/*---------------Doesnt work for 128mb-------------------
 	// Ez0n3 - old method of rom paging
 	uint32 i;
 	uint32 pageNumberOfLocation;
@@ -619,10 +630,10 @@ uint16 ReadUHALFFromROM(uint32 location)
 			return *(uint16 *)(g_memory + (g_pageTable[pageNumberOfLocation]*RP_PAGE_SIZE) + offsetFromPage);
 		}
 	}
-
+*/
 
 // freakdave - new method of rom paging
-/*
+
 	uint32 location2 = location & 0x7ffffff;
 
 	uint8 numero = (location2/pagesize);
@@ -644,13 +655,14 @@ uint16 ReadUHALFFromROM(uint32 location)
 	}
 	// return information
 	return *(uint16*) (g_memory + (adress[numero] * pagesize) + adresstemp);
-*/
+
 	
 }
 
 uint8 ReadUBYTEFromROM(uint32 location)
 {
 	
+	/*---------------Doesnt work for 128mb-------------------
 	// Ez0n3 - old method of rom paging
 	uint32 i;
 	uint32 pageNumberOfLocation;
@@ -741,10 +753,10 @@ uint8 ReadUBYTEFromROM(uint32 location)
 			return *(uint8 *)(g_memory + (g_pageTable[pageNumberOfLocation]*RP_PAGE_SIZE) + offsetFromPage);
 		}
 	}
-
+*/
 
 // freakdave - new method of rom paging
-/*
+
 	uint32 location2 = location & 0x7ffffff;
 
 	uint8 numero = (location2/pagesize);
@@ -766,13 +778,14 @@ uint8 ReadUBYTEFromROM(uint32 location)
 	}
 	// return information
 	return *(uint8*) (g_memory + (adress[numero] * pagesize) + adresstemp);
-*/
+
 	
 }
 
 __int32 ReadSWORDFromROM(uint32 location)
 {
 
+	/*---------------Doesnt work for 128mb-------------------
 	// Ez0n3 - old method of rom paging
 	uint32 i;
 	uint32 pageNumberOfLocation;
@@ -866,10 +879,10 @@ __int32 ReadSWORDFromROM(uint32 location)
 	}
 
 	return retVal;
-
+*/
 
 // freakdave - new method of rom paging
-/*
+
 	uint32 location2 = location & 0x7ffffff;
 
 	uint8 numero = (location2/pagesize);
@@ -891,7 +904,7 @@ __int32 ReadSWORDFromROM(uint32 location)
 	}
 	// return information
 	return *(__int32*) (g_memory + (adress[numero] * pagesize) + adresstemp);
-*/
+
 	
 }
 

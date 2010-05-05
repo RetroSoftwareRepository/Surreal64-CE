@@ -780,12 +780,12 @@ VOID __cdecl main()
 
 	g_dwNormalCompileBufferSize = loaddwPJ64DynaMem() * 1024 * 1024;
 	
-	
+	//weinerschnitzel disabled per 128mb user issues
 	// Ez0n3 - old method of rom paging - but still using 128MB var
 	//g_dwNumFrames = 64; //default 64 set in stubs.h and assigned below (bottom)
-	Enable128MegCaching();
-	g_frameTable = (Frame *)VirtualAlloc(NULL, g_dwNumFrames * sizeof(Frame *), MEM_COMMIT, PAGE_EXECUTE_READWRITE);
-	g_memory = (uint8 *)VirtualAlloc(NULL, RP_PAGE_SIZE * g_dwNumFrames, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+	//Enable128MegCaching();
+	//g_frameTable = (Frame *)VirtualAlloc(NULL, g_dwNumFrames * sizeof(Frame *), MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+	//g_memory = (uint8 *)VirtualAlloc(NULL, RP_PAGE_SIZE * g_dwNumFrames, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
 	
 	
 	// Ez0n3 - reinstate max video mem
