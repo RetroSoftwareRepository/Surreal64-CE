@@ -19,9 +19,9 @@
 
 
 // Ez0n3 - old method of rom paging
-#define RP_PAGE_SIZE		0x10000		// 64k pages
+//#define RP_PAGE_SIZE		0x10000		// 64k pages
 // freakdave - new method of rom paging
-//#define RP_PAGE_SIZE		0x40000		// 64k pages
+#define RP_PAGE_SIZE		0x40000		// 64k pages
 
 
 extern DWORD g_dwNumFrames;

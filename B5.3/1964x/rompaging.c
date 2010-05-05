@@ -28,7 +28,7 @@
 #include "n64rcp.h"
 
 
-
+/*---------------Doesnt work for 128mb-------------------
 // Ez0n3 - old method of rom paging
 DWORD g_dwNumFrames = 64; // default 4mb of memory
 #define PAGE_NOT_IN_MEMORY	(g_dwNumFrames+1)
@@ -39,6 +39,7 @@ Frame *g_frameTable;
 uint8 *g_memory;
 uint8 *g_pageTable;
 uint32 g_pageTableSize;
+
 FILE	*g_temporaryRomFile = NULL;
 
 
@@ -46,17 +47,37 @@ FILE	*g_temporaryRomFile = NULL;
 uint8 *g_memory;
 char    g_temporaryRomPath[260];
 uint32	g_romSize;
+*/
 
+//---------------------------------------------------
+//weinerschnitzel - reverted XXX B5 for 128mb users if freakdave's doesnt work
+FILE	*g_temporaryRomFile = NULL;
+char    g_temporaryRomPath[260];
+uint32	g_romSize;
 
+uint8 *g_memory;
 
+char    g_temporaryRomPath[260];
+uint32	g_romSize;
+
+static BOOL indic[256];
+static uint8 adress[256];
+static uint8 adfix[256];
+
+uint32 pagesize;  // 256*1024 -> uint32
+uint16 nombreframes = 64; // 256 max -> uint8 = 255 max -> uint16
+static uint8 plusgrand;
+//---------------------------------------------------
+
+/*
 // freakdave - new method of rom paging
-/*static BOOL indic[256];
+static BOOL indic[256];
 static uint8 adress[256];
 static uint8 adfix[256];
 uint32 pagesize;  // 256*1024 -> uint32
 uint16 nombreframes = 64; // 256 max -> uint8 = 255 max -> uint16
-static uint8 plusgrand;*/
-
+static uint8 plusgrand;
+*/
 
 
 BOOL InitVirtualRomData(char *rompath)
@@ -90,16 +111,20 @@ BOOL InitVirtualRomData(char *rompath)
 	fread(rominfo.name, sizeof(uint8), 20, g_temporaryRomFile);
 	SwapRomName(rominfo.name);
 	
+	/* weinerschnitzel - doesn't work for 128mb users
 	// Ez0n3 - old method of rom paging
 	fclose(g_temporaryRomFile);
+	*/
 	
 	return TRUE;
 }
 
 void LoadVirtualRomData()
 {
+	/* weinerschnitzel - doesn't work for 128mb users
 	// Ez0n3 - old method of rom paging
 	g_temporaryRomFile = fopen(g_temporaryRomPath, "rb");
+	*/
 }
 
 void CloseVirtualRomData()
@@ -108,16 +133,17 @@ void CloseVirtualRomData()
 	{
 		fclose(g_temporaryRomFile);
 		g_temporaryRomFile = NULL;
-		
+		/* weinserschnitzel - doesn't work for 128mb users
 		// Ez0n3 - old method of rom paging
 		free(g_pageTable);
+		*/
 
 	}
 }
 
 void InitPageAndFrameTables()
 {
-
+	/* weinerschnitzel - doesn't work for 128mb users
 	// Ez0n3 - old method of rom paging
 	uint32 i;
 
@@ -139,10 +165,11 @@ void InitPageAndFrameTables()
 		g_frameTable[i].pageNum				= FRAME_FREE;
 		g_frameTable[i].lastUsed.QuadPart	= NEVER;
 	}
+	*/
 	
-
+//-------weinerschnitzel -- reverted for 128mb users------
 // freakdave - new method of rom paging
-/*
+
 	uint16 i;
 	pagesize = 256*1024;
 	g_memory = (uint8 *) malloc ( sizeof(*g_memory)  *  RP_PAGE_SIZE * nombreframes );
@@ -164,13 +191,13 @@ void InitPageAndFrameTables()
 	adfix[i] = i;
 	} 
 	plusgrand = nombreframes-1;
-*/
+//--------------------------------------------------------
 
 }
 
 uint32 ReadUWORDFromROM(uint32 location)
 {
-	
+	/*-------doesn't work for 128mb users------------------
 	// Ez0n3 - old method of rom paging
 	uint32 i;
 	uint32 pageNumberOfLocation;
@@ -262,9 +289,12 @@ uint32 ReadUWORDFromROM(uint32 location)
 		}
 	}
 
+*/
+//-----------------------------------------------------
 
+//weinerschnitzel reverting for 128mb users------------
 // freakdave - new method of rom paging
-/*
+
 	uint32 location2 = location & 0x7ffffff;
 
 	uint8 numero = (location2/pagesize);
@@ -288,13 +318,13 @@ uint32 ReadUWORDFromROM(uint32 location)
 	}
 	// return information
 	return *(uint32*) (g_memory + (adress[numero] * pagesize) + adresstemp);
-*/
-
+//--------------------------------------------------------
 }
 
 uint16 ReadUHALFFromROM(uint32 location)
 {
 
+	/*-------doesn't work for 128mb users------------------
 	// Ez0n3 - old method of rom paging
 	uint32 i;
 	uint32 pageNumberOfLocation;
@@ -385,10 +415,12 @@ uint16 ReadUHALFFromROM(uint32 location)
 			return *(uint16 *)(g_memory + (g_pageTable[pageNumberOfLocation]*RP_PAGE_SIZE) + offsetFromPage);
 		}
 	}
+*/
+//------------------------------------------------------------
 
-
+//weinerschnitzel - reverting for 128mb users
 // freakdave - new method of rom paging
-/*
+
 	uint32 location2 = location & 0x7ffffff;
 
 	uint8 numero = (location2/pagesize);
@@ -410,13 +442,14 @@ uint16 ReadUHALFFromROM(uint32 location)
 	}
 	// return information
 	return *(uint16*) (g_memory + (adress[numero] * pagesize) + adresstemp);
-*/
+//--------------------------------------
 	
 }
 
 uint8 ReadUBYTEFromROM(uint32 location)
 {
 
+	/*-------doesn't work for 128mb users------------------
 	// Ez0n3 - old method of rom paging
 	uint32 i;
 	uint32 pageNumberOfLocation;
@@ -507,10 +540,12 @@ uint8 ReadUBYTEFromROM(uint32 location)
 			return *(uint8 *)(g_memory + (g_pageTable[pageNumberOfLocation]*RP_PAGE_SIZE) + offsetFromPage);
 		}
 	}
+*/
 
-
+//-----------------------------------------------------
+//weinerschnitzel - reverting for 128mb users
 // freakdave - new method of rom paging
-/*
+
 	uint32 location2 = location & 0x7ffffff;
 
 	uint8 numero = (location2/pagesize);
@@ -532,13 +567,14 @@ uint8 ReadUBYTEFromROM(uint32 location)
 	}
 	// return information
 	return *(uint8*) (g_memory + (adress[numero] * pagesize) + adresstemp);
-*/
+//-------------------------------------------------
 	
 }
 
 __int32 ReadSWORDFromROM(uint32 location)
 {
 	
+	/*-------doesn't work for 128mb users------------------
 	// Ez0n3 - old method of rom paging
 	uint32 i;
 	uint32 pageNumberOfLocation;
@@ -632,10 +668,12 @@ __int32 ReadSWORDFromROM(uint32 location)
 	}
 
 	return retVal;
+*/
+//------------------------------------------
 
-
+//weinerschnitzel - reverting for 128mb users
 // freakdave - new method of rom paging
-/*
+
 	uint32 location2 = location & 0x7ffffff;
 
 	uint8 numero = (location2/pagesize);
@@ -657,7 +695,7 @@ __int32 ReadSWORDFromROM(uint32 location)
 	}
 	// return information
 	return *(__int32*) (g_memory + (adress[numero] * pagesize) + adresstemp);
-*/
+//-----------------------------------------------------------------
 	
 }
 
