@@ -843,6 +843,7 @@ fprintf(fp,"\n");
 fprintf(fp,"Visit us at:\n");
 fprintf(fp,"http://sourceforge.net/projects/surreal64xxxce\n");
 fprintf(fp,"http://forums.xbox-scene.com\n");
+fprintf(fp,"#surreal64ce on EFNET\n");
 fprintf(fp,"\n\n");
 fprintf(fp,"Surreal64 XXX Modification\n");
 fprintf(fp,"\n");

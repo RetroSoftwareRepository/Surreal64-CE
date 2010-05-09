@@ -3,15 +3,15 @@
 #include "128meg.h"
 #include <stdio.h>
 
-
+//weinerschnitzel - shouldn't need this for 128mb
 // Ez0n3 - old method of rom paging
 //extern unsigned short g_dwNumFrames;
-//#define RP_PAGE_SIZE 0x10000
+#define RP_PAGE_SIZE_O 0x10000
 
 
 // freakdave - new method of rom paging
 extern unsigned short nombreframes;
-#define RP_PAGE_SIZE 0x40000
+#define RP_PAGE_SIZE_N 0x40000
 
 
 
@@ -79,9 +79,9 @@ void Enable128MegCaching( void )
   if( memStatus.dwTotalPhys < (100 * 1024 * 1024) ){
   
     //Ez0n3 - wrong paging variable - should be 1964 not PJ64
-   	//nombreframes = (loaddwPJ64PagingMem() * 1024 * 1024) / RP_PAGE_SIZE;
-	nombreframes = (loaddw1964PagingMem() * 1024 * 1024) / RP_PAGE_SIZE; //need for 128mb users
-	//g_dwNumFrames = (loaddw1964PagingMem() * 1024 * 1024) / RP_PAGE_SIZE; //old method
+   	//nombreframes = (loaddwPJ64PagingMem() * 1024 * 1024) / RP_PAGE_SIZE_N;
+	nombreframes = (loaddw1964PagingMem() * 1024 * 1024) / RP_PAGE_SIZE_N; //need for 128mb users
+	//g_dwNumFrames = (loaddw1964PagingMem() * 1024 * 1024) / RP_PAGE_SIZE_O; //old method
 	
 	return;}
 
@@ -97,6 +97,6 @@ void Enable128MegCaching( void )
   fseek(fp, 0, SEEK_END);
   filesize = ftell(fp);
   fclose(fp);
-  nombreframes = (filesize) / RP_PAGE_SIZE; //need this for 128mb users
-  //g_dwNumFrames = (filesize) / RP_PAGE_SIZE; //old method
+  nombreframes = (filesize) / RP_PAGE_SIZE_N; //need this for 128mb users
+  //g_dwNumFrames = (filesize) / RP_PAGE_SIZE_O; //old method
 }
