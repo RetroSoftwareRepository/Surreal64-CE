@@ -38,6 +38,13 @@
 #include "IOSupport.h"
 
 int InitalizeApplication ( HINSTANCE hInstance );
+//weinerschnitzel - determine memory size for rompaging method
+BOOL PhysRam128(){
+  MEMORYSTATUS memStatus;
+  GlobalMemoryStatus( &memStatus );
+  if( memStatus.dwTotalPhys < (100 * 1024 * 1024) ) return FALSE;
+  else return TRUE;  
+}
 
 
 // Ez0n3 - reinstate max video mem until freakdave finishes this
@@ -775,18 +782,21 @@ VOID __cdecl main()
 	Mount("G:","Harddisk0\\Partition7");
 
 	loadinis();
-	//Enable128MegCaching();
+	if(PhysRam128() == TRUE){
+	Enable128MegCaching(); // weinerschnitzel - put this in 128mb mode
+	}
     sprintf(emuname,"Project64x");
 
 	g_dwNormalCompileBufferSize = loaddwPJ64DynaMem() * 1024 * 1024;
 	
-	//weinerschnitzel disabled per 128mb user issues
+	//weinerschnitzel enable in 64mb condition
+	if(PhysRam128() == FALSE){
 	// Ez0n3 - old method of rom paging - but still using 128MB var
-	//g_dwNumFrames = 64; //default 64 set in stubs.h and assigned below (bottom)
-	//Enable128MegCaching();
-	//g_frameTable = (Frame *)VirtualAlloc(NULL, g_dwNumFrames * sizeof(Frame *), MEM_COMMIT, PAGE_EXECUTE_READWRITE);
-	//g_memory = (uint8 *)VirtualAlloc(NULL, RP_PAGE_SIZE * g_dwNumFrames, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
-	
+	g_dwNumFrames = 64; //default 64 set in stubs.h and assigned below (bottom)
+	Enable128MegCaching();
+	g_frameTable = (Frame *)VirtualAlloc(NULL, g_dwNumFrames * sizeof(Frame *), MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+	g_memory = (uint8 *)VirtualAlloc(NULL, RP_PAGE_SIZE_O * g_dwNumFrames, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+	}
 	
 	// Ez0n3 - reinstate max video mem
 	//_VIDEO_SetMaxTextureMem(pLd->dwMaxVideoMem);
@@ -914,7 +924,7 @@ void Enable128MegCaching( void )
   MEMORYSTATUS memStatus;
   GlobalMemoryStatus( &memStatus );
   if( memStatus.dwTotalPhys < (100 * 1024 * 1024) ) {
-  	g_dwNumFrames = (loaddwPJ64PagingMem() * 1024 * 1024) / RP_PAGE_SIZE;
+  	g_dwNumFrames = (loaddwPJ64PagingMem() * 1024 * 1024) / RP_PAGE_SIZE_N;
 	return;}
 
     // Grab the existing default type
@@ -929,10 +939,12 @@ void Enable128MegCaching( void )
   fseek(fp, 0, SEEK_END);
   filesize = ftell(fp);
   fclose(fp);
-  g_dwNumFrames = (filesize) / RP_PAGE_SIZE;
+  g_dwNumFrames = (filesize) / RP_PAGE_SIZE_N;
 
 }
 
-void DisplayError (char * Message, ...) {
-	 OutputDebugString(Message);
+void DisplayError (char * Message, ...) {
+
+	 OutputDebugString(Message);
+
 }
