@@ -56,7 +56,8 @@ bool D3D::Create()
 	d3dpp.EnableAutoDepthStencil			= TRUE;
     d3dpp.AutoDepthStencilFormat			= D3DFMT_D16;
     d3dpp.SwapEffect						= D3DSWAPEFFECT_DISCARD;
-    d3dpp.FullScreen_PresentationInterval	= D3DPRESENT_INTERVAL_ONE_OR_IMMEDIATE;
+	d3dpp.Flags								= D3DPRESENTFLAG_INTERLACED; 
+    d3dpp.FullScreen_PresentationInterval	= D3DPRESENT_INTERVAL_DEFAULT;
 
 	//TESTME! HDTV Modes (Launcher only!), Skins should be modified accordingly
 	//Parts of code by XPORT and nes6502
