@@ -58,6 +58,7 @@ bool D3D::Create()
     d3dpp.SwapEffect						= D3DSWAPEFFECT_DISCARD;
 	d3dpp.Flags								= D3DPRESENTFLAG_INTERLACED; 
     d3dpp.FullScreen_PresentationInterval	= D3DPRESENT_INTERVAL_DEFAULT;
+	d3dpp.FullScreen_RefreshRateInHz		= 60;
 
 	//TESTME! HDTV Modes (Launcher only!), Skins should be modified accordingly
 	//Parts of code by XPORT and nes6502

@@ -64,6 +64,7 @@ CXBApplication::CXBApplication()
     m_d3dpp.SwapEffect						= D3DSWAPEFFECT_DISCARD;
 	m_d3dpp.Flags							= D3DPRESENTFLAG_INTERLACED;
 	m_d3dpp.FullScreen_PresentationInterval	= D3DPRESENT_INTERVAL_DEFAULT;
+	m_d3dpp.FullScreen_RefreshRateInHz		= 60;
 
 
 	//TESTME! HDTV Modes (Launcher only!), Skins should be modified accordingly
