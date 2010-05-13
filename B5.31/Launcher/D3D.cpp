@@ -51,7 +51,7 @@ bool D3D::Create()
 
     d3dpp.BackBufferWidth					= 640;
     d3dpp.BackBufferHeight					= 480;
-    d3dpp.BackBufferFormat					= D3DFMT_X1R5G5B5;
+    d3dpp.BackBufferFormat					= D3DFMT_LIN_R5G6B5;
     d3dpp.BackBufferCount					= 1;
 	d3dpp.EnableAutoDepthStencil			= TRUE;
     d3dpp.AutoDepthStencilFormat			= D3DFMT_D16;
@@ -98,12 +98,16 @@ bool D3D::Create()
 		}
 */
 	
-		//480p
+		//480p 1.6 Backbuffer format ?
 	 if(XGetAVPack() == XC_AV_PACK_HDTV){
 		if( videoFlags & XC_VIDEO_FLAGS_HDTV_480p){
-			d3dpp.Flags = D3DPRESENTFLAG_PROGRESSIVE ;
+			d3dpp.Flags = D3DPRESENTFLAG_PROGRESSIVE;
+			d3dpp.BackBufferFormat = D3DFMT_A8R8G8B8;
 		}
 	 }
+
+
+
 // use an orthogonal matrix for the projection matrix
     D3DXMATRIX mat;
 	g_Width = 640;
