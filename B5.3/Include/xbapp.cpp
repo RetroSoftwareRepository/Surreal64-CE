@@ -55,14 +55,15 @@ CXBApplication::CXBApplication()
     // 32-bit display using depth-stencil. Override these parameters in
     // your derived class as your app requires.
     ZeroMemory( &m_d3dpp, sizeof(m_d3dpp) );
-    m_d3dpp.BackBufferWidth        = 640;
-    m_d3dpp.BackBufferHeight       = 480;
-    m_d3dpp.BackBufferFormat       = D3DFMT_X1R5G5B5/*D3DFMT_A8R8G8B8*/;
-    m_d3dpp.BackBufferCount        = 1;
-    m_d3dpp.EnableAutoDepthStencil = TRUE;
-    m_d3dpp.AutoDepthStencilFormat = D3DFMT_D16/*D3DFMT_D24S8*/;
-    m_d3dpp.SwapEffect             = D3DSWAPEFFECT_DISCARD;
-	//m_d3dpp.Flags                  |= D3DPRESENTFLAG_WIDESCREEN; 
+    m_d3dpp.BackBufferWidth					= 640;
+    m_d3dpp.BackBufferHeight				= 480;
+    m_d3dpp.BackBufferFormat				= D3DFMT_X1R5G5B5/*D3DFMT_A8R8G8B8*/;
+    m_d3dpp.BackBufferCount					= 1;
+    m_d3dpp.EnableAutoDepthStencil			= TRUE;
+    m_d3dpp.AutoDepthStencilFormat			= D3DFMT_D16/*D3DFMT_D24S8*/;
+    m_d3dpp.SwapEffect						= D3DSWAPEFFECT_DISCARD;
+	m_d3dpp.Flags							= D3DPRESENTFLAG_INTERLACED;
+	m_d3dpp.FullScreen_PresentationInterval	= D3DPRESENT_INTERVAL_DEFAULT;
 
 
 	//TESTME! HDTV Modes (Launcher only!), Skins should be modified accordingly
