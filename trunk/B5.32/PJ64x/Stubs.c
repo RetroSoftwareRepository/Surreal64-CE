@@ -7,7 +7,7 @@
 DWORD g_dwNumFrames = 64; // default 4mb of memory
 
 //weinerschnitzel - check memory size for paging method
-extern  BOOL PhysRam128(){
+BOOL PhysRam128(){
   MEMORYSTATUS memStatus;
   GlobalMemoryStatus( &memStatus );
   if( memStatus.dwTotalPhys < (100 * 1024 * 1024) ) return FALSE;
@@ -23,13 +23,13 @@ extern  BOOL PhysRam128(){
 #define NEVER				0x0
 #define NONE_FOUND			0xFFFFFFFF	
 
-if(PhysRam128() == FALSE){
+//if(PhysRam128() == FALSE){
 Frame *g_frameTable;
 
-//check if this is in 5.1?
+//weinerschnitzel this is old xxx
 // Memory
-uint8 g_memory[RP_PAGE_SIZE_O*64];
-}
+//uint8 g_memory[RP_PAGE_SIZE_N*64];
+//}
 //--------------------------------------------
 uint8 *g_memory;
 
@@ -52,7 +52,7 @@ uint8 *g_memory;
 //---------------Doesnt work for 128mb-------------------
 //weinerschnitsel - enable this in 64mb condition
 // Ez0n3 - old method of rom paging
-if(PhysRam128() == FALSE){
+//if(PhysRam128() == FALSE){
 uint8 *g_pageTable;
 uint32 g_pageTableSize;
 uint32 g_pageFunctionHits;
@@ -60,7 +60,7 @@ uint32 g_memFunctionHits;
 uint32 g_pageHits;
 uint32 g_pageMisses;
 uint32 g_dynaHits;
-}
+//}
 //
 
 
@@ -369,7 +369,7 @@ void CloseVirtualRomData()
 
 // freakdave - new method of rom paging
 // weinerschnitzel - this needs to be in 128mb condition
-if(PhysRam128() == TRUE){
+//if(PhysRam128() == TRUE){
 static BOOL indic[256];
 static uint8 adress[256];
 static uint8 adfix[256];
@@ -378,7 +378,7 @@ uint16 nombreframes; // 256 max -> uint8 = 255 max -> uint16
 static uint8 plusgrand;
 uint32 poubelle = 0;
 BOOL pause = 0;
-}
+//}
 
 void InitPageAndFrameTables()
 {
@@ -536,7 +536,7 @@ uint32 ReadUWORDFromROM(uint32 location)
 		}
 	}
 	}
-	//
+	//end ram check
 
 // freakdave - new method of rom paging
 //weinerschnitzel - 128mb condition

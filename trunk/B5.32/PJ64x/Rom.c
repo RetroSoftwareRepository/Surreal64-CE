@@ -39,14 +39,7 @@
 
 int InitalizeApplication ( HINSTANCE hInstance );
 //weinerschnitzel - determine memory size for rompaging method
-BOOL PhysRam128(){
-  MEMORYSTATUS memStatus;
-  GlobalMemoryStatus( &memStatus );
-  if( memStatus.dwTotalPhys < (100 * 1024 * 1024) ) return FALSE;
-  else return TRUE;  
-}
-
-
+BOOL PhysRam128();
 // Ez0n3 - reinstate max video mem until freakdave finishes this
 extern void _VIDEO_SetMaxTextureMem(DWORD mem);
 
@@ -792,7 +785,7 @@ VOID __cdecl main()
 	//weinerschnitzel enable in 64mb condition
 	if(PhysRam128() == FALSE){
 	// Ez0n3 - old method of rom paging - but still using 128MB var
-	g_dwNumFrames = 64; //default 64 set in stubs.h and assigned below (bottom)
+	//g_dwNumFrames = 64; //default 64 set in stubs.h and assigned below (bottom)
 	Enable128MegCaching();
 	g_frameTable = (Frame *)VirtualAlloc(NULL, g_dwNumFrames * sizeof(Frame *), MEM_COMMIT, PAGE_EXECUTE_READWRITE);
 	g_memory = (uint8 *)VirtualAlloc(NULL, RP_PAGE_SIZE_O * g_dwNumFrames, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
@@ -924,7 +917,13 @@ void Enable128MegCaching( void )
   MEMORYSTATUS memStatus;
   GlobalMemoryStatus( &memStatus );
   if( memStatus.dwTotalPhys < (100 * 1024 * 1024) ) {
+	if(PhysRam128() == TRUE){
   	g_dwNumFrames = (loaddwPJ64PagingMem() * 1024 * 1024) / RP_PAGE_SIZE_N;
+	}
+	//weinerschnitzel - Yeah I know it will only use the original method but this keeps both methods known
+	if(PhysRam128() == FALSE){
+  	g_dwNumFrames = (loaddwPJ64PagingMem() * 1024 * 1024) / RP_PAGE_SIZE_O;
+	}
 	return;}
 
     // Grab the existing default type
@@ -939,8 +938,12 @@ void Enable128MegCaching( void )
   fseek(fp, 0, SEEK_END);
   filesize = ftell(fp);
   fclose(fp);
+if(PhysRam128() == TRUE){
   g_dwNumFrames = (filesize) / RP_PAGE_SIZE_N;
-
+}
+if(PhysRam128() == FALSE){
+  g_dwNumFrames = (filesize) / RP_PAGE_SIZE_O;
+}
 }
 
 void DisplayError (char * Message, ...) {
