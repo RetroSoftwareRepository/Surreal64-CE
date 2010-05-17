@@ -142,7 +142,7 @@ string GetAudioPluginName(int iAudioPluginNum)
 		case _AudioPluginLleRsp : szAudioPlugin = "LLE RSP"; break;
 		case _AudioPluginBasic : szAudioPlugin = "Basic"; break;
 		case _AudioPluginJttl : szAudioPlugin = "JttL"; break;
-		//case _AudioPluginAzimer : szAudioPlugin = "Azimer"; break;
+		case _AudioPluginAzimer : szAudioPlugin = "Azimer"; break;
 		//case _AudioPluginMissing : 
 		default : szAudioPlugin = "JttL"; break;//freakdave - set JttL plugin as default
 	}	
