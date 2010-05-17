@@ -44,7 +44,7 @@ int FormatToSize(D3DFORMAT fmt)
 	case D3DFMT_X8R8G8B8:
 		return 32;
 	default:*/
-	case D3DFMT_X1R5G5B5:
+	case D3DFMT_LIN_R5G6B5:
 	case D3DFMT_D16:
 		return 16;
 	}
@@ -71,7 +71,7 @@ CDXGraphicsContext::CDXGraphicsContext() :
 	m_dwMinDepthBits(16),
 	m_dwMinStencilBits(0),
 	//m_desktopFormat(D3DFMT_A8R8G8B8),
-	m_desktopFormat(D3DFMT_X1R5G5B5),
+	m_desktopFormat(D3DFMT_LIN_R5G6B5),
 	m_FSAAIsEnabled(false),
 	m_bFontIsCreated(false)
 {
@@ -534,8 +534,7 @@ HRESULT CDXGraphicsContext::InitializeD3D()
 	//m_d3dpp.BackBufferHeight = 576;
 	m_d3dpp.BackBufferWidth = 640;
 	m_d3dpp.BackBufferHeight = 480;
-    m_d3dpp.BackBufferFormat = D3DFMT_X1R5G5B5;
-	//m_d3dpp.BackBufferFormat = D3DFMT_X8R8G8B8;
+    m_d3dpp.BackBufferFormat = D3DFMT_LIN_R5G6B5;
 	
 
 DWORD videoFlags = XGetVideoFlags();
@@ -556,15 +555,16 @@ DWORD videoFlags = XGetVideoFlags();
 		//480p
 	 if(XGetAVPack() == XC_AV_PACK_HDTV){
 		if( videoFlags & XC_VIDEO_FLAGS_HDTV_480p){
-			m_d3dpp.Flags = D3DPRESENTFLAG_PROGRESSIVE ;
+			m_d3dpp.Flags = D3DPRESENTFLAG_PROGRESSIVE;
+			m_d3dpp.BackBufferFormat = D3DFMT_A8R8G8B8;
 		}
 	 }
     
 	windowSetting.uDisplayWidth = m_d3dpp.BackBufferWidth;
 	windowSetting.uDisplayHeight = m_d3dpp.BackBufferHeight;
 
-	//m_desktopFormat = D3DFMT_X8R8G8B8;
-	m_desktopFormat = D3DFMT_X1R5G5B5;
+	//m_desktopFormat = D3DFMT_A8R8G8B8;
+	m_desktopFormat = D3DFMT_LIN_R5G6B5;
 	
 //freakdave
 	if(VertexMode == 0){
