@@ -106,18 +106,19 @@ extern void _AUDIO_MUSYX_ProcessAList(void);
 */
 
 // Ez0n3 - old Azimer
-/*
-extern void _AUDIO_JTTL_CloseDLL (void);
-extern void _AUDIO_JTTL_RomClosed(void);
-extern void _AUDIO_JTTL_DllConfig ( HWND hParent );
-extern void _AUDIO_JTTL_GetDllInfo(PLUGIN_INFO *PluginInfo);
-extern void _AUDIO_JTTL_AiDacrateChanged(int SystemType);
-extern void _AUDIO_JTTL_AiLenChanged(void);
-extern void _AUDIO_JTTL_AiReadLength(void);
-extern void _AUDIO_JTTL_AiUpdate(BOOL Wait);
-extern BOOL _AUDIO_JTTL_InitiateAudio (AUDIO_INFO Audio_Info);
-extern void _AUDIO_JTTL_ProcessAList(void);
-*/
+// freakdave - readded Azimer
+
+extern void _AUDIO_AZIMER_CloseDLL (void);
+extern void _AUDIO_AZIMER_RomClosed(void);
+extern void _AUDIO_AZIMER_DllConfig ( HWND hParent );
+extern void _AUDIO_AZIMER_GetDllInfo(PLUGIN_INFO *PluginInfo);
+extern void _AUDIO_AZIMER_AiDacrateChanged(int SystemType);
+extern void _AUDIO_AZIMER_AiLenChanged(void);
+extern void _AUDIO_AZIMER_AiReadLength(void);
+extern void _AUDIO_AZIMER_AiUpdate(BOOL Wait);
+extern BOOL _AUDIO_AZIMER_InitiateAudio (AUDIO_INFO Audio_Info);
+extern void _AUDIO_AZIMER_ProcessAList(void);
+
 
 
 
@@ -255,40 +256,40 @@ BOOL LoadAudioJttLDll(void) {
 
 }
 
-/*
+//freakdave - readded Azimer
 BOOL LoadAudioAzimerDll(void) {
 	PLUGIN_INFO PluginInfo;
 	 
 	hAudioDll = (HANDLE)100;
 	if (hAudioDll == NULL) {  return FALSE; }
 
-	GetDllInfo = (void *)_AUDIO_JTTL_GetDllInfo;
+	GetDllInfo = (void *)_AUDIO_AZIMER_GetDllInfo;
 	if (GetDllInfo == NULL) { return FALSE; }
 
 	GetDllInfo(&PluginInfo);
 	if (!ValidPluginVersion(&PluginInfo) || PluginInfo.MemoryBswaped == FALSE) { return FALSE; }	
 	
-	AiCloseDLL = (void *)_AUDIO_JTTL_CloseDLL;
+	AiCloseDLL = (void *)_AUDIO_AZIMER_CloseDLL;
 	if (AiCloseDLL == NULL) { return FALSE; }
-	AiDacrateChanged = (void *)(int)_AUDIO_JTTL_AiDacrateChanged;
+	AiDacrateChanged = (void *)(int)_AUDIO_AZIMER_AiDacrateChanged;
 	if (AiDacrateChanged == NULL) { return FALSE; }
-	AiLenChanged = (void *)_AUDIO_JTTL_AiLenChanged;
+	AiLenChanged = (void *)_AUDIO_AZIMER_AiLenChanged;
 	if (AiLenChanged == NULL) { return FALSE; }
-	AiReadLength = (DWORD ( *)(void))_AUDIO_JTTL_AiReadLength;
+	AiReadLength = (DWORD ( *)(void))_AUDIO_AZIMER_AiReadLength;
 	if (AiReadLength == NULL) { return FALSE; }
-	InitiateAudio = (BOOL ( *)(AUDIO_INFO))_AUDIO_JTTL_InitiateAudio;
+	InitiateAudio = (BOOL ( *)(AUDIO_INFO))_AUDIO_AZIMER_InitiateAudio;
 	if (InitiateAudio == NULL) { return FALSE; }
-	AiRomClosed = (void ( *)(void))_AUDIO_JTTL_RomClosed;
+	AiRomClosed = (void ( *)(void))_AUDIO_AZIMER_RomClosed;
 	if (AiRomClosed == NULL) { return FALSE; }
-	ProcessAList = (void ( *)(void))_AUDIO_JTTL_ProcessAList;	
+	ProcessAList = (void ( *)(void))_AUDIO_AZIMER_ProcessAList;	
 	if (ProcessAList == NULL) { return FALSE; }
 
-	AiDllConfig = (void ( *)(HWND))_AUDIO_JTTL_DllConfig;
-	AiUpdate = (void ( *)(BOOL))_AUDIO_JTTL_AiUpdate;
+	AiDllConfig = (void ( *)(HWND))_AUDIO_AZIMER_DllConfig;
+	AiUpdate = (void ( *)(BOOL))_AUDIO_AZIMER_AiUpdate;
 	return TRUE;
 
 }
-*/
+
 
 
 // Ez0n3 - No Audio
@@ -583,15 +584,15 @@ void SetupPlugins (HWND hWnd) {
 	else if (g_iAudioPlugin == _AudioPluginJttl)
 	{
 		success = LoadAudioJttLDll();
-	}/*
+	}
+	else if (g_iAudioPlugin == _AudioPluginAzimer)
+	{
+		success = LoadAudioAzimerDll();
+	}
+	/*
 	else if (g_iAudioPlugin == _AudioPluginMusyX)
 	{
 		success = LoadAudioMusyXDll();
-	}
-	/*
-	else if (g_iAudioPlugin == _AudioPluginAzimer)
-	{
-		success = LoadAudioAzimerDll;
 	}
 	*/
 

@@ -15,7 +15,7 @@
 
 // Ez0n3 - Audio None
 #include <AudioNone.h>
-//#include <AudioAzimer.h>
+#include <AudioAzimer.h>
 //freakdave - Audio MusyX
 //#include <AudioMusyX.h>
 #include "../Plugins.h"

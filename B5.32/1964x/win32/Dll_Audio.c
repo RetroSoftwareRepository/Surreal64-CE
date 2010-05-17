@@ -39,23 +39,6 @@ BOOL	CoreDoingAIUpdate = TRUE;
 //BOOL	g_bUseBasicAudio = FALSE;
 int g_iAudioPlugin = _AudioPluginJttl; // set default to jttl
 
-
-
-//freakdave - Implementation of Jttl's audio plugin (replace old Azimer)
-/*
-void (*_AUDIO_LINK_AiDacrateChanged)(int SystemType) = _AUDIO_JTTL_AiDacrateChanged;
-void (*_AUDIO_LINK_AiLenChanged)(void) = _AUDIO_JTTL_AiLenChanged;
-DWORD (*_AUDIO_LINK_AiReadLength)(void) = _AUDIO_JTTL_AiReadLength;
-void (*_AUDIO_LINK_AiUpdate)(BOOL Wait) = _AUDIO_JTTL_AiUpdate;
-void (*_AUDIO_LINK_CloseDLL)(void) = _AUDIO_JTTL_CloseDLL;
-void (*_AUDIO_LINK_DllAbout)(HWND hParent) = _AUDIO_JTTL_DllAbout;
-void (*_AUDIO_LINK_DllConfig)(HWND hParent) = _AUDIO_JTTL_DllConfig;
-void (*_AUDIO_LINK_DllTest)(HWND hParent) = _AUDIO_JTTL_DllTest;
-void (*_AUDIO_LINK_GetDllInfo)(PLUGIN_INFO *PluginInfo) = _AUDIO_JTTL_GetDllInfo;
-BOOL (*_AUDIO_LINK_InitiateAudio)(AUDIO_INFO Audio_Info) = _AUDIO_JTTL_InitiateAudio;
-void (*_AUDIO_LINK_ProcessAList)(void) = _AUDIO_JTTL_ProcessAList;
-void (*_AUDIO_LINK_RomClosed)(void) = _AUDIO_JTTL_RomClosed;
-*/
 // SET DEFAULT AUDIO PLUGIN - JttL
 void (*_AUDIO_LINK_AiDacrateChanged)(int SystemType) = _AUDIO_AiDacrateChanged;
 void (*_AUDIO_LINK_AiLenChanged)(void) = _AUDIO_AiLenChanged;
@@ -132,8 +115,25 @@ BOOL LoadAudioPlugin()
 		_AUDIO_LINK_InitiateAudio	 	= _AUDIO_InitiateAudio;
 		_AUDIO_LINK_ProcessAList	 	= _AUDIO_ProcessAList;
 		_AUDIO_LINK_RomClosed		 	= _AUDIO_RomClosed;
-
-	}/*
+	}
+	else if (g_iAudioPlugin == _AudioPluginAzimer)
+	{
+		// Ez0n3 - old Azimer plugin from Surreal 1.0 and FDB
+		//freakdave - readded Azimer
+		_AUDIO_LINK_AiDacrateChanged 	= _AUDIO_AZIMER_AiDacrateChanged;
+		_AUDIO_LINK_AiLenChanged	 	= _AUDIO_AZIMER_AiLenChanged;
+		_AUDIO_LINK_AiReadLength	 	= _AUDIO_AZIMER_AiReadLength;
+		_AUDIO_LINK_AiUpdate		 	= _AUDIO_AZIMER_AiUpdate;
+		_AUDIO_LINK_CloseDLL		 	= _AUDIO_AZIMER_CloseDLL;
+		_AUDIO_LINK_DllAbout		 	= _AUDIO_AZIMER_DllAbout;
+		_AUDIO_LINK_DllConfig		 	= _AUDIO_AZIMER_DllConfig;
+		_AUDIO_LINK_DllTest			 	= _AUDIO_AZIMER_DllTest;
+		_AUDIO_LINK_GetDllInfo		 	= _AUDIO_AZIMER_GetDllInfo;
+		_AUDIO_LINK_InitiateAudio	 	= _AUDIO_AZIMER_InitiateAudio;
+		_AUDIO_LINK_ProcessAList	 	= _AUDIO_AZIMER_ProcessAList;
+		_AUDIO_LINK_RomClosed		 	= _AUDIO_AZIMER_RomClosed;
+	}
+	/*
 	else if (g_iAudioPlugin == _AudioPluginMusyX)
 	{
 		// freakdave - new MusyX Audio plugin
@@ -150,26 +150,7 @@ BOOL LoadAudioPlugin()
 		_AUDIO_LINK_ProcessAList	 	= _AUDIO_MUSYX_ProcessAList;
 		_AUDIO_LINK_RomClosed		 	= _AUDIO_MUSYX_RomClosed;
 	}
-	/*
-	else if (g_iAudioPlugin == _AudioPluginAzimer)
-	{
-		// Ez0n3 - old Azimer plugin from Surreal 1.0 and FDB
-		_AUDIO_LINK_AiDacrateChanged 	= _AUDIO_JTTL_AiDacrateChanged;
-		_AUDIO_LINK_AiLenChanged	 	= _AUDIO_JTTL_AiLenChanged;
-		_AUDIO_LINK_AiReadLength	 	= _AUDIO_JTTL_AiReadLength;
-		_AUDIO_LINK_AiUpdate		 	= _AUDIO_JTTL_AiUpdate;
-		_AUDIO_LINK_CloseDLL		 	= _AUDIO_JTTL_CloseDLL;
-		_AUDIO_LINK_DllAbout		 	= _AUDIO_JTTL_DllAbout;
-		_AUDIO_LINK_DllConfig		 	= _AUDIO_JTTL_DllConfig;
-		_AUDIO_LINK_DllTest			 	= _AUDIO_JTTL_DllTest;
-		_AUDIO_LINK_GetDllInfo		 	= _AUDIO_JTTL_GetDllInfo;
-		_AUDIO_LINK_InitiateAudio	 	= _AUDIO_JTTL_InitiateAudio;
-		_AUDIO_LINK_ProcessAList	 	= _AUDIO_JTTL_ProcessAList;
-		_AUDIO_LINK_RomClosed		 	= _AUDIO_JTTL_RomClosed;
-	}
 	*/
-	
-	
 
 	return TRUE;
 }
