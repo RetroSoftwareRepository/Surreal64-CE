@@ -98,7 +98,7 @@ CDirectXGraphicsContext::CDirectXGraphicsContext() :
 	m_dwMinDepthBits(16),
 	m_dwMinStencilBits(0),
 	//m_desktopFormat(D3DFMT_A8R8G8B8),
-	m_desktopFormat(D3DFMT_X1R5G5B5),
+	m_desktopFormat(D3DFMT_LIN_R5G6B5),
 	pBackBufferSave(NULL),
 	m_pBackColorBuffer(NULL),
 	m_pBackDepthBuffer(NULL),
@@ -402,13 +402,13 @@ HRESULT CDirectXGraphicsContext::InitializeD3DEnvironment()
     //m_d3dpp.BackBufferHeight = pModeInfo->Height;
 	m_d3dpp.BackBufferWidth = 640;
 	m_d3dpp.BackBufferHeight = 480;
-    m_d3dpp.BackBufferFormat = D3DFMT_X1R5G5B5;
+    m_d3dpp.BackBufferFormat = D3DFMT_LIN_R5G6B5;
 	//m_d3dpp.BackBufferFormat = D3DFMT_A8R8G8B8;
     
 	windowSetting.uDisplayWidth = m_d3dpp.BackBufferWidth;
 	windowSetting.uDisplayHeight = m_d3dpp.BackBufferHeight;
 
-	m_desktopFormat = D3DFMT_X1R5G5B5;
+	m_desktopFormat = D3DFMT_LIN_R5G6B5;
 
 
 	DWORD videoFlags = XGetVideoFlags();
@@ -429,7 +429,8 @@ HRESULT CDirectXGraphicsContext::InitializeD3DEnvironment()
 		//480p
 	 if(XGetAVPack() == XC_AV_PACK_HDTV){
 		if( videoFlags & XC_VIDEO_FLAGS_HDTV_480p){
-			m_d3dpp.Flags = D3DPRESENTFLAG_PROGRESSIVE ;
+			m_d3dpp.Flags = D3DPRESENTFLAG_PROGRESSIVE;
+			m_d3dpp.BackBufferFormat = D3DFMT_A8R8G8B8;
 		}
 	 }
 

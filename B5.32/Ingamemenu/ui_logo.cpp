@@ -3,6 +3,7 @@
 #include "../config.h"
 #include <xgraphics.h>
 
+#define VERSION L"Surreal64 XXX CE B5.32"
 extern char romname[256];
 CPanel m_BgPanel;
 CPanel m_BoxPanel;
@@ -68,7 +69,7 @@ void DrawLogo()
 	m_Font.Begin();
 
 	// Title
-	m_Font.DrawText(305, 20, 0xFFFF7F7f, L"Surreal64 XXX CE B5.3", XBFONT_CENTER_X);
+	m_Font.DrawText(305, 20, 0xFFFF7F7f, VERSION, XBFONT_CENTER_X);
 
 	if (showdebug) {
 	MEMORYSTATUS memStat;

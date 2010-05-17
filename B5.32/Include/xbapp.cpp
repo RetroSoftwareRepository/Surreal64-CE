@@ -57,7 +57,7 @@ CXBApplication::CXBApplication()
     ZeroMemory( &m_d3dpp, sizeof(m_d3dpp) );
     m_d3dpp.BackBufferWidth					= 640;
     m_d3dpp.BackBufferHeight				= 480;
-    m_d3dpp.BackBufferFormat				= D3DFMT_LIN_R5G6B5/*D3DFMT_A8R8G8B8*/;
+    m_d3dpp.BackBufferFormat				= D3DFMT_LIN_R5G6B5; //D3DFMT_A8R8G8B8;
     m_d3dpp.BackBufferCount					= 1;
     m_d3dpp.EnableAutoDepthStencil			= TRUE;
     m_d3dpp.AutoDepthStencilFormat			= D3DFMT_D16/*D3DFMT_D24S8*/;
@@ -109,7 +109,7 @@ CXBApplication::CXBApplication()
 		m_d3dpp.Flags = D3DPRESENTFLAG_WIDESCREEN;
 	 }
 
-		//480p 1.6 Backbuffer format ?
+		//480p 1.6 needs 32 bit backbuffer format
 	 if(XGetAVPack() == XC_AV_PACK_HDTV){
 		if( videoFlags & XC_VIDEO_FLAGS_HDTV_480p){
 			m_d3dpp.Flags = D3DPRESENTFLAG_PROGRESSIVE;
