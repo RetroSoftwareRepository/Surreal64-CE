@@ -45,11 +45,13 @@ void RomList::Load()
 			string szFilename;
 			string szBoxArtFilename;
 			string szRomSize;
+			string szComments;
 
 			dword crc1;						
 			dword crc2;			
 			dword country;
 			dword romSize;
+			dword comments;
 
 			getline(cacheFile, szCrc1);
 			getline(cacheFile, szCrc2);
@@ -57,6 +59,7 @@ void RomList::Load()
 			getline(cacheFile, szFilename);
 			getline(cacheFile, szBoxArtFilename);
 			getline(cacheFile, szRomSize);
+			getline(cacheFile, szComments);
 
 			if (Trim(szCrc1).length() == 0 ||
 				Trim(szCrc2).length() == 0 ||
@@ -87,9 +90,14 @@ void RomList::Load()
 				stringstream conv(szRomSize);
 				conv >> romSize;
 			}
+			// convert the country string to a dword
+			{
+				stringstream conv(szComments);
+				conv >> comments;
+			}
 
 			bool bSuccess = rom->LoadFromCache(crc1, crc2, static_cast<byte>(country),
-											   szFilename, szBoxArtFilename, romSize);
+											   szFilename, szBoxArtFilename, romSize, szComments);
 
 			if (bSuccess)
 				m_romList.push_back(rom);
@@ -120,6 +128,7 @@ void RomList::Save()
 		cacheFile << rom->GetFileName() << endl;
 		cacheFile << rom->GetBoxArtFilename() << endl;
 		cacheFile << rom->GetRomSize() << endl;
+		cacheFile << rom->GetComments() << endl;
 	}
 
 	cacheFile.close();
