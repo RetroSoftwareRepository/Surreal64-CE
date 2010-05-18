@@ -187,7 +187,7 @@ bool Rom::Load(const string &szFilename)
 	return true;
 }
 
-bool Rom::LoadFromCache(dword crc1, dword crc2, byte country, const string &szFilename, const string &szBoxArtFilename, dword romSize)
+bool Rom::LoadFromCache(dword crc1, dword crc2, byte country, const string &szFilename, const string &szBoxArtFilename, dword romSize, const string &szComments)
 {
 	m_szFilename = szFilename;
 	m_szBoxArtFilename = szBoxArtFilename;

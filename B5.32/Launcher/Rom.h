@@ -26,7 +26,7 @@ public:
 
 	bool Load(const string &szFilename);
 	bool LoadFromCache(dword crc1, dword crc2, byte country, const string &szFilename, 
-					   const string &szBoxArtFilename, dword romSize);
+					   const string &szBoxArtFilename, dword romSize, const string &szComments);
 
 	dword GetCrc1();
 	dword GetCrc2();
