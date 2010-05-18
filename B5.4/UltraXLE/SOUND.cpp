@@ -58,6 +58,8 @@ static void dserror(HRESULT hErr,char *text)
 	}*/
 
     print("DirectSound Error %08X at %s: %s\n", hErr,text,err);
+	OutputDebugString(text);
+	OutputDebugString(err);
 	//PostQuitMessage(0);
 }
 
