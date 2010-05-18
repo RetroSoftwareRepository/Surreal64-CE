@@ -5,7 +5,7 @@
 
 
 
-#define VERSION L"Surreal64 XXX CE B5.32"
+#define VERSION L"Surreal64 XXX CE B5.4"
 extern CMusicManager  music;
 extern int actualrom;
 CPanel m_BgPanel;

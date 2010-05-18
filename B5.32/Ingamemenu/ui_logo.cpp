@@ -3,7 +3,7 @@
 #include "../config.h"
 #include <xgraphics.h>
 
-#define VERSION L"Surreal64 XXX CE B5.32"
+#define VERSION L"Surreal64 XXX CE B5.4"
 extern char romname[256];
 CPanel m_BgPanel;
 CPanel m_BoxPanel;
