@@ -217,6 +217,12 @@ void inifile_command(char *cmd)
         int i=atoi(param);
         st.soundenable=i;
     }
+	//freakdave - soundsync added for testing
+	else IFIS(cmd,"soundsync")
+	{
+		int i=atoi(param);
+		st.soundslowsgfx=i;
+	}
     else IFIS(cmd,"optimize")
     {
         int i=atoi(param);
