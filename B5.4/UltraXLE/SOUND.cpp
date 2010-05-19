@@ -7,12 +7,13 @@
 #include <stdio.h>
 #include "ultra.h"
 
+
 extern void debugprint(char *str,...);
 
 static LPDIRECTSOUND       ds;
 static LPDIRECTSOUNDBUFFER sbuf;
-static int                 bufrate=32000;
-static int                 bufsize=256*1024;  // bytes
+static int                 bufrate=48000;
+static int                 bufsize=1024*1024;  // bytes
 static int                 wpos;
 static int                 initdone;
 
@@ -58,8 +59,8 @@ static void dserror(HRESULT hErr,char *text)
 	}*/
 
     print("DirectSound Error %08X at %s: %s\n", hErr,text,err);
+	OutputDebugString((LPCTSTR)hErr);
 	OutputDebugString(text);
-	OutputDebugString(err);
 	//PostQuitMessage(0);
 }
 
@@ -91,8 +92,11 @@ void sound_start(int rate)
     WAVEFORMATEX form;
     DSBUFFERDESC  desc;
 
-    if(!initdone) return;
-
+    if(!initdone) 
+	{
+		OutputDebugString("void sound_start Line 96\n");
+		return;
+	}
     bufrate=rate;
 
     // Set up wave format structure.
@@ -132,7 +136,11 @@ void sound_start(int rate)
 void sound_stop(void)
 {
     HRESULT e;
-    if(!initdone) return;
+    if(!initdone) 
+	{
+		OutputDebugString("void sound_stop Line 140\n");	
+		return;
+	}
     if((e=IDirectSoundBuffer_Stop(sbuf))!=DS_OK)
     {
         dserror(e,"stopsound");
@@ -149,7 +157,11 @@ static int safepos;
 int  sound_buffered(void)
 {
     int playpos,safepos,a;
-    if(!initdone || !sbuf) return(0);
+    if(!initdone || !sbuf) 
+	{
+		OutputDebugString("void sound_buffered Line 161\n");
+		return(0);
+	}
 
     IDirectSoundBuffer_GetCurrentPosition(sbuf,(LPDWORD)&playpos,(LPDWORD)&safepos);
 
@@ -164,8 +176,11 @@ int  sound_buffered(void)
 int  sound_position(int *bufsizeptr)
 {
     int playpos,safepos;
-    if(!initdone || !sbuf) return(0);
-
+    if(!initdone || !sbuf) 
+	{
+		OutputDebugString("void sound_position Line 180\n");
+		return(0);
+	}
     IDirectSoundBuffer_GetCurrentPosition(sbuf,(LPDWORD)&playpos,(LPDWORD)&safepos);
 
     if(bufsizeptr) *bufsizeptr=bufsize;
@@ -178,9 +193,16 @@ int  sound_add(short *data0,int bytes)
     HRESULT e;
     char *data=(char *)data0;
 
-    if(!initdone || !sbuf) return(-2);
-    if(bytes<=0 || bytes>65535) return(-1);
-
+    if(!initdone || !sbuf) 
+	{
+		OutputDebugString("void sound_add return -2 Line 197\n");	
+		return(-2);
+	}
+    if(bytes<=0 || bytes>65535) 
+	{
+		OutputDebugString("void sound_add return -1 Line 202\n");	
+		return(-1);
+	}
     {
         LPVOID  data1;
         DWORD   size1;
@@ -222,13 +244,16 @@ void sound_resync(int target)
     LPVOID  data2;
     DWORD   size2;
     int playpos,safepos;
-    if(!initdone || !sbuf) return;
-
+    if(!initdone || !sbuf) 
+	{
+		OutputDebugString("void sound_resync Line 248\n");
+		return;
+	}
     IDirectSoundBuffer_GetCurrentPosition(sbuf,(LPDWORD)&playpos,(LPDWORD)&safepos);
 
     wpos=(safepos+target)&(bufsize-1);
 
-    if((e=IDirectSoundBuffer_Lock(sbuf,safepos,target,&data1,&size1,&data2,&size2,0))!=DS_OK)
+    if((e=IDirectSoundBuffer_Lock(sbuf,safepos,target,&data1,&size1,&data2,&size2,DSBLOCK_ENTIREBUFFER))!=DS_OK)
     {
         dserror(e,"");
         return;
