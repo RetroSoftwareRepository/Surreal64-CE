@@ -82,11 +82,17 @@ void					DisableNetplayMemu();
 
 //weinerschnitzel - lets do this for rom paging now
 // Ez0n3 - determine if the current phys ram is greater than 100MB
-BOOL PhysRam128(){
+extern int	RAM_IS_128 = 0; //assume we are 64mb
+extern BOOL PhysRam128(){
   MEMORYSTATUS memStatus;
   GlobalMemoryStatus( &memStatus );
-  if( memStatus.dwTotalPhys < (100 * 1024 * 1024) ) return FALSE;
-  else return TRUE;  
+  if( memStatus.dwTotalPhys < (100 * 1024 * 1024) ){ 
+	  return FALSE;
+	  RAM_IS_128 = 0;
+  }else{
+	  return TRUE;
+	  RAM_IS_128 = 1;
+  }
 }
 
 
@@ -137,7 +143,7 @@ void __cdecl main()
 	loadinis();
 	sprintf(emuname,"1964x");
 	//weinerscnitzel reverted to act like xxxb5 for 128mb users
-	if(PhysRam128() == TRUE){
+	if(RAM_IS_128 == 1){
 	Enable128MegCaching();//added by freakdave
 	}
 	g_dwRecompCodeSize = loaddw1964DynaMem() * 1024 * 1024;
@@ -146,7 +152,7 @@ void __cdecl main()
 	
 	//weinerschnitzel - use old method if 64mb
 	// Ez0n3 - old method of rom paging - but still using 128MB var
-	if(PhysRam128() == FALSE){
+	if(RAM_IS_128 == 0){
 	//g_dwNumFrames = 64; //default 64 set in rompaging.h at and assigned in 128meg.c
 	Enable128MegCaching();
 	g_frameTable = (Frame *)VirtualAlloc(NULL, g_dwNumFrames * sizeof(Frame *), MEM_COMMIT, PAGE_EXECUTE_READWRITE);

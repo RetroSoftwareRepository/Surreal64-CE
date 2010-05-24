@@ -81,7 +81,7 @@ void Enable128MegCaching( void )
     //Ez0n3 - wrong paging variable - should be 1964 not PJ64
    	//nombreframes = (loaddwPJ64PagingMem() * 1024 * 1024) / RP_PAGE_SIZE_N;
 	nombreframes = (loaddw1964PagingMem() * 1024 * 1024) / RP_PAGE_SIZE_N; //need for 128mb users
-	g_dwNumFrames = (loaddw1964PagingMem() * 1024 * 1024) / RP_PAGE_SIZE_O; //old method
+	g_dwNumFrames = (loaddw1964PagingMem() * 1024 * 1024) / RP_PAGE_SIZE_O; //old method 
 	
 	return;}
 

@@ -7,12 +7,19 @@
 DWORD g_dwNumFrames = 64; // default 4mb of memory
 
 //weinerschnitzel - check memory size for paging method
-BOOL PhysRam128(){
+extern int	RAM_IS_128 = 0; //assume we are 64mb
+extern BOOL PhysRam128(){
   MEMORYSTATUS memStatus;
   GlobalMemoryStatus( &memStatus );
-  if( memStatus.dwTotalPhys < (100 * 1024 * 1024) ) return FALSE;
-  else return TRUE;  
+  if( memStatus.dwTotalPhys < (100 * 1024 * 1024) ){ 
+	  return FALSE;
+	  RAM_IS_128 = 0;
+  }else{
+	  return TRUE;
+	  RAM_IS_128 = 1;
+  }
 }
+
 
 
 //---------------Doesnt work for 128mb-------------------
@@ -23,13 +30,11 @@ BOOL PhysRam128(){
 #define NEVER				0x0
 #define NONE_FOUND			0xFFFFFFFF	
 
-//if(PhysRam128() == FALSE){
 Frame *g_frameTable;
 
-//weinerschnitzel this is old xxx
+
 // Memory
 //uint8 g_memory[RP_PAGE_SIZE_N*64];
-//}
 //--------------------------------------------
 uint8 *g_memory;
 
@@ -50,9 +55,8 @@ uint8 *g_memory;
 // the frame that stores its page in memory
 
 //---------------Doesnt work for 128mb-------------------
-//weinerschnitsel - enable this in 64mb condition
-// Ez0n3 - old method of rom paging
-//if(PhysRam128() == FALSE){
+//weinerschnitsel - need to be declared for 64mb
+// Ez0n3 - old method of rom pagin
 uint8 *g_pageTable;
 uint32 g_pageTableSize;
 uint32 g_pageFunctionHits;
@@ -60,7 +64,6 @@ uint32 g_memFunctionHits;
 uint32 g_pageHits;
 uint32 g_pageMisses;
 uint32 g_dynaHits;
-//}
 //
 
 
@@ -226,7 +229,7 @@ BOOL InitVirtualRomData(char *rompath)
 	//---------------Doesnt work for 128mb-------------------
 	//weinerschnitzel - enable this in 64mb condition
 	// Ez0n3 - old method of rom paging
-	if(PhysRam128() == FALSE){
+	if(RAM_IS_128 == 0){
 	//FILE *temporaryFile = NULL; //lets be consistent here...
 
 	strcpy(g_temporaryRomPath, "Z:\\TemporaryRom.dat");
@@ -254,31 +257,31 @@ BOOL InitVirtualRomData(char *rompath)
 	
 // freakdave - new method of rom paging
 //weinerschnitzel - this needs to be in 128mb condition
-	if(PhysRam128() == TRUE){
-	FILE *temporaryFile = NULL;
+	if(RAM_IS_128 == 1){
+		FILE *temporaryFile = NULL;
 
-	strcpy(g_temporaryRomPath, "Z:\\TemporaryRom.dat");
+		strcpy(g_temporaryRomPath, "Z:\\TemporaryRom.dat");
 
-	// open the temporary file again for reading
-	temporaryFile = fopen(g_temporaryRomPath, "rb");
+		// open the temporary file again for reading
+		temporaryFile = fopen(g_temporaryRomPath, "rb");
 
-	// get the size of the original rom file
-	rewind(temporaryFile);
-	fseek(temporaryFile, 0, SEEK_END);
-	RomFileSize = ftell(temporaryFile);
+		// get the size of the original rom file
+		rewind(temporaryFile);
+		fseek(temporaryFile, 0, SEEK_END);
+		RomFileSize = ftell(temporaryFile);
 
-	// read in the rom header
-	fseek(temporaryFile, 0, SEEK_SET);
-	fread((uint8 *) &RomHeader, sizeof(uint8), 0x40, temporaryFile);
+		// read in the rom header
+		fseek(temporaryFile, 0, SEEK_SET);
+		fread((uint8 *) &RomHeader, sizeof(uint8), 0x40, temporaryFile);
 
-	
-	// read in rom name
-	fseek(temporaryFile, 0x20, SEEK_SET);
-	fread(RomName, sizeof(uint8), 20, temporaryFile);
+		
+		// read in rom name
+		fseek(temporaryFile, 0x20, SEEK_SET);
+		fread(RomName, sizeof(uint8), 20, temporaryFile);
 
-	fclose(temporaryFile);
+		fclose(temporaryFile);
 
-	return TRUE;
+		return TRUE;
 	}
 	
 }
@@ -358,8 +361,8 @@ void CloseVirtualRomData()
 		//---------------Doesnt work for 128mb-------------------
 		// weinerschnitzel - enable in 64mb condition
 		// Ez0n3 - old method of rom paging
-		if(PhysRam128() == FALSE){
-		free(g_pageTable);
+		if(RAM_IS_128 == 0){
+			free(g_pageTable);
 		}
 		//
 		
@@ -368,8 +371,7 @@ void CloseVirtualRomData()
 
 
 // freakdave - new method of rom paging
-// weinerschnitzel - this needs to be in 128mb condition
-//if(PhysRam128() == TRUE){
+// weinerschnitzel - declare these for 128mb
 static BOOL indic[256];
 static uint8 adress[256];
 static uint8 adfix[256];
@@ -378,14 +380,13 @@ uint16 nombreframes; // 256 max -> uint8 = 255 max -> uint16
 static uint8 plusgrand;
 uint32 poubelle = 0;
 BOOL pause = 0;
-//}
 
 void InitPageAndFrameTables()
 {
 	//---------------Doesnt work for 128mb-------------------
 	// weinerschnitzel - 64 mb condition
 	// Ez0n3 - old method of rom paging
-	if(PhysRam128() == FALSE){
+	if(RAM_IS_128 == 0){
 	uint32 i;
 
 	// get the size of the page table
@@ -412,7 +413,7 @@ void InitPageAndFrameTables()
 
 // freakdave - new method of rom paging
 //weinerschnitzel - 128mb condition
-if(PhysRam128() == TRUE){
+if(RAM_IS_128 == 1){
 
 	uint16 i;
 	pagesize = 256*1024;
@@ -445,7 +446,7 @@ uint32 ReadUWORDFromROM(uint32 location)
 	//---------------Doesnt work for 128mb-------------------
 	//weinerschnitzel - 64mb condition
 	// Ez0n3 - old method of rom paging
-	if(PhysRam128() == FALSE){
+	if(RAM_IS_128 == 0){
 	uint32 i;
 	uint32 pageNumberOfLocation;
 	uint32 offsetFromPage;
@@ -540,7 +541,7 @@ uint32 ReadUWORDFromROM(uint32 location)
 
 // freakdave - new method of rom paging
 //weinerschnitzel - 128mb condition
-if(PhysRam128() == TRUE){
+if(RAM_IS_128 == 1){
 
 	uint32 location2 = location & 0x7ffffff;
 
@@ -575,7 +576,7 @@ uint16 ReadUHALFFromROM(uint32 location)
 	//---------------Doesnt work for 128mb-------------------
 	//weinerschnitzel - 64mb condition
 	// Ez0n3 - old method of rom paging
-	if(PhysRam128() == FALSE){
+	if(RAM_IS_128 == 0){
 	uint32 i;
 	uint32 pageNumberOfLocation;
 	uint32 offsetFromPage;
@@ -669,7 +670,7 @@ uint16 ReadUHALFFromROM(uint32 location)
 
 // freakdave - new method of rom paging
 // weinerschnitzel - 128mb condition
-if(PhysRam128() == TRUE){
+if(RAM_IS_128 == 1){
 
 	uint32 location2 = location & 0x7ffffff;
 
@@ -702,7 +703,7 @@ uint8 ReadUBYTEFromROM(uint32 location)
 	//---------------Doesnt work for 128mb-------------------
 	//weinerschnitzel - 64mb condition
 	// Ez0n3 - old method of rom paging
-	if(PhysRam128() == FALSE){
+	if(RAM_IS_128 == 0){
 	uint32 i;
 	uint32 pageNumberOfLocation;
 	uint32 offsetFromPage;
@@ -796,7 +797,7 @@ uint8 ReadUBYTEFromROM(uint32 location)
 
 // freakdave - new method of rom paging
 //weinerschnitzel - 128mb condition
-if(PhysRam128() == TRUE){
+if(RAM_IS_128 == 1){
 
 	uint32 location2 = location & 0x7ffffff;
 
@@ -829,7 +830,7 @@ __int32 ReadSWORDFromROM(uint32 location)
 	//---------------Doesnt work for 128mb-------------------
 	// Ez0n3 - old method of rom paging
 	//weinerschnitzel - 64mb condition
-	if(PhysRam128() == FALSE){
+	if(RAM_IS_128 == 0){
 	uint32 i;
 	uint32 pageNumberOfLocation;
 	uint32 offsetFromPage;
@@ -926,7 +927,7 @@ __int32 ReadSWORDFromROM(uint32 location)
 
 // freakdave - new method of rom paging
 // weinerschnitzel 128mb condition                                                                                                                                                                                                                                                                                                           
-if(PhysRam128() == TRUE){
+if(RAM_IS_128 == 1){
 	uint32 location2 = location & 0x7ffffff;
 
 	uint8 numero = (location2/pagesize);
