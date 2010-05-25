@@ -28,7 +28,7 @@ extern int TextureMode;
 extern bool FrameSkip;
 
 #define MAIN_KEY		"Software\\RICEVIDEO\\Version612"
-#define INI_FILE		"D:\\RiceVideo6.1.2.ini"
+#define INI_FILE		"RiceVideo6.1.2.ini"
 char *project_name =	"Rice's Video Plugin";
 
 // Disable the config dialog box to allow Vtune call graph feature to work
