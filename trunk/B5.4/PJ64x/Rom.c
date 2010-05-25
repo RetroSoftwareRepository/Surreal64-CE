@@ -776,6 +776,10 @@ VOID __cdecl main()
 	Mount("G:","Harddisk0\\Partition7");
 
 	loadinis();
+
+	//freakdave - check for 128mb
+	PhysRam128();
+
 	if(RAM_IS_128 == 1){
 	Enable128MegCaching(); // weinerschnitzel - put this in 128mb mode
 	}

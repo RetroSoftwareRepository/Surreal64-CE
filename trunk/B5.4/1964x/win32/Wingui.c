@@ -142,6 +142,10 @@ void __cdecl main()
 
 	loadinis();
 	sprintf(emuname,"1964x");
+
+	//freakdave - check for 128mb
+	PhysRam128();
+
 	//weinerscnitzel reverted to act like xxxb5 for 128mb users
 	if(RAM_IS_128 == 1){
 	Enable128MegCaching();//added by freakdave
