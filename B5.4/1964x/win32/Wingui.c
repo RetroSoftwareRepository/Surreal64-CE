@@ -87,11 +87,11 @@ extern BOOL PhysRam128(){
   MEMORYSTATUS memStatus;
   GlobalMemoryStatus( &memStatus );
   if( memStatus.dwTotalPhys < (100 * 1024 * 1024) ){ 
-	  return FALSE;
 	  RAM_IS_128 = 0;
+	  return FALSE;
   }else{
-	  return TRUE;
 	  RAM_IS_128 = 1;
+	  return TRUE;
   }
 }
 
