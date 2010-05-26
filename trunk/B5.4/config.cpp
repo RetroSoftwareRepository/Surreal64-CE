@@ -168,7 +168,6 @@ int ConfigAppLoad()
 		VAR(FlickerFilter);
 		BOL(SoftDisplayFilter);
 		VAR(TextureMode);
-		BOL(FrameSkip);
 		VAR(romcounter);
 		BOL(onhd);
 		STR(skinname);
@@ -215,7 +214,6 @@ int ConfigAppSave()
 	VAR(FlickerFilter);
 	BOL(SoftDisplayFilter);
 	VAR(TextureMode);
-	BOL(FrameSkip);
 	VAR(romcounter);
 	BOL(onhd);
 	STR(skinname);
@@ -267,6 +265,7 @@ int ConfigAppSave2()
 	VAR(dwPJ64DynaMem);
 	VAR(dwPJ64PagingMem);
 	BOL(bUseLLERSP); // Ez0n3 - use iAudioPlugin instead
+	BOL(FrameSkip);
 	
 	// Ez0n3 - reinstate max video mem until freakdave finishes this
 	//VAR(dwFreeMem);
@@ -412,7 +411,8 @@ int ConfigAppLoad2()
 		VAR(dwPJ64DynaMem);
 		VAR(dwPJ64PagingMem);
 		BOL(bUseLLERSP); // Ez0n3 - use iAudioPlugin instead, but leave this in in case it's set in ini
-		
+		BOL(FrameSkip);
+
 		// Ez0n3 - reinstate max video mem until freakdave finishes this
 		//VAR(dwFreeMem);
 		VAR(dwMaxVideoMem);
