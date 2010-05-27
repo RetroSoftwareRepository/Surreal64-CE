@@ -19,7 +19,7 @@ int TextureMode = 3;
 int VertexMode = 1;
 float XBINPUT_DEADZONE = 0.24;
 float XBINPUT_SUMMAND = 0.5;
-float XBOX_CONTROLLER_DEAD_ZONE = 8000;
+float XBOX_CONTROLLER_DEAD_ZONE = 0;
 int Sensitivity = 0;
 
 enum Pak
