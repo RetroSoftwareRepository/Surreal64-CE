@@ -64,6 +64,7 @@ void ToggleTextureFilter(bool inc);
 void ToggleSoftDisplayFilter();
 void ToggleFrameSkip();
 void ToggleSensitivity(bool inc);
+void ToggleDeadzone(bool inc);
 void ControllerSettingsMenu();
 void TogglePak();
 void ShowDebug();
@@ -108,6 +109,8 @@ void incTextureFilter(){ ToggleTextureFilter(true); }
 void decTextureFilter(){ ToggleTextureFilter(false); }
 void incSensitivity(){ ToggleSensitivity(true); }
 void decSensitivity(){ ToggleSensitivity(false); }
+void incDeadzone(){ ToggleDeadzone(true); }
+void decDeadzone(){ ToggleDeadzone(false); }
 //
 extern bool showdebug;
 
@@ -690,6 +693,11 @@ void ControllerSettingsMenu()
 	swprintf(currentname,L"Analog Sensitivity : %d",Sensitivity);
 	XLMenu_AddItem2(m_pSettingsMenu,MITEM_ROUTINE,currentname,incSensitivity,decSensitivity);
 
+	//Deadzone
+	swprintf(currentname,L"Analog Deadzone : %f", XBOX_CONTROLLER_DEAD_ZONE);
+	XLMenu_AddItem2(m_pSettingsMenu,MITEM_ROUTINE,currentname,incDeadzone,decDeadzone);
+
+
 	//Mempak/RumblePak/NoPak
 	if (DefaultPak == NoPak)
 	{
@@ -748,7 +756,34 @@ void ToggleSensitivity(bool inc)
 
 	ConfigAppSave2();
 }
+void ToggleDeadzone(bool inc)
+{
+	WCHAR currentname[120];
+	currentItem = m_pSettingsMenu->curitem;
+	float Deadzone = XBOX_CONTROLLER_DEAD_ZONE;
 
+	if (inc)
+	{
+	Deadzone += 200;
+	if(Deadzone > 10000) Deadzone = 0;
+	//freakdave
+	//Don't forget to alter the floats in the brackets accordingly if you change XBOX_CONTROLLER_DEAD_ZONE
+	}
+	else
+	{
+    Deadzone -= 200;
+	if(Deadzone < 0) Deadzone = 10000;
+	}
+
+	XBOX_CONTROLLER_DEAD_ZONE = float(Deadzone);
+	
+	XLMenu_CurRoutine = NULL;
+	
+	swprintf(currentname,L"Analog Deadzone: %f",Deadzone);
+	XLMenu_SetItemText(&m_pSettingsMenu->items[currentItem], currentname);
+
+	ConfigAppSave2();
+}
 void TogglePak()
 {
 WCHAR currentname[120];

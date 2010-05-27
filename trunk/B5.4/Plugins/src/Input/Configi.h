@@ -9,7 +9,7 @@ using namespace std;
 
 #define NUMBER_OF_CONTROLLERS		4
 
-#define XBOX_CONTROLLER_DEAD_ZONE 8600
+//extern float XBOX_CONTROLLER_DEAD_ZONE;
 
 #define IS_N64_AXIS(button)		(button < 4)
 #define IS_XBOX_AXIS(button)	(button < 8)
