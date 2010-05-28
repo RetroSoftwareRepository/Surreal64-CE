@@ -365,8 +365,8 @@ void _AUDIO_MUSYX_AiUpdate (BOOL Wait)
 
 #ifndef THREADED
 	Update (Wait&Playing);
-	PlayIt();
 	DirectSoundDoWork();
+	PlayIt();
 #endif
 	
 
@@ -421,8 +421,8 @@ DWORD WINAPI AudioThreadProc (void)
 	while (1)
 	{
 		EnterCriticalSection(&CriticalSection);
-		DirectSoundDoWork();
 		Update (0);
+		DirectSoundDoWork();
 		PlayIt();
 		LeaveCriticalSection(&CriticalSection);
 		Sleep(1);
