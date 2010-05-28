@@ -1291,7 +1291,7 @@ void ControllerSettingsMenu()
 
     WCHAR currentname[120];
 
-	m_pSettingsMenu = XLMenu_Init(60,80,6, MENU_LEFT|MENU_WRAP, NULL);
+	m_pSettingsMenu = XLMenu_Init(60,80,7, MENU_LEFT|MENU_WRAP, NULL);
 
 	m_pSettingsMenu->topcolor = 0x40254365;
 	m_pSettingsMenu->bottomcolor = 0x40556486;
@@ -1307,8 +1307,8 @@ void ControllerSettingsMenu()
 	XLMenu_AddItem2(m_pSettingsMenu,MITEM_ROUTINE,currentname,incSensitivity,decSensitivity);
 	
 	//Deadzone
-	//swprintf(currentname,L"Analog Deadzone : %4.0f", XBOX_CONTROLLER_DEAD_ZONE);
-	//XLMenu_AddItem2(m_pSettingsMenu,MITEM_ROUTINE,currentname,incDeadzone,decDeadzone);
+	swprintf(currentname,L"Analog Deadzone : %4.0f", XBOX_CONTROLLER_DEAD_ZONE);
+	XLMenu_AddItem2(m_pSettingsMenu,MITEM_ROUTINE,currentname,incDeadzone,decDeadzone);
 
 	//Mempak/RumblePak/NoPak
 
