@@ -694,8 +694,8 @@ void ControllerSettingsMenu()
 	XLMenu_AddItem2(m_pSettingsMenu,MITEM_ROUTINE,currentname,incSensitivity,decSensitivity);
 
 	//Deadzone
-	swprintf(currentname,L"Analog Deadzone : %f", XBOX_CONTROLLER_DEAD_ZONE);
-	XLMenu_AddItem2(m_pSettingsMenu,MITEM_ROUTINE,currentname,incDeadzone,decDeadzone);
+	//swprintf(currentname,L"Analog Deadzone : %4.0f", XBOX_CONTROLLER_DEAD_ZONE);
+	//XLMenu_AddItem2(m_pSettingsMenu,MITEM_ROUTINE,currentname,incDeadzone,decDeadzone);
 
 
 	//Mempak/RumblePak/NoPak
@@ -779,7 +779,7 @@ void ToggleDeadzone(bool inc)
 	
 	XLMenu_CurRoutine = NULL;
 	
-	swprintf(currentname,L"Analog Deadzone: %f",Deadzone);
+	swprintf(currentname,L"Analog Deadzone: %4.0f",Deadzone);
 	XLMenu_SetItemText(&m_pSettingsMenu->items[currentItem], currentname);
 
 	ConfigAppSave2();
