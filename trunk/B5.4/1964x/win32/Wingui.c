@@ -99,6 +99,12 @@ extern BOOL PhysRam128(){
 // Ez0n3 - reinstate max video mem until freakdave finishes this
 extern void _VIDEO_SetMaxTextureMem(DWORD mem);
 
+BOOL MessageBox(HWND hWnd, LPCTSTR lpText, LPCTSTR lpCaption, UINT uType)
+{
+	OutputDebugString(lpText);
+	return 0;
+
+}
 
 void __EMU_SaveState(int index)
 {

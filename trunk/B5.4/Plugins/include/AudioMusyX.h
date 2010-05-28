@@ -127,7 +127,7 @@ extern "C" {
   input:    none
   output:   none
 *******************************************************************/ 
- void  _AUDIO_MUSYX_ProcessAList(void);
+ void  _AUDIO_MUSYX_ProcessAList(void); DWORD _AUDIO_MUSYX_ProcessAListCountCycles(void);
 
 /******************************************************************
   Function: _AUDIO_MUSYX_RomClosed

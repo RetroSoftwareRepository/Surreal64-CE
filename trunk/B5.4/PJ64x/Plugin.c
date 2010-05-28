@@ -91,7 +91,7 @@ extern void _AUDIO_NONE_AiReadLength(void);
 extern void _AUDIO_NONE_AiUpdate(BOOL Wait);
 extern BOOL _AUDIO_NONE_InitiateAudio (AUDIO_INFO Audio_Info);
 extern void _AUDIO_NONE_ProcessAList(void);
-/*
+
 // freakdave - New MusyX audio plugin
 extern void _AUDIO_MUSYX_CloseDLL (void);
 extern void _AUDIO_MUSYX_RomClosed(void);
@@ -103,7 +103,7 @@ extern void _AUDIO_MUSYX_AiReadLength(void);
 extern void _AUDIO_MUSYX_AiUpdate(BOOL Wait);
 extern BOOL _AUDIO_MUSYX_InitiateAudio (AUDIO_INFO Audio_Info);
 extern void _AUDIO_MUSYX_ProcessAList(void);
-*/
+
 
 // Ez0n3 - old Azimer
 // freakdave - readded Azimer
@@ -324,7 +324,7 @@ BOOL LoadAudioNoneDll(void) {
 	AiUpdate = (void ( *)(BOOL))_AUDIO_NONE_AiUpdate;
 	return TRUE;
 }
-/*
+
 // freakdave - MusyX Audio plugin
 BOOL LoadAudioMusyXDll(void) {
 	PLUGIN_INFO PluginInfo;
@@ -357,7 +357,7 @@ BOOL LoadAudioMusyXDll(void) {
 	AiUpdate = (void ( *)(BOOL))_AUDIO_MUSYX_AiUpdate;
 	return TRUE;
 }
-*/
+
 
 BOOL LoadControllerDll(void) {
 	PLUGIN_INFO PluginInfo;
@@ -589,12 +589,12 @@ void SetupPlugins (HWND hWnd) {
 	{
 		success = LoadAudioAzimerDll();
 	}
-	/*
+	
 	else if (g_iAudioPlugin == _AudioPluginMusyX)
 	{
 		success = LoadAudioMusyXDll();
 	}
-	*/
+	
 
 	if (!success) {
 		AiCloseDLL       = NULL;

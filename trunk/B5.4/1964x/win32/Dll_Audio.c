@@ -52,6 +52,7 @@ void (*_AUDIO_LINK_GetDllInfo)(PLUGIN_INFO *PluginInfo) = _AUDIO_GetDllInfo;
 BOOL (*_AUDIO_LINK_InitiateAudio)(AUDIO_INFO Audio_Info) = _AUDIO_InitiateAudio;
 void (*_AUDIO_LINK_ProcessAList)(void) = _AUDIO_ProcessAList;
 void (*_AUDIO_LINK_RomClosed)(void) = _AUDIO_RomClosed;
+DWORD (*_AUDIO_LINK_ProcessAListCountCycles)(void) = NULL;
 
 
 /* Used when selecting plugins */
@@ -133,7 +134,7 @@ BOOL LoadAudioPlugin()
 		_AUDIO_LINK_ProcessAList	 	= _AUDIO_AZIMER_ProcessAList;
 		_AUDIO_LINK_RomClosed		 	= _AUDIO_AZIMER_RomClosed;
 	}
-	/*
+	
 	else if (g_iAudioPlugin == _AudioPluginMusyX)
 	{
 		// freakdave - new MusyX Audio plugin
@@ -149,8 +150,9 @@ BOOL LoadAudioPlugin()
 		_AUDIO_LINK_InitiateAudio	 	= _AUDIO_MUSYX_InitiateAudio;
 		_AUDIO_LINK_ProcessAList	 	= _AUDIO_MUSYX_ProcessAList;
 		_AUDIO_LINK_RomClosed		 	= _AUDIO_MUSYX_RomClosed;
+		_AUDIO_LINK_ProcessAListCountCycles = _AUDIO_MUSYX_ProcessAListCountCycles;
 	}
-	*/
+	
 
 	return TRUE;
 }
@@ -311,6 +313,11 @@ DWORD AUDIO_AiReadLength(void)
 void AUDIO_AiUpdate(BOOL update)
 {
 	_AUDIO_LINK_AiUpdate(update);
+}
+
+DWORD AUDIO_ProcessAListCountCycles(void)
+{
+	_AUDIO_LINK_ProcessAListCountCycles();
 }
 
 /*

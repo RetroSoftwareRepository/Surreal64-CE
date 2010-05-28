@@ -36,23 +36,24 @@
 				EnableEnhancedInstructionSet="1"
 				UsePrecompiledHeader="0"
 				PrecompiledHeaderFile="obj\Release\$(ProjectName).pch"
+				AssemblerOutput="2"
 				BrowseInformation="1"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
-				DebugInformationFormat="0"
+				DebugInformationFormat="3"
 				CallingConvention="1"
 				CompileAs="1"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xacteng.lib xboxkrnl.lib zlib\xzlib.lib AudioBasic.lib AudioJttl.lib AudioNone.lib AudioAzimer.lib Input.lib RSP.lib Video612.lib"
+				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xacteng.lib xboxkrnl.lib zlib\xzlib.lib AudioBasic.lib AudioJttl.lib AudioNone.lib AudioAzimer.lib AudioMusyX.lib Input.lib RSP.lib Video612.lib"
 				OutputFile="$(OutDir)/1964-612.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\Plugins\lib\"
 				IgnoreAllDefaultLibraries="FALSE"
 				IgnoreDefaultLibraryNames=""
-				GenerateDebugInformation="FALSE"
+				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(OutDir)/$(ProjectName).pdb"
 				SubSystem="2"
 				OptimizeReferences="2"

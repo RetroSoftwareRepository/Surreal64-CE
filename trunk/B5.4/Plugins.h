@@ -37,8 +37,8 @@ enum AudioPlugins
 	_AudioPluginLleRsp,
 	_AudioPluginBasic,
 	_AudioPluginJttl,
-	//_AudioPluginMusyX,	//freakdave - new MusyX audio plugin
 	_AudioPluginAzimer,
+	_AudioPluginMusyX,
 	_AudioPluginMissing
 };
 
