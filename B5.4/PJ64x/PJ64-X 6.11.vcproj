@@ -48,7 +48,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xacteng.lib xboxkrnl.lib AudioBasic.lib AudioJttl.lib AudioNone.lib AudioAzimer.lib Input.lib RSP.lib Video612.lib"
+				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xacteng.lib xboxkrnl.lib AudioBasic.lib AudioJttl.lib AudioNone.lib AudioAzimer.lib AudioMusyX.lib Input.lib RSP.lib Video612.lib"
 				OutputFile="$(OutDir)/Pj64-612.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\Plugins\lib"

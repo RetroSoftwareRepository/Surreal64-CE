@@ -122,7 +122,7 @@ BOOL PeekMessage(PMSG lpMsg, HWND hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax, 
 
 BOOL MessageBox(HWND hWnd, LPCTSTR lpText, LPCTSTR lpCaption, UINT uType)
 {
-
+	OutputDebugString(lpText);
 	return 0;
 
 }
