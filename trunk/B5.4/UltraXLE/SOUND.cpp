@@ -10,12 +10,14 @@
 
 extern void debugprint(char *str,...);
 
-static LPDIRECTSOUND       ds;
-static LPDIRECTSOUNDBUFFER sbuf;
-static int                 bufrate=48000;
-static int                 bufsize=1024*1024;  // bytes
-static int                 wpos;
-static int                 initdone;
+static LPDIRECTSOUND		ds;
+static LPDIRECTSOUNDBUFFER	sbuf;
+static int					bufrate=32000;
+static int					bufsize=256*1024;  // bytes
+static int					wpos;
+static int					initdone;
+HANDLE						hMutex;
+#define						MS INFINITE
 
 typedef struct
 {
@@ -69,16 +71,19 @@ int sound_init(int rate)
     HRESULT e;
     HWND    hwnd;
 
+	
     if(initdone) return(0);
 
     //hwnd=(HWND)main_gethwnd();
 
+	hMutex = CreateMutex(NULL, FALSE, NULL);
+	WaitForSingleObject(hMutex, MS);
     e=DirectSoundCreate(NULL,&ds,NULL);
     if(e!=DS_OK) return(-1);
 
     e=IDirectSound_SetCooperativeLevel(ds,hwnd,DSSCL_NORMAL);
     if(e!=DS_OK) return(-1);
-
+	ReleaseMutex(hMutex);
     if(!ds) return(0);
 
     initdone=1;
@@ -98,7 +103,7 @@ void sound_start(int rate)
 		return;
 	}
     bufrate=rate;
-
+	WaitForSingleObject(hMutex, MS);
     // Set up wave format structure.
     memset(&form, 0, sizeof(WAVEFORMATEX));
     form.wFormatTag         = WAVE_FORMAT_PCM;
@@ -129,7 +134,7 @@ void sound_start(int rate)
     {
         dserror(e,"startsound");
     }
-
+	ReleaseMutex(hMutex);
     wpos=bufsize/2;
 }
 
@@ -141,12 +146,14 @@ void sound_stop(void)
 		OutputDebugString("void sound_stop Line 140\n");	
 		return;
 	}
+	WaitForSingleObject(hMutex, MS);
     if((e=IDirectSoundBuffer_Stop(sbuf))!=DS_OK)
     {
         dserror(e,"stopsound");
     }
     IDirectSoundBuffer_Release(sbuf);
     sbuf=NULL;
+	ReleaseMutex(hMutex);
 }
 
 // space in buffer (samples)
@@ -162,14 +169,13 @@ int  sound_buffered(void)
 		OutputDebugString("void sound_buffered Line 161\n");
 		return(0);
 	}
-
+	WaitForSingleObject(hMutex, MS);
     IDirectSoundBuffer_GetCurrentPosition(sbuf,(LPDWORD)&playpos,(LPDWORD)&safepos);
-
     // advance wpos above safepos
     a=wpos-safepos;
     if(a<-bufsize/2) a+=bufsize;
     if(a> bufsize/2) a=bufsize-a;
-
+	ReleaseMutex(hMutex);
 	return(a);
 }
 
@@ -181,8 +187,9 @@ int  sound_position(int *bufsizeptr)
 		OutputDebugString("void sound_position Line 180\n");
 		return(0);
 	}
+	WaitForSingleObject(hMutex, MS);
     IDirectSoundBuffer_GetCurrentPosition(sbuf,(LPDWORD)&playpos,(LPDWORD)&safepos);
-
+	ReleaseMutex(hMutex);
     if(bufsizeptr) *bufsizeptr=bufsize;
     return(playpos);
 }
@@ -208,6 +215,7 @@ int  sound_add(short *data0,int bytes)
         DWORD   size1;
         LPVOID  data2;
         DWORD   size2;
+		WaitForSingleObject(hMutex, MS);
         if((e=IDirectSoundBuffer_Lock(sbuf,wpos,bytes,&data1,&size1,&data2,&size2,0))!=DS_OK)
         {
             dserror(e,"add1");
@@ -231,6 +239,7 @@ int  sound_add(short *data0,int bytes)
         // print("soundadd: to %06X,%04X (%p/%05X,%p%/05X)\n",wpos,bytes,data1,size1,data2,size2);
         wpos+=bytes;
         wpos&=(bufsize-1);
+		ReleaseMutex(hMutex);
     }
 
     return(0);
@@ -249,6 +258,7 @@ void sound_resync(int target)
 		OutputDebugString("void sound_resync Line 248\n");
 		return;
 	}
+	WaitForSingleObject(hMutex, MS);
     IDirectSoundBuffer_GetCurrentPosition(sbuf,(LPDWORD)&playpos,(LPDWORD)&safepos);
 
     wpos=(safepos+target)&(bufsize-1);
@@ -271,6 +281,7 @@ void sound_resync(int target)
         dserror(e,"");
         return;
     }
+	ReleaseMutex(hMutex);
 }
 
 unsigned char wavheaderstereo[]={

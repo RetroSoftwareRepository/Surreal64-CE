@@ -32,6 +32,7 @@ void sync_audio(void)
     int a,b,bufsize;
     static int lastsndpos;
 
+	DirectSoundDoWork();
     if(st2.audiorequest)
     {
         // slist.c has found audio and wants to enable
@@ -51,7 +52,7 @@ void sync_audio(void)
 
     if(st2.audioon)
     {
-        int buffered;
+        unsigned int buffered;
         //int target;
 
         //target=SOUNDTARGET;
@@ -67,7 +68,9 @@ void sync_audio(void)
         st2.sync_soundused+=b;
 
         // we have audio, syncronize to it
+
         buffered=sound_buffered(); // how many bytes in buffer
+		
         st2.audiobuffered=buffered-SOUNDTARGET;
 
         st2.audiobufferedsum+=st2.audiobuffered;
@@ -85,7 +88,10 @@ void sync_audio(void)
             else if(buffered<SOUNDTARGET/4)
             { // ran out of buffer! (4K safety)
 				OutputDebugString("Line 87\n");
-                sound_resync(SOUNDTARGET);
+
+				buffered=sound_buffered(); // how many bytes in buffer
+
+                sound_resync(SOUNDTARGET*2);
                 st2.audiostatus=-9;
                 st2.audioresync++;
                 st2.audiobufferedcnt+=0x10000;
