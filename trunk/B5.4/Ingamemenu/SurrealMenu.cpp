@@ -629,7 +629,7 @@ void ToggleFrameSkip()
 	swprintf(currentname,L"Skip Frames : Yes");
 	XLMenu_SetItemText(&m_pSettingsMenu->items[currentItem], currentname);
 
-	ConfigAppSave();
+	ConfigAppSave2();
 }
 
 void ToggleTextureFilter(bool inc)
