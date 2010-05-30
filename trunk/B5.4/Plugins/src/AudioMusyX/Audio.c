@@ -16,7 +16,7 @@
 #define AI_STATUS_DMA_BUSY	0x40000000		/* Bit 30: busy */
 #define MI_INTR_AI			0x04			/* Bit 2: AI intr */
 #define NUMCAPTUREEVENTS	3
-#define BufferSize			0x4000			//0x2000 //8192
+#define BufferSize			0x2000			//0x2000 //8192
 //int BufferSize;
 
 
