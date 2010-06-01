@@ -619,6 +619,8 @@ HRESULT	CXBoxSample::Render()
 		{
 		Rom *rom = g_romList.GetRomAt(iTempGameSel++);
 		char nameofgame[120];
+		char nameofgametrunc[43];
+		WCHAR m_currentname_trunc[43];
 		bool caps = true;
 		bool end = false;
 		sprintf(nameofgame,rom->GetProperName().c_str());
@@ -649,11 +651,26 @@ HRESULT	CXBoxSample::Render()
 			if (end) 
 			{nameofgame[j]='\0';break;}
 		}
+		//weinerschnitzel - truncate the name to fit in GUI
+		for(int k = 0; k <= 43; k++){
+			nameofgametrunc[k] = ' ';
+			m_currentname_trunc[k] = ' ';
+		}
+		for(int k = 0; k <= 43; k++){
+			nameofgametrunc[k] = nameofgame[k];
+			m_currentname_trunc[k] = m_currentname[k];
+			if( k == 43){
+				nameofgametrunc[k] = '\0';
+				m_currentname_trunc[k] = '\0';
+			}
+
+		}
+
 		
-		swprintf( m_currentname, L"%S",nameofgame );
+		swprintf( m_currentname_trunc, L"%S",nameofgametrunc );
 
 			if (iGameidx==iCursorPos){
-                m_Font.DrawText( 45, 45+(20*iGameidx), 0xFFFF7F7f, m_currentname, XBFONT_TRUNCATED,	530);
+                m_Font.DrawText( 45, 45+(20*iGameidx), 0xFFFF7F7f, m_currentname_trunc, XBFONT_TRUNCATED,	530);
 				sprintf(romCRC,"%x",rom->m_dwCrc1);
 				sprintf(romname,"%S",m_currentname);
 				for (int i=0;i<3;i++){
@@ -661,7 +678,7 @@ HRESULT	CXBoxSample::Render()
 			}
 			else
 			{
-				m_Font.DrawText( 45, 45+(20*iGameidx), 0xFFEEEEEE, m_currentname, XBFONT_TRUNCATED,	530);
+				m_Font.DrawText( 45, 45+(20*iGameidx), 0xFFEEEEEE, m_currentname_trunc, XBFONT_TRUNCATED,	530);
 			}
 
 		}
