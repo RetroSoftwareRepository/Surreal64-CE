@@ -836,18 +836,7 @@ void D3DRender::BeginRendering(void)
 
 void D3DRender::CaptureScreen(char *filename)
 {
-#ifndef _XBOX
-	MYLPDIRECT3DSURFACE surface;
-#if DIRECTX_VERSION == 8
-	g_pD3DDev->GetRenderTarget(&surface);
-#else
-	g_pD3DDev->GetRenderTarget(0,&surface);
-#endif
-	((CDXGraphicsContext*)CGraphicsContext::g_pGraphicsContext)->SaveSurfaceToFile(filename, surface, false);
-	//D3DXSaveSurfaceToFile(filename,D3DXIFF_BMP,surface,NULL,NULL);
-	surface->Release();
-	TRACE1("Capture screen to %s", filename);
-#endif
+
 }
 
 void D3DRender::SetCullMode(bool bCullFront, bool bCullBack)
