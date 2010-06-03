@@ -50,15 +50,7 @@ void D3DRender::LoadTxtrBufFromRDRAM(void)
 #else
 		d3dSprite->Draw(MYLPDIRECT3DTEXTURE(g_textures[0].m_lpsTexturePtr), NULL, NULL, NULL, 0xFFFFFFFF);
 #endif
-#ifdef _DEBUG
-		if( pauseAtNext && eventToPause == NEXT_RENDER_TEXTURE )
-		{
-			MYLPDIRECT3DTEXTURE pD3DTexture = MYLPDIRECT3DTEXTURE(g_textures[0].m_lpsTexturePtr);
-			MYLPDIRECT3DSURFACE pD3DSurface = NULL;
-			pD3DTexture->GetSurfaceLevel(0,&pD3DSurface);
-			((CDXGraphicsContext*)CGraphicsContext::g_pGraphicsContext)->SaveSurfaceToFile("\\DxTxtBuf25", pD3DSurface);
-		}
-#endif
+
 	}
 	FinishSpriteDraw(d3dSprite);
 }
@@ -109,15 +101,6 @@ void D3DRender::DrawObjBGCopy(uObjBg &info)
 				for( uint32 j=0; j<width; j+=inc)
 				{
 					DrawSimpleRect(j, i, j+inc, i+inc, gRDP.primitiveColor, depth, 1/depth);
-
-#ifdef _DEBUG
-					if( pauseAtNext && eventToPause == NEXT_TRIANGLE )
-					{
-						debuggerPause = true;
-						TRACE0("Pause after drawing a rect for Z buffer");
-						DebuggerPause();
-					}
-#endif
 				}
 			}
 		}
@@ -141,8 +124,8 @@ void D3DRender::DrawObjBGCopy(uObjBg &info)
 			}
 		}
 
-		DEBUGGER_IF_DUMP((pauseAtNext&& (eventToPause==NEXT_OBJ_TXT_CMD||eventToPause==NEXT_OBJ_BG)), 
-		{TRACE0("Using BG to update Z buffer has not been implemented yet");});
+		//DEBUGGER_IF_DUMP((pauseAtNext&& (eventToPause==NEXT_OBJ_TXT_CMD||eventToPause==NEXT_OBJ_BG)), 
+		//{TRACE0("Using BG to update Z buffer has not been implemented yet");});
 
 		// I can not finish this function because Z buffer is not lockable
 		// and lockable zbuffer does not work
@@ -244,41 +227,4 @@ void D3DRender::DrawText(const char* str, RECT *rect)
 {
 	return;
 
-	//// code below does not work
-
-	//LOGFONT     lf;
-	//HFONT       hFont;
-
-	//// Let's create a TrueType font to display.
-	//memset(&lf,0,sizeof(LOGFONT));
-	//lf.lfHeight               =   20 ;
-	//lf.lfWeight               =   FW_NORMAL ;
-	//lf.lfCharSet              =   ANSI_CHARSET ;
-	//lf.lfOutPrecision         =   OUT_DEFAULT_PRECIS ;
-	//lf.lfClipPrecision        =   CLIP_DEFAULT_PRECIS ;
-	//lf.lfQuality              =   DEFAULT_QUALITY ;
-	//lf.lfPitchAndFamily       =   FF_DONTCARE|DEFAULT_PITCH;
-	//lstrcpy (lf.lfFaceName, "Arial") ;
-	//hFont = CreateFontIndirect(&lf);
-
-	//HDC hdc;
-	//if ((hdc = GetDC(g_GraphicsInfo.hWnd)) == NULL)
-	//{
-	//	ErrorMsg("GetDC on main window failed");
-	//	return;
-	//}
-
-	//HGDIOBJ oldFont = SelectObject(hdc, hFont);
-
-	//LPD3DXFONT pFont;
-	//HRESULT res = D3DXCreateFont(g_pD3DDev, hFont, &pFont);
-	//if( res == S_OK )
-	//{
-	//	pFont->DrawText(str, -1, rect, DT_CENTER, 0xFFFFFFFF);
-	//	pFont->Release();
-	//}
-
-	//DeleteObject(SelectObject(hdc, oldFont));
-
-	//ReleaseDC(g_GraphicsInfo.hWnd, hdc);
 }
