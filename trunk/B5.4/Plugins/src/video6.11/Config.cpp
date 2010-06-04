@@ -384,7 +384,7 @@ void ReadConfiguration(void)
 		options.bFullTMEM = TRUE;
 		options.bUseFullTMEM = TRUE;
 
-		options.bForceSoftwareTnL = TRUE;
+		options.bForceSoftwareTnL = FALSE;
 		options.bForceSoftwareClipper = FALSE;
 
 		options.bEnableVertexShader = FALSE;
@@ -406,16 +406,16 @@ void ReadConfiguration(void)
 		options.DirectXCombiner = DX_PIXEL_SHADER;
 		options.DirectXDevice = DIRECTX_DEVICE;	// HAL device
 		options.DirectXAnisotropyValue = 0;
-		options.DirectXMaxFSAA = 16;
+		options.DirectXMaxFSAA = 4;
 		options.FPSColor = 0xFFFFFFFF;
-		options.DirectXMaxAnisotropy = 16;
+		options.DirectXMaxAnisotropy = 2;
 
 		defaultRomOptions.screenUpdateSetting = SCREEN_UPDATE_AT_VI_CHANGE;
 		//defaultRomOptions.screenUpdateSetting = SCREEN_UPDATE_AT_VI_UPDATE_AND_DRAWN;
 
 		defaultRomOptions.N64FrameBufferEmuType = FRM_BUF_NONE;
 		defaultRomOptions.N64FrameBufferWriteBackControl = FRM_BUF_WRITEBACK_NORMAL;
-		defaultRomOptions.N64RenderToTextureEmuType = TXT_BUF_NONE;
+		defaultRomOptions.N64RenderToTextureEmuType = TXT_BUF_NORMAL;//TXT_BUF_NONE;
 
 		defaultRomOptions.bNormalBlender = FALSE;
 		defaultRomOptions.bFastTexCRC=TRUE;
