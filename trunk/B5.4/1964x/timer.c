@@ -47,7 +47,7 @@ int		CounterFactor = COUTERFACTOR_2;
 uint64	current_counter;
 uint64	next_vi_counter;		/* use 64bit varible, will never overflow */
 uint64	next_count_counter;		/* value in here is in the unit of VIcounter, not in the half rate */
-uint32  vi_field_number = 0;;
+uint32  vi_field_number = 0;
 /*
  * speed concerning about using 64bit is not a big deal here £
  * because these two variables will not be used in emu main loop £
