@@ -402,9 +402,7 @@ void ReadConfiguration(void)
 	defaultRomOptions.N64FrameBufferWriteBackControl = FRM_BUF_WRITEBACK_NORMAL;
 	defaultRomOptions.N64RenderToTextureEmuType = TXT_BUF_NONE;
 
-	if(TestRegistry() == FALSE)
-	{
-		options.bEnableFog = FALSE;
+		options.bEnableFog = TRUE;
 		options.bWinFrameMode = FALSE;
 		options.bFullTMEM = TRUE;
 		options.bUseFullTMEM = TRUE;
@@ -448,9 +446,6 @@ void ReadConfiguration(void)
 		defaultRomOptions.bOverlapAutoWriteBack = FALSE;
 		defaultRomOptions.bDoubleSizeForSmallTxtrBuf = FALSE;
 		windowSetting.uFullScreenRefreshRate = 0;	// 0 is the default value, means to use Window default frequency
-		WriteConfiguration();
-		 
-	}
 
 	//freakdave
 	//0 = None (valid for Mips only)

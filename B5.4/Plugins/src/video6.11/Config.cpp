@@ -150,10 +150,10 @@ const SettingInfo TextureEnhancementSettings[] =
 const SettingInfo TextureEnhancementControlSettings[] =
 {
 	"Normal",	TEXTURE_ENHANCEMENT_NORMAL,
-	"Smooth",	TEXTURE_ENHANCEMENT_WITH_SMOOTH_FILTER_1,
-	"Less smooth", TEXTURE_ENHANCEMENT_WITH_SMOOTH_FILTER_2,
-	"2xSaI smooth", TEXTURE_ENHANCEMENT_WITH_SMOOTH_FILTER_3,
-	"Less 2xSaI smooth", TEXTURE_ENHANCEMENT_WITH_SMOOTH_FILTER_4,
+	//"Smooth",	TEXTURE_ENHANCEMENT_WITH_SMOOTH_FILTER_1,
+	//"Less smooth", TEXTURE_ENHANCEMENT_WITH_SMOOTH_FILTER_2,
+	//"2xSaI smooth", TEXTURE_ENHANCEMENT_WITH_SMOOTH_FILTER_3,
+	//"Less 2xSaI smooth", TEXTURE_ENHANCEMENT_WITH_SMOOTH_FILTER_4,
 };
 
 const SettingInfo colorQualitySettings[] =
@@ -341,76 +341,7 @@ uint32 ReadRegistryDwordVal(char *MainKey, char *Field)
 
 void ReadConfiguration(void)
 {
-	options.bEnableHacks = TRUE;
-	options.bEnableSSE = TRUE;
-	options.bEnableVertexShader = FALSE;
-
-	defaultRomOptions.screenUpdateSetting = SCREEN_UPDATE_AT_VI_CHANGE;
-	//defaultRomOptions.screenUpdateSetting = SCREEN_UPDATE_AT_VI_UPDATE_AND_DRAWN;
-
-
-	status.isMMXSupported = 1;
-	status.isSSESupported = 0;
-	status.isVertexShaderSupported = true;
-
-	defaultRomOptions.N64FrameBufferEmuType = FRM_BUF_NONE;
-	defaultRomOptions.N64FrameBufferWriteBackControl = FRM_BUF_WRITEBACK_NORMAL;
-	defaultRomOptions.N64RenderToTextureEmuType = TXT_BUF_NONE;
-
-	if(TestRegistry() == FALSE)
-	{
-		options.bEnableFog = TRUE;
-		options.bWinFrameMode = FALSE;
-		options.bFullTMEM = FALSE;
-		options.bUseFullTMEM = FALSE;
-
-		options.bForceSoftwareTnL = FALSE;
-		options.bForceSoftwareClipper = FALSE;
-		options.bEnableSSE = FALSE;
-
-		options.bEnableVertexShader = FALSE;
-		options.RenderBufferSetting=1;
-		//options.forceTextureFilter = 0;
-		//freakdave - override default texture filter setting
-		options.forceTextureFilter = TextureMode;
-		options.textureQuality = TXT_QUALITY_DEFAULT;
-		options.bTexRectOnly = FALSE;
-		options.bSmallTextureOnly = FALSE;
-		options.bLoadHiResTextures = FALSE;
-		options.bDumpTexturesToFiles = FALSE;
-		options.DirectXDepthBufferSetting = 0;
-		options.colorQuality = TEXTURE_FMT_A8R8G8B8;
-		options.textureEnhancement = 0;
-		options.textureEnhancementControl = 0;
-		options.bSkipFrame = FrameSkip;
-		options.DirectXAntiAliasingValue = 0;
-		options.DirectXCombiner = DX_PIXEL_SHADER;
-		options.DirectXDevice = DIRECTX_DEVICE;	// HAL device
-		options.DirectXAnisotropyValue = 0;
-		options.DirectXMaxFSAA = 16;
-		options.FPSColor = 0xFFFFFFFF;
-		options.DirectXMaxAnisotropy = 16;
-
-		defaultRomOptions.N64FrameBufferEmuType = FRM_BUF_NONE;
-		defaultRomOptions.N64FrameBufferWriteBackControl = FRM_BUF_WRITEBACK_NORMAL;
-		defaultRomOptions.N64RenderToTextureEmuType = TXT_BUF_NONE;
-
-		defaultRomOptions.bNormalBlender = FALSE;
-		defaultRomOptions.bFastTexCRC=FALSE;
-		defaultRomOptions.bNormalCombiner = FALSE;
-		defaultRomOptions.bAccurateTextureMapping = TRUE;
-		defaultRomOptions.bInN64Resolution = FALSE;
-		defaultRomOptions.bSaveVRAM = FALSE;
-		defaultRomOptions.bOverlapAutoWriteBack = FALSE;
-		defaultRomOptions.bDoubleSizeForSmallTxtrBuf = FALSE;
-		windowSetting.uFullScreenRefreshRate = 0;	// 0 is the default value, means to use Window default frequency
-
-		WriteConfiguration();
-		return;
-	}
-	else
-	{
-		windowSetting.uWindowDisplayWidth = (uint16)ReadRegistryDwordVal(MAIN_KEY, "WinModeWidth");
+	windowSetting.uWindowDisplayWidth = (uint16)ReadRegistryDwordVal(MAIN_KEY, "WinModeWidth");
 		if( windowSetting.uWindowDisplayWidth == 0 )
 		{
 			windowSetting.uWindowDisplayWidth = 640;
@@ -437,12 +368,67 @@ void ReadConfiguration(void)
 			windowSetting.uFullScreenDisplayHeight = 480;
 		}
 
-
 		
 		CDeviceBuilder::SelectDeviceType( DIRECTX_DEVICE );
+	
 
-	}
+		status.isMMXSupported = 1;
+		status.isSSESupported = 0;
+		status.isVertexShaderSupported = true;
 
+		options.bEnableHacks = TRUE;
+		options.bEnableSSE = TRUE;
+
+		options.bEnableFog = TRUE;
+		options.bWinFrameMode = FALSE;
+		options.bFullTMEM = TRUE;
+		options.bUseFullTMEM = TRUE;
+
+		options.bForceSoftwareTnL = TRUE;
+		options.bForceSoftwareClipper = FALSE;
+
+		options.bEnableVertexShader = FALSE;
+		options.RenderBufferSetting=0;
+		//options.forceTextureFilter = 0;
+		//freakdave - override default texture filter setting
+		options.forceTextureFilter = TextureMode;
+		options.textureQuality = TXT_QUALITY_DEFAULT;
+		options.bTexRectOnly = FALSE;
+		options.bSmallTextureOnly = FALSE;
+		options.bLoadHiResTextures = FALSE;
+		options.bDumpTexturesToFiles = FALSE;
+		options.DirectXDepthBufferSetting = 0;
+		options.colorQuality = TEXTURE_FMT_A8R8G8B8;
+		options.textureEnhancement = 0;
+		options.textureEnhancementControl = 0;
+		options.bSkipFrame = FrameSkip;
+		options.DirectXAntiAliasingValue = 0;
+		options.DirectXCombiner = DX_PIXEL_SHADER;
+		options.DirectXDevice = DIRECTX_DEVICE;	// HAL device
+		options.DirectXAnisotropyValue = 0;
+		options.DirectXMaxFSAA = 16;
+		options.FPSColor = 0xFFFFFFFF;
+		options.DirectXMaxAnisotropy = 16;
+
+		defaultRomOptions.screenUpdateSetting = SCREEN_UPDATE_AT_VI_CHANGE;
+		//defaultRomOptions.screenUpdateSetting = SCREEN_UPDATE_AT_VI_UPDATE_AND_DRAWN;
+
+		defaultRomOptions.N64FrameBufferEmuType = FRM_BUF_NONE;
+		defaultRomOptions.N64FrameBufferWriteBackControl = FRM_BUF_WRITEBACK_NORMAL;
+		defaultRomOptions.N64RenderToTextureEmuType = TXT_BUF_NONE;
+
+		defaultRomOptions.bNormalBlender = FALSE;
+		defaultRomOptions.bFastTexCRC=TRUE;
+		defaultRomOptions.bNormalCombiner = FALSE;
+		defaultRomOptions.bAccurateTextureMapping = TRUE;
+		defaultRomOptions.bInN64Resolution = FALSE;
+		defaultRomOptions.bSaveVRAM = FALSE;
+		defaultRomOptions.bOverlapAutoWriteBack = FALSE;
+		defaultRomOptions.bDoubleSizeForSmallTxtrBuf = FALSE;
+		windowSetting.uFullScreenRefreshRate = 0;	// 0 is the default value, means to use Window default frequency
+
+
+		
 
 	//freakdave
 	//0 = None (valid for Mips only)
