@@ -3086,7 +3086,7 @@ Self-modifying code Method=Cache
 Use TLB=No
 Linking=On
 Reg Cache=Yes
-Use Large Buffer=No
+Use Large Buffer=Yes
 Status=Compatible
 Plugin Note=
 Delay SI=No
@@ -5217,7 +5217,7 @@ Culling=1
 Self Texture=0
 Primary Frame Buffer=0
 Emulate Clear=0
-Audio Signal=No
+Audio Signal=YeS
 Resolution Width=-1
 Resolution Height=-1
 
@@ -12908,6 +12908,10 @@ Plugin Note=[video] flicker
 Delay SI=No
 SP Hack=No
 Core Note=
+Audio Signal=No
+Clear Frame=1
+//Resolution Width=-1
+//Resolution Height=-1
 
 [827E4890-958468DC-C:4A]
 Good Name=Star Wars - Shuggeki Rogue Chitai (J) 
@@ -14126,10 +14130,10 @@ Audio Signal=No
 Good Name=Toy Story 2 (E) 
 Internal Name=Toy Story 2
 RDRAM Size=4
-Counter Factor=2
+Counter Factor=1
 Save Type=First Save Type
 CPU Type=Recompiler
-Self-modifying code Method=Check Memory Advance
+Self-modifying code Method=Change Memory
 Use TLB=No
 Linking=Off
 Reg Cache=Yes
@@ -14138,6 +14142,7 @@ Delay SI=No
 SP Hack=No
 Status=Compatible
 Clear Frame=0
+Audio Signal=No
 
 [CB93DB97-7F5C63D5-C:46]
 Good Name=Toy Story 2 (F) 
