@@ -859,7 +859,7 @@ fprintf(fp,"3D boxart:\n");
 fprintf(fp,"cbagy\n");
 fprintf(fp,"\n");
 fprintf(fp,"Testing / Ideas / Support:\n");
-fprintf(fp,"Neo369, Bomb Bloke, greatant, edwardar, Darknior\n");
+fprintf(fp,"Neo369, Bomb Bloke, greatant, edwardar, Darknior, que2eqe \n");
 fprintf(fp,"\n");
 fprintf(fp,"Skins:\n");
 fprintf(fp,"cbagy\n");

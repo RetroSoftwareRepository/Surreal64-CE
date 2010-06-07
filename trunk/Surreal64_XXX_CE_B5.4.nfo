@@ -1,21 +1,22 @@
 Changelog for Surreal64 XXX CE B5.4 (including all changes since B5.31)
 -----------------------------------------------------------------------
 
-Fixed: 480p detection for xbox 1.6
-Fixed: Rom Paging for 128MB users - 128MB uses XXX method 64MB uses original method
+Fixed: 480p detection for Xbox 1.6
+Fixed: Rom paging for 128MB users -> 128MB uses XXX method, 64MB uses original method
+Fixed: Skip Frames was a global setting -> now game specific
 Fixed: Some long rom names would overlap the skin borders
 Fixed: Updated ini files (thanks Darknior, Monkeys69, Spbaabck, Xmodder deluX, Xpfrags, Greatant, Mwaterbu, and Dnyce1987 http://forums.xbox-scene.com/index.php?showtopic=712374&st=105
-Fixed: Updated 1964.ini to v2.1
+Fixed: Updated 1964.ini to v2.1 (Rename 1964_21.ini to 1964.ini if you want to use it)
 Fixed: Updated to latest PJ64.rdb (thx scorp316)
-Fixed: Another ini/rdb fix for WWF No Mercy and GoldenEye (thx scorp316) 
+Fixed: Multiple *.ini/*.rdb fixes for e.g. WWF No Mercy and GoldenEye (thx scorp316)
 Added: Azimer's audio plugin 0.5.5.1 (http://www.emutalk.net/showthread.php?t=18183)
-Added: MusyX Audio Plugin
-Added: Comments Line in Launcher
-Added: Deadzone feature - Increments by 200 between 0 and 10000
-Added: Cbagy's 3D boxart and Updated skin
+Added: MusyX audio plugin (Caution: may cause certain roms to slow down!)
+Added: Comments line in Launcher
+Added: Deadzone feature in Launcher - Increments by 200 between 0 and 10000
+Added: Cbagy's 3D boxart and updated default skin
 
 Note: Delete your ini folder before upgrading to B5.4
-Note: For even greater compatibility you might want to experiment with the Rice ini files, ultra.ini, 1964.ini, Project64.rdb, take a look into to the Docs folder to find out more!
+Note: For even greater compatibility you might want to experiment with the Rice ini files, ultra.ini, 1964.ini, Project64.rdb, take a look into the Docs folder to find out more!
 
 ----------------------------------------------
 http://sourceforge.net/projects/surreal64xxxce
