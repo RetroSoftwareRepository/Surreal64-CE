@@ -706,7 +706,7 @@ void Check_VI_and_COMPARE_Interrupt(void)
 	Set_Countdown_Counter();
 }
 
-#define DOUBLE_COUNT	2	/* 1 */
+#define DOUBLE_COUNT	1 /*2*/	/* 1 */
 
 /*
  =======================================================================================================================
