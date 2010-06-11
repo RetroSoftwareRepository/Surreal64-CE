@@ -19,7 +19,8 @@ int TextureMode = 3;
 int VertexMode = 1;
 float XBINPUT_DEADZONE = 0.24;
 float XBINPUT_SUMMAND = 0.5;
-float XBOX_CONTROLLER_DEAD_ZONE = 0;
+float XBOX_CONTROLLER_DEAD_ZONE = 8600;
+float Deadzone = 0.26;
 int Sensitivity = 0;
 
 enum Pak
@@ -81,6 +82,7 @@ int ConfigAppLoad()
 		FLT(XBINPUT_DEADZONE);
 		FLT(XBINPUT_SUMMAND);
 		FLT(XBOX_CONTROLLER_DEAD_ZONE);
+		FLT(Deadzone);
 		VAR(Sensitivity);
 		VAR(DefaultPak);
 		BOL(EnableController1);
@@ -138,6 +140,7 @@ int ConfigAppSave()
 	FLT(XBINPUT_DEADZONE);
 	FLT(XBINPUT_SUMMAND);
 	FLT(XBOX_CONTROLLER_DEAD_ZONE);
+	FLT(Deadzone);
 	VAR(Sensitivity);
 	VAR(DefaultPak);
 	BOL(EnableController1);

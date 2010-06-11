@@ -1308,7 +1308,7 @@ void ControllerSettingsMenu()
 	XLMenu_AddItem2(m_pSettingsMenu,MITEM_ROUTINE,currentname,incSensitivity,decSensitivity);
 	
 	//Deadzone
-	swprintf(currentname,L"Analog Deadzone : %4.0f", XBOX_CONTROLLER_DEAD_ZONE);
+	swprintf(currentname,L"Analog Deadzone : %2.0f%%", Deadzone);
 	XLMenu_AddItem2(m_pSettingsMenu,MITEM_ROUTINE,currentname,incDeadzone,decDeadzone);
 
 	//Mempak/RumblePak/NoPak
@@ -1411,26 +1411,26 @@ void ToggleDeadzone(bool inc)
 {
 	WCHAR currentname[120];
 	currentItem = m_pSettingsMenu->curitem;
-	float Deadzone = XBOX_CONTROLLER_DEAD_ZONE;
+	
 
 	if (inc)
 	{
-	Deadzone += 200;
-	if(Deadzone > 10000) Deadzone = 0;
+	Deadzone += 1;
+	if(Deadzone > 100) Deadzone = 0;
 	//freakdave
 	//Don't forget to alter the floats in the brackets accordingly if you change XBOX_CONTROLLER_DEAD_ZONE
 	}
 	else
 	{
-    Deadzone -= 200;
-	if(Deadzone < 0) Deadzone = 10000;
+     Deadzone -= 1;
+	if(Deadzone < 0) Deadzone = 100;
 	}
 
-	XBOX_CONTROLLER_DEAD_ZONE = float(Deadzone);
+	XBOX_CONTROLLER_DEAD_ZONE = float(32768) * (float(Deadzone)/float(100));
 	
 	XLMenu_CurRoutine = NULL;
 	
-	swprintf(currentname,L"Analog Deadzone: %4.0f",Deadzone);
+	swprintf(currentname,L"Analog Deadzone: %2.0f%%",Deadzone);
 	XLMenu_SetItemText(&m_pSettingsMenu->items[currentItem], currentname);
 
 	ConfigAppSave2();

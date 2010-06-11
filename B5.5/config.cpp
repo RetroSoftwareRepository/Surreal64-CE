@@ -51,6 +51,7 @@ int TextureMode = 3;
 int VertexMode = 1;
 bool FrameSkip = FALSE;
 float XBOX_CONTROLLER_DEAD_ZONE = 8600; // also change in SurrealMenu.cpp
+float Deadzone = 26;
 unsigned int Sensitivity = 5;
 char skinname[32] = "default";
 
@@ -113,6 +114,7 @@ EnableController2 = true;
 EnableController3 = true;
 EnableController4 = true;
 XBOX_CONTROLLER_DEAD_ZONE = 8600;
+Deadzone = 26;
 Sensitivity = 5;
 videoplugin = _VideoPluginRice560; // Ez0n3 - 2=rice560
 
@@ -253,6 +255,7 @@ int ConfigAppSave2()
 	VAR(preferedemu);
 
 	FLT(XBOX_CONTROLLER_DEAD_ZONE);
+	FLT(Deadzone);
 	VAR(Sensitivity);
 	VAR(DefaultPak);
 	BOL(EnableController1);
@@ -399,6 +402,7 @@ int ConfigAppLoad2()
 	
 		VAR(preferedemu);
 		FLT(XBOX_CONTROLLER_DEAD_ZONE);
+		FLT(Deadzone);
 		VAR(Sensitivity);
 		VAR(DefaultPak);
 		BOL(EnableController1);
