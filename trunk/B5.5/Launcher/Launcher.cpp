@@ -667,6 +667,7 @@ HRESULT	CXBoxSample::Render()
 		}
 
 		
+		swprintf( m_currentname, L"%S",nameofgame );
 		swprintf( m_currentname_trunc, L"%S",nameofgametrunc );
 
 			if (iGameidx==iCursorPos){

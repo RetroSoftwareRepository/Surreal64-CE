@@ -59,6 +59,7 @@ extern bool FrameSkip;
 extern float XBINPUT_DEADZONE;
 extern float XBINPUT_SUMMAND;
 extern float XBOX_CONTROLLER_DEAD_ZONE;
+extern float Deadzone;
 extern unsigned int Sensitivity;
 extern int DefaultPak;
 extern bool EnableController1;
