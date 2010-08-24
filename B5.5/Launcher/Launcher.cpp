@@ -148,6 +148,10 @@ HRESULT	CXBoxSample::Initialize()
 	//This method is more reliable (CD/DVD check) - freakdave
 	//The size of a fixed sector on the hard disk is 512 bytes. 
 	//The size of a sector on a CD or DVD drive is 2048 bytes.
+
+	//FIXME: Running the application from HDD while having the roms 
+	//on CD/DVD does only work through editing the path in Surreal.ini.
+	//This needs to be automated.
 	FILE *fp;
 	if(XGetDiskSectorSize("D:\\") == 2048){
 		onhd = FALSE;
@@ -237,8 +241,9 @@ HRESULT	CXBoxSample::Initialize()
 
 	// load the rom list if it isn't already loaded
 	// we do it here so that the user can see the rom list is loading
-	if (!g_romList.IsLoaded())
-	g_romList.Load();
+	if (!g_romList.IsLoaded()) //freakdave - in this case something went wrong
+		g_romList.Refresh(); //Do a full refresh (delete, create new and load)
+		//g_romList.Load();
 
 	iNumGames =	romcounter;
 
