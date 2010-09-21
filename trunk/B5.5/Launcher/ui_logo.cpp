@@ -3,8 +3,6 @@
 #include <xbfont.h>
 #include "musicmanager.h"
 
-
-
 #define VERSION L"Surreal64 XXX CE B5.4"
 extern CMusicManager  music;
 extern int actualrom;
@@ -44,11 +42,8 @@ void DrawLogo(bool Menu)
 	m_BgPanel.Render(0,0);
 
 	m_Font.Begin();
-	// Title
 	
-	// Ez0n3 - update the version: unofficial "community edition"
-	//m_Font.DrawText(320, 35, 0xFFFF7F7f, L"Surreal64 XXX B5", XBFONT_CENTER_X);
-	//freakdave - Version is now defined
+	// Title and Version
 	m_Font.DrawText(305, 20, 0xFFFF7F7f, VERSION, XBFONT_CENTER_X);
 
 	m_Font.End();
@@ -69,7 +64,6 @@ void DrawLogo(bool Menu)
 
 	if (Menu){
 	m_Font.Begin();
-	//freakdave - yeah, gimme some Action ^^
 	m_Font.DrawText(480, 300, 0xFFEEEEEE, L"\400 Select / Next", XBFONT_LEFT);
 	m_Font.DrawText(480, 325, 0xFFEEEEEE, L"\402 Select / Prev", XBFONT_LEFT);
 	m_Font.DrawText(480, 350, 0xFFEEEEEE, L"\401 Back", XBFONT_LEFT);
@@ -92,45 +86,22 @@ void DrawLogo(bool Menu)
 		m_BoxPanel.Destroy();
 		D3DXCreateTextureFromFileEx( g_pd3dDevice, imagename,D3DX_DEFAULT, D3DX_DEFAULT,	1, 0, D3DFMT_LIN_A8R8G8B8 ,	D3DPOOL_MANAGED,D3DX_FILTER_NONE , D3DX_FILTER_NONE, 0x00000000,NULL, NULL,&BoxTexture);		
 		m_BoxPanel.Create(g_pd3dDevice,	BoxTexture, true);
-		m_BoxPanel.Render(435,35);
-		
+		m_BoxPanel.Render(435,35);	
 	}
 	
-	
-
     m_Font.Begin();
 
 // rom size
 		int romsize = (rom->m_romSize / 0x100000 * 8); 
 		swprintf( m_currentname, L"Rom Size : %d Mbits", romsize);
 		m_Font.DrawText( 60, 320, 0xFFEEEEEE, m_currentname, XBFONT_TRUNCATED,	530);
-// country
 
-		
+// country
 		int country = rom->m_byCountry;
 		char country2[10];
 		
 		// Ez0n3 - update the countries
-		/*
-		//calculate country (apparently 69=US, 4 and 74 = JAP, 80=PAL, no sure about that)
-		switch (country) {
-				case 4 : 
-		sprintf( country2, "JAP" );
-		break;
-			case 69 : 
-		sprintf( country2, "US" );
-		break;
-			case 74 : 
-		sprintf( country2, "JAP" );
-		break;
-			case 80 :
-		sprintf( country2, "EUR" );
-		break;
-			default :
-		sprintf( country2, "Unknown" );
-		break;
-		}
-		*/
+
 		switch (country) {
 			//case  : sprintf( country2, "Demo" ); break;
 			//case  : sprintf( country2, "Beta" ); break;
@@ -155,11 +126,14 @@ void DrawLogo(bool Menu)
 		
 		swprintf( m_currentname, L"Country : %S", country2);
 		m_Font.DrawText( 60, 340, 0xFFEEEEEE, m_currentname, XBFONT_TRUNCATED,	530);
-// zip name
+		// zip name
 		char zipname[120];
+
 		sprintf(zipname,rom->GetFileName().c_str());
+
 		/* remove rom path */
 		int counterbackslash;
+
 		// find last backslash
 		for (int i=0;i<120;i++){
 			if (zipname[i]=='\\')  counterbackslash=i;
@@ -185,21 +159,17 @@ void DrawLogo(bool Menu)
 		m_Font.DrawText( 260, 430, 0xFFEEEEEE, L"\402 Surreal Setup");
 		m_Font.DrawText( 70, 430, 0xFFEEEEEE, L"\406 - \407 Fast Scroll");
 
-//comments.
+//comments
 		Rom *sRom = g_romList.GetRomAt(actualrom);
 		swprintf( m_currentname, L"Comments: %S", sRom->GetIniEntry()->szComments );
 		m_Font.DrawText( 60, 400, 0xFFEEEEEE, m_currentname, XBFONT_TRUNCATED,	530);
 
         m_Font.End();
 		}
-
-
-	
 }
 
 void DrawCredits()
 {
-
 DirectSoundDoWork();
 music.Process();//BGMProgress();
 
@@ -243,12 +213,12 @@ int x=0;
 
 while(!feof(fp))
 {
-fseek(fp,nombre,SEEK_SET);
+	fseek(fp,nombre,SEEK_SET);
 if ((fgets(name,99,fp))!= NULL)
 {
-nombre=nombre+(strlen(name));
+	nombre=nombre+(strlen(name));
 }
-x=x+15;
+	x=x+15;
 }
 
 endcredits = -1*(x);
@@ -259,22 +229,23 @@ void CreateProgress()
 {
 	char progressname[256];
 	sprintf(progressname,"D:\\Skins\\%s\\progress.png",skinname);
-D3DXCreateTextureFromFileEx( g_pd3dDevice, progressname,D3DX_DEFAULT, D3DX_DEFAULT,	1, 0, D3DFMT_LIN_A8R8G8B8 ,	D3DPOOL_MANAGED,D3DX_FILTER_NONE , D3DX_FILTER_NONE, 0x00000000,NULL, NULL,&PgTexture);		
-m_PgPanel.Create(g_pd3dDevice,	PgTexture, true);
+	D3DXCreateTextureFromFileEx( g_pd3dDevice, progressname,D3DX_DEFAULT, D3DX_DEFAULT,	1, 0, D3DFMT_LIN_A8R8G8B8 ,	D3DPOOL_MANAGED,D3DX_FILTER_NONE , D3DX_FILTER_NONE, 0x00000000,NULL, NULL,&PgTexture);		
+	m_PgPanel.Create(g_pd3dDevice,	PgTexture, true);
 }
 
 void RenderProgress(int progress)
 {
-g_d3d.BeginRender();
+	g_d3d.BeginRender();
+	m_BgPanel.Render(0,0);
+	m_Font.Begin();
+	m_Font.DrawText(320, 200, 0xFFFFFFFF,L"Loading Rom" , XBFONT_CENTER_X);
+	m_Font.End();
 
-m_BgPanel.Render(0,0);
-m_Font.Begin();
-m_Font.DrawText(320, 200, 0xFFFFFFFF,L"Loading Rom" , XBFONT_CENTER_X);
-m_Font.End();
-for (int i=0;i<progress;i++){
-	m_PgPanel.Render(95+(i*4),230);}
+	for (int i=0;i<progress;i++){
+		m_PgPanel.Render(95+(i*4),230);
+	}
 
-g_d3d.EndRender();
+	g_d3d.EndRender();
 }
 
 extern bool compatible[3];

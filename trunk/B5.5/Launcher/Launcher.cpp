@@ -144,10 +144,6 @@ HRESULT	CXBoxSample::Initialize()
 	g_IOSupport.Mount("F:","Harddisk0\\Partition6");
 	g_IOSupport.Mount("G:","Harddisk0\\Partition7");
 	
-	
-	//This method is more reliable (CD/DVD check) - freakdave
-	//The size of a fixed sector on the hard disk is 512 bytes. 
-	//The size of a sector on a CD or DVD drive is 2048 bytes.
 
 	//FIXME: Running the application from HDD while having the roms 
 	//on CD/DVD does only work through editing the path in Surreal.ini.
@@ -155,18 +151,12 @@ HRESULT	CXBoxSample::Initialize()
 	FILE *fp;
 	if(XGetDiskSectorSize("D:\\") == 2048){
 		onhd = FALSE;
-		//fp=fopen("T:\\log.txt","wb");
-		//fprintf(fp,"Running from CD/DVD\n");
 	}else{
 		onhd = TRUE;
-		//fp=fopen("D:\\log.txt","wb");
-		//fprintf(fp,"Running from HD\n");
 	}
-	//fprintf(fp,"Disc sector size : %d bytes\n",XGetDiskSectorSize("D:\\"));
-	//fclose(fp);
 
-	ConfigAppLoad(); // GogoAckman
-	ConfigAppSave(); // freakdave - If there's no ini in the directory -> Crash !
+	ConfigAppLoad();
+	ConfigAppSave();
 
 	char fontname[256];
 	sprintf(fontname,"D:\\Skins\\%s\\Font.xpr",skinname);
@@ -204,20 +194,6 @@ HRESULT	CXBoxSample::Initialize()
 
 	InitLogo();
 
-	
-	// Ez0n3 - change this to prevent it from crashing if the media folder is empry
-	/*
-	// build the box art filename table
-	g_boxArtTable.Build();
-
-	if (onhd) {
-    CreateDirectory("D:\\ini", NULL);
-	CreateDirectory("D:\\ini\\games", NULL);}
-	else {
-    CreateDirectory("T:\\ini", NULL);
-	CreateDirectory("T:\\ini\\games", NULL);
-	}
-	*/
 
 	if (onhd) {
 		CreateDirectory("D:\\ini", NULL);
@@ -383,26 +359,6 @@ HRESULT	CXBoxSample::Initialize()
 					sprintf(romname,"%S",m_currentname);
 					sprintf(romCRC,"%x",rom->m_dwCrc1);
 
-					// set in ini now
-					/*s
-					char plugin[32];
-					if ((onhd)&&((fp=fopen("D:\\default-plugin.cfg","r+")) != NULL)) {
-						fgets(plugin,32,fp);
-						fclose(fp);
-					}
-					else if((!onhd)&&((fp=fopen("T:\\default-plugin.cfg","r+")) != NULL)) {
-						fgets(plugin,32,fp);
-						fclose(fp);
-					}
-					//else fclose(fp);
-					*/
-
-					//ConfigAppLoad3(); // load user pref for rom
-					//Sleep(100); //too fast for ini load?
-					
-					// set in ini now
-					//if (videoplugin == _VideoPluginMissing && strcmp(plugin, "") != 0 && atoi(plugin) < _VideoPluginMissing) videoplugin = atoi(plugin);
-
 					// just to be safe
 					switch (videoplugin) {
 						case _VideoPluginRice510 : videoplugin = _VideoPluginRice510; //5.1.0
@@ -437,10 +393,6 @@ HRESULT	CXBoxSample::Initialize()
 			}
 			
 			if (match == false) {
-				// launch data isn't used anymore for roms
-				//LAUNCH_DATA ld;
-				//ZeroMemory(&ld, sizeof(LAUNCH_DATA));
-				//XLaunchNewImage("D:\\default.xbe", &ld);
 				XLaunchNewImage("D:\\default.xbe", NULL);
 			}
 		}
@@ -485,7 +437,6 @@ HRESULT	CXBoxSample::FrameMove()
 					if(fGameSelect == 0) fGameSelect +=	(fCursorPos	- m_iWindowMiddle);
 					else fGameSelect ++;
 
-					// clamp game window range (high)
 					// clamp game window range (high)
 					if((fGameSelect	+ m_iMaxWindowList)	> iNumGames)
 					{
@@ -565,7 +516,7 @@ HRESULT	CXBoxSample::FrameMove()
 			MainMenu();
 		}
 
-		//freakdave
+
 		if(m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_RIGHT_THUMB){
 			bMusicPlaying = !bMusicPlaying;
 			if(!bMusicPlaying){
@@ -591,7 +542,6 @@ HRESULT	CXBoxSample::FrameMove()
 				m_iWindowMiddle	 = GAMESEL_WindowMiddle;
 			}
 		}
-
 
 			return S_OK;
 
@@ -629,7 +579,7 @@ HRESULT	CXBoxSample::Render()
 		bool caps = true;
 		bool end = false;
 		sprintf(nameofgame,rom->GetProperName().c_str());
-// Here we "clean" our name
+		// Here we "clean" our name
 		for (int j=0;j<120;j++){
 			if (j==0){
 				if (!(nameofgame[j]>=97) && (nameofgame[j]<=122))
@@ -671,7 +621,6 @@ HRESULT	CXBoxSample::Render()
 
 		}
 
-		
 		swprintf( m_currentname, L"%S",nameofgame );
 		swprintf( m_currentname_trunc, L"%S",nameofgametrunc );
 
@@ -694,14 +643,11 @@ HRESULT	CXBoxSample::Render()
      	g_d3d.EndRender();
 
 			return S_OK;
-
-
 }
 
 // check for move cursor and move accordingly (with	clamp etc)
 void CXBoxSample::MoveCursor()
 {
-
 	// get right trigger state (convert	to float & scale to	0.0f - 1.0f)
 	float fWindowVelocity =	(float)(m_DefaultGamepad.bAnalogButtons[XINPUT_GAMEPAD_RIGHT_TRIGGER])/256.0f;
 
@@ -820,25 +766,27 @@ extern CPanel m_PgPanel;
 extern LPDIRECT3DTEXTURE8 bgTexture;
 
 void ReloadSkin() {
-// fonts
-char fontname[256];
-m_MSFont.Destroy();
-m_Font.Destroy();
-sprintf(fontname,"D:\\Skins\\%s\\Font.xpr",skinname);
-m_Font.Create(fontname);
-sprintf(fontname,"D:\\Skins\\%s\\MsFont.xpr",skinname);
-m_MSFont.Create(fontname);
-// background
-m_PgPanel.Destroy();
-bgTexture->Release();
-InitLogo();
-// music
-music.Stop();
-sprintf(fontname,"D:\\Skins\\%s\\main.wma",skinname);
-g_aGameSoundtrack[0][0].strFilename = fontname;
-music.Initialize();
-bMusicPlaying = true;
-music.Play();
+	// fonts
+	char fontname[256];
+	m_MSFont.Destroy();
+	m_Font.Destroy();
+	sprintf(fontname,"D:\\Skins\\%s\\Font.xpr",skinname);
+	m_Font.Create(fontname);
+	sprintf(fontname,"D:\\Skins\\%s\\MsFont.xpr",skinname);
+	m_MSFont.Create(fontname);
+	
+	// background
+	m_PgPanel.Destroy();
+	bgTexture->Release();
+	InitLogo();
+
+	// music
+	music.Stop();
+	sprintf(fontname,"D:\\Skins\\%s\\main.wma",skinname);
+	g_aGameSoundtrack[0][0].strFilename = fontname;
+	music.Initialize();
+	bMusicPlaying = true;
+	music.Play();
 }
 
 

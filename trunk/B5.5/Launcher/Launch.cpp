@@ -1,5 +1,4 @@
 #include "RomList.h"
-//#include "../Launchdata.h"	// Ez0n3 - launchdata isn't used anymore
 #include "../config.h"
 #include "zlib/zlib.h"
 #include "zlib/unzip.h"
@@ -73,12 +72,8 @@ DWORD WINAPI PrepareRomThread(Rom *rom)
 	// allocate 1 meg of memory for temporary rom loading
 	byte *pBuffer = static_cast<byte *>(VirtualAlloc(NULL, BUFFER_SIZE, MEM_COMMIT, PAGE_READWRITE));
 	
-	// save the ini file
-	//Only save to T: if we're on CD/DVD
-	//We should only have one Surreal.ini
-	//g_iniFile.Save("T:\\Surreal10.ini");
-	//FIXME: needs testing
 
+	//freakdave - CD/DVD check
 	if (!onhd)
 	{
 		g_iniFile.Save("T:\\Surreal.ini");

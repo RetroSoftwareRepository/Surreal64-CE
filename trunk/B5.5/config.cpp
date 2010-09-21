@@ -15,13 +15,10 @@ extern "C" int loaddw1964PagingMem();
 extern "C" int loaddw1964DynaMem();
 
 // Ez0n3 - use iAudioPlugin instead to determine which audio plugin is used
-//extern "C" int loadbUseLLERSP();
 extern "C" int loadiAudioPlugin();
 
 // Ez0n3 - reinstate max video mem
 extern "C" int loaddwMaxVideoMem();
-
-
 
 //freakdave
 int dw1964DynaMem=8;
@@ -33,8 +30,7 @@ int dwPJ64PagingMem=4;
 bool bUseLLERSP=false; // leave this in case it's set in ini
 int iAudioPlugin = _AudioPluginJttl; // 2=JttL
 
-// Ez0n3 - reinstate max free mem until freakdave finishes this
-//int dwFreeMem=9;
+// Ez0n3 - reinstate max free
 int dwMaxVideoMem=5;
 bool has128ram; // determine if the current phys ram is greater than 100MB: 128MB = true, 64MB = false
 
@@ -89,7 +85,6 @@ bool EnableController2 = true;
 bool EnableController3 = true;
 bool EnableController4 = true;
 
-//#include "RomList.h"
 extern int actualrom;
 int preferedemu=0;
 
@@ -104,8 +99,7 @@ dwPJ64PagingMem=4;
 // Ez0n3 - use iAudioPlugin instead to determine if basic audio is used
 bUseLLERSP=false; // leave this in case it's set in ini
 
-// Ez0n3 - reinstate max free mem until freakdave finishes this
-//int dwFreeMem=9;
+// Ez0n3 - reinstate max free mem
 dwMaxVideoMem=5;
 
 DefaultPak = MemPak;
@@ -145,7 +139,7 @@ int ConfigAppLoad()
 	// Go through each line of the config file
 	while (1) {
 		int nLen;
-		if (fgets(szLine, sizeof(szLine), h) == NULL) {				// End of config file
+		if (fgets(szLine, sizeof(szLine), h) == NULL) {	// End of config file
 			break;
 		}
 
@@ -191,8 +185,6 @@ int ConfigAppLoad()
 
 int ConfigAppSave()
 {
-
-	//
 	FILE *h;
 
 	if(onhd){
@@ -232,7 +224,7 @@ int ConfigAppSave()
 	return 0;
 }
 
-//
+
 int ConfigAppSave2()
 {
 	FILE *h;
@@ -270,85 +262,84 @@ int ConfigAppSave2()
 	BOL(bUseLLERSP); // Ez0n3 - use iAudioPlugin instead
 	BOL(FrameSkip);
 	
-	// Ez0n3 - reinstate max video mem until freakdave finishes this
-	//VAR(dwFreeMem);
+	// Ez0n3 - reinstate max video mem
 	VAR(dwMaxVideoMem);
 	VAR(videoplugin);
 	VAR(iAudioPlugin);
 	
 
-        VAR(ControllerConfig[0]);
-        VAR(ControllerConfig[1]);
-        VAR(ControllerConfig[2]);
-        VAR(ControllerConfig[3]);
-        VAR(ControllerConfig[4]);
-        VAR(ControllerConfig[5]);
-        VAR(ControllerConfig[6]);
-        VAR(ControllerConfig[7]);
-        VAR(ControllerConfig[8]);
-        VAR(ControllerConfig[9]);
-        VAR(ControllerConfig[10]);
-        VAR(ControllerConfig[11]);
-        VAR(ControllerConfig[12]);
-        VAR(ControllerConfig[13]);
-        VAR(ControllerConfig[14]);
-        VAR(ControllerConfig[15]);
-        VAR(ControllerConfig[16]);
-        VAR(ControllerConfig[17]);
-        VAR(ControllerConfig[18]);
-        VAR(ControllerConfig[19]);
-        VAR(ControllerConfig[20]);
-        VAR(ControllerConfig[21]);
-        VAR(ControllerConfig[22]);
-        VAR(ControllerConfig[23]);
-        VAR(ControllerConfig[24]);
-        VAR(ControllerConfig[25]);
-        VAR(ControllerConfig[26]);
-        VAR(ControllerConfig[27]);
-        VAR(ControllerConfig[28]);
-        VAR(ControllerConfig[29]);
-        VAR(ControllerConfig[30]);
-        VAR(ControllerConfig[31]);
-        VAR(ControllerConfig[32]);
-        VAR(ControllerConfig[33]);
-        VAR(ControllerConfig[34]);
-        VAR(ControllerConfig[35]);
-        VAR(ControllerConfig[36]);
-        VAR(ControllerConfig[37]);
-        VAR(ControllerConfig[38]);
-        VAR(ControllerConfig[39]);
-        VAR(ControllerConfig[40]);
-        VAR(ControllerConfig[41]);
-        VAR(ControllerConfig[42]);
-        VAR(ControllerConfig[43]);
-        VAR(ControllerConfig[44]);
-        VAR(ControllerConfig[45]);
-        VAR(ControllerConfig[46]);
-        VAR(ControllerConfig[47]);
-        VAR(ControllerConfig[48]);
-        VAR(ControllerConfig[49]);
-        VAR(ControllerConfig[50]);
-        VAR(ControllerConfig[51]);
-        VAR(ControllerConfig[52]);
-        VAR(ControllerConfig[53]);
-        VAR(ControllerConfig[54]);
-        VAR(ControllerConfig[55]);
-        VAR(ControllerConfig[56]);
-        VAR(ControllerConfig[57]);
-        VAR(ControllerConfig[58]);
-        VAR(ControllerConfig[59]);
-        VAR(ControllerConfig[60]);
-        VAR(ControllerConfig[61]);
-        VAR(ControllerConfig[62]);
-        VAR(ControllerConfig[63]);
-        VAR(ControllerConfig[64]);
-        VAR(ControllerConfig[65]);
-        VAR(ControllerConfig[66]);
-        VAR(ControllerConfig[67]);
-        VAR(ControllerConfig[68]);
-        VAR(ControllerConfig[69]);
-        VAR(ControllerConfig[70]);
-        VAR(ControllerConfig[71]);
+	VAR(ControllerConfig[0]);
+	VAR(ControllerConfig[1]);
+	VAR(ControllerConfig[2]);
+	VAR(ControllerConfig[3]);
+	VAR(ControllerConfig[4]);
+	VAR(ControllerConfig[5]);
+	VAR(ControllerConfig[6]);
+	VAR(ControllerConfig[7]);
+	VAR(ControllerConfig[8]);
+	VAR(ControllerConfig[9]);
+	VAR(ControllerConfig[10]);
+	VAR(ControllerConfig[11]);
+	VAR(ControllerConfig[12]);
+	VAR(ControllerConfig[13]);
+	VAR(ControllerConfig[14]);
+	VAR(ControllerConfig[15]);
+	VAR(ControllerConfig[16]);
+	VAR(ControllerConfig[17]);
+	VAR(ControllerConfig[18]);
+	VAR(ControllerConfig[19]);
+	VAR(ControllerConfig[20]);
+	VAR(ControllerConfig[21]);
+	VAR(ControllerConfig[22]);
+	VAR(ControllerConfig[23]);
+	VAR(ControllerConfig[24]);
+	VAR(ControllerConfig[25]);
+	VAR(ControllerConfig[26]);
+	VAR(ControllerConfig[27]);
+	VAR(ControllerConfig[28]);
+	VAR(ControllerConfig[29]);
+	VAR(ControllerConfig[30]);
+	VAR(ControllerConfig[31]);
+	VAR(ControllerConfig[32]);
+	VAR(ControllerConfig[33]);
+	VAR(ControllerConfig[34]);
+	VAR(ControllerConfig[35]);
+	VAR(ControllerConfig[36]);
+	VAR(ControllerConfig[37]);
+	VAR(ControllerConfig[38]);
+	VAR(ControllerConfig[39]);
+	VAR(ControllerConfig[40]);
+	VAR(ControllerConfig[41]);
+	VAR(ControllerConfig[42]);
+	VAR(ControllerConfig[43]);
+	VAR(ControllerConfig[44]);
+	VAR(ControllerConfig[45]);
+	VAR(ControllerConfig[46]);
+	VAR(ControllerConfig[47]);
+	VAR(ControllerConfig[48]);
+	VAR(ControllerConfig[49]);
+	VAR(ControllerConfig[50]);
+	VAR(ControllerConfig[51]);
+	VAR(ControllerConfig[52]);
+	VAR(ControllerConfig[53]);
+	VAR(ControllerConfig[54]);
+	VAR(ControllerConfig[55]);
+	VAR(ControllerConfig[56]);
+	VAR(ControllerConfig[57]);
+	VAR(ControllerConfig[58]);
+	VAR(ControllerConfig[59]);
+	VAR(ControllerConfig[60]);
+	VAR(ControllerConfig[61]);
+	VAR(ControllerConfig[62]);
+	VAR(ControllerConfig[63]);
+	VAR(ControllerConfig[64]);
+	VAR(ControllerConfig[65]);
+	VAR(ControllerConfig[66]);
+	VAR(ControllerConfig[67]);
+	VAR(ControllerConfig[68]);
+	VAR(ControllerConfig[69]);
+	VAR(ControllerConfig[70]);
+	VAR(ControllerConfig[71]);
 
 #undef STR
 #undef FLT
@@ -358,7 +349,6 @@ int ConfigAppSave2()
 	return 0;
 }
 
-//
 
 int ConfigAppLoad2()
 {
@@ -378,7 +368,7 @@ int ConfigAppLoad2()
 	// Go through each line of the config file
 	while (1) {
 		int nLen;
-		if (fgets(szLine, sizeof(szLine), h) == NULL) {				// End of config file
+		if (fgets(szLine, sizeof(szLine), h) == NULL) {	// End of config file
 			break;
 		}
 
@@ -417,8 +407,7 @@ int ConfigAppLoad2()
 		BOL(bUseLLERSP); // Ez0n3 - use iAudioPlugin instead, but leave this in in case it's set in ini
 		BOL(FrameSkip);
 
-		// Ez0n3 - reinstate max video mem until freakdave finishes this
-		//VAR(dwFreeMem);
+		// Ez0n3 - reinstate max video mem
 		VAR(dwMaxVideoMem);
 		VAR(videoplugin);
 		VAR(iAudioPlugin);
@@ -505,7 +494,6 @@ int ConfigAppLoad2()
 	return 0;
 }
 
-//
 
 int ConfigAppSaveTemp()
 {
@@ -534,7 +522,6 @@ int ConfigAppSaveTemp()
 	return 0;
 }
 
-//
 
 int ConfigAppLoadTemp()
 {
@@ -549,7 +536,7 @@ int ConfigAppLoadTemp()
 	// Go through each line of the config file
 	while (1) {
 		int nLen;
-		if (fgets(szLine, sizeof(szLine), h) == NULL) {				// End of config file
+		if (fgets(szLine, sizeof(szLine), h) == NULL) {	// End of config file
 			break;
 		}
 
@@ -583,28 +570,16 @@ int ConfigAppLoadTemp()
 	return 0;
 }
 
-//
 
 void loadinis() {
-	//This method is more reliable (CD/DVD check) - freakdave
-	//The size of a fixed sector on the hard disk is 512 bytes. 
-	//The size of a sector on a CD or DVD drive is 2048 bytes.
-	//FILE *fp;
+	//Check for CD/DVD
 	if(XGetDiskSectorSize("D:\\") == 2048){
 		onhd = FALSE;
-		//fp=fopen("T:\\log.txt","wb");
-		//fprintf(fp,"Running from CD/DVD\n");
 	}else{
 		onhd = TRUE;
-		//fp=fopen("D:\\log.txt","wb");
-		//fprintf(fp,"Running from HD\n");
 	}
-	//fprintf(fp,"Disc sector size : %d bytes\n",XGetDiskSectorSize("D:\\"));
-	//fclose(fp);
-
-
-	ConfigAppLoad(); // GogoAckman
-	ConfigAppSave(); // freakdave - If there's no ini in the directory -> Crash !
+	ConfigAppLoad();
+	ConfigAppSave();
 	ConfigAppLoadTemp();
 	ConfigAppLoad2();
 }
@@ -615,13 +590,12 @@ int loaddw1964PagingMem(){ return dw1964PagingMem;}
 int loaddw1964DynaMem(){ return dw1964DynaMem;}
 
 // Ez0n3 - use iAudioPlugin instead to determine if basic audio is used
-//int loadbUseLLERSP() { if (bUseLLERSP) return 1; return 0;}
 int loadiAudioPlugin(){ return iAudioPlugin;}
 
 // Ez0n3 - reinstate max video mem
 int loaddwMaxVideoMem(){ return dwMaxVideoMem;}
 
-//
+
 char* LabelCheck(char *s,char *szLabel)
 {
 	int nLen;
@@ -686,7 +660,6 @@ char* LabelCheckNew( char *s, char *szLabel )
 	return returnvalue;
 }
 
-//
 
 int QuoteRead(char** pszQuote, char** pszEnd, char* szSrc)		// Read a quoted string from szSrc and point to the end
 {

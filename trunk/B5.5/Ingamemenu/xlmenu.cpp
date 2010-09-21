@@ -379,7 +379,6 @@ DWORD XLMenu_Routine(DWORD command)
                     XLMenu_Activate(NULL);
                 }
             }
-			//Sleep(200);
             break;
 
         case MENU_SELECTITEM2:
@@ -418,7 +417,6 @@ DWORD XLMenu_Routine(DWORD command)
                     XLMenu_Activate(NULL);
                 }
             }
-			//Sleep(200);
             break;
 
         case MENU_BACK:
@@ -432,7 +430,6 @@ DWORD XLMenu_Routine(DWORD command)
                 else
                     XLMenu_Activate(NULL);
             }
-			//Sleep(200);
             break;
 
         default:
