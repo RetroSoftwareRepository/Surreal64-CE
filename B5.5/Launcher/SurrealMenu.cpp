@@ -11,10 +11,6 @@
 #include "zlib/unzip.h"
 #include "../Ingamemenu/xlmenu.h"
 #include "musicmanager.h"
-//#include "Network.h"
-
-//extern BOOL IsXboxConnected();
-//extern BOOL UpdateIni(int Version);
 
 extern CMusicManager  music;
 extern bool bMusicPlaying;
@@ -43,10 +39,7 @@ string GetEmulatorName(int iEmulator);
 void ToggleAudioPlugin(bool inc); // replace usellersp bool with iAudioPlugin
 void ToggleVideoPlugin(bool inc);
 void ToggleEmulator(bool inc);
-
 void ToggleHideLaunchScreens();
-
-
 void ToggleMaxVideoMem(bool inc);
 void ToggleVideoplugin(bool inc);
 void Toggle1964DynaMem(bool inc);
@@ -80,7 +73,6 @@ static int SkinMenu(void);
 
 
 // controller config
-
 void Control();
 void Control1();
 void Control2();
@@ -88,7 +80,6 @@ void Control3();
 void Control4();
 void ControllerMenu();
 extern void ChangeControl();
-
 extern void CalculateEndCredits();
 extern void DrawCredits();
 extern int defilement;
@@ -183,10 +174,8 @@ string GetEmulatorName(int iEmulator)
 		case _None : 
 		default : szEmulator = "Unknown"; break;
 	}	
-
 	return szEmulator;
 }
-
 
 
 void MainMenu(void)
@@ -229,13 +218,6 @@ void MainMenu(void)
 	if ((onhd)&&(!fopen("D:\\Credits.txt","r"))) XLMenu_AddItem(m_pMainMenu,MITEM_DISABLED,L"Credits",NULL);
 	else if ((!onhd)&&(!fopen("T:\\Credits.txt","r"))) XLMenu_AddItem(m_pMainMenu,MITEM_DISABLED,L"Credits",NULL);
 	else XLMenu_AddItem(m_pMainMenu,MITEM_ROUTINE,L"Credits",ToggleCredits);
-
-	//Network stuff - freakdave
-/*	if (IsXboxConnected()){
-	XLMenu_AddItem(m_pMainMenu,MITEM_ROUTINE,L"Content Download",DownloadsMenu);
-	}else{
-	XLMenu_AddItem(m_pMainMenu,MITEM_DISABLED,L"Content Download",NULL);
-	}*/
 
 	XLMenu_AddItem(m_pMainMenu,MITEM_ROUTINE,L"Quit Surreal",ExitToDash);
 	XLMenu_AddItem(m_pMainMenu,MITEM_ROUTINE,L"Shutdown Xbox",ShutdownXbox);
@@ -320,8 +302,6 @@ static int SkinMenu(void)
 	HANDLE				hFind;	
 	WIN32_FIND_DATAA	oFindData;
 	WCHAR				wstr[MITEM_STRINGLEN];
-//	FILE				*fp;
-//	char				config_path[MAX_PATH];
 	int					nSkinCount = 0;
 
 	DWORD dwMenuCommand = 0;
@@ -492,9 +472,6 @@ void SettingsMenu(void)
 
 	XLMenu_SetTitle(m_pSettingsMenu,L"Settings",0xFF8080FF);
 
-	
-	
-	
 	// Ez0n3 - emulator selector in menu
 	swprintf(currentname, L"Emulator : %S", GetEmulatorName(preferedemu).c_str());
 	XLMenu_AddItem2(m_pSettingsMenu,MITEM_ROUTINE,currentname,incEmulator,decEmulator);
@@ -515,10 +492,7 @@ void SettingsMenu(void)
 	XLMenu_AddItem2(m_pSettingsMenu,MITEM_ROUTINE,currentname,incAudioPlugin,decAudioPlugin);
 	
 	
-	// Ez0n3 - reinstate max video mem until freakdave finishes this
-	//Doesn't work at the moment -> Keep Memory Free has currently a static value
-	//swprintf(currentname,L"Keep Memory Free : %d Mbytes",dwFreeMem);
-	//XLMenu_AddItem2(m_pSettingsMenu,MITEM_ROUTINE,currentname,incMaxVideoMem,decMaxVideoMem);
+	// Ez0n3 - reinstate max video mem
 	swprintf(currentname,L"Max Video Memory : %d Mbytes",dwMaxVideoMem);
 	XLMenu_AddItem2(m_pSettingsMenu,MITEM_ROUTINE,currentname,incMaxVideoMem,decMaxVideoMem);
 	
@@ -633,10 +607,7 @@ void ToggleEmulator(bool inc)
 	// Ez0n3 - video plugins
 	swprintf(currentname, L"Emulator : %S", GetEmulatorName(preferedemu).c_str());
 	XLMenu_SetItemText(&m_pSettingsMenu->items[currentItem], currentname);
-
 }
-
-
 
 void ToggleMaxVideoMem(bool inc)
 {
@@ -660,28 +631,6 @@ void ToggleMaxVideoMem(bool inc)
 	
 	swprintf(currentname,L"Max Video Memory : %d Mbytes",dwMaxVideoMem);
 	XLMenu_SetItemText(&m_pSettingsMenu->items[currentItem], currentname);
-	
-	
-
-//    WCHAR currentname[120];
-	//currentItem = m_pSettingsMenu->curitem;
-/*
-	if (inc)
-	{
-    dwFreeMem++;
-	if (dwFreeMem > 10) dwFreeMem=2;
-	}
-	else
-	{
-    dwFreeMem--;
-	if (dwFreeMem < 2) dwFreeMem=10;
-	}
-	
-	XLMenu_CurRoutine = NULL;
-	
-	swprintf(currentname,L"Keep Memory Free : %d Mbytes",dwFreeMem);
-	XLMenu_SetItemText(&m_pSettingsMenu->items[currentItem], currentname);
-	*/
 }
 
 void Toggle1964DynaMem(bool inc)
@@ -839,9 +788,7 @@ void selectvideomode(void)
 	XLMenu_Routine(MENU_NEXTITEM);
 	
 		//Ez0n3 - had to increase this a tad to give the ini time to load
-		//Sleep(200); //too fast
 		Sleep(300); //too fast for ini load
-
 	}
 
 	while( XLMenu_CurMenu == m_pSettingsMenu)
@@ -902,15 +849,12 @@ void LaunchMenu(void)
 	XLMenu_Routine(MENU_NEXTITEM);
 		
 		//Ez0n3 - had to increase this a tad to give the ini time to load
-		//Sleep(200); //too fast
 		Sleep(300); //too fast for ini load
-
 	}
 
 	while( XLMenu_CurMenu == m_pMainMenu)
 	{
 		DrawLogo(true);
-		//display_compatible();  //- not needed for the moment, nothing in the inifile?
 		dwMenuCommand = getAllGamepadsCommand(&gamepad);
 		XLMenu_Routine(dwMenuCommand);
 		//freakdave - check for music playing
@@ -989,9 +933,6 @@ Launch();
 // Ez0n3 - launch rom without emulator and video plugin selectors
 void LaunchHideScreens(void)
 {
-	//XLMenu_Activate(NULL);            // kill the current menu
-    //XLMenu_CurRoutine = NULL; 
-
 	ConfigAppLoad3();
 	
 	// just to be safe
@@ -1098,11 +1039,9 @@ void VideoSettingsMenu(void)
 
 	
 	// Ez0n3 - more emulator settings
-	// freakdave - actually a launcher setting
 	XLMenu_AddItem(m_pSettingsMenu,MITEM_DISABLED,L"Launcher Settings",NULL);
 	
 	// Ez0n3 - launch screens enable / disable
-	// freakdave - should be yes or no
 	if (HideLaunchScreens)
 		swprintf(currentname,L"Hide Launch Screens : Yes");
 	else
@@ -1137,7 +1076,6 @@ void VideoSettingsMenu(void)
 }
 
 // Ez0n3 - enable / disable launch screens
-// freakdave - same here, should be yes or no
 void ToggleHideLaunchScreens()
 {
 	currentItem = m_pSettingsMenu->curitem;
@@ -1312,7 +1250,6 @@ void ControllerSettingsMenu()
 	XLMenu_AddItem2(m_pSettingsMenu,MITEM_ROUTINE,currentname,incDeadzone,decDeadzone);
 
 	//Mempak/RumblePak/NoPak
-
 	if (DefaultPak == NoPak)
 	{
 	swprintf(currentname,L"Default Pak : None");
@@ -1390,15 +1327,12 @@ void ToggleSensitivity(bool inc)
 	{
 	Sensitivity += 1;
 	if(Sensitivity > 10) Sensitivity = 10;
-	//freakdave
-	//Don't forget to alter the floats in the brackets accordingly if you change XBOX_CONTROLLER_DEAD_ZONE
 	}
 	else
 	{
     Sensitivity -= 1;
 	if(Sensitivity < 1) Sensitivity = 1;
 	}
-	//XBOX_CONTROLLER_DEAD_ZONE = float(8600) - (float(8600) * (float(Sensitivity) / 100));
 	
 	XLMenu_CurRoutine = NULL;
 	
@@ -1417,8 +1351,6 @@ void ToggleDeadzone(bool inc)
 	{
 	Deadzone += 1;
 	if(Deadzone > 100) Deadzone = 0;
-	//freakdave
-	//Don't forget to alter the floats in the brackets accordingly if you change XBOX_CONTROLLER_DEAD_ZONE
 	}
 	else
 	{
@@ -1443,6 +1375,7 @@ DefaultPak++;
 if (DefaultPak > 2) DefaultPak = 0;
 
 XLMenu_CurRoutine = NULL;
+
 //Mempak/RumblePak/NoPak
 if (DefaultPak == NoPak)
 {
@@ -1677,93 +1610,3 @@ void Control()
 	if (m_pControllerMenu)
 		XLMenu_Delete(m_pControllerMenu);
 }
-
-
-
-
-/*
-//Network stuff - freakdave
-void DownloadsMenu()
-{
-	DWORD dwMenuCommand = 0;
-
-	XLMenu_CurRoutine = NULL;
-	XLMenu_CurMenu = NULL;
-	XLMenu_SetFont(&m_Font);
-
-//    WCHAR currentname[120];
-
-	m_pSettingsMenu = XLMenu_Init(60,80,2, MENU_LEFT|MENU_WRAP, NULL);
-
-	m_pSettingsMenu->topcolor = 0x40254365;
-	m_pSettingsMenu->bottomcolor = 0x40556486;
-	m_pSettingsMenu->seltopcolor = 0x4055FF86;
-	m_pSettingsMenu->selbotcolor = 0x4055FF86;
-	m_pSettingsMenu->itemcolor = 0xFFFFFFFF;
-	m_pSettingsMenu->parent = m_pMainMenu;
-
-	XLMenu_SetTitle(m_pSettingsMenu,L"Content Download",0xFF8080FF);
-
-	if(IsXboxConnected()){
-	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,L"Update Rice INI",UpdateRice);
-	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,L"Update Roms INI",UpdateRoms);
-	//XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,L"Update Surreal64 XXX",UpdateSurreal);
-	//XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,"Download Skins,DownloadSkins);
-	}else{
-	XLMenu_AddItem(m_pSettingsMenu,MITEM_DISABLED,L"Update Rice INI",NULL);
-	XLMenu_AddItem(m_pSettingsMenu,MITEM_DISABLED,L"Update Roms INI",NULL);
-	}
-
-	XLMenu_Activate(m_pSettingsMenu);
-
-	while( XLMenu_CurMenu == m_pSettingsMenu)
-	{
-		DrawLogo(true);
-		dwMenuCommand = getAllGamepadsCommand(&gamepad);
-		XLMenu_Routine(dwMenuCommand);
-		g_pd3dDevice->Present( NULL, NULL, NULL, NULL );
-	}
-
-	if (m_pSettingsMenu)
-		XLMenu_Delete(m_pSettingsMenu);
-
-	ConfigAppSave2();
-
-}
-
-
-
-void UpdateRice(){
-HANDLE hThread;
-//BOOL bThreadInit = true;
-DWORD dwThreadId;
-
-OutputDebugString("Creating Thread\n");
-hThread = CreateThread( NULL, 0, &ThreadUpdateIni, NULL, 0,&dwThreadId); 
-
-	if (hThread == NULL) {
-		OutputDebugString( "CreateThread failed!\n" );
-	}
-	else {
-		OutputDebugString( "CreateThread succeeded!\n" );
-		CloseHandle( hThread );
-	}
-}
-
-
-DWORD WINAPI ThreadUpdateIni( LPVOID lpParam ) 
-{ 
-	UpdateIni(510);
-	UpdateIni(531);
-	UpdateIni(560);
-    return 0; 
-} 
-
-
-
-
-
-void UpdateRoms(){
-return;
-}
-*/

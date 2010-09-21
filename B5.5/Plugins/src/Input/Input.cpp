@@ -68,8 +68,6 @@ void _INPUT_GetKeys(int Control, BUTTONS * Keys)
 //		char msg[100];
 		dwLastChange = GetTickCount();
 
-		//freakdave- Change or Remove Paks
-
 		//Switch to MemPak if no Pak is detected
 		if (gControls[Control].Plugin == PLUGIN_NONE)
 		{
@@ -170,8 +168,7 @@ BOOL _INPUT_IsIngameMenuWaiting()
 	return FALSE;
 }
 
-//freakdave
-//This function works 100%
+
 BOOL _INPUT_UpdatePaks()
 {
 	gControls[0].Plugin  = DefaultPak + 1;
@@ -182,8 +179,7 @@ BOOL _INPUT_UpdatePaks()
 	return TRUE;
 }
 
-//freakdave
-//Works, but only partially..
+
 BOOL _INPUT_UpdateControllerStates()
 {
 	ConfigAppLoadTemp();//retrieve name of the current rom
@@ -193,6 +189,7 @@ BOOL _INPUT_UpdateControllerStates()
 	gControls[2].Present = EnableController3;
 	gControls[3].Present = EnableController4;
 
+	//freakdave FIXME
 	//Disabling a Controller seems to work, however
 	//re-enabling it doesn't work. This is strange..
 

@@ -10,11 +10,7 @@
 #include <stdio.h>
 #include "../../../config.h"
 
-
-
 using namespace std;
-
-//float XBOX_CONTROLLER_DEAD_ZONE;
 
 Config::Config(void)
 {
