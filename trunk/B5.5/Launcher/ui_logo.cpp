@@ -3,7 +3,10 @@
 #include <xbfont.h>
 #include "musicmanager.h"
 
-#define VERSION L"Surreal64 XXX CE B5.4"
+#define VERSION L"Surreal64 XXX CE B5.5"
+#define MenuItemColor 0xCCEEEEEE
+#define TitleColor 0xFF53B77f
+
 extern CMusicManager  music;
 extern int actualrom;
 CPanel m_BgPanel;
@@ -21,6 +24,7 @@ int endcredits=0;
 extern bool onhd;
 extern char skinname[32];
 extern int ConfigAppLoad3();
+
 
 void InitLogo(void)
 {
@@ -44,7 +48,7 @@ void DrawLogo(bool Menu)
 	m_Font.Begin();
 	
 	// Title and Version
-	m_Font.DrawText(305, 20, 0xFFFF7F7f, VERSION, XBFONT_CENTER_X);
+	m_Font.DrawText(305, 20, TitleColor, VERSION, XBFONT_CENTER_X);
 
 	m_Font.End();
 
@@ -57,16 +61,16 @@ void DrawLogo(bool Menu)
 
 	m_Font.Begin();
 
-	m_Font.DrawText(60, 35, 0xFFFF7F7f, szMemStatus, XBFONT_LEFT);
+	m_Font.DrawText(60, 35, TitleColor, szMemStatus, XBFONT_LEFT);
 
 	m_Font.End();
 #endif
 
 	if (Menu){
 	m_Font.Begin();
-	m_Font.DrawText(480, 300, 0xFFEEEEEE, L"\400 Select / Next", XBFONT_LEFT);
-	m_Font.DrawText(480, 325, 0xFFEEEEEE, L"\402 Select / Prev", XBFONT_LEFT);
-	m_Font.DrawText(480, 350, 0xFFEEEEEE, L"\401 Back", XBFONT_LEFT);
+	m_Font.DrawText(480, 300, 0xAAEEEEEE, L"\400 Select / Next", XBFONT_LEFT);
+	m_Font.DrawText(480, 325, 0xAAEEEEEE, L"\402 Select / Prev", XBFONT_LEFT);
+	m_Font.DrawText(480, 350, 0xAAEEEEEE, L"\401 Back", XBFONT_LEFT);
 
 	m_Font.End();}
 
@@ -94,7 +98,7 @@ void DrawLogo(bool Menu)
 // rom size
 		int romsize = (rom->m_romSize / 0x100000 * 8); 
 		swprintf( m_currentname, L"Rom Size : %d Mbits", romsize);
-		m_Font.DrawText( 60, 320, 0xFFEEEEEE, m_currentname, XBFONT_TRUNCATED,	530);
+		m_Font.DrawText( 60, 320, MenuItemColor, m_currentname, XBFONT_TRUNCATED,	530);
 
 // country
 		int country = rom->m_byCountry;
@@ -125,7 +129,7 @@ void DrawLogo(bool Menu)
 
 		
 		swprintf( m_currentname, L"Country : %S", country2);
-		m_Font.DrawText( 60, 340, 0xFFEEEEEE, m_currentname, XBFONT_TRUNCATED,	530);
+		m_Font.DrawText( 60, 340, MenuItemColor, m_currentname, XBFONT_TRUNCATED,	530);
 		// zip name
 		char zipname[120];
 
@@ -150,19 +154,19 @@ void DrawLogo(bool Menu)
 			break;
 		}
 		swprintf( m_currentname, L"Rom Name : %S", zipname );
-		m_Font.DrawText( 60, 360, 0xFFEEEEEE, m_currentname, XBFONT_TRUNCATED,	530);
+		m_Font.DrawText( 60, 360, MenuItemColor, m_currentname, XBFONT_TRUNCATED,	530);
 
 // rom counter
 		swprintf( m_currentname, L"[%d Roms]", romcounter );
-		m_Font.DrawText( 60, 380, 0xFFEEEEEE, m_currentname, XBFONT_TRUNCATED,	530);
-		m_Font.DrawText( 450, 430, 0xFFEEEEEE, L"\403 Refresh");
-		m_Font.DrawText( 260, 430, 0xFFEEEEEE, L"\402 Surreal Setup");
-		m_Font.DrawText( 70, 430, 0xFFEEEEEE, L"\406 - \407 Fast Scroll");
+		m_Font.DrawText( 60, 380, MenuItemColor, m_currentname, XBFONT_TRUNCATED,	530);
+		m_Font.DrawText( 450, 430, MenuItemColor, L"\403 Refresh");
+		m_Font.DrawText( 260, 430, MenuItemColor, L"\402 Surreal Setup");
+		m_Font.DrawText( 70, 430, MenuItemColor, L"\406 - \407 Fast Scroll");
 
 //comments
 		Rom *sRom = g_romList.GetRomAt(actualrom);
 		swprintf( m_currentname, L"Comments: %S", sRom->GetIniEntry()->szComments );
-		m_Font.DrawText( 60, 400, 0xFFEEEEEE, m_currentname, XBFONT_TRUNCATED,	530);
+		m_Font.DrawText( 60, 400, MenuItemColor, m_currentname, XBFONT_TRUNCATED,	530);
 
         m_Font.End();
 		}
