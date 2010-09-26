@@ -4,8 +4,12 @@
 #include "XBInput.h"
 #include "XLMenu.h"
 #include "panel.h"
-extern LPDIRECT3DDEVICE8 g_pd3dDevice;
 
+//weinerschnitzel - Customize Font
+#define MenuItemColor 0xCCEEEEEE
+#define NullItemColor 0xFF53B77f
+
+extern LPDIRECT3DDEVICE8 g_pd3dDevice;
 
 CXBFont *XLMenu_Font = NULL;                // pointer to font
 DWORD XLMenu_FontLoaded = FALSE;            // font loaded flag
@@ -39,7 +43,7 @@ XLMenu *XLMenu_Init(float x, float y, DWORD maxitems, DWORD flags, DWORD (*abort
     m->selbotcolor = 0xffc00000;
     m->maxitems = maxitems;
     m->abortroutine = abortroutine;
-    m->itemcolor = 0xffffffff;
+    m->itemcolor = MenuItemColor;
 
     m->x = x;
     m->y = y;
@@ -289,7 +293,7 @@ DWORD XLMenu_Routine(DWORD command)
 
             // set item color
             if(mi->flags&MITEM_DISABLED)
-                color = /*(mi->color&0xffffff) | 0xFF000000; */0xff888888;   // lower alpha
+                color = /*(mi->color&0xffffff) | 0xFF000000; */NullItemColor;   // lower alpha
             else
                 color = mi->color;
     

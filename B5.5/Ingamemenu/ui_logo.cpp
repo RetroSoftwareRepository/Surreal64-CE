@@ -3,7 +3,9 @@
 #include "../config.h"
 #include <xgraphics.h>
 
-#define VERSION L"Surreal64 XXX CE B5.4"
+#define VERSION L"Surreal64 XXX CE B5.5"
+#define TitleColor 0xFF53B77f
+
 extern char romname[256];
 CPanel m_BgPanel;
 CPanel m_BoxPanel;
@@ -69,7 +71,7 @@ void DrawLogo()
 	m_Font.Begin();
 
 	// Title
-	m_Font.DrawText(305, 20, 0xFFFF7F7f, VERSION, XBFONT_CENTER_X);
+	m_Font.DrawText(305, 20, TitleColor, VERSION, XBFONT_CENTER_X);
 
 	if (showdebug) {
 	MEMORYSTATUS memStat;
@@ -77,7 +79,7 @@ void DrawLogo()
 
 	GlobalMemoryStatus(&memStat);
 	swprintf(szMemStatus,L"%d MB Free",(memStat.dwAvailPhys /1024 /1024));
-	m_Font.DrawText(60, 35, 0xFFFF7F7f, szMemStatus, XBFONT_LEFT);
+	m_Font.DrawText(60, 35, TitleColor, szMemStatus, XBFONT_LEFT);
 	
 		// Ez0n3 - temp
 		//WCHAR szVidMemStatus[128];

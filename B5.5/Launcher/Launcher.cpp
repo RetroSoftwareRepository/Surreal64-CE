@@ -27,6 +27,9 @@
 #include "musicmanager.h"
 #include "Panel.h"
 
+//weinerschnitzel Customize font
+#define RomListColor 0xAAEEEEEE
+#define SelectedRomColor 0xFF76C7CF
 
 float fGameSelect;
 float fCursorPos;
@@ -83,6 +86,9 @@ extern int ConfigAppLoad3();
 extern bool has128ram;
 
 extern void LaunchHideScreens(); // launch rom no screens
+
+
+
 
 WIN32_FIND_DATA wfd;
 HANDLE hFind;
@@ -625,7 +631,7 @@ HRESULT	CXBoxSample::Render()
 		swprintf( m_currentname_trunc, L"%S",nameofgametrunc );
 
 			if (iGameidx==iCursorPos){
-                m_Font.DrawText( 45, 45+(20*iGameidx), 0xFFFF7F7f, m_currentname_trunc, XBFONT_TRUNCATED,	530);
+                m_Font.DrawText( 45, 45+(20*iGameidx), SelectedRomColor, m_currentname_trunc, XBFONT_TRUNCATED,	530);
 				sprintf(romCRC,"%x",rom->m_dwCrc1);
 				sprintf(romname,"%S",m_currentname);
 				for (int i=0;i<3;i++){
@@ -633,7 +639,7 @@ HRESULT	CXBoxSample::Render()
 			}
 			else
 			{
-				m_Font.DrawText( 45, 45+(20*iGameidx), 0xFFEEEEEE, m_currentname_trunc, XBFONT_TRUNCATED,	530);
+				m_Font.DrawText( 45, 45+(20*iGameidx), RomListColor, m_currentname_trunc, XBFONT_TRUNCATED,	530);
 			}
 
 		}
