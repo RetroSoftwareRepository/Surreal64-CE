@@ -4,7 +4,9 @@
 #include <xgraphics.h>
 
 #define VERSION L"Surreal64 XXX CE B5.5"
-#define TitleColor 0xFF53B77f
+extern DWORD MenuItemColor;
+extern DWORD TitleColor;
+extern void LoadSkinFont();
 
 extern char romname[256];
 CPanel m_BgPanel;
@@ -65,6 +67,7 @@ void InitLogo(void)
 
 void DrawLogo()
 {
+	LoadSkinFont();
 	m_BgPanel.Render(0,0);
 	m_RenderPanel.Render(305 ,65 , 267 , 200 , false, 0);
 

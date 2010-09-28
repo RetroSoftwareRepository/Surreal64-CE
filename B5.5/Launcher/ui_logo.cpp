@@ -4,8 +4,8 @@
 #include "musicmanager.h"
 
 #define VERSION L"Surreal64 XXX CE B5.5"
-#define MenuItemColor 0xCCEEEEEE
-#define TitleColor 0xFF53B77f
+extern DWORD MenuItemColor;
+extern DWORD TitleColor;
 
 extern CMusicManager  music;
 extern int actualrom;
@@ -24,6 +24,7 @@ int endcredits=0;
 extern bool onhd;
 extern char skinname[32];
 extern int ConfigAppLoad3();
+extern void LoadSkinFont();
 
 
 void InitLogo(void)
@@ -42,6 +43,7 @@ void DrawLogo(bool Menu)
 {
 	DirectSoundDoWork();
 	music.Process();
+	LoadSkinFont();
 
 	m_BgPanel.Render(0,0);
 

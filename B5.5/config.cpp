@@ -9,10 +9,12 @@ bool showdebug = false;
 #endif
 
 extern "C" void loadinis();
+void LoadSkinFont();
 extern "C" int loaddwPJ64PagingMem();
 extern "C" int loaddwPJ64DynaMem();
 extern "C" int loaddw1964PagingMem();
 extern "C" int loaddw1964DynaMem();
+void WriteSkinFont();
 
 // Ez0n3 - use iAudioPlugin instead to determine which audio plugin is used
 extern "C" int loadiAudioPlugin();
@@ -76,6 +78,13 @@ NoPak,
 MemPak,
 RumblePak,
 };
+
+DWORD TitleColor = 0x00000000;
+DWORD MenuItemColor = 0x00000000;
+DWORD MenuTitleColor = 0x00000000;
+DWORD RomListColor = 0x00000000;
+DWORD SelectedRomColor = 0x00000000;
+DWORD NullItemColor = 0x00000000;
 
 int DefaultPak = MemPak;
 
@@ -570,6 +579,131 @@ int ConfigAppLoadTemp()
 	return 0;
 }
 
+//Load Skin Font 
+void LoadSkinFont(){
+	FILE* f;
+	std::string PATH = "D:\\skins\\";
+	PATH += skinname;
+	PATH += "\\Font.ini";
+	f = fopen(PATH.c_str() , "r");
+
+
+	//Build ini if nonexistant
+	if(!f) {
+		FILE* f;
+		std::string PATH = "D:\\skins\\";
+		PATH += skinname;
+		PATH += "\\Font.ini";
+		f = fopen(PATH.c_str(), "w");
+		fclose(f);
+
+		WriteSkinFont();
+		return;
+	}
+	if(f){
+		char line[100];
+		char sTitleColor[10];
+
+		fgets(line,100, f);
+		for(int i = 0; i < 100; i++) {
+			if(line[i] == '=') {
+				for(int j = 0; j < 10; j++){
+					sTitleColor[j] = line[i+1+j]; 
+				}
+				TitleColor = (DWORD) atoi(sTitleColor);
+				break;
+			}
+		}
+		char line2[100];
+		char sMenuTitleColor[10];
+
+		fgets(line2,100, f);
+		for(int i = 0; i < 100; i++) {
+			if(line2[i] == '=') {
+				for(int j = 0; j < 10; j++){
+					sMenuTitleColor[j] = line2[i+1+j]; 
+				}
+				MenuTitleColor =  (DWORD) atoi(sMenuTitleColor);
+				break;
+			}
+		}
+		char line3[100];
+		char sRomListColor[10];
+
+		fgets(line3,100, f);
+		for(int i = 0; i < 100; i++) {
+			if(line3[i] == '=') {
+				for(int j = 0; j < 10; j++){
+					sRomListColor[j] = line3[i+1+j]; 
+				}
+				RomListColor =  (DWORD) atoi(sRomListColor);
+				break;
+			}
+		}
+		char line4[100];
+		char sSelectedRomColor[10];
+
+		fgets(line4,100, f);
+		for(int i = 0; i < 100; i++) {
+			if(line4[i] == '=') {
+				for(int j = 0; j < 10; j++){
+					sSelectedRomColor[j] = line4[i+1+j]; 
+				}
+				SelectedRomColor =  (DWORD) atoi(sSelectedRomColor);
+				break;
+			}
+		}
+		char line5[100];
+		char sMenuItemColor[10];
+
+		fgets(line5,100, f);
+		for(int i = 0; i < 100; i++) {
+			if(line5[i] == '=') {
+				for(int j = 0; j < 10; j++){
+					sMenuItemColor[j] = line5[i+1+j]; 
+				}
+				MenuItemColor =  (DWORD) atoi(sMenuItemColor);
+				break;
+			}
+		}
+		char line6[100];
+		char sNullItemColor[10];
+
+		fgets(line6,100, f);
+		for(int i = 0; i < 100; i++) {
+			if(line6[i] == '=') {
+				for(int j = 0; j < 10; j++){
+					sNullItemColor[j] = line6[i+1+j]; 
+				}
+				NullItemColor =  (DWORD) atoi(sNullItemColor);
+				break;
+			}
+		}
+	}
+	fclose(f);
+	return;
+
+
+}
+
+void WriteSkinFont(){
+	FILE* f;
+		std::string PATH = "D:\\skins\\";
+		PATH += skinname;
+		PATH += "\\Font.ini";
+		f = fopen(PATH.c_str() , "w");
+		if(f) {
+			fprintf(f, "TitleColor=0xFF53B77f\n");
+			fprintf(f, "MenuTitleColor=0xFF8080FF\n");
+			fprintf(f, "RomListColor=0xAAEEEEEE\n");
+			fprintf(f, "SelectedRomColor=0xFF76C7CF\n");
+			fprintf(f, "MenuItemColor=0xCCEEEEEE\n");
+			fprintf(f, "NullItemColor=0xFF53B77f\n");
+		}
+	fclose(f);
+	return;
+
+}
 
 void loadinis() {
 	//Check for CD/DVD

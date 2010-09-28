@@ -7,8 +7,8 @@
 #include "Panel.h"
 
 //weinerschnitzel - Customize Font
-#define MenuItemColor 0xCCEEEEEE
-#define MenuTitleColor 0xFF8080FF
+extern DWORD MenuItemColor;
+extern DWORD MenuTitleColor;
 
 //freakdave
 enum Emulators
