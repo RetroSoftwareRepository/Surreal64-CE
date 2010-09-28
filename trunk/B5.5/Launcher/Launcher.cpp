@@ -28,8 +28,8 @@
 #include "Panel.h"
 
 //weinerschnitzel Customize font
-#define RomListColor 0xAAEEEEEE
-#define SelectedRomColor 0xFF76C7CF
+extern DWORD RomListColor;
+extern DWORD SelectedRomColor;
 
 float fGameSelect;
 float fCursorPos;
@@ -59,6 +59,7 @@ const float	GAMESEL_cfLowestScrollMult = 2.0f;
 extern "C" void Enable128MegCaching();
 extern void InitLogo();
 extern void DrawLogo(bool Menu);
+extern void LoadSkinFont();
 extern int romcounter;
 int actualrom = 0;
 extern void LaunchMenu();
@@ -138,6 +139,9 @@ HRESULT	CXBoxSample::Initialize()
 
 	Enable128MegCaching();
 	XSetFileCacheSize(8 * 1024 * 1024);
+
+	//weinerschnitzel - Load Fonts
+	LoadSkinFont();
 
 	// initialise direct 3d
 	if (!g_d3d.Create())

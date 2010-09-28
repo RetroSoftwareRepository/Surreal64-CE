@@ -6,8 +6,8 @@
 #include "panel.h"
 
 //weinerschnitzel - Customize Font
-#define MenuItemColor 0xCCEEEEEE
-#define NullItemColor 0xFF53B77f
+extern DWORD MenuItemColor;
+extern DWORD NullItemColor;
 
 extern LPDIRECT3DDEVICE8 g_pd3dDevice;
 
