@@ -28,8 +28,8 @@
 #include "Panel.h"
 
 //weinerschnitzel Customize font
-extern DWORD RomListColor;
-extern DWORD SelectedRomColor;
+extern DWORD dwRomListColor;
+extern DWORD dwSelectedRomColor;
 
 float fGameSelect;
 float fCursorPos;
@@ -635,7 +635,7 @@ HRESULT	CXBoxSample::Render()
 		swprintf( m_currentname_trunc, L"%S",nameofgametrunc );
 
 			if (iGameidx==iCursorPos){
-                m_Font.DrawText( 45, 45+(20*iGameidx), SelectedRomColor, m_currentname_trunc, XBFONT_TRUNCATED,	530);
+                m_Font.DrawText( 45, 45+(20*iGameidx), dwSelectedRomColor, m_currentname_trunc, XBFONT_TRUNCATED,	530);
 				sprintf(romCRC,"%x",rom->m_dwCrc1);
 				sprintf(romname,"%S",m_currentname);
 				for (int i=0;i<3;i++){
@@ -643,7 +643,7 @@ HRESULT	CXBoxSample::Render()
 			}
 			else
 			{
-				m_Font.DrawText( 45, 45+(20*iGameidx), RomListColor, m_currentname_trunc, XBFONT_TRUNCATED,	530);
+				m_Font.DrawText( 45, 45+(20*iGameidx), dwRomListColor, m_currentname_trunc, XBFONT_TRUNCATED,	530);
 			}
 
 		}
@@ -780,6 +780,7 @@ void ReloadSkin() {
 	char fontname[256];
 	m_MSFont.Destroy();
 	m_Font.Destroy();
+	LoadSkinFont();
 	sprintf(fontname,"D:\\Skins\\%s\\Font.xpr",skinname);
 	m_Font.Create(fontname);
 	sprintf(fontname,"D:\\Skins\\%s\\MsFont.xpr",skinname);
