@@ -13,8 +13,8 @@
 #include "musicmanager.h"
 
 //weinerschnitzel - Customize Font
-extern DWORD MenuItemColor;
-extern DWORD MenuTitleColor;
+extern DWORD dwMenuItemColor;
+extern DWORD dwMenuTitleColor;
 
 extern CMusicManager  music;
 extern bool bMusicPlaying;
@@ -204,10 +204,10 @@ void MainMenu(void)
 	m_pMainMenu->bottomcolor = 0x40556486;
 	m_pMainMenu->seltopcolor = 0x4055FF86;
 	m_pMainMenu->selbotcolor = 0x4055FF86;
-	m_pMainMenu->itemcolor = MenuItemColor;
+	m_pMainMenu->itemcolor = dwMenuItemColor;
 	m_pMainMenu->parent = NULL;
 
-	XLMenu_SetTitle(m_pMainMenu,L"Main Menu",MenuTitleColor);
+	XLMenu_SetTitle(m_pMainMenu,L"Main Menu",dwMenuTitleColor);
 
 	XLMenu_AddItem(m_pMainMenu,MITEM_DISABLED,L"General Settings",NULL);
 	XLMenu_AddItem(m_pMainMenu,MITEM_ROUTINE,L"Video Settings",VideoSettingsMenu);
@@ -336,10 +336,10 @@ static int SkinMenu(void)
 	m_pSkinMenu->bottomcolor = 0x40556486;
 	m_pSkinMenu->seltopcolor = 0x4055FF86;
 	m_pSkinMenu->selbotcolor = 0x4055FF86;
-	m_pSkinMenu->itemcolor = MenuItemColor;
+	m_pSkinMenu->itemcolor = dwMenuItemColor;
 	m_pSkinMenu->parent = m_pMainMenu;
 
-	XLMenu_SetTitle(m_pSkinMenu, L"Change Skin  ",MenuTitleColor);
+	XLMenu_SetTitle(m_pSkinMenu, L"Change Skin  ",dwMenuTitleColor);
 	XLMenu_SetMaxShow(m_pSkinMenu, nSkinCount + 2);
 
 	swprintf(wstr, L"Current: %S", skinname);
@@ -473,10 +473,10 @@ void SettingsMenu(void)
 	m_pSettingsMenu->bottomcolor = 0x40556486;
 	m_pSettingsMenu->seltopcolor = 0x4055FF86;
 	m_pSettingsMenu->selbotcolor = 0x4055FF86;
-	m_pSettingsMenu->itemcolor = MenuItemColor;
+	m_pSettingsMenu->itemcolor = dwMenuItemColor;
 	m_pSettingsMenu->parent = m_pMainMenu;
 
-	XLMenu_SetTitle(m_pSettingsMenu,L"Settings",MenuTitleColor);
+	XLMenu_SetTitle(m_pSettingsMenu,L"Settings",dwMenuTitleColor);
 
 	// Ez0n3 - emulator selector in menu
 	swprintf(currentname, L"Emulator : %S", GetEmulatorName(preferedemu).c_str());
@@ -776,10 +776,10 @@ void selectvideomode(void)
 	m_pSettingsMenu->bottomcolor = 0x40556486;
 	m_pSettingsMenu->seltopcolor = 0x4055FF86;
 	m_pSettingsMenu->selbotcolor = 0x4055FF86;
-	m_pSettingsMenu->itemcolor = MenuItemColor;
+	m_pSettingsMenu->itemcolor = dwMenuItemColor;
 	m_pSettingsMenu->parent = m_pMainMenu;
 
-	XLMenu_SetTitle(m_pSettingsMenu,L"Select Video Plugin",MenuTitleColor);
+	XLMenu_SetTitle(m_pSettingsMenu,L"Select Video Plugin",dwMenuTitleColor);
 
 	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,L"Rice 5.10",launch510);
 	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,L"Rice 5.31",launch531);
@@ -837,10 +837,10 @@ void LaunchMenu(void)
 	m_pMainMenu->bottomcolor = 0x40556486;
 	m_pMainMenu->seltopcolor = 0x4055FF86;
 	m_pMainMenu->selbotcolor = 0x4055FF86;
-	m_pMainMenu->itemcolor = MenuItemColor;
+	m_pMainMenu->itemcolor = dwMenuItemColor;
 	m_pMainMenu->parent = NULL;
 
-	XLMenu_SetTitle(m_pMainMenu,L"Launch Menu",MenuTitleColor);
+	XLMenu_SetTitle(m_pMainMenu,L"Launch Menu",dwMenuTitleColor);
 
 	XLMenu_AddItem(m_pMainMenu,MITEM_ROUTINE,L"Launch with 1964",Launch1964);
 	XLMenu_AddItem(m_pMainMenu,MITEM_ROUTINE,L"Launch with PJ64",PJ64Launch);
@@ -990,10 +990,10 @@ void VideoSettingsMenu(void)
 	m_pSettingsMenu->bottomcolor = 0x40556486;
 	m_pSettingsMenu->seltopcolor = 0x4055FF86;
 	m_pSettingsMenu->selbotcolor = 0x4055FF86;
-	m_pSettingsMenu->itemcolor = MenuItemColor;
+	m_pSettingsMenu->itemcolor = dwMenuItemColor;
 	m_pSettingsMenu->parent = m_pMainMenu;
 
-	XLMenu_SetTitle(m_pSettingsMenu,L"Video Settings",MenuTitleColor);
+	XLMenu_SetTitle(m_pSettingsMenu,L"Video Settings",dwMenuTitleColor);
 
     if (!FlickerFilter)
 	swprintf(currentname,L"Flicker Filter : Disabled");
@@ -1242,10 +1242,10 @@ void ControllerSettingsMenu()
 	m_pSettingsMenu->bottomcolor = 0x40556486;
 	m_pSettingsMenu->seltopcolor = 0x4055FF86;
 	m_pSettingsMenu->selbotcolor = 0x4055FF86;
-	m_pSettingsMenu->itemcolor = MenuItemColor;
+	m_pSettingsMenu->itemcolor = dwMenuItemColor;
 	m_pSettingsMenu->parent = m_pMainMenu;
 
-	XLMenu_SetTitle(m_pSettingsMenu,L"Controller Settings",MenuItemColor);
+	XLMenu_SetTitle(m_pSettingsMenu,L"Controller Settings",dwMenuItemColor);
 	
 	//Sensitivity
 	swprintf(currentname,L"Analog Sensitivity : %d", Sensitivity);
@@ -1496,10 +1496,10 @@ void ControllerMenu(void)
 	m_pSettingsMenu->bottomcolor = 0x40556486;
 	m_pSettingsMenu->seltopcolor = 0x4055FF86;
 	m_pSettingsMenu->selbotcolor = 0x4055FF86;
-	m_pSettingsMenu->itemcolor = MenuItemColor;
+	m_pSettingsMenu->itemcolor = dwMenuItemColor;
 	m_pSettingsMenu->parent = m_pMainMenu;
 
-	XLMenu_SetTitle(m_pSettingsMenu,L"Choose Controller",MenuTitleColor);
+	XLMenu_SetTitle(m_pSettingsMenu,L"Choose Controller",dwMenuTitleColor);
 
 	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,L"Controller 1",Control1);
 	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,L"Controller 2",Control2);

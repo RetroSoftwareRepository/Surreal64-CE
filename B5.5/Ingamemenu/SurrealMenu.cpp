@@ -7,8 +7,8 @@
 #include "Panel.h"
 
 //weinerschnitzel - Customize Font
-extern DWORD MenuItemColor;
-extern DWORD MenuTitleColor;
+extern DWORD dwMenuItemColor;
+extern DWORD dwMenuTitleColor;
 
 //freakdave
 enum Emulators
@@ -146,7 +146,7 @@ void MainMenu(void)
 	m_pMainMenu->bottomcolor = 0x40556486;
 	m_pMainMenu->seltopcolor = 0x4055FF86;
 	m_pMainMenu->selbotcolor = 0x4055FF86;
-	m_pMainMenu->itemcolor = MenuItemColor;
+	m_pMainMenu->itemcolor = dwMenuItemColor;
 	m_pMainMenu->parent = NULL;
 
 	while ((x != 320) || (y != 80) || (nx != 267) || (ny != 200))
@@ -176,7 +176,7 @@ void MainMenu(void)
 
 	}
 
-	XLMenu_SetTitle(m_pMainMenu,L"Main Menu",MenuTitleColor);
+	XLMenu_SetTitle(m_pMainMenu,L"Main Menu",dwMenuTitleColor);
 
 	XLMenu_AddItem(m_pMainMenu,MITEM_ROUTINE,L"Load State",LoadStateMenu);
 	XLMenu_AddItem(m_pMainMenu,MITEM_ROUTINE,L"Save State",SaveStateMenu);
@@ -365,10 +365,10 @@ void LoadStateMenu(void)
 	m_pSettingsMenu->bottomcolor = 0x40556486;
 	m_pSettingsMenu->seltopcolor = 0x4055FF86;
 	m_pSettingsMenu->selbotcolor = 0x4055FF86;
-	m_pSettingsMenu->itemcolor = MenuItemColor;
+	m_pSettingsMenu->itemcolor = dwMenuItemColor;
 	m_pSettingsMenu->parent = m_pMainMenu;
 
-	XLMenu_SetTitle(m_pSettingsMenu,L"Load State",MenuTitleColor);
+	XLMenu_SetTitle(m_pSettingsMenu,L"Load State",dwMenuTitleColor);
 
   	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,L"Load State 1",LoadState1);
   	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,L"Load State 2",LoadState2);
@@ -442,10 +442,10 @@ void SaveStateMenu(void)
 	m_pSettingsMenu->bottomcolor = 0x40556486;
 	m_pSettingsMenu->seltopcolor = 0x4055FF86;
 	m_pSettingsMenu->selbotcolor = 0x4055FF86;
-	m_pSettingsMenu->itemcolor = MenuItemColor;
+	m_pSettingsMenu->itemcolor = dwMenuItemColor;
 	m_pSettingsMenu->parent = m_pMainMenu;
 
-	XLMenu_SetTitle(m_pSettingsMenu,L"Save State",MenuTitleColor);
+	XLMenu_SetTitle(m_pSettingsMenu,L"Save State",dwMenuTitleColor);
 
   	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,L"Save State 1",SaveState1);
   	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,L"Save State 2",SaveState2);
@@ -520,10 +520,10 @@ void VideoSettingsMenu(void)
 	m_pSettingsMenu->bottomcolor = 0x40556486;
 	m_pSettingsMenu->seltopcolor = 0x4055FF86;
 	m_pSettingsMenu->selbotcolor = 0x4055FF86;
-	m_pSettingsMenu->itemcolor = MenuItemColor;
+	m_pSettingsMenu->itemcolor = dwMenuItemColor;
 	m_pSettingsMenu->parent = m_pMainMenu;
 
-	XLMenu_SetTitle(m_pSettingsMenu,L"Video Settings",MenuTitleColor);
+	XLMenu_SetTitle(m_pSettingsMenu,L"Video Settings",dwMenuTitleColor);
 
     if (!FlickerFilter)
 	swprintf(currentname,L"Flicker Filter : Disabled");
@@ -688,10 +688,10 @@ void ControllerSettingsMenu()
 	m_pSettingsMenu->bottomcolor = 0x40556486;
 	m_pSettingsMenu->seltopcolor = 0x4055FF86;
 	m_pSettingsMenu->selbotcolor = 0x4055FF86;
-	m_pSettingsMenu->itemcolor = MenuItemColor;
+	m_pSettingsMenu->itemcolor = dwMenuItemColor;
 	m_pSettingsMenu->parent = m_pMainMenu;
 
-	XLMenu_SetTitle(m_pSettingsMenu,L"Controller Settings",MenuTitleColor);
+	XLMenu_SetTitle(m_pSettingsMenu,L"Controller Settings",dwMenuTitleColor);
 	
 	//Sensitivity
 	swprintf(currentname,L"Analog Sensitivity : %d",Sensitivity);
@@ -841,10 +841,10 @@ void ControllerMenu(void)
 	m_pSettingsMenu->bottomcolor = 0x40556486;
 	m_pSettingsMenu->seltopcolor = 0x4055FF86;
 	m_pSettingsMenu->selbotcolor = 0x4055FF86;
-	m_pSettingsMenu->itemcolor = MenuItemColor;
+	m_pSettingsMenu->itemcolor = dwMenuItemColor;
 	m_pSettingsMenu->parent = m_pMainMenu;
 
-	XLMenu_SetTitle(m_pSettingsMenu,L"Choose Controller",MenuTitleColor);
+	XLMenu_SetTitle(m_pSettingsMenu,L"Choose Controller",dwMenuTitleColor);
 
 	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,L"Controller 1",Control1);
 	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,L"Controller 2",Control2);

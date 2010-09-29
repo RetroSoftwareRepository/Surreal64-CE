@@ -79,12 +79,12 @@ MemPak,
 RumblePak,
 };
 
-DWORD TitleColor = 0x00000000;
-DWORD MenuItemColor = 0x00000000;
-DWORD MenuTitleColor = 0x00000000;
-DWORD RomListColor = 0x00000000;
-DWORD SelectedRomColor = 0x00000000;
-DWORD NullItemColor = 0x00000000;
+DWORD dwTitleColor = 0x00000000;
+DWORD dwMenuItemColor = 0x00000000;
+DWORD dwMenuTitleColor = 0x00000000;
+DWORD dwRomListColor = 0x00000000;
+DWORD dwSelectedRomColor = 0x00000000;
+DWORD dwNullItemColor = 0x00000000;
 
 int DefaultPak = MemPak;
 
@@ -602,7 +602,8 @@ void LoadSkinFont(){
 	}
 	if(f){
 		char line[100];
-		int szTitleColor[10];
+		char szTitleColor[10];
+		char tmpbuf[11];
 		
 
 		fgets(line,100, f);
@@ -610,151 +611,92 @@ void LoadSkinFont(){
 			if(line[i] == '=') {
 				for(int j = 0; j < 10; j++){
 
-					if(line[i+1+j] == '0') line[i+1+j] = 0;
-					else if(line[i+1+j] == '0') line[i+1+j] = 0;
-					else if(line[i+1+j] == '1') line[i+1+j] = 1;
-					else if(line[i+1+j] == '2') line[i+1+j] = 2;
-					else if(line[i+1+j] == '3') line[i+1+j] = 3;
-					else if(line[i+1+j] == '4') line[i+1+j] = 4;
-					else if(line[i+1+j] == '5') line[i+1+j] = 5;
-					else if(line[i+1+j] == '6') line[i+1+j] = 6;
-					else if(line[i+1+j] == '7') line[i+1+j] = 7;
-					else if(line[i+1+j] == '8') line[i+1+j] = 8;
-					else if(line[i+1+j] == '9') line[i+1+j] = 9;
-
 					szTitleColor[j] = line[i+1+j]; 
 				}
-				TitleColor =  (DWORD) szTitleColor;
+				memcpy(tmpbuf, szTitleColor, 10);
+				tmpbuf[10] = '\0';
+				dwTitleColor = strtoul(tmpbuf, NULL, 16);
 				break;
 			}
 		}
 		char line2[100];
-		int szMenuTitleColor[10];
+		char szMenuTitleColor[10];
 
 		fgets(line2,100, f);
 		for(int i = 0; i < 100; i++) {
 			if(line2[i] == '=') {
 				for(int j = 0; j < 10; j++){
 
-					if(line[i+1+j] == '0') line[i+1+j] = 0;
-					else if(line[i+1+j] == '0') line[i+1+j] = 0;
-					else if(line[i+1+j] == '1') line[i+1+j] = 1;
-					else if(line[i+1+j] == '2') line[i+1+j] = 2;
-					else if(line[i+1+j] == '3') line[i+1+j] = 3;
-					else if(line[i+1+j] == '4') line[i+1+j] = 4;
-					else if(line[i+1+j] == '5') line[i+1+j] = 5;
-					else if(line[i+1+j] == '6') line[i+1+j] = 6;
-					else if(line[i+1+j] == '7') line[i+1+j] = 7;
-					else if(line[i+1+j] == '8') line[i+1+j] = 8;
-					else if(line[i+1+j] == '9') line[i+1+j] = 9;
-
 					szMenuTitleColor[j] = line2[i+1+j]; 
 				}
-				MenuTitleColor =  (DWORD) szMenuTitleColor;
+				memcpy(tmpbuf, szMenuTitleColor, 10);
+				tmpbuf[10] = '\0';
+				dwMenuTitleColor = strtoul(tmpbuf, NULL, 16);
 				break;
 			}
 		}
 		char line3[100];
-		int szRomListColor[10];
+		char szRomListColor[10];
 
 		fgets(line3,100, f);
 		for(int i = 0; i < 100; i++) {
 			if(line3[i] == '=') {
 				for(int j = 0; j < 10; j++){
 
-					if(line[i+1+j] == '0') line[i+1+j] = 0;
-					else if(line[i+1+j] == '0') line[i+1+j] = 0;
-					else if(line[i+1+j] == '1') line[i+1+j] = 1;
-					else if(line[i+1+j] == '2') line[i+1+j] = 2;
-					else if(line[i+1+j] == '3') line[i+1+j] = 3;
-					else if(line[i+1+j] == '4') line[i+1+j] = 4;
-					else if(line[i+1+j] == '5') line[i+1+j] = 5;
-					else if(line[i+1+j] == '6') line[i+1+j] = 6;
-					else if(line[i+1+j] == '7') line[i+1+j] = 7;
-					else if(line[i+1+j] == '8') line[i+1+j] = 8;
-					else if(line[i+1+j] == '9') line[i+1+j] = 9;
-
 					szRomListColor[j] = line3[i+1+j]; 
 				}
-				RomListColor =  (DWORD) szRomListColor;
+				memcpy(tmpbuf, szRomListColor, 10);
+				tmpbuf[10] = '\0';
+				dwRomListColor = strtoul(tmpbuf, NULL, 16);
 				break;
 			}
 		}
 		char line4[100];
-		int szSelectedRomColor[10];
+		char szSelectedRomColor[10];
 
 		fgets(line4,100, f);
 		for(int i = 0; i < 100; i++) {
 			if(line4[i] == '=') {
 				for(int j = 0; j < 10; j++){
-
-					if(line[i+1+j] == '0') line[i+1+j] = 0;
-					else if(line[i+1+j] == '0') line[i+1+j] = 0;
-					else if(line[i+1+j] == '1') line[i+1+j] = 1;
-					else if(line[i+1+j] == '2') line[i+1+j] = 2;
-					else if(line[i+1+j] == '3') line[i+1+j] = 3;
-					else if(line[i+1+j] == '4') line[i+1+j] = 4;
-					else if(line[i+1+j] == '5') line[i+1+j] = 5;
-					else if(line[i+1+j] == '6') line[i+1+j] = 6;
-					else if(line[i+1+j] == '7') line[i+1+j] = 7;
-					else if(line[i+1+j] == '8') line[i+1+j] = 8;
-					else if(line[i+1+j] == '9') line[i+1+j] = 9;
-
+					
 					szSelectedRomColor[j] = line4[i+1+j]; 
 				}
-				SelectedRomColor = (DWORD) szSelectedRomColor;
+				memcpy(tmpbuf, szSelectedRomColor, 10);
+				tmpbuf[10] = '\0';
+				dwSelectedRomColor = strtoul(tmpbuf, NULL, 16);
 				break;
 			}
 		}
 		char line5[100];
-		int szMenuItemColor[10];
+		char szMenuItemColor[10];
 
 		fgets(line5,100, f);
 		for(int i = 0; i < 100; i++) {
 			if(line5[i] == '=') {
 				for(int j = 0; j < 10; j++){
 
-					if(line[i+1+j] == '0') line[i+1+j] = 0;
-					else if(line[i+1+j] == '0') line[i+1+j] = 0;
-					else if(line[i+1+j] == '1') line[i+1+j] = 1;
-					else if(line[i+1+j] == '2') line[i+1+j] = 2;
-					else if(line[i+1+j] == '3') line[i+1+j] = 3;
-					else if(line[i+1+j] == '4') line[i+1+j] = 4;
-					else if(line[i+1+j] == '5') line[i+1+j] = 5;
-					else if(line[i+1+j] == '6') line[i+1+j] = 6;
-					else if(line[i+1+j] == '7') line[i+1+j] = 7;
-					else if(line[i+1+j] == '8') line[i+1+j] = 8;
-					else if(line[i+1+j] == '9') line[i+1+j] = 9;
-
 					szMenuItemColor[j] = line5[i+1+j]; 
 				}
-				MenuItemColor = (DWORD) szMenuItemColor;
+
+				memcpy(tmpbuf, szMenuItemColor, 10);
+				tmpbuf[10] = '\0';
+				dwMenuItemColor = strtoul(tmpbuf, NULL, 16);
 				break;
 			}
 		}
 		char line6[100];
-		int szNullItemColor[10];
+		char szNullItemColor[10];
 
 		fgets(line6,100, f);
 		for(int i = 0; i < 100; i++) {
 			if(line6[i] == '=') {
 				for(int j = 0; j < 10; j++){
 
-					if(line[i+1+j] == '0') line[i+1+j] = 0;
-					else if(line[i+1+j] == '0') line[i+1+j] = 0;
-					else if(line[i+1+j] == '1') line[i+1+j] = 1;
-					else if(line[i+1+j] == '2') line[i+1+j] = 2;
-					else if(line[i+1+j] == '3') line[i+1+j] = 3;
-					else if(line[i+1+j] == '4') line[i+1+j] = 4;
-					else if(line[i+1+j] == '5') line[i+1+j] = 5;
-					else if(line[i+1+j] == '6') line[i+1+j] = 6;
-					else if(line[i+1+j] == '7') line[i+1+j] = 7;
-					else if(line[i+1+j] == '8') line[i+1+j] = 8;
-					else if(line[i+1+j] == '9') line[i+1+j] = 9;
-
 					szNullItemColor[j] = line6[i+1+j]; 
 				}
-				NullItemColor = (DWORD) szNullItemColor;
+				memcpy(tmpbuf, szNullItemColor, 10);
+				tmpbuf[10] = '\0';
+				dwNullItemColor = strtoul(tmpbuf, NULL, 16);
 				break;
 			}
 		}
@@ -766,6 +708,14 @@ void LoadSkinFont(){
 }
 
 void WriteSkinFont(){
+	
+	dwTitleColor = 0xFF53B77F;
+	dwMenuItemColor = 0xCCEEEEEE;
+	dwMenuTitleColor = 0xFF8080FF;
+	dwRomListColor = 0xAAEEEEEE;
+	dwSelectedRomColor = 0xFFFF8000;
+	dwNullItemColor = 0xEE53B77F;
+	
 	FILE* f;
 		std::string PATH = "D:\\skins\\";
 		PATH += skinname;
@@ -775,18 +725,13 @@ void WriteSkinFont(){
 			fprintf(f, "TitleColor=0xFF53B77F\n");
 			fprintf(f, "MenuTitleColor=0xFF8080FF\n");
 			fprintf(f, "RomListColor=0xAAEEEEEE\n");
-			fprintf(f, "SelectedRomColor=0xFF76C7CF\n");
+			fprintf(f, "SelectedRomColor=0xFFFF8000\n");
 			fprintf(f, "MenuItemColor=0xCCEEEEEE\n");
 			fprintf(f, "NullItemColor=0xEE53B77F\n");
 		}
 	fclose(f);
 	
-	TitleColor = 0xFF53B77F;
-	MenuItemColor = 0xCCEEEEEE;
-	MenuTitleColor = 0xFF8080FF;
-	RomListColor = 0xAAEEEEEE;
-	SelectedRomColor = 0xFF76C7CF;
-	NullItemColor = 0xEE53B77F;
+	
 
 	return;
 

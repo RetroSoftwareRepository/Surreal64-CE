@@ -6,8 +6,8 @@
 #include "panel.h"
 
 //weinerschnitzel - Customize Font
-extern DWORD MenuItemColor;
-extern DWORD NullItemColor;
+extern DWORD dwMenuItemColor;
+extern DWORD dwNullItemColor;
 
 extern LPDIRECT3DDEVICE8 g_pd3dDevice;
 
@@ -43,7 +43,7 @@ XLMenu *XLMenu_Init(float x, float y, DWORD maxitems, DWORD flags, DWORD (*abort
     m->selbotcolor = 0xffc00000;
     m->maxitems = maxitems;
     m->abortroutine = abortroutine;
-    m->itemcolor = MenuItemColor;
+    m->itemcolor = dwMenuItemColor;
 
     m->x = x;
     m->y = y;
@@ -293,7 +293,7 @@ DWORD XLMenu_Routine(DWORD command)
 
             // set item color
             if(mi->flags&MITEM_DISABLED)
-                color = /*(mi->color&0xffffff) | 0xFF000000; */NullItemColor;   // lower alpha
+                color = /*(mi->color&0xffffff) | 0xFF000000; */dwNullItemColor;   // lower alpha
             else
                 color = mi->color;
     
