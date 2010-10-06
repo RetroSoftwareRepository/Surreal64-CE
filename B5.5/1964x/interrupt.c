@@ -38,8 +38,13 @@
 //#include "cheatcode.h"
 #include "dynarec/dynacpu.h"
 
+
 extern void		Init_Timer_Event_List(void);
 extern uint32	TLB_Error_Vector;
+
+
+
+
 
 uint32			sp_hle_task = 0;
 LARGE_INTEGER	LastVITime = { 0, 0 };
@@ -299,11 +304,19 @@ void RunSPTask(void)
 #ifndef CRASHABLE
 		__except(NULL, EXCEPTION_EXECUTE_HANDLER)
 		{
-			OutputDebugString("Video Plugin exception.\n");
+			//OutputDebugString("Video Plugin exception.\n");
 			
-			emustatus.Emu_Keep_Running = FALSE;
-			emustatus.reason_to_stop = VIDEOCRASH;
-			countdown_counter = 0;
+			//emustatus.Emu_Keep_Running = FALSE;
+			//emustatus.reason_to_stop = VIDEOCRASH;
+			//countdown_counter = 0;
+/*weinerschnitzel - we'll need fonts...
+			WCHAR szErrorMSG[128];
+			swprintf(szErrorMSG,L"Video Plugin Exception! Returning to Launcher...");
+			m_Font.Begin();
+			m_Font.DrawText(320, 240, dwTitleColor, szErrorMSG, XBFONT_CENTER_X);
+			m_Font.End();
+*/
+			XLaunchNewImage("D:\\default.xbe", NULL);
 		}
 #endif
 		DEBUG_SP_TASK_MACRO(TRACE0("SP GRX Task finished"));

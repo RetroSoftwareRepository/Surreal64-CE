@@ -213,7 +213,7 @@ void MainMenu(void)
 	XLMenu_AddItem(m_pMainMenu,MITEM_ROUTINE,L"Video Settings",VideoSettingsMenu);
 	XLMenu_AddItem(m_pMainMenu,MITEM_ROUTINE,L"Choose Skin",SkinMenu);
 
-	swprintf(currentname,L"%S specific settings",romname);
+	swprintf(currentname,L"%SSpecific Settings",romname);
 	XLMenu_AddItem(m_pMainMenu,MITEM_DISABLED,currentname,NULL);
 	XLMenu_AddItem(m_pMainMenu,MITEM_ROUTINE,L"Emulator Settings",SettingsMenu);
 	XLMenu_AddItem(m_pMainMenu,MITEM_ROUTINE,L"Controller Settings",ControllerSettingsMenu);
@@ -1248,7 +1248,7 @@ void ControllerSettingsMenu()
 	XLMenu_SetTitle(m_pSettingsMenu,L"Controller Settings",dwMenuItemColor);
 	
 	//Sensitivity
-	swprintf(currentname,L"Analog Sensitivity : %d", Sensitivity);
+	swprintf(currentname,L"Analog Sensitivity : %d%%", Sensitivity * 10);
 	XLMenu_AddItem2(m_pSettingsMenu,MITEM_ROUTINE,currentname,incSensitivity,decSensitivity);
 	
 	//Deadzone
@@ -1342,7 +1342,7 @@ void ToggleSensitivity(bool inc)
 	
 	XLMenu_CurRoutine = NULL;
 	
-	swprintf(currentname,L"Analog Sensitivity : %d",Sensitivity);
+	swprintf(currentname,L"Analog Sensitivity : %d%%",Sensitivity * 10);
 	XLMenu_SetItemText(&m_pSettingsMenu->items[currentItem], currentname);
 
 	ConfigAppSave2();

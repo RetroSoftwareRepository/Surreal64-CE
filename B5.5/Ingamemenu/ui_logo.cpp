@@ -38,8 +38,11 @@ extern char skinname[32];
 
 void InitLogo(void)
 {
- // thx to gamedev.net for the code - GogoAckman
-
+ 
+	LoadSkinFont(); 
+	
+	// thx to gamedev.net for the code - GogoAckman
+  
   // get the back surface and its description
   g_pd3dDevice->GetBackBuffer(-1,0,&surface);
   surface->GetDesc(&surfDesc);

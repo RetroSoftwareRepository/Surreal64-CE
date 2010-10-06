@@ -694,7 +694,7 @@ void ControllerSettingsMenu()
 	XLMenu_SetTitle(m_pSettingsMenu,L"Controller Settings",dwMenuTitleColor);
 	
 	//Sensitivity
-	swprintf(currentname,L"Analog Sensitivity : %d",Sensitivity);
+	swprintf(currentname,L"Analog Sensitivity : %d%%",Sensitivity * 10);
 	XLMenu_AddItem2(m_pSettingsMenu,MITEM_ROUTINE,currentname,incSensitivity,decSensitivity);
 
 	//Deadzone
@@ -755,7 +755,7 @@ void ToggleSensitivity(bool inc)
 	
 	XLMenu_CurRoutine = NULL;
 	
-	swprintf(currentname,L"Analog Sensitivity : %d",Sensitivity);
+	swprintf(currentname,L"Analog Sensitivity : %d%%",Sensitivity * 10);
 	XLMenu_SetItemText(&m_pSettingsMenu->items[currentItem], currentname);
 
 	ConfigAppSave2();

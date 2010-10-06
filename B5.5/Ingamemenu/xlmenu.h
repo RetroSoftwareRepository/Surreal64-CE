@@ -19,7 +19,7 @@
 #define MROUTINE_SLEEP        0x0003            // routine sleeps
 
 // menu item definition
-#define MITEM_STRINGLEN 48
+#define MITEM_STRINGLEN 256
 typedef struct _XLMenuitem
 {
     DWORD flags;

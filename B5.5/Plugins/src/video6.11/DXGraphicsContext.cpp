@@ -45,6 +45,7 @@ extern "C" void _INPUT_LoadButtonMap(int *cfgData);
 extern int ControllerConfig[72];
 extern bool showdebug;
 extern bool onhd;
+extern DWORD dwTitleColor;
 CXBFont		m_Font;					// Font	for	text display
 CXBFont		m_MSFont;					// Font	for	buttons
 extern "C" char emuname[256];
@@ -216,7 +217,7 @@ void CDXGraphicsContext::UpdateFrame(bool swaponly)
 		CRender::g_pRender->EndRendering();
 	}
 	
-		if (showdebug) {
+		
 		static DWORD lastTick = GetTickCount() / 1000;
 		static int lastTickFPS = 0;
 		static int frameCount = 0;
@@ -234,15 +235,25 @@ MEMORYSTATUS memStat;
 WCHAR szMemStatus[128];
 
 GlobalMemoryStatus(&memStat);
-swprintf(szMemStatus,L"%d Mb Free",(memStat.dwAvailPhys /1024 /1024));
-WCHAR debugemu[256];
-swprintf(debugemu,L"%S",emuname);
+//Check Memory, Warn User, Return to Launcher
+if (memStat.dwAvailPhys / 1024 / 1024 < 1)
+	{
+		swprintf(szMemStatus,L"Out of Memory! Returning to Launcher...");
+		m_Font.Begin();
+		m_Font.DrawText(320, 240, dwTitleColor, szMemStatus, XBFONT_CENTER_X);
+		m_Font.End();
+		XLaunchNewImage("D:\\default.xbe", NULL);
+	}
+if (showdebug) {
+	swprintf(szMemStatus,L"%d Mb Free",(memStat.dwAvailPhys /1024 /1024));
+	WCHAR debugemu[256];
+	swprintf(debugemu,L"%S",emuname);
 
-  m_Font.Begin();
-  m_Font.DrawText(60, 35, 0xFFFF7F7f, szMemStatus, XBFONT_LEFT);
-  m_Font.DrawText(60, 50, 0xFFFF7F7f, str, XBFONT_LEFT);
-  m_Font.DrawText(60, 65, 0xFFFF7F7f, debugemu, XBFONT_LEFT);
-  m_Font.End();
+	m_Font.Begin();
+	m_Font.DrawText(60, 35, dwTitleColor, szMemStatus, XBFONT_LEFT);
+	m_Font.DrawText(60, 50, dwTitleColor, str, XBFONT_LEFT);
+	m_Font.DrawText(60, 65, dwTitleColor, debugemu, XBFONT_LEFT);
+	m_Font.End();
 }
 	Lock();
 	if (m_pd3dDevice == NULL)
