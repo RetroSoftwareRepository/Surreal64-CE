@@ -142,6 +142,7 @@ extern "C" void __EMU_SaveState(int index);
 extern "C" void __EMU_LoadState(int index);
 extern bool onhd;
 extern bool showdebug;
+extern DWORD dwTitleColor;
 extern void RenderScreen();
 extern void SetAsRenderTarget();
 extern LPDIRECT3DSURFACE8 pTargetSurface;
@@ -162,7 +163,7 @@ void CDirectXGraphicsContext::UpdateFrame(bool swaponly)
 
 	CGraphicsContext::UpdateFrameBufferBeforeUpdateFrame();
 
-	if (showdebug) {
+
 		static DWORD lastTick = GetTickCount() / 1000;
 		static int lastTickFPS = 0;
 		static int frameCount = 0;
@@ -180,18 +181,31 @@ MEMORYSTATUS memStat;
 WCHAR szMemStatus[128];
 
 GlobalMemoryStatus(&memStat);
-swprintf(szMemStatus,L"%d Mb Free",(memStat.dwAvailPhys /1024 /1024));
-WCHAR debugemu[256];
-swprintf(debugemu,L"%S",emuname);
+//Check Memory, Warn User, Return to Launcher
+if (memStat.dwAvailPhys / 1024 / 1024 < 1)
+	{
+		swprintf(szMemStatus,L"Out of Memory! Returning to Launcher...");
+		m_Font.Begin();
+		m_Font.DrawText(320, 240, dwTitleColor, szMemStatus, XBFONT_CENTER_X);
+		m_Font.End();
+		XLaunchNewImage("D:\\default.xbe", NULL);
+	}
+	if (showdebug)
+	 {
 
-// m_pd3dDevice->Clear(0,NULL,D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER,D3DCOLOR_XRGB(100,100,100),1.0f,0);
-//  SetAsRenderTarget();
-//  Clear(CLEAR_DEPTH_BUFFER);
-  m_Font.Begin();
-  m_Font.DrawText(60, 35, 0xFFFF7F7f, szMemStatus, XBFONT_LEFT);
-  m_Font.DrawText(60, 50, 0xFFFF7F7f, str, XBFONT_LEFT);
-  m_Font.DrawText(60, 65, 0xFFFF7F7f, debugemu, XBFONT_LEFT);
-  m_Font.End();
+	swprintf(szMemStatus,L"%d Mb Free",(memStat.dwAvailPhys /1024 /1024));
+	WCHAR debugemu[256];
+	swprintf(debugemu,L"%S",emuname);
+
+	// m_pd3dDevice->Clear(0,NULL,D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER,D3DCOLOR_XRGB(100,100,100),1.0f,0);
+	//  SetAsRenderTarget();
+	//  Clear(CLEAR_DEPTH_BUFFER);
+  
+	m_Font.Begin();
+	m_Font.DrawText(60, 35, dwTitleColor, szMemStatus, XBFONT_LEFT);
+	m_Font.DrawText(60, 50, dwTitleColor, str, XBFONT_LEFT);
+	m_Font.DrawText(60, 65, dwTitleColor, debugemu, XBFONT_LEFT);
+	m_Font.End();
 
 //  RenderScreen();
 //  m_pd3dDevice->Present( NULL, NULL, NULL, NULL );

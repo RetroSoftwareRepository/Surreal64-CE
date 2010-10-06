@@ -8,6 +8,7 @@
 //weinerschnitzel - Customize Font
 extern DWORD dwMenuItemColor;
 extern DWORD dwNullItemColor;
+extern DWORD dwSelectedRomColor;
 
 extern LPDIRECT3DDEVICE8 g_pd3dDevice;
 
@@ -294,6 +295,8 @@ DWORD XLMenu_Routine(DWORD command)
             // set item color
             if(mi->flags&MITEM_DISABLED)
                 color = /*(mi->color&0xffffff) | 0xFF000000; */dwNullItemColor;   // lower alpha
+			else if(i ==m->curitem)
+				color = dwSelectedRomColor;
             else
                 color = mi->color;
     

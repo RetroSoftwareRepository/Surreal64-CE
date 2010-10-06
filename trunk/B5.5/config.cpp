@@ -50,7 +50,7 @@ int VertexMode = 1;
 bool FrameSkip = FALSE;
 float XBOX_CONTROLLER_DEAD_ZONE = 8600; // also change in SurrealMenu.cpp
 float Deadzone = 26;
-unsigned int Sensitivity = 5;
+unsigned int Sensitivity = 10;
 char skinname[32] = "default";
 
 char romname[256];
@@ -86,7 +86,7 @@ DWORD dwRomListColor = 0x00000000;
 DWORD dwSelectedRomColor = 0x00000000;
 DWORD dwNullItemColor = 0x00000000;
 
-int DefaultPak = MemPak;
+int DefaultPak = RumblePak;
 
 //freakdave - now all controllers are enabled by default, users don't seem to know how to change it in Surreal's Menu
 bool EnableController1 = true;
@@ -111,14 +111,14 @@ bUseLLERSP=false; // leave this in case it's set in ini
 // Ez0n3 - reinstate max free mem
 dwMaxVideoMem=5;
 
-DefaultPak = MemPak;
+DefaultPak = RumblePak;
 EnableController1 = true;
 EnableController2 = true;
 EnableController3 = true;
 EnableController4 = true;
 XBOX_CONTROLLER_DEAD_ZONE = 8600;
 Deadzone = 26;
-Sensitivity = 5;
+Sensitivity = 10;
 videoplugin = _VideoPluginRice560; // Ez0n3 - 2=rice560
 
 //Ez0n3 - plugins

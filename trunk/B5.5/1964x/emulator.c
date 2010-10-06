@@ -46,6 +46,8 @@
 //#include "romlist.h"
 #include "rompaging.h"
 
+
+
 /*#ifdef DEBUG_COMMON
 //#include "win32/windebug.h"
 extern char			*DebugPrintInstruction(uint32 instruction);
@@ -55,6 +57,8 @@ extern char		    *Get_Interrupt_Name(void);
 //extern char			*DebugPrintInstr(uint32 Instruction);
 extern uint32		SetException_Interrupt(uint32 pc);
 extern void			rc_Intr_Common(void);
+
+
 
 void				RunTheInterpreter(void);
 void				RunTheRegCacheWithoutOpcodeDebugger(void);
@@ -121,8 +125,16 @@ void RunEmulator(uint32 core)
 #ifndef CRASHABLE
     }__except(NULL, EXCEPTION_EXECUTE_HANDLER)
 	{
-		DisplayError("Emulation stopped. Please restart 1964.exe");
-		emustatus.reason_to_stop = CPUCRASH;	/* Quit like VIDEO plugin crash */
+		//DisplayError("Emulation stopped. Please restart 1964.exe");
+		//emustatus.reason_to_stop = CPUCRASH;	/* Quit like VIDEO plugin crash */
+/* weinerschnitzel we'll need fonts here...
+		WCHAR szErrorMSG[128];
+		swprintf(szErrorMSG,L"Emulation stopped! Returning to Launcher...");
+		m_Font.Begin();
+		m_Font.DrawText(320, 240, dwTitleColor, szErrorMSG, XBFONT_CENTER_X);
+		m_Font.End();
+*/
+		XLaunchNewImage("D:\\default.xbe", NULL);
 	}
 #endif
 
@@ -1069,8 +1081,16 @@ Dyna_Check_Codes();
 
 	__except(NULL, EXCEPTION_EXECUTE_HANDLER)
 	{
-		DisplayError("Unknown error happens in DynaRunBlock()");
-		emustatus.reason_to_stop = CPUCRASH;	/* Quit like VIDEO plugin crash */
+		//DisplayError("Unknown error happens in DynaRunBlock()");
+		//emustatus.reason_to_stop = CPUCRASH;	/* Quit like VIDEO plugin crash */
+/*weinerschnitzel - we'll need fonts here
+		WCHAR szErrorMSG[128];
+		swprintf(szErrorMSG,L"Unknown error happens in DynaRunBlock()! Returning to Launcher...");
+		m_Font.Begin();
+		m_Font.DrawText(320, 240, dwTitleColor, szErrorMSG, XBFONT_CENTER_X);
+		m_Font.End();
+*/
+		XLaunchNewImage("D:\\default.xbe", NULL);
 	}
 #endif
 }

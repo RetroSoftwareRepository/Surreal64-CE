@@ -12,7 +12,7 @@
 #include "../config.h"
 #include <xgraphics.h>
 #include <xbfont.h>
-
+extern DWORD dwTitleColor;
 extern CXBFont m_Font;
 HRESULT g_hr;					// Variable to hold function call results
 
@@ -5826,7 +5826,7 @@ void rdp_frameend(void)
     // show buffer on screen
     if(rst.tris>0)
     {
-		if (showdebug) {
+		
 		static DWORD lastTick = GetTickCount() / 1000;
 		static int lastTickFPS = 0;
 		static int frameCount = 0;
@@ -5842,15 +5842,24 @@ WCHAR str[10];
 swprintf(str,L"%i fps", lastTickFPS);
 MEMORYSTATUS memStat;
 WCHAR szMemStatus[128];
-
+//Check memory, Warn user, return to Launcher
 GlobalMemoryStatus(&memStat);
-swprintf(szMemStatus,L"%d Mb Free",(memStat.dwAvailPhys /1024 /1024));
-
-  m_Font.Begin();
-  m_Font.DrawText(60, 35, 0xFFFF7F7f, szMemStatus, XBFONT_LEFT);
-  m_Font.DrawText(60, 50, 0xFFFF7F7f, str, XBFONT_LEFT);
-  m_Font.DrawText(60, 65, 0xFFFF7F7f, L"UltraHLE", XBFONT_LEFT);
-  m_Font.End();
+if (memStat.dwAvailPhys / 1024 / 1024 < 1)
+	{
+		swprintf(szMemStatus,L"Out of Memory! Returning to Launcher...");
+		m_Font.Begin();
+		m_Font.DrawText(320, 240, dwTitleColor, szMemStatus, XBFONT_CENTER_X);
+		m_Font.End();
+		XLaunchNewImage("D:\\default.xbe", NULL);
+	}
+		if (showdebug)
+		{
+			swprintf(szMemStatus,L"%d Mb Free",(memStat.dwAvailPhys /1024 /1024));
+			m_Font.Begin();
+			m_Font.DrawText(60, 35, dwTitleColor, szMemStatus, XBFONT_LEFT);
+			m_Font.DrawText(60, 50, dwTitleColor, str, XBFONT_LEFT);
+			m_Font.DrawText(60, 65, dwTitleColor, L"UltraHLE", XBFONT_LEFT);
+			m_Font.End();
 		}
 		g_pDevice->EndScene();
 		g_pDevice->Present(NULL, NULL, NULL, NULL);
