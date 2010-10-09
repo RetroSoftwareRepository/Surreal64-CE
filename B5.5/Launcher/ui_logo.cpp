@@ -6,15 +6,31 @@
 #define VERSION L"Surreal64 XXX CE B5.5"
 extern DWORD dwMenuItemColor;
 extern DWORD dwTitleColor;
+char menuBG2path[256];
+extern int iInfoPosX;
+extern int iInfoPosY;
+extern int iBoxPosX;
+extern int iBoxPosY;
+extern int iTitleX;
+extern int iTitleY;
+extern void LoadSkinFile();
 
 extern CMusicManager  music;
 extern int actualrom;
 CPanel m_BgPanel;
 CPanel m_BoxPanel;
+CPanel m_BoxBG;
 CPanel m_PgPanel;
+CPanel m_LoadPanel;
+CPanel m_RLPanel;
+CPanel m_InfoPanel;
+LPDIRECT3DTEXTURE8 infoTexture;
 LPDIRECT3DTEXTURE8 bgTexture;
+LPDIRECT3DTEXTURE8 RLTexture;
+LPDIRECT3DTEXTURE8 LoadBGTexture;
 LPDIRECT3DTEXTURE8 PgTexture;
 LPDIRECT3DTEXTURE8 BoxTexture;
+LPDIRECT3DTEXTURE8 BoxBGTexture;
 extern int romcounter;
 extern CXBFont	m_Font;					// Font	for	text display
 extern LPDIRECT3DDEVICE8 g_pd3dDevice;
@@ -24,15 +40,24 @@ int endcredits=0;
 extern bool onhd;
 extern char skinname[32];
 extern int ConfigAppLoad3();
-extern void LoadSkinFont();
+
 
 
 void InitLogo(void)
 {
 	char bgpath[256];
-	sprintf(bgpath,"D:\\Skins\\%s\\bg.jpg",skinname);
+	sprintf(bgpath,"D:\\Skins\\%s\\bg.png",skinname);
 	D3DXCreateTextureFromFileEx( g_pd3dDevice, bgpath,D3DX_DEFAULT, D3DX_DEFAULT,	1, 0, D3DFMT_LIN_A8R8G8B8 ,	D3DPOOL_MANAGED,D3DX_FILTER_NONE , D3DX_FILTER_NONE, 0x00000000,NULL, NULL,&bgTexture);		
 	m_BgPanel.Create(g_pd3dDevice,	bgTexture, true);
+	char RLpath[256];
+	sprintf(RLpath,"D:\\Skins\\%s\\Launcher\\RomList.png",skinname);
+	D3DXCreateTextureFromFileEx( g_pd3dDevice, RLpath,D3DX_DEFAULT, D3DX_DEFAULT,	1, 0, D3DFMT_LIN_A8R8G8B8 ,	D3DPOOL_MANAGED,D3DX_FILTER_NONE , D3DX_FILTER_NONE, 0x00000000,NULL, NULL,&RLTexture);		
+	m_RLPanel.Create(g_pd3dDevice,	RLTexture, true);
+	char Infopath[256];
+	sprintf(Infopath,"D:\\Skins\\%s\\Launcher\\InfoPanel.png",skinname);
+	D3DXCreateTextureFromFileEx( g_pd3dDevice, Infopath,D3DX_DEFAULT, D3DX_DEFAULT,	1, 0, D3DFMT_LIN_A8R8G8B8 ,	D3DPOOL_MANAGED,D3DX_FILTER_NONE , D3DX_FILTER_NONE, 0x00000000,NULL, NULL,&infoTexture);		
+	m_InfoPanel.Create(g_pd3dDevice,infoTexture, true);
+	
 }
 
 
@@ -43,14 +68,15 @@ void DrawLogo(bool Menu)
 {
 	DirectSoundDoWork();
 	music.Process();
-	LoadSkinFont();
+	LoadSkinFile();
+	sprintf(menuBG2path,"D:\\Skins\\%s\\Launcher\\hilight.png",skinname);
 
 	m_BgPanel.Render(0,0);
 
 	m_Font.Begin();
 	
 	// Title and Version
-	m_Font.DrawText(305, 20, dwTitleColor, VERSION, XBFONT_CENTER_X);
+	m_Font.DrawText(iTitleX, iTitleY, dwTitleColor, VERSION, XBFONT_CENTER_X);//305, 20
 
 	m_Font.End();
 
@@ -88,11 +114,17 @@ void DrawLogo(bool Menu)
 	
 	// Ez0n3 - make sure that there's actually an image - otherwise -> crash! (ie: boxart dir is empty = crash)
 	if ( FileExists( imagename ) ) {
+		m_BoxBG.Destroy();
+		char BoxartBGpath[256];
+		sprintf(BoxartBGpath,"D:\\Skins\\%s\\Launcher\\BoxartBG.png",skinname);
+		D3DXCreateTextureFromFileEx( g_pd3dDevice, BoxartBGpath,D3DX_DEFAULT, D3DX_DEFAULT,	1, 0, D3DFMT_LIN_A8R8G8B8 ,	D3DPOOL_MANAGED,D3DX_FILTER_NONE , D3DX_FILTER_NONE, 0x00000000,NULL, NULL,&BoxBGTexture);		
+		m_BoxBG.Create(g_pd3dDevice, BoxBGTexture, true);
+		m_BoxBG.Render(iBoxPosX,iBoxPosY);//430,30	
 	
 		m_BoxPanel.Destroy();
 		D3DXCreateTextureFromFileEx( g_pd3dDevice, imagename,D3DX_DEFAULT, D3DX_DEFAULT,	1, 0, D3DFMT_LIN_A8R8G8B8 ,	D3DPOOL_MANAGED,D3DX_FILTER_NONE , D3DX_FILTER_NONE, 0x00000000,NULL, NULL,&BoxTexture);		
 		m_BoxPanel.Create(g_pd3dDevice,	BoxTexture, true);
-		m_BoxPanel.Render(435,35);	
+		m_BoxPanel.Render(iBoxPosX+5,iBoxPosY+5);//435,35	
 	}
 	
     m_Font.Begin();
@@ -100,7 +132,7 @@ void DrawLogo(bool Menu)
 // rom size
 		int romsize = (rom->m_romSize / 0x100000 * 8); 
 		swprintf( m_currentname, L"Rom Size : %d Mbits", romsize);
-		m_Font.DrawText( 60, 320, dwMenuItemColor, m_currentname, XBFONT_TRUNCATED,	530);
+		m_Font.DrawText( iInfoPosX+10, iInfoPosY+10, dwMenuItemColor, m_currentname, XBFONT_TRUNCATED,	530);//50, 310
 
 // country
 		int country = rom->m_byCountry;
@@ -131,7 +163,7 @@ void DrawLogo(bool Menu)
 
 		
 		swprintf( m_currentname, L"Country : %S", country2);
-		m_Font.DrawText( 60, 340, dwMenuItemColor, m_currentname, XBFONT_TRUNCATED,	530);
+		m_Font.DrawText( iInfoPosX+10, iInfoPosY+30, dwMenuItemColor, m_currentname, XBFONT_TRUNCATED,	530);
 		// zip name
 		char zipname[120];
 
@@ -156,11 +188,11 @@ void DrawLogo(bool Menu)
 			break;
 		}
 		swprintf( m_currentname, L"Rom Name : %S", zipname );
-		m_Font.DrawText( 60, 360, dwMenuItemColor, m_currentname, XBFONT_TRUNCATED,	530);
+		m_Font.DrawText( iInfoPosX+10, iInfoPosY+50, dwMenuItemColor, m_currentname, XBFONT_TRUNCATED,	530);
 
 // rom counter
 		swprintf( m_currentname, L"[%d Roms]", romcounter );
-		m_Font.DrawText( 60, 380, dwMenuItemColor, m_currentname, XBFONT_TRUNCATED,	530);
+		m_Font.DrawText( iInfoPosX+10, iInfoPosY+70, dwMenuItemColor, m_currentname, XBFONT_TRUNCATED,	530);
 		m_Font.DrawText( 450, 430, dwMenuItemColor, L"\403 Refresh");
 		m_Font.DrawText( 260, 430, dwMenuItemColor, L"\402 Surreal Setup");
 		m_Font.DrawText( 70, 430, dwMenuItemColor, L"\406 - \407 Fast Scroll");
@@ -168,7 +200,7 @@ void DrawLogo(bool Menu)
 //comments
 		Rom *sRom = g_romList.GetRomAt(actualrom);
 		swprintf( m_currentname, L"Comments: %S", sRom->GetIniEntry()->szComments );
-		m_Font.DrawText( 60, 400, dwMenuItemColor, m_currentname, XBFONT_TRUNCATED,	530);
+		m_Font.DrawText( iInfoPosX+10, iInfoPosY+90, dwMenuItemColor, m_currentname, XBFONT_TRUNCATED,	530);
 
         m_Font.End();
 		}
@@ -237,14 +269,19 @@ void CreateProgress()
 	sprintf(progressname,"D:\\Skins\\%s\\progress.png",skinname);
 	D3DXCreateTextureFromFileEx( g_pd3dDevice, progressname,D3DX_DEFAULT, D3DX_DEFAULT,	1, 0, D3DFMT_LIN_A8R8G8B8 ,	D3DPOOL_MANAGED,D3DX_FILTER_NONE , D3DX_FILTER_NONE, 0x00000000,NULL, NULL,&PgTexture);		
 	m_PgPanel.Create(g_pd3dDevice,	PgTexture, true);
+	char loadingBGpath[256];
+	sprintf(loadingBGpath,"D:\\Skins\\%s\\Launcher\\LoadingBG.png",skinname);
+	D3DXCreateTextureFromFileEx( g_pd3dDevice, loadingBGpath,D3DX_DEFAULT, D3DX_DEFAULT,	1, 0, D3DFMT_LIN_A8R8G8B8 ,	D3DPOOL_MANAGED,D3DX_FILTER_NONE , D3DX_FILTER_NONE, 0x00000000,NULL, NULL,&LoadBGTexture);		
+	m_LoadPanel.Create(g_pd3dDevice,	LoadBGTexture, true);
 }
 
 void RenderProgress(int progress)
 {
 	g_d3d.BeginRender();
 	m_BgPanel.Render(0,0);
+	m_LoadPanel.Render(150,190);
 	m_Font.Begin();
-	m_Font.DrawText(320, 200, 0xFFFFFFFF,L"Loading Rom" , XBFONT_CENTER_X);
+	m_Font.DrawText(320, 200, dwTitleColor,L"Loading Rom" , XBFONT_CENTER_X);//320,200
 	m_Font.End();
 
 	for (int i=0;i<progress;i++){
@@ -257,6 +294,7 @@ void RenderProgress(int progress)
 extern bool compatible[3];
 // 0=1964,1=pj64,2=ultrahle 
 // not working apparently , ini not done
+/*
 void display_compatible()
 {
 	char compatib[99];
@@ -300,3 +338,4 @@ m_Font.DrawText(320, 100, 0xFFFFFFFF,compat , XBFONT_CENTER_X);
 m_Font.End(); 
 
 }
+*/

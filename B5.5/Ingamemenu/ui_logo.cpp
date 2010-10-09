@@ -5,7 +5,14 @@
 
 #define VERSION L"Surreal64 XXX CE B5.5"
 extern DWORD dwTitleColor;
-extern void LoadSkinFont();
+extern void LoadSkinFile();
+char menuBG2path[256];
+extern int iIGMTitleX;
+extern int iIGMTitleY;
+extern int iPanelX;
+extern int iPanelY;
+extern int iPanelNH;
+extern int iPanelNW;
 
 extern char romname[256];
 CPanel m_BgPanel;
@@ -39,9 +46,9 @@ extern char skinname[32];
 void InitLogo(void)
 {
  
-	LoadSkinFont(); 
+	LoadSkinFile(); 
 	
-	// thx to gamedev.net for the code - GogoAckman
+  // thx to gamedev.net for the code - GogoAckman
   
   // get the back surface and its description
   g_pd3dDevice->GetBackBuffer(-1,0,&surface);
@@ -59,24 +66,26 @@ void InitLogo(void)
   // release both surfaces
   texSurface->Release();
   surface->Release();
+    
+	sprintf(menuBG2path,"D:\\Skins\\%s\\IGM\\hilight.png",skinname);
 
 	m_RenderPanel.Create(g_pd3dDevice,	texture, true);
 	char gamebgname[256];
-	sprintf(gamebgname,"D:\\skins\\%s\\ingamebg.jpg",skinname);
+	sprintf(gamebgname,"D:\\skins\\%s\\ingamebg.png",skinname);
 	D3DXCreateTextureFromFileEx( g_pd3dDevice, gamebgname,D3DX_DEFAULT, D3DX_DEFAULT,	1, 0, D3DFMT_LIN_A8R8G8B8 ,	D3DPOOL_MANAGED,D3DX_FILTER_NONE , D3DX_FILTER_NONE, 0x00000000,NULL, NULL,&bgTexture);		
 	m_BgPanel.Create(g_pd3dDevice,	bgTexture, true);
 }
 
 void DrawLogo()
 {
-	LoadSkinFont();
-	m_BgPanel.Render(0,0);
-	m_RenderPanel.Render(305 ,65 , 267 , 200 , false, 0);
 
+	m_BgPanel.Render(0,0);
+	m_RenderPanel.Render(iPanelX ,iPanelY , iPanelNW , iPanelNH , false, 0);//305,65,267,200
+	
 	m_Font.Begin();
 
 	// Title
-	m_Font.DrawText(305, 20, dwTitleColor, VERSION, XBFONT_CENTER_X);
+	m_Font.DrawText(iIGMTitleX, iIGMTitleY, dwTitleColor, VERSION, XBFONT_CENTER_X);//305, 20
 
 	if (showdebug) {
 	MEMORYSTATUS memStat;

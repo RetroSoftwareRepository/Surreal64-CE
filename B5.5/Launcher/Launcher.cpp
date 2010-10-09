@@ -27,9 +27,23 @@
 #include "musicmanager.h"
 #include "Panel.h"
 
-//weinerschnitzel Customize font
+//weinerschnitzel Skin Control
 extern DWORD dwRomListColor;
 extern DWORD dwSelectedRomColor;
+extern int iRomListPosX;
+extern int iRomListPosY;
+extern int iInfoPosX;
+extern int iInfoPosY;
+extern int RomListTrunc;
+extern CPanel m_PgPanel;
+extern LPDIRECT3DTEXTURE8 bgTexture;
+extern CPanel m_RLPanel;
+extern LPDIRECT3DTEXTURE8 RLTexture;
+extern CPanel m_RLPanel;
+extern LPDIRECT3DTEXTURE8 BoxBGTexture;
+extern CPanel m_BoxBG;
+extern CPanel m_InfoPanel;
+extern LPDIRECT3DTEXTURE8 infoTexture;
 
 float fGameSelect;
 float fCursorPos;
@@ -43,8 +57,8 @@ int	  LastPos;
 int	  m_iMaxWindowList;
 int	  m_iWindowMiddle;
 
-const int GAMESEL_MaxWindowList	= 12;		 
-const int GAMESEL_WindowMiddle = 6;	
+extern int GAMESEL_MaxWindowList;		 
+const int GAMESEL_WindowMiddle = GAMESEL_MaxWindowList/2;	
 const float	GAMESEL_cfDeadZone = 0.3f;
 const float	GAMESEL_cfMaxThresh	= 0.93f;
 const float	GAMESEL_cfMaxPossible =	1.0f;
@@ -59,7 +73,7 @@ const float	GAMESEL_cfLowestScrollMult = 2.0f;
 extern "C" void Enable128MegCaching();
 extern void InitLogo();
 extern void DrawLogo(bool Menu);
-extern void LoadSkinFont();
+extern void LoadSkinFile();
 extern int romcounter;
 int actualrom = 0;
 extern void LaunchMenu();
@@ -140,8 +154,8 @@ HRESULT	CXBoxSample::Initialize()
 	Enable128MegCaching();
 	XSetFileCacheSize(8 * 1024 * 1024);
 
-	//weinerschnitzel - Load Fonts
-	LoadSkinFont();
+	//weinerschnitzel - Load Skin
+	LoadSkinFile();
 
 	// initialise direct 3d
 	if (!g_d3d.Create())
@@ -203,6 +217,7 @@ HRESULT	CXBoxSample::Initialize()
 
 
 	InitLogo();
+
 
 
 	if (onhd) {
@@ -569,6 +584,11 @@ HRESULT	CXBoxSample::Render()
 	    // printf Gamelist
 		DrawLogo(false);
 
+		//Draw Launcher images
+		m_RLPanel.Render(iRomListPosX-5,iRomListPosX-5);
+		m_InfoPanel.Render(iInfoPosX,iInfoPosY);
+
+
 		m_Font.Begin();
 
 		// draw	game list entries
@@ -584,8 +604,8 @@ HRESULT	CXBoxSample::Render()
 		{
 		Rom *rom = g_romList.GetRomAt(iTempGameSel++);
 		char nameofgame[120];
-		char nameofgametrunc[43];
-		WCHAR m_currentname_trunc[43];
+		char nameofgametrunc[120];
+		WCHAR m_currentname_trunc[120];
 		bool caps = true;
 		bool end = false;
 		sprintf(nameofgame,rom->GetProperName().c_str());
@@ -617,14 +637,14 @@ HRESULT	CXBoxSample::Render()
 			{nameofgame[j]='\0';break;}
 		}
 		//weinerschnitzel - truncate the name to fit in GUI
-		for(int k = 0; k <= 43; k++){
+		for(int k = 0; k <= 120; k++){
 			nameofgametrunc[k] = ' ';
 			m_currentname_trunc[k] = ' ';
 		}
-		for(int k = 0; k <= 43; k++){
+		for(int k = 0; k <= RomListTrunc; k++){
 			nameofgametrunc[k] = nameofgame[k];
 			m_currentname_trunc[k] = m_currentname[k];
-			if( k == 43){
+			if( k == RomListTrunc){
 				nameofgametrunc[k] = '\0';
 				m_currentname_trunc[k] = '\0';
 			}
@@ -635,7 +655,7 @@ HRESULT	CXBoxSample::Render()
 		swprintf( m_currentname_trunc, L"%S",nameofgametrunc );
 
 			if (iGameidx==iCursorPos){
-                m_Font.DrawText( 45, 45+(20*iGameidx), dwSelectedRomColor, m_currentname_trunc, XBFONT_TRUNCATED,	530);
+                m_Font.DrawText( iRomListPosX, iRomListPosY+(20*iGameidx), dwSelectedRomColor, m_currentname_trunc, XBFONT_TRUNCATED,	530);//45,45
 				sprintf(romCRC,"%x",rom->m_dwCrc1);
 				sprintf(romname,"%S",m_currentname);
 				for (int i=0;i<3;i++){
@@ -643,7 +663,7 @@ HRESULT	CXBoxSample::Render()
 			}
 			else
 			{
-				m_Font.DrawText( 45, 45+(20*iGameidx), dwRomListColor, m_currentname_trunc, XBFONT_TRUNCATED,	530);
+				m_Font.DrawText( iRomListPosX, iRomListPosY+(20*iGameidx), dwRomListColor, m_currentname_trunc, XBFONT_TRUNCATED,	530);//45,45
 			}
 
 		}
@@ -772,23 +792,29 @@ void CXBoxSample::MoveCursor()
 
 }
 
-extern CPanel m_PgPanel;
-extern LPDIRECT3DTEXTURE8 bgTexture;
+
+
 
 void ReloadSkin() {
 	// fonts
 	char fontname[256];
 	m_MSFont.Destroy();
 	m_Font.Destroy();
-	LoadSkinFont();
+	LoadSkinFile();
 	sprintf(fontname,"D:\\Skins\\%s\\Font.xpr",skinname);
 	m_Font.Create(fontname);
 	sprintf(fontname,"D:\\Skins\\%s\\MsFont.xpr",skinname);
 	m_MSFont.Create(fontname);
 	
-	// background
+	//Refresh images
 	m_PgPanel.Destroy();
 	bgTexture->Release();
+	m_RLPanel.Destroy();
+	RLTexture->Release();
+	m_BoxBG.Destroy();
+	BoxBGTexture->Release();
+	m_InfoPanel.Destroy();
+	infoTexture->Release();
 	InitLogo();
 
 	// music
