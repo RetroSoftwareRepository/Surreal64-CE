@@ -9,12 +9,12 @@ bool showdebug = false;
 #endif
 
 extern "C" void loadinis();
-void LoadSkinFont();
+void LoadSkinFile();
 extern "C" int loaddwPJ64PagingMem();
 extern "C" int loaddwPJ64DynaMem();
 extern "C" int loaddw1964PagingMem();
 extern "C" int loaddw1964DynaMem();
-void WriteSkinFont();
+void WriteSkinFile();
 
 // Ez0n3 - use iAudioPlugin instead to determine which audio plugin is used
 extern "C" int loadiAudioPlugin();
@@ -78,13 +78,69 @@ NoPak,
 MemPak,
 RumblePak,
 };
+//Skin.ini Defaults
+//Font Colors
+DWORD dwTitleColor = 0xFF53B77F;
+DWORD dwMenuItemColor = 0xCCEEEEEE;
+DWORD dwMenuTitleColor = 0xFF8080FF;
+DWORD dwRomListColor = 0xAAEEEEEE;
+DWORD dwSelectedRomColor = 0xFFFF8000;
+DWORD dwNullItemColor = 0xEE53B77F;
 
-DWORD dwTitleColor = 0x00000000;
-DWORD dwMenuItemColor = 0x00000000;
-DWORD dwMenuTitleColor = 0x00000000;
-DWORD dwRomListColor = 0x00000000;
-DWORD dwSelectedRomColor = 0x00000000;
-DWORD dwNullItemColor = 0x00000000;
+//Launcher XLMenu Coords
+int iContMenuPosX = 60;
+int iContMenuPosY = 80;
+int iContSetMenuPosX = 60;
+int iContSetMenuPosY = 80;
+int iCreditsPosX = 60;
+int iCreditsPosY = 80;
+int iLaunchMenuPosX = 210;
+int iLaunchMenuPosY = 160;
+int iMainMenuPosX = 60;
+int iMainMenuPosY = 80;
+int iSettingsMenuPosX = 60;
+int iSettingsMenuPosY = 80;
+int iSkinMenuPosX = 60;
+int iSkinMenuPosY = 80;
+int iVidSetMenuPosX = 60;
+int iVidSetMenuPosY = 80;
+
+//IGM XLMenu Coords
+int iIGMContPosX = 60;
+int iIGMContPosY = 80;
+int iIGMContSetPosX = 60;
+int iIGMContSetPosY = 80;
+int iIGMLoadPosX = 60;
+int iIGMLoadPosY = 80;
+int iIGMSavePosX = 60;
+int iIGMSavePosY = 80;
+int iIGMMainPosX = 60;
+int iIGMMainPosY = 80;
+int iIGMVidSetPosX = 60;
+int iIGMVidSetPosY = 80;
+
+//Launcher Coords
+int iInfoPosX = 50;
+int iInfoPosY = 310;
+int iBoxPosX = 430;
+int iBoxPosY = 30;
+int iTitleX = 305;
+int iTitleY = 20;
+
+//IGM Coords
+int iIGMTitleX = 305;
+int iIGMTitleY = 20;
+int iPanelX = 305;
+int iPanelY = 65;
+int iPanelNH = 267;
+int iPanelNW = 200;
+
+//RomList Coords
+int iRomListPosX = 45;
+int iRomListPosY = 45;
+int GAMESEL_MaxWindowList = 12;
+int RomListTrunc = 43;
+int MenuTrunc = 256;
 
 int DefaultPak = RumblePak;
 
@@ -579,12 +635,12 @@ int ConfigAppLoadTemp()
 	return 0;
 }
 
-//Load Skin Font 
-void LoadSkinFont(){
+//Load Skin File 
+void LoadSkinFile(){
 	FILE* f;
 	std::string PATH = "D:\\skins\\";
 	PATH += skinname;
-	PATH += "\\Font.ini";
+	PATH += "\\Skin.ini";
 	f = fopen(PATH.c_str() , "r");
 
 
@@ -593,11 +649,11 @@ void LoadSkinFont(){
 		FILE* f;
 		std::string PATH = "D:\\skins\\";
 		PATH += skinname;
-		PATH += "\\Font.ini";
+		PATH += "\\Skin.ini";
 		f = fopen(PATH.c_str(), "w");
 		fclose(f);
 
-		WriteSkinFont();
+		WriteSkinFile();
 		return;
 	}
 	if(f){
@@ -700,6 +756,404 @@ void LoadSkinFont(){
 				break;
 			}
 		}
+		//Load Coords
+		char line7[100];
+		fgets(line7,100, f);
+		for(int i = 0; i < 100; i++) {
+			if(line7[i] == '=') {
+				iContMenuPosX = atoi(&line7[i+1]); 
+				break;
+			}
+		}
+		char line8[100];
+		fgets(line8,100, f);
+		for(int i = 0; i < 100; i++) {
+			if(line8[i] == '=') {
+				iContMenuPosY = atoi(&line8[i+1]); 
+				break;
+			}
+		}
+		char line9[100];
+		fgets(line9,100, f);
+		for(int i = 0; i < 100; i++) {
+			if(line9[i] == '=') {
+				iContSetMenuPosX = atoi(&line9[i+1]); 
+				break;
+			}
+		}
+		char line10[100];
+		fgets(line10,100, f);
+		for(int i = 0; i < 100; i++) {
+			if(line10[i] == '=') {
+				iContSetMenuPosY = atoi(&line10[i+1]); 
+				break;
+			}
+		}
+		char line11[100];
+		fgets(line11,100, f);
+		for(int i = 0; i < 100; i++) {
+			if(line11[i] == '=') {
+				iCreditsPosX = atoi(&line11[i+1]); 
+				break;
+			}
+		}
+		char line12[100];
+		fgets(line12,100, f);
+		for(int i = 0; i < 100; i++) {
+			if(line12[i] == '=') {
+				iCreditsPosY = atoi(&line12[i+1]); 
+				break;
+			}
+		}
+		char line13[100];
+		fgets(line13,100, f);
+		for(int i = 0; i < 100; i++) {
+			if(line13[i] == '=') {
+				iLaunchMenuPosX = atoi(&line13[i+1]); 
+				break;
+			}
+		}
+		char line14[100];
+		fgets(line14,100, f);
+		for(int i = 0; i < 100; i++) {
+			if(line14[i] == '=') {
+				iLaunchMenuPosY = atoi(&line14[i+1]); 
+				break;
+			}
+		}
+		char line15[100];
+		fgets(line15,100, f);
+		for(int i = 0; i < 100; i++) {
+			if(line15[i] == '=') {
+				iMainMenuPosX = atoi(&line15[i+1]); 
+				break;
+			}
+		}
+		char line16[100];
+		fgets(line16,100, f);
+		for(int i = 0; i < 100; i++) {
+			if(line16[i] == '=') {
+				iMainMenuPosY = atoi(&line16[i+1]); 
+				break;
+			}
+		}
+		char line17[100];
+		fgets(line17,100, f);
+		for(int i = 0; i < 100; i++) {
+			if(line17[i] == '=') {
+				iSettingsMenuPosX = atoi(&line17[i+1]); 
+				break;
+			}
+		}
+		char line18[100];
+		fgets(line18,100, f);
+		for(int i = 0; i < 100; i++) {
+			if(line18[i] == '=') {
+				iSettingsMenuPosY = atoi(&line18[i+1]); 
+				break;
+			}
+		}
+		char line19[100];
+		fgets(line19,100, f);
+		for(int i = 0; i < 100; i++) {
+			if(line19[i] == '=') {
+				iSkinMenuPosX = atoi(&line19[i+1]); 
+				break;
+			}
+		}
+		char line20[100];
+		fgets(line20,100, f);
+		for(int i = 0; i < 100; i++) {
+			if(line20[i] == '=') {
+				iSkinMenuPosY = atoi(&line20[i+1]); 
+				break;
+			}
+		}
+		char line21[100];
+		fgets(line21,100, f);
+		for(int i = 0; i < 100; i++) {
+			if(line21[i] == '=') {
+				iVidSetMenuPosX = atoi(&line21[i+1]); 
+				break;
+			}
+		}
+		char line22[100];
+		fgets(line22,100, f);
+		for(int i = 0; i < 100; i++) {
+			if(line22[i] == '=') {
+				iVidSetMenuPosY = atoi(&line22[i+1]); 
+				break;
+			}
+		}
+		char line23[100];
+		fgets(line23,100, f);
+		for(int i = 0; i < 100; i++) {
+			if(line23[i] == '=') {
+				iIGMContPosX = atoi(&line23[i+1]); 
+				break;
+			}
+		}
+		char line24[100];
+		fgets(line24,100, f);
+		for(int i = 0; i < 100; i++) {
+			if(line24[i] == '=') {
+				iIGMContPosY = atoi(&line24[i+1]); 
+				break;
+			}
+		}
+		char line25[100];
+		fgets(line25,100, f);
+		for(int i = 0; i < 100; i++) {
+			if(line25[i] == '=') {
+				iIGMContSetPosX  = atoi(&line25[i+1]); 
+				break;
+			}
+		}
+		char line26[100];
+		fgets(line26,100, f);
+		for(int i = 0; i < 100; i++) {
+			if(line26[i] == '=') {
+				iIGMContSetPosY  = atoi(&line26[i+1]); 
+				break;
+			}
+		}
+		char line27[100];
+		fgets(line27,100, f);
+		for(int i = 0; i < 100; i++) {
+			if(line27[i] == '=') {
+				iIGMLoadPosX  = atoi(&line27[i+1]); 
+				break;
+			}
+		}
+		char line28[100];
+		fgets(line28,100, f);
+		for(int i = 0; i < 100; i++) {
+			if(line28[i] == '=') {
+				iIGMLoadPosY  = atoi(&line28[i+1]); 
+				break;
+			}
+		}
+		char line29[100];
+		fgets(line29,100, f);
+		for(int i = 0; i < 100; i++) {
+			if(line29[i] == '=') {
+				iIGMSavePosX  = atoi(&line29[i+1]); 
+				break;
+			}
+		}
+		char line30[100];
+		fgets(line30,100, f);
+		for(int i = 0; i < 100; i++) {
+			if(line30[i] == '=') {
+				iIGMSavePosY  = atoi(&line30[i+1]); 
+				break;
+			}
+		}
+		char line31[100];
+		fgets(line31,100, f);
+		for(int i = 0; i < 100; i++) {
+			if(line31[i] == '=') {
+				iIGMMainPosX  = atoi(&line31[i+1]); 
+				break;
+			}
+		}
+		char line32[100];
+		fgets(line32,100, f);
+		for(int i = 0; i < 100; i++) {
+			if(line32[i] == '=') {
+				iIGMMainPosY  = atoi(&line32[i+1]); 
+				break;
+			}
+		}
+		char line33[100];
+		fgets(line33,100, f);
+		for(int i = 0; i < 100; i++) {
+			if(line33[i] == '=') {
+				iIGMVidSetPosX  = atoi(&line33[i+1]); 
+				break;
+			}
+		}
+		char line34[100];
+		fgets(line34,100, f);
+		for(int i = 0; i < 100; i++) {
+			if(line34[i] == '=') {
+				iIGMVidSetPosY  = atoi(&line34[i+1]); 
+				break;
+			}
+		}
+		char line35[100];
+		fgets(line35,100, f);
+		for(int i = 0; i < 100; i++) {
+			if(line35[i] == '=') {
+				iIGMVidSetPosY  = atoi(&line35[i+1]); 
+				break;
+			}
+		}
+		char line36[100];
+		fgets(line36,100, f);
+		for(int i = 0; i < 100; i++) {
+			if(line36[i] == '=') {
+				iIGMVidSetPosY  = atoi(&line36[i+1]); 
+				break;
+			}
+		}
+		char line37[100];
+		fgets(line37,100, f);
+		for(int i = 0; i < 100; i++) {
+			if(line37[i] == '=') {
+				iIGMVidSetPosY  = atoi(&line37[i+1]); 
+				break;
+			}
+		}
+		char line38[100];
+		fgets(line38,100, f);
+		for(int i = 0; i < 100; i++) {
+			if(line38[i] == '=') {
+				iIGMVidSetPosY  = atoi(&line38[i+1]); 
+				break;
+			}
+		}
+		char line39[100];
+		fgets(line39,100, f);
+		for(int i = 0; i < 100; i++) {
+			if(line39[i] == '=') {
+				iInfoPosX  = atoi(&line39[i+1]); 
+				break;
+			}
+		}
+		char line40[100];
+		fgets(line40,100, f);
+		for(int i = 0; i < 100; i++) {
+			if(line40[i] == '=') {
+				iInfoPosY  = atoi(&line40[i+1]); 
+				break;
+			}
+		}
+		char line41[100];
+		fgets(line41,100, f);
+		for(int i = 0; i < 100; i++) {
+			if(line41[i] == '=') {
+				iBoxPosX  = atoi(&line41[i+1]); 
+				break;
+			}
+		}
+		char line42[100];
+		fgets(line42,100, f);
+		for(int i = 0; i < 100; i++) {
+			if(line42[i] == '=') {
+				iBoxPosY  = atoi(&line42[i+1]); 
+				break;
+			}
+		}
+		char line43[100];
+		fgets(line43,100, f);
+		for(int i = 0; i < 100; i++) {
+			if(line43[i] == '=') {
+				iTitleX  = atoi(&line43[i+1]); 
+				break;
+			}
+		}
+		char line44[100];
+		fgets(line44,100, f);
+		for(int i = 0; i < 100; i++) {
+			if(line44[i] == '=') {
+				iTitleY  = atoi(&line44[i+1]); 
+				break;
+			}
+		}
+		char line45[100];
+		fgets(line45,100, f);
+		for(int i = 0; i < 100; i++) {
+			if(line45[i] == '=') {
+				iIGMTitleX  = atoi(&line45[i+1]); 
+				break;
+			}
+		}
+		char line46[100];
+		fgets(line46,100, f);
+		for(int i = 0; i < 100; i++) {
+			if(line46[i] == '=') {
+				iIGMTitleY  = atoi(&line46[i+1]); 
+				break;
+			}
+		}
+		char line47[100];
+		fgets(line47,100, f);
+		for(int i = 0; i < 100; i++) {
+			if(line47[i] == '=') {
+				iPanelX  = atoi(&line47[i+1]); 
+				break;
+			}
+		}
+		char line48[100];
+		fgets(line48,100, f);
+		for(int i = 0; i < 100; i++) {
+			if(line48[i] == '=') {
+				iPanelY  = atoi(&line48[i+1]); 
+				break;
+			}
+		}
+		char line49[100];
+		fgets(line49,100, f);
+		for(int i = 0; i < 100; i++) {
+			if(line49[i] == '=') {
+				iPanelNW  = atoi(&line49[i+1]); 
+				break;
+			}
+		}
+		char line50[100];
+		fgets(line50,100, f);
+		for(int i = 0; i < 100; i++) {
+			if(line50[i] == '=') {
+				iPanelNH  = atoi(&line50[i+1]); 
+				break;
+			}
+		}
+		char line51[100];
+		fgets(line51,100, f);
+		for(int i = 0; i < 100; i++) {
+			if(line51[i] == '=') {
+				iRomListPosX  = atoi(&line51[i+1]); 
+				break;
+			}
+		}
+		char line52[100];
+		fgets(line52,100, f);
+		for(int i = 0; i < 100; i++) {
+			if(line52[i] == '=') {
+				iRomListPosY  = atoi(&line52[i+1]); 
+				break;
+			}
+		}
+		char line53[100];
+		fgets(line53,100, f);
+		for(int i = 0; i < 100; i++) {
+			if(line53[i] == '=') {
+				GAMESEL_MaxWindowList  = atoi(&line53[i+1]); 
+				break;
+			}
+		}
+		char line54[100];
+		fgets(line54,100, f);
+		for(int i = 0; i < 100; i++) {
+			if(line54[i] == '=') {
+				RomListTrunc  = atoi(&line54[i+1]); 
+				break;
+			}
+		}
+		char line55[100];
+		fgets(line55,100, f);
+		for(int i = 0; i < 100; i++) {
+			if(line55[i] == '=') {
+				MenuTrunc = atoi(&line55[i+1]); 
+				break;
+			}
+		}
+		
+			
+		
+		
+
 	}
 	fclose(f);
 	return;
@@ -707,27 +1161,75 @@ void LoadSkinFont(){
 
 }
 
-void WriteSkinFont(){
+void WriteSkinFile(){
 	
-	dwTitleColor = 0xFF53B77F;
-	dwMenuItemColor = 0xCCEEEEEE;
-	dwMenuTitleColor = 0xFF8080FF;
-	dwRomListColor = 0xAAEEEEEE;
-	dwSelectedRomColor = 0xFFFF8000;
-	dwNullItemColor = 0xEE53B77F;
+	
 	
 	FILE* f;
 		std::string PATH = "D:\\skins\\";
 		PATH += skinname;
-		PATH += "\\Font.ini";
+		PATH += "\\Skin.ini";
 		f = fopen(PATH.c_str() , "w");
 		if(f) {
-			fprintf(f, "TitleColor=0xFF53B77F\n");
-			fprintf(f, "MenuTitleColor=0xFF8080FF\n");
-			fprintf(f, "RomListColor=0xAAEEEEEE\n");
-			fprintf(f, "SelectedRomColor=0xFFFF8000\n");
-			fprintf(f, "MenuItemColor=0xCCEEEEEE\n");
-			fprintf(f, "NullItemColor=0xEE53B77F\n");
+			fprintf(f, "TitleColor=%ul\n",dwTitleColor);
+			fprintf(f, "MenuTitleColor=%ul\n",dwMenuTitleColor);
+			fprintf(f, "RomListColor=%ul\n",dwRomListColor);
+			fprintf(f, "SelectedRomColor=%ul\n",dwSelectedRomColor);
+			fprintf(f, "MenuItemColor=%ul\n",dwMenuItemColor);
+			fprintf(f, "NullItemColor=%ul\n",dwNullItemColor);
+
+			fprintf(f, "ContMenuPosX=%d\n",iContMenuPosX);
+			fprintf(f, "ContMenuPosY=%d\n",iContMenuPosY);
+			fprintf(f, "ContSetMenuPosX=%d\n",iContSetMenuPosX);
+			fprintf(f, "ContSetMenuPosY=%d\n",iContSetMenuPosY);
+			fprintf(f, "CreditsPosX=%d\n",iCreditsPosX);
+			fprintf(f, "CreditsPosY=%d\n",iCreditsPosY);
+			fprintf(f, "LaunchMenuPosX=%d\n",iLaunchMenuPosX);
+			fprintf(f, "LaunchMenuPosY=%d\n",iLaunchMenuPosY);
+			fprintf(f, "MainMenuPosX=%d\n",iMainMenuPosX);
+			fprintf(f, "MainMenuPosY=%d\n",iMainMenuPosY);
+			fprintf(f, "SettingsMenuPosX=%d\n",iSettingsMenuPosX);
+			fprintf(f, "SettingsMenuPosY=%d\n",iSettingsMenuPosY);
+			fprintf(f, "SkinMenuPosX=%d\n",iSkinMenuPosX);
+			fprintf(f, "SkinMenuPosY=%d\n",iSkinMenuPosY);
+			fprintf(f, "VidSetMenuPosX=%d\n",iVidSetMenuPosX);
+			fprintf(f, "VidSetMenuPosY=%d\n",iVidSetMenuPosY);
+
+			fprintf(f, "IGMContPosX=%d\n",iIGMContPosX);
+			fprintf(f, "IGMContPosY=%d\n",iIGMContPosY);
+			fprintf(f, "IGMContSetPosX=%d\n",iIGMContSetPosX);
+			fprintf(f, "IGMContSetPosY=%d\n",iIGMContSetPosY);
+			fprintf(f, "IGMLoadPosX=%d\n",iIGMLoadPosX);
+			fprintf(f, "IGMLoadPosY=%d\n",iIGMLoadPosY);
+			fprintf(f, "IGMSavePosX=%d\n",iIGMSavePosX);
+			fprintf(f, "IGMSavePosY=%d\n",iIGMSavePosY);
+			fprintf(f, "IGMMainPosX=%d\n",iIGMMainPosX);
+			fprintf(f, "IGMMainPosY=%d\n",iIGMMainPosY);
+			fprintf(f, "IGMVidSetPosX=%d\n",iIGMVidSetPosX);
+			fprintf(f, "IGMVidSetPosY=%d\n",iIGMVidSetPosY);
+
+			fprintf(f, "InfoPosX=%d\n",iInfoPosX);
+			fprintf(f, "InfoPosY=%d\n",iInfoPosY);
+			fprintf(f, "BoxPosX=%d\n",iBoxPosX);
+			fprintf(f, "BoxPosY=%d\n",iBoxPosY);
+			fprintf(f, "TitleX=%d\n",iTitleX);
+			fprintf(f, "TitleY=%d\n",iTitleY);
+
+			fprintf(f, "IGMTitleX=%d\n",iIGMTitleX);
+			fprintf(f, "IGMTitleY=%d\n",iIGMTitleY);
+			fprintf(f, "PanelX=%d\n",iPanelX);
+			fprintf(f, "PanelY=%d\n",iPanelY);
+			fprintf(f, "PanelNH=%d\n",iPanelNH);
+			fprintf(f, "PanelNW=%d\n",iPanelNW);
+
+			fprintf(f, "RomListPosX=%d\n",iRomListPosX);
+			fprintf(f, "RomListPosY=%d\n",iRomListPosY);
+			fprintf(f, "RomListSize=%d\n",GAMESEL_MaxWindowList);
+			fprintf(f, "RomListCharacterLimit=%d\n",RomListTrunc);
+			fprintf(f, "MenuCharacterLimit=%d\n",MenuTrunc);
+
+
+
 		}
 	fclose(f);
 	

@@ -21,7 +21,7 @@ void BoxArtTable::Build()
 {
 	WIN32_FIND_DATA fd;
 
-	HANDLE hFF = FindFirstFile((g_iniFile.GetMediaPath() + "\\boxart\\*.jpg").c_str(), &fd);
+	HANDLE hFF = FindFirstFile((g_iniFile.GetMediaPath() + "\\boxart\\*.png").c_str(), &fd);
 
 	do
 	{
@@ -93,5 +93,5 @@ string BoxArtTable::GetBoxArtFilename(dword crc1)
 	}
 
 	// no entry was found that matches
-	return string("boxart\\default.jpg");
+	return string("boxart\\default.png");
 }

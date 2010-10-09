@@ -3,12 +3,21 @@
 #include "XBUtil.h"
 #include "XBInput.h"
 #include "XLMenu.h"
-#include "panel.h"
+#include "Panel.h"
 
-//weinerschnitzel - Customize Font
+
+//weinerschnitzel - Skin Control
 extern DWORD dwMenuItemColor;
 extern DWORD dwNullItemColor;
 extern DWORD dwSelectedRomColor;
+extern char skinname[32];
+extern char menuBGpath[256];
+extern char menuBG2path[256];
+extern int MenuTrunc;
+CPanel m_MenuBgPanel;
+CPanel m_MenuBg2Panel;
+LPDIRECT3DTEXTURE8 menuBgTexture;
+LPDIRECT3DTEXTURE8 menuBg2Texture;
 
 extern LPDIRECT3DDEVICE8 g_pd3dDevice;
 
@@ -17,7 +26,7 @@ DWORD XLMenu_FontLoaded = FALSE;            // font loaded flag
 XLMenu *XLMenu_CurMenu = NULL;
 int (*XLMenu_CurRoutine)(DWORD cmd, XLMenuItem *mi);            // called when item selected
 
-void DrawRect(float x, float y, float w, float h, DWORD dwTopColor, DWORD dwBottomColor);
+
 
 void XLMenu_SetFont(CXBFont *font)
 {
@@ -28,8 +37,13 @@ XLMenu *XLMenu_Init(float x, float y, DWORD maxitems, DWORD flags, DWORD (*abort
 {
     XLMenu *m;
     BYTE *mem;
-
-    assert(XLMenu_Font!=NULL);                // make sure font is set
+	
+	D3DXCreateTextureFromFileEx( g_pd3dDevice, menuBGpath,D3DX_DEFAULT, D3DX_DEFAULT,	1, 0, D3DFMT_LIN_A8R8G8B8 ,	D3DPOOL_MANAGED,D3DX_FILTER_NONE , D3DX_FILTER_NONE, 0x00000000,NULL, NULL,&menuBgTexture);		
+	m_MenuBgPanel.Create(g_pd3dDevice,	menuBgTexture, true);
+    D3DXCreateTextureFromFileEx( g_pd3dDevice, menuBG2path,D3DX_DEFAULT, D3DX_DEFAULT,	1, 0, D3DFMT_LIN_A8R8G8B8 ,	D3DPOOL_MANAGED,D3DX_FILTER_NONE , D3DX_FILTER_NONE, 0x00000000,NULL, NULL,&menuBg2Texture);		
+	m_MenuBg2Panel.Create(g_pd3dDevice,	menuBg2Texture, true);
+   
+	assert(XLMenu_Font!=NULL);                // make sure font is set
 
     // allocate memory for menu
     mem = new BYTE[sizeof(XLMenu) + maxitems*sizeof(XLMenuItem)];
@@ -38,10 +52,6 @@ XLMenu *XLMenu_Init(float x, float y, DWORD maxitems, DWORD flags, DWORD (*abort
     m = (XLMenu *)mem;
     m->items = (XLMenuItem *)(mem+sizeof(XLMenu));
     m->flags = flags;
-    m->topcolor = 0xff007000;
-    m->bottomcolor = 0xff0000c0;
-    m->seltopcolor = 0xff000000;
-    m->selbotcolor = 0xffc00000;
     m->maxitems = maxitems;
     m->abortroutine = abortroutine;
     m->itemcolor = dwMenuItemColor;
@@ -139,12 +149,24 @@ void XLMenu_SetTitle(XLMenu *m, WCHAR *string, DWORD color)
 void XLMenu_SetItemText(XLMenuItem *mi, WCHAR *string)
 {
     float w, h;
+	WCHAR MenuItemTrunc[MITEM_STRINGLEN];
 
     if(!string || (mi->flags&MITEM_SEPARATOR))
         return;
 
-    // set string
-    wcsncpy(mi->string, string, MITEM_STRINGLEN-1);
+    //Truncate the text
+	for(int k = 0; k <= MITEM_STRINGLEN; k++){
+			MenuItemTrunc[k] = ' ';
+		}
+	for(int k = 0; k <= MenuTrunc; k++){
+			MenuItemTrunc[k] = string[k];
+			if( k == MenuTrunc){
+				MenuItemTrunc[k] = '\0';
+			}
+
+		}
+	// set string
+    wcsncpy(mi->string, MenuItemTrunc, MITEM_STRINGLEN-1);
 
     // calculate new menu width based on this item
     XLMenu_Font->GetTextExtent(string, &w, &h);
@@ -201,6 +223,7 @@ DWORD XLMenu_Routine(DWORD command)
     WCHAR ddd[16] = L"[--MORE--]";
     WCHAR *str;
     DWORD status;
+	
 
     // check for menu routine first
     if(XLMenu_CurRoutine)
@@ -225,10 +248,12 @@ DWORD XLMenu_Routine(DWORD command)
     rectw = m->w+10;
     recth = m->h+20;
 
-    if(m->flags&(MENU_LEFT|MENU_RIGHT))
-        DrawRect(rectx-8.0f, recty, rectw, recth, m->topcolor, m->bottomcolor);
-    else
-        DrawRect(rectx-(rectw/2.0f), recty, rectw, recth, m->topcolor, m->bottomcolor);
+	if(m->flags&(MENU_LEFT|MENU_RIGHT)){
+		m_MenuBgPanel.Render(rectx-8.0f, recty);
+	}
+	else{
+	   m_MenuBgPanel.Render(rectx-8.0f, recty);
+	}
 
     menux = m->x;
     menuy = m->y;
@@ -286,15 +311,17 @@ DWORD XLMenu_Routine(DWORD command)
             // draw menu highlight bar
             if(i==m->curitem)
             {
-                if(m->flags&(MENU_LEFT|MENU_RIGHT))
-                    DrawRect(rectx-8.0f, itemy-2.0f, rectw, XLMenu_Font->GetFontHeight()+4.0f, m->seltopcolor, m->selbotcolor);
-                else
-                    DrawRect(rectx-(rectw/2.0f), itemy-2.0f, rectw, XLMenu_Font->GetFontHeight()+4.0f, m->seltopcolor, m->selbotcolor);
+				if(m->flags&(MENU_LEFT|MENU_RIGHT)){
+					m_MenuBg2Panel.Render(rectx-8.0f, itemy-1.0f);
+				}
+				else{
+					m_MenuBg2Panel.Render(rectx-8.0f, itemy-1.0f);
+				}
             }
 
             // set item color
             if(mi->flags&MITEM_DISABLED)
-                color = /*(mi->color&0xffffff) | 0xFF000000; */dwNullItemColor;   // lower alpha
+                color = dwNullItemColor;   
 			else if(i ==m->curitem)
 				color = dwSelectedRomColor;
             else
@@ -444,56 +471,6 @@ DWORD XLMenu_Routine(DWORD command)
     }
 
     return 1;
-}
-
-//-----------------------------------------------------------------------------
-// Name: DrawRect
-// Desc: Draws a gradient filled rectangle
-//-----------------------------------------------------------------------------
-
-//static LPDIRECT3DVERTEXBUFFER8 XLMenu_VB = NULL;
-LPDIRECT3DVERTEXBUFFER8 XLMenu_VB;
-
-void DrawRect(float x, float y, float w, float h, DWORD dwTopColor, DWORD dwBottomColor)
-{
-    
-    struct BACKGROUNDVERTEX 
-    { 
-        D3DXVECTOR4 p; 
-        D3DCOLOR color; 
-    } *v;
-
-    if(XLMenu_VB == NULL)
-        g_pd3dDevice->CreateVertexBuffer(4*sizeof(BACKGROUNDVERTEX), D3DUSAGE_WRITEONLY, 
-                                          0L, D3DPOOL_DEFAULT, &XLMenu_VB);
-
-    // Setup vertices for a background-covering quad
-    XLMenu_VB->Lock(0, 0, (BYTE **)&v, 0L);
-    v[0].p = D3DXVECTOR4(x  -0.5f, y  -0.5f, 1.0f, 1.0f);  v[0].color = dwTopColor/2;
-    v[1].p = D3DXVECTOR4(x+w-0.5f, y  -0.5f, 1.0f, 1.0f);  v[1].color = dwTopColor;
-    v[2].p = D3DXVECTOR4(x  -0.5f, y+h-0.5f, 1.0f, 1.0f);  v[2].color = dwBottomColor*1.2;
-    v[3].p = D3DXVECTOR4(x+w-0.5f, y+h-0.5f, 1.0f, 1.0f);  v[3].color = dwBottomColor;
-    XLMenu_VB->Unlock();
-
-    // set render states
-    g_pd3dDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE); 
-    g_pd3dDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-    g_pd3dDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
-    g_pd3dDevice->SetRenderState(D3DRS_ZENABLE, FALSE);
-
-    // Set states
-    g_pd3dDevice->SetTexture(0, NULL);
-    g_pd3dDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_DISABLE);
-    g_pd3dDevice->SetVertexShader(D3DFVF_XYZRHW|D3DFVF_DIFFUSE);
-    g_pd3dDevice->SetStreamSource(0, XLMenu_VB, sizeof(BACKGROUNDVERTEX));
-
-    // Render the quad
-    g_pd3dDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
-
-    // restore render state
-    g_pd3dDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE); 
-    g_pd3dDevice->SetRenderState(D3DRS_ZENABLE, TRUE);
-
 }
 
 const SHORT XINPUT_DEADZONE = (SHORT)(0.24f * FLOAT(0x7FFF));

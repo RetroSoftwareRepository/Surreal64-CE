@@ -12,9 +12,28 @@
 #include "../Ingamemenu/xlmenu.h"
 #include "musicmanager.h"
 
-//weinerschnitzel - Customize Font
+//weinerschnitzel - Skin Control
 extern DWORD dwMenuItemColor;
 extern DWORD dwMenuTitleColor;
+extern char skinname[32];
+char menuBGpath[256];
+extern int iContMenuPosX;
+extern int iContMenuPosY;
+extern int iContSetMenuPosX;
+extern int iContSetMenuPosY;
+extern int iCreditsPosX;
+extern int iCreditsPosY;
+extern int iLaunchMenuPosX;
+extern int iLaunchMenuPosY;
+extern int iMainMenuPosX;
+extern int iMainMenuPosY;
+extern int iSettingsMenuPosX;
+extern int iSettingsMenuPosY;
+extern int iSkinMenuPosX;
+extern int iSkinMenuPosY;
+extern int iVidSetMenuPosX;
+extern int iVidSetMenuPosY;
+
 
 extern CMusicManager  music;
 extern bool bMusicPlaying;
@@ -189,6 +208,7 @@ void MainMenu(void)
 	// Ez0n3 - get user pref instead of always loading defaults
 	//ConfigAppLoad2();	
 	ConfigAppLoad3();
+	sprintf(menuBGpath,"D:\\Skins\\%s\\Launcher\\MainMenuBG.png",skinname);
 	
 
 	DWORD dwMenuCommand = 0;
@@ -198,12 +218,9 @@ void MainMenu(void)
 	XLMenu_CurMenu = NULL;
 	XLMenu_SetFont(&m_Font);
 
-	m_pMainMenu = XLMenu_Init(60,80,11,MENU_LEFT|MENU_WRAP,NULL);
+	m_pMainMenu = XLMenu_Init(iMainMenuPosX,iMainMenuPosY,11,MENU_LEFT|MENU_WRAP,NULL);
 
-	m_pMainMenu->topcolor = 0x40254365;
-	m_pMainMenu->bottomcolor = 0x40556486;
-	m_pMainMenu->seltopcolor = 0x4055FF86;
-	m_pMainMenu->selbotcolor = 0x4055FF86;
+	
 	m_pMainMenu->itemcolor = dwMenuItemColor;
 	m_pMainMenu->parent = NULL;
 
@@ -261,21 +278,16 @@ void MainMenu(void)
 
 void ToggleCredits()
 {
+	sprintf(menuBGpath,"D:\\Skins\\%s\\Launcher\\CreditsBG.png",skinname);
 	DWORD dwMenuCommand = 0;
 
 	XLMenu_CurRoutine = NULL;
 	XLMenu_CurMenu = NULL;
 	XLMenu_SetFont(&m_Font);
 
-	m_pSettingsMenu = XLMenu_Init(60,80,1, MENU_LEFT|MENU_WRAP, NULL);
+	m_pSettingsMenu = XLMenu_Init(iCreditsPosX,iCreditsPosY,1, MENU_LEFT|MENU_WRAP, NULL);
 
-	// make the menu transparent
-	m_pSettingsMenu->bottomcolor = 0x00FFFFFF;
-	m_pSettingsMenu->itemcolor = 0x00FFFFFF;
-	m_pSettingsMenu->selbotcolor = 0x00FFFFFF;
-	m_pSettingsMenu->seltopcolor = 0x00FFFFFF;
-	m_pSettingsMenu->titlecolor = 0x00FFFFFF;
-	m_pSettingsMenu->topcolor = 0x00FFFFFF;
+
 	m_pSettingsMenu->parent = m_pMainMenu;
     
 	XLMenu_SetTitle(m_pSettingsMenu,L" ",0x00FFFFFF);
@@ -303,6 +315,7 @@ void ToggleCredits()
 // Skin
 static int SkinMenu(void)
 {
+	sprintf(menuBGpath,"D:\\Skins\\%s\\Launcher\\SkinMenuBG.png",skinname);
 	XBGAMEPAD gamepad;
 	char skins_path[] = "d:\\skins\\*";
 	HANDLE				hFind;	
@@ -331,11 +344,7 @@ static int SkinMenu(void)
 
 	if (nSkinCount < 2) return MROUTINE_RETURN;
 
-	m_pSkinMenu = XLMenu_Init(60, 80, nSkinCount + 2, MENU_LEFT|MENU_WRAP, NULL);
-	m_pSkinMenu->topcolor = 0x40254365;
-	m_pSkinMenu->bottomcolor = 0x40556486;
-	m_pSkinMenu->seltopcolor = 0x4055FF86;
-	m_pSkinMenu->selbotcolor = 0x4055FF86;
+	m_pSkinMenu = XLMenu_Init(iSkinMenuPosX, iSkinMenuPosY, nSkinCount + 2, MENU_LEFT|MENU_WRAP, NULL);
 	m_pSkinMenu->itemcolor = dwMenuItemColor;
 	m_pSkinMenu->parent = m_pMainMenu;
 
@@ -457,6 +466,7 @@ void ShutdownXbox(void)
 
 void SettingsMenu(void)
 {
+	sprintf(menuBGpath,"D:\\Skins\\%s\\Launcher\\SettingsMenuBG.png",skinname);
 	DWORD dwMenuCommand = 0;
 
 	XLMenu_CurRoutine = NULL;
@@ -467,12 +477,8 @@ void SettingsMenu(void)
 
 	// Ez0n3 - more items
 	//m_pSettingsMenu = XLMenu_Init(60,80,8, MENU_LEFT|MENU_WRAP, NULL);
-	m_pSettingsMenu = XLMenu_Init(60,80,10, MENU_LEFT|MENU_WRAP, NULL);
+	m_pSettingsMenu = XLMenu_Init(iSettingsMenuPosX,iSettingsMenuPosY,10, MENU_LEFT|MENU_WRAP, NULL);
 
-	m_pSettingsMenu->topcolor = 0x40254365;
-	m_pSettingsMenu->bottomcolor = 0x40556486;
-	m_pSettingsMenu->seltopcolor = 0x4055FF86;
-	m_pSettingsMenu->selbotcolor = 0x4055FF86;
 	m_pSettingsMenu->itemcolor = dwMenuItemColor;
 	m_pSettingsMenu->parent = m_pMainMenu;
 
@@ -758,6 +764,7 @@ extern void display_compatible();
 
 void selectvideomode(void)
 {
+	sprintf(menuBGpath,"D:\\Skins\\%s\\Launcher\\LaunchMenuBG.png",skinname);
 	// Ez0n3 - get user pref instead of always just defaults
 	// ConfigAppLoad2();	
 	int tmp_preferedemu = preferedemu; // get the just selected pref emu
@@ -770,12 +777,8 @@ void selectvideomode(void)
 	XLMenu_CurMenu = NULL;
 	XLMenu_SetFont(&m_Font);
 
-	m_pSettingsMenu = XLMenu_Init(210,160,4,MENU_LEFT|MENU_WRAP,NULL);
+	m_pSettingsMenu = XLMenu_Init(iLaunchMenuPosX,iLaunchMenuPosY,4,MENU_LEFT|MENU_WRAP,NULL);//210, 160
 
-	m_pSettingsMenu->topcolor = 0x40254365;
-	m_pSettingsMenu->bottomcolor = 0x40556486;
-	m_pSettingsMenu->seltopcolor = 0x4055FF86;
-	m_pSettingsMenu->selbotcolor = 0x4055FF86;
 	m_pSettingsMenu->itemcolor = dwMenuItemColor;
 	m_pSettingsMenu->parent = m_pMainMenu;
 
@@ -821,6 +824,7 @@ void selectvideomode(void)
 
 void LaunchMenu(void)
 {
+	sprintf(menuBGpath,"D:\\Skins\\%s\\Launcher\\LaunchMenuBG.png",skinname);
 	// Ez0n3 - get user pref instead of always just defaults
 	// ConfigAppLoad2();	
 	ConfigAppLoad3();
@@ -831,12 +835,9 @@ void LaunchMenu(void)
 	XLMenu_CurMenu = NULL;
 	XLMenu_SetFont(&m_Font);
 
-	m_pMainMenu = XLMenu_Init(210,160,3,MENU_LEFT|MENU_WRAP,NULL);
+	m_pMainMenu = XLMenu_Init(iLaunchMenuPosX,iLaunchMenuPosY,3,MENU_LEFT|MENU_WRAP,NULL);//210, 160
 
-	m_pMainMenu->topcolor = 0x40254365;
-	m_pMainMenu->bottomcolor = 0x40556486;
-	m_pMainMenu->seltopcolor = 0x4055FF86;
-	m_pMainMenu->selbotcolor = 0x4055FF86;
+	
 	m_pMainMenu->itemcolor = dwMenuItemColor;
 	m_pMainMenu->parent = NULL;
 
@@ -974,6 +975,7 @@ void LaunchHideScreens(void)
 
 void VideoSettingsMenu(void)
 {
+	sprintf(menuBGpath,"D:\\Skins\\%s\\Launcher\\VidSetMenuBG.png",skinname);
 	DWORD dwMenuCommand = 0;
 
 	XLMenu_CurRoutine = NULL;
@@ -984,12 +986,9 @@ void VideoSettingsMenu(void)
 
 	// Ez0n3 - more items
 	//m_pSettingsMenu = XLMenu_Init(60,80,4, MENU_LEFT|MENU_WRAP, NULL);
-	m_pSettingsMenu = XLMenu_Init(60,80,7, MENU_LEFT|MENU_WRAP, NULL);
+	m_pSettingsMenu = XLMenu_Init(iVidSetMenuPosX,iVidSetMenuPosY,7, MENU_LEFT|MENU_WRAP, NULL);
 
-	m_pSettingsMenu->topcolor = 0x40254365;
-	m_pSettingsMenu->bottomcolor = 0x40556486;
-	m_pSettingsMenu->seltopcolor = 0x4055FF86;
-	m_pSettingsMenu->selbotcolor = 0x4055FF86;
+	
 	m_pSettingsMenu->itemcolor = dwMenuItemColor;
 	m_pSettingsMenu->parent = m_pMainMenu;
 
@@ -1228,6 +1227,7 @@ void ToggleVertexMode(bool inc)
 
 void ControllerSettingsMenu()
 {
+	sprintf(menuBGpath,"D:\\Skins\\%s\\Launcher\\ContSetMenuBG.png",skinname);
 	DWORD dwMenuCommand = 0;
 
 	XLMenu_CurRoutine = NULL;
@@ -1236,12 +1236,8 @@ void ControllerSettingsMenu()
 
     WCHAR currentname[120];
 
-	m_pSettingsMenu = XLMenu_Init(60,80,7, MENU_LEFT|MENU_WRAP, NULL);
+	m_pSettingsMenu = XLMenu_Init(iContSetMenuPosX,iContSetMenuPosY,7, MENU_LEFT|MENU_WRAP, NULL);
 
-	m_pSettingsMenu->topcolor = 0x40254365;
-	m_pSettingsMenu->bottomcolor = 0x40556486;
-	m_pSettingsMenu->seltopcolor = 0x4055FF86;
-	m_pSettingsMenu->selbotcolor = 0x4055FF86;
 	m_pSettingsMenu->itemcolor = dwMenuItemColor;
 	m_pSettingsMenu->parent = m_pMainMenu;
 
@@ -1484,18 +1480,15 @@ XLMenu *m_pControllerMenu;
 
 void ControllerMenu(void)
 {
+	sprintf(menuBGpath,"D:\\Skins\\%s\\Launcher\\ContSetMenuBG.png",skinname);
 	DWORD dwMenuCommand = 0;
 
 	XLMenu_CurRoutine = NULL;
 	XLMenu_CurMenu = NULL;
 	XLMenu_SetFont(&m_Font);
 
-	m_pSettingsMenu = XLMenu_Init(60,80,4, MENU_LEFT|MENU_WRAP, NULL);
+	m_pSettingsMenu = XLMenu_Init(iContSetMenuPosX,iContSetMenuPosY,4, MENU_LEFT|MENU_WRAP, NULL);
 
-	m_pSettingsMenu->topcolor = 0x40254365;
-	m_pSettingsMenu->bottomcolor = 0x40556486;
-	m_pSettingsMenu->seltopcolor = 0x4055FF86;
-	m_pSettingsMenu->selbotcolor = 0x4055FF86;
 	m_pSettingsMenu->itemcolor = dwMenuItemColor;
 	m_pSettingsMenu->parent = m_pMainMenu;
 
@@ -1556,21 +1549,16 @@ Control();
 
 void Control()
 {
+	sprintf(menuBGpath,"D:\\Skins\\%s\\Launcher\\ContMenuBG.png",skinname);
 	DWORD dwMenuCommand = 0;
 
 	XLMenu_CurRoutine = NULL;
 	XLMenu_CurMenu = NULL;
 	XLMenu_SetFont(&m_Font);
 
-	m_pControllerMenu = XLMenu_Init(60,80,1, MENU_LEFT|MENU_WRAP, NULL);
+	m_pControllerMenu = XLMenu_Init(iContMenuPosX,iContMenuPosY,1, MENU_LEFT|MENU_WRAP, NULL);
 
-	// make the menu transparent
-	m_pControllerMenu->bottomcolor = 0x00FFFFFF;
-	m_pControllerMenu->itemcolor = 0x00FFFFFF;
-	m_pControllerMenu->selbotcolor = 0x00FFFFFF;
-	m_pControllerMenu->seltopcolor = 0x00FFFFFF;
-	m_pControllerMenu->titlecolor = 0x00FFFFFF;
-	m_pControllerMenu->topcolor = 0x00FFFFFF;
+	
 	m_pControllerMenu->parent = m_pSettingsMenu;
 
 	XLMenu_SetTitle(m_pControllerMenu,L" ",0x00FFFFFF);

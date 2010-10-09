@@ -48,11 +48,9 @@ typedef struct _XLMenuitem
 
 typedef struct _XLMenu
 {
-    float x, y;                                // screen position
-    float w, h;                                // menu size
+    float x, y;						// screen position
+    float w, h;                      // menu size
     DWORD flags;                            // menu flags
-    DWORD topcolor, bottomcolor;            // menu background gradient color
-    DWORD seltopcolor, selbotcolor;            // menu selection bar gradient color
     DWORD itemcolor;                        // menu item default color
     struct _XLMenu *parent;                    // parent menu
 
