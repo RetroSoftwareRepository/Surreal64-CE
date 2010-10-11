@@ -244,15 +244,15 @@ DWORD XLMenu_Routine(DWORD command)
 
     // draw menu background
     rectx = m->x-10;
-    recty = m->y - itemh/2.0f;
+    recty = m->y-10;
     rectw = m->w+10;
     recth = m->h+20;
 
 	if(m->flags&(MENU_LEFT|MENU_RIGHT)){
-		m_MenuBgPanel.Render(rectx-8.0f, recty);
+		m_MenuBgPanel.Render(rectx, recty);
 	}
 	else{
-	   m_MenuBgPanel.Render(rectx-8.0f, recty);
+	   m_MenuBgPanel.Render(rectx, recty);
 	}
 
     menux = m->x;
@@ -312,10 +312,10 @@ DWORD XLMenu_Routine(DWORD command)
             if(i==m->curitem)
             {
 				if(m->flags&(MENU_LEFT|MENU_RIGHT)){
-					m_MenuBg2Panel.Render(rectx-8.0f, itemy-1.0f);
+					m_MenuBg2Panel.Render(rectx, itemy-1.0f);
 				}
 				else{
-					m_MenuBg2Panel.Render(rectx-8.0f, itemy-1.0f);
+					m_MenuBg2Panel.Render(rectx, itemy-1.0f);
 				}
             }
 

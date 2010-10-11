@@ -3,16 +3,18 @@
 #include <xbfont.h>
 #include "musicmanager.h"
 
-#define VERSION L"Surreal64 XXX CE B5.5"
+
 extern DWORD dwMenuItemColor;
 extern DWORD dwTitleColor;
 char menuBG2path[256];
+char menuBGpath[256];
+char BoxartBGpath[256];
 extern int iInfoPosX;
 extern int iInfoPosY;
 extern int iBoxPosX;
 extern int iBoxPosY;
-extern int iTitleX;
-extern int iTitleY;
+extern int iControlsPosX;
+extern int iControlsPosY;
 extern void LoadSkinFile();
 
 extern CMusicManager  music;
@@ -50,13 +52,15 @@ void InitLogo(void)
 	D3DXCreateTextureFromFileEx( g_pd3dDevice, bgpath,D3DX_DEFAULT, D3DX_DEFAULT,	1, 0, D3DFMT_LIN_A8R8G8B8 ,	D3DPOOL_MANAGED,D3DX_FILTER_NONE , D3DX_FILTER_NONE, 0x00000000,NULL, NULL,&bgTexture);		
 	m_BgPanel.Create(g_pd3dDevice,	bgTexture, true);
 	char RLpath[256];
-	sprintf(RLpath,"D:\\Skins\\%s\\Launcher\\RomList.png",skinname);
+	sprintf(RLpath,"D:\\Skins\\%s\\Launcher\\RomListBG.png",skinname);
 	D3DXCreateTextureFromFileEx( g_pd3dDevice, RLpath,D3DX_DEFAULT, D3DX_DEFAULT,	1, 0, D3DFMT_LIN_A8R8G8B8 ,	D3DPOOL_MANAGED,D3DX_FILTER_NONE , D3DX_FILTER_NONE, 0x00000000,NULL, NULL,&RLTexture);		
 	m_RLPanel.Create(g_pd3dDevice,	RLTexture, true);
 	char Infopath[256];
 	sprintf(Infopath,"D:\\Skins\\%s\\Launcher\\InfoPanel.png",skinname);
 	D3DXCreateTextureFromFileEx( g_pd3dDevice, Infopath,D3DX_DEFAULT, D3DX_DEFAULT,	1, 0, D3DFMT_LIN_A8R8G8B8 ,	D3DPOOL_MANAGED,D3DX_FILTER_NONE , D3DX_FILTER_NONE, 0x00000000,NULL, NULL,&infoTexture);		
 	m_InfoPanel.Create(g_pd3dDevice,infoTexture, true);
+
+
 	
 }
 
@@ -68,17 +72,13 @@ void DrawLogo(bool Menu)
 {
 	DirectSoundDoWork();
 	music.Process();
-	LoadSkinFile();
+	sprintf(BoxartBGpath,"D:\\Skins\\%s\\Launcher\\BoxartBG.png",skinname);
+	sprintf(menuBGpath,"D:\\Skins\\%s\\Launcher\\MainMenuBG.png",skinname);
 	sprintf(menuBG2path,"D:\\Skins\\%s\\Launcher\\hilight.png",skinname);
+
 
 	m_BgPanel.Render(0,0);
 
-	m_Font.Begin();
-	
-	// Title and Version
-	m_Font.DrawText(iTitleX, iTitleY, dwTitleColor, VERSION, XBFONT_CENTER_X);//305, 20
-
-	m_Font.End();
 
 #ifdef DEBUG
 	MEMORYSTATUS memStat;
@@ -96,9 +96,9 @@ void DrawLogo(bool Menu)
 
 	if (Menu){
 	m_Font.Begin();
-	m_Font.DrawText(480, 300, 0xAAEEEEEE, L"\400 Select / Next", XBFONT_LEFT);
-	m_Font.DrawText(480, 325, 0xAAEEEEEE, L"\402 Select / Prev", XBFONT_LEFT);
-	m_Font.DrawText(480, 350, 0xAAEEEEEE, L"\401 Back", XBFONT_LEFT);
+	m_Font.DrawText(iControlsPosX, iControlsPosY, dwMenuItemColor, L"\400 Select / Next", XBFONT_LEFT);//480,300
+	m_Font.DrawText(iControlsPosX, iControlsPosY+25, dwMenuItemColor, L"\402 Select / Prev", XBFONT_LEFT);//480,325
+	m_Font.DrawText(iControlsPosX, iControlsPosX+50, dwMenuItemColor, L"\401 Back", XBFONT_LEFT);//480,350
 
 	m_Font.End();}
 
@@ -115,8 +115,6 @@ void DrawLogo(bool Menu)
 	// Ez0n3 - make sure that there's actually an image - otherwise -> crash! (ie: boxart dir is empty = crash)
 	if ( FileExists( imagename ) ) {
 		m_BoxBG.Destroy();
-		char BoxartBGpath[256];
-		sprintf(BoxartBGpath,"D:\\Skins\\%s\\Launcher\\BoxartBG.png",skinname);
 		D3DXCreateTextureFromFileEx( g_pd3dDevice, BoxartBGpath,D3DX_DEFAULT, D3DX_DEFAULT,	1, 0, D3DFMT_LIN_A8R8G8B8 ,	D3DPOOL_MANAGED,D3DX_FILTER_NONE , D3DX_FILTER_NONE, 0x00000000,NULL, NULL,&BoxBGTexture);		
 		m_BoxBG.Create(g_pd3dDevice, BoxBGTexture, true);
 		m_BoxBG.Render(iBoxPosX,iBoxPosY);//430,30	

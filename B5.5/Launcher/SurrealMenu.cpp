@@ -16,23 +16,11 @@
 extern DWORD dwMenuItemColor;
 extern DWORD dwMenuTitleColor;
 extern char skinname[32];
-char menuBGpath[256];
-extern int iContMenuPosX;
-extern int iContMenuPosY;
-extern int iContSetMenuPosX;
-extern int iContSetMenuPosY;
-extern int iCreditsPosX;
-extern int iCreditsPosY;
-extern int iLaunchMenuPosX;
-extern int iLaunchMenuPosY;
+//char menuBGpath[256];
 extern int iMainMenuPosX;
 extern int iMainMenuPosY;
-extern int iSettingsMenuPosX;
-extern int iSettingsMenuPosY;
-extern int iSkinMenuPosX;
-extern int iSkinMenuPosY;
-extern int iVidSetMenuPosX;
-extern int iVidSetMenuPosY;
+extern int iLaunchMenuPosX;
+extern int iLaunchMenuPosY;
 
 
 extern CMusicManager  music;
@@ -208,7 +196,7 @@ void MainMenu(void)
 	// Ez0n3 - get user pref instead of always loading defaults
 	//ConfigAppLoad2();	
 	ConfigAppLoad3();
-	sprintf(menuBGpath,"D:\\Skins\\%s\\Launcher\\MainMenuBG.png",skinname);
+	//sprintf(menuBGpath,"D:\\Skins\\%s\\Launcher\\MainMenuBG.png",skinname);
 	
 
 	DWORD dwMenuCommand = 0;
@@ -278,14 +266,14 @@ void MainMenu(void)
 
 void ToggleCredits()
 {
-	sprintf(menuBGpath,"D:\\Skins\\%s\\Launcher\\CreditsBG.png",skinname);
+	//sprintf(menuBGpath,"D:\\Skins\\%s\\Launcher\\CreditsBG.png",skinname);
 	DWORD dwMenuCommand = 0;
 
 	XLMenu_CurRoutine = NULL;
 	XLMenu_CurMenu = NULL;
 	XLMenu_SetFont(&m_Font);
 
-	m_pSettingsMenu = XLMenu_Init(iCreditsPosX,iCreditsPosY,1, MENU_LEFT|MENU_WRAP, NULL);
+	m_pSettingsMenu = XLMenu_Init(iMainMenuPosX,iMainMenuPosY,1, MENU_LEFT|MENU_WRAP, NULL);
 
 
 	m_pSettingsMenu->parent = m_pMainMenu;
@@ -315,7 +303,7 @@ void ToggleCredits()
 // Skin
 static int SkinMenu(void)
 {
-	sprintf(menuBGpath,"D:\\Skins\\%s\\Launcher\\SkinMenuBG.png",skinname);
+	//sprintf(menuBGpath,"D:\\Skins\\%s\\Launcher\\SkinMenuBG.png",skinname);
 	XBGAMEPAD gamepad;
 	char skins_path[] = "d:\\skins\\*";
 	HANDLE				hFind;	
@@ -344,7 +332,7 @@ static int SkinMenu(void)
 
 	if (nSkinCount < 2) return MROUTINE_RETURN;
 
-	m_pSkinMenu = XLMenu_Init(iSkinMenuPosX, iSkinMenuPosY, nSkinCount + 2, MENU_LEFT|MENU_WRAP, NULL);
+	m_pSkinMenu = XLMenu_Init(iMainMenuPosX, iMainMenuPosY, nSkinCount + 2, MENU_LEFT|MENU_WRAP, NULL);
 	m_pSkinMenu->itemcolor = dwMenuItemColor;
 	m_pSkinMenu->parent = m_pMainMenu;
 
@@ -417,10 +405,10 @@ static int ChangeSkin(void)
 		sprintf(testname,"D:\\skins\\%s\\Font.xpr",skin_name);
 		break;
 	case 2 :
-		sprintf(testname,"D:\\skins\\%s\\bg.jpg",skin_name);
+		sprintf(testname,"D:\\skins\\%s\\bg.png",skin_name);
 		break;
 	case 3 :
-		sprintf(testname,"D:\\skins\\%s\\ingamebg.jpg",skin_name);
+		sprintf(testname,"D:\\skins\\%s\\ingamebg.png",skin_name);
 		break;
 	case 4 :
 		sprintf(testname,"D:\\skins\\%s\\main.wma",skin_name);
@@ -466,7 +454,7 @@ void ShutdownXbox(void)
 
 void SettingsMenu(void)
 {
-	sprintf(menuBGpath,"D:\\Skins\\%s\\Launcher\\SettingsMenuBG.png",skinname);
+	//sprintf(menuBGpath,"D:\\Skins\\%s\\Launcher\\SettingsMenuBG.png",skinname);
 	DWORD dwMenuCommand = 0;
 
 	XLMenu_CurRoutine = NULL;
@@ -477,7 +465,7 @@ void SettingsMenu(void)
 
 	// Ez0n3 - more items
 	//m_pSettingsMenu = XLMenu_Init(60,80,8, MENU_LEFT|MENU_WRAP, NULL);
-	m_pSettingsMenu = XLMenu_Init(iSettingsMenuPosX,iSettingsMenuPosY,10, MENU_LEFT|MENU_WRAP, NULL);
+	m_pSettingsMenu = XLMenu_Init(iMainMenuPosX,iMainMenuPosY,10, MENU_LEFT|MENU_WRAP, NULL);
 
 	m_pSettingsMenu->itemcolor = dwMenuItemColor;
 	m_pSettingsMenu->parent = m_pMainMenu;
@@ -764,7 +752,7 @@ extern void display_compatible();
 
 void selectvideomode(void)
 {
-	sprintf(menuBGpath,"D:\\Skins\\%s\\Launcher\\LaunchMenuBG.png",skinname);
+	//sprintf(menuBGpath,"D:\\Skins\\%s\\Launcher\\LaunchMenuBG.png",skinname);
 	// Ez0n3 - get user pref instead of always just defaults
 	// ConfigAppLoad2();	
 	int tmp_preferedemu = preferedemu; // get the just selected pref emu
@@ -824,7 +812,7 @@ void selectvideomode(void)
 
 void LaunchMenu(void)
 {
-	sprintf(menuBGpath,"D:\\Skins\\%s\\Launcher\\LaunchMenuBG.png",skinname);
+	//sprintf(menuBGpath,"D:\\Skins\\%s\\Launcher\\LaunchMenuBG.png",skinname);
 	// Ez0n3 - get user pref instead of always just defaults
 	// ConfigAppLoad2();	
 	ConfigAppLoad3();
@@ -975,7 +963,7 @@ void LaunchHideScreens(void)
 
 void VideoSettingsMenu(void)
 {
-	sprintf(menuBGpath,"D:\\Skins\\%s\\Launcher\\VidSetMenuBG.png",skinname);
+	//sprintf(menuBGpath,"D:\\Skins\\%s\\Launcher\\VidSetMenuBG.png",skinname);
 	DWORD dwMenuCommand = 0;
 
 	XLMenu_CurRoutine = NULL;
@@ -986,7 +974,7 @@ void VideoSettingsMenu(void)
 
 	// Ez0n3 - more items
 	//m_pSettingsMenu = XLMenu_Init(60,80,4, MENU_LEFT|MENU_WRAP, NULL);
-	m_pSettingsMenu = XLMenu_Init(iVidSetMenuPosX,iVidSetMenuPosY,7, MENU_LEFT|MENU_WRAP, NULL);
+	m_pSettingsMenu = XLMenu_Init(iMainMenuPosX,iMainMenuPosY,7, MENU_LEFT|MENU_WRAP, NULL);
 
 	
 	m_pSettingsMenu->itemcolor = dwMenuItemColor;
@@ -1227,7 +1215,7 @@ void ToggleVertexMode(bool inc)
 
 void ControllerSettingsMenu()
 {
-	sprintf(menuBGpath,"D:\\Skins\\%s\\Launcher\\ContSetMenuBG.png",skinname);
+	//sprintf(menuBGpath,"D:\\Skins\\%s\\Launcher\\ContSetMenuBG.png",skinname);
 	DWORD dwMenuCommand = 0;
 
 	XLMenu_CurRoutine = NULL;
@@ -1236,7 +1224,7 @@ void ControllerSettingsMenu()
 
     WCHAR currentname[120];
 
-	m_pSettingsMenu = XLMenu_Init(iContSetMenuPosX,iContSetMenuPosY,7, MENU_LEFT|MENU_WRAP, NULL);
+	m_pSettingsMenu = XLMenu_Init(iMainMenuPosX,iMainMenuPosY,7, MENU_LEFT|MENU_WRAP, NULL);
 
 	m_pSettingsMenu->itemcolor = dwMenuItemColor;
 	m_pSettingsMenu->parent = m_pMainMenu;
@@ -1480,14 +1468,14 @@ XLMenu *m_pControllerMenu;
 
 void ControllerMenu(void)
 {
-	sprintf(menuBGpath,"D:\\Skins\\%s\\Launcher\\ContSetMenuBG.png",skinname);
+	//sprintf(menuBGpath,"D:\\Skins\\%s\\Launcher\\ContSetMenuBG.png",skinname);
 	DWORD dwMenuCommand = 0;
 
 	XLMenu_CurRoutine = NULL;
 	XLMenu_CurMenu = NULL;
 	XLMenu_SetFont(&m_Font);
 
-	m_pSettingsMenu = XLMenu_Init(iContSetMenuPosX,iContSetMenuPosY,4, MENU_LEFT|MENU_WRAP, NULL);
+	m_pSettingsMenu = XLMenu_Init(iMainMenuPosX,iMainMenuPosY,4, MENU_LEFT|MENU_WRAP, NULL);
 
 	m_pSettingsMenu->itemcolor = dwMenuItemColor;
 	m_pSettingsMenu->parent = m_pMainMenu;
@@ -1549,14 +1537,14 @@ Control();
 
 void Control()
 {
-	sprintf(menuBGpath,"D:\\Skins\\%s\\Launcher\\ContMenuBG.png",skinname);
+	//sprintf(menuBGpath,"D:\\Skins\\%s\\Launcher\\ContMenuBG.png",skinname);
 	DWORD dwMenuCommand = 0;
 
 	XLMenu_CurRoutine = NULL;
 	XLMenu_CurMenu = NULL;
 	XLMenu_SetFont(&m_Font);
 
-	m_pControllerMenu = XLMenu_Init(iContMenuPosX,iContMenuPosY,1, MENU_LEFT|MENU_WRAP, NULL);
+	m_pControllerMenu = XLMenu_Init(iMainMenuPosX,iMainMenuPosY,1, MENU_LEFT|MENU_WRAP, NULL);
 
 	
 	m_pControllerMenu->parent = m_pSettingsMenu;
