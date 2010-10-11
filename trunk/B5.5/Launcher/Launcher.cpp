@@ -27,13 +27,21 @@
 #include "musicmanager.h"
 #include "Panel.h"
 
+#define VERSION L"Surreal64 XXX CE B5.5"
+
+
 //weinerschnitzel Skin Control
 extern DWORD dwRomListColor;
 extern DWORD dwSelectedRomColor;
+extern DWORD dwTitleColor;
 extern int iRomListPosX;
 extern int iRomListPosY;
+extern int iRLBorderPosX;
+extern int iRLBorderPosY;
 extern int iInfoPosX;
 extern int iInfoPosY;
+extern int iTitleX;
+extern int iTitleY;
 extern int RomListTrunc;
 extern CPanel m_PgPanel;
 extern LPDIRECT3DTEXTURE8 bgTexture;
@@ -154,8 +162,7 @@ HRESULT	CXBoxSample::Initialize()
 	Enable128MegCaching();
 	XSetFileCacheSize(8 * 1024 * 1024);
 
-	//weinerschnitzel - Load Skin
-	LoadSkinFile();
+	
 
 	// initialise direct 3d
 	if (!g_d3d.Create())
@@ -181,6 +188,10 @@ HRESULT	CXBoxSample::Initialize()
 
 	ConfigAppLoad();
 	ConfigAppSave();
+
+	//weinerschnitzel - Load Skin
+	LoadSkinFile();
+	Sleep(300);
 
 	char fontname[256];
 	sprintf(fontname,"D:\\Skins\\%s\\Font.xpr",skinname);
@@ -585,7 +596,7 @@ HRESULT	CXBoxSample::Render()
 		DrawLogo(false);
 
 		//Draw Launcher images
-		m_RLPanel.Render(iRomListPosX-5,iRomListPosX-5);
+		m_RLPanel.Render(iRLBorderPosX,iRLBorderPosY);
 		m_InfoPanel.Render(iInfoPosX,iInfoPosY);
 
 
@@ -668,6 +679,8 @@ HRESULT	CXBoxSample::Render()
 
 		}
 
+		//Title and Version
+		m_Font.DrawText(iTitleX, iTitleY, dwTitleColor, VERSION, XBFONT_CENTER_X);//So the RomList doesn't cover the title
 		m_Font.End();
 
      	g_d3d.EndRender();
@@ -801,6 +814,7 @@ void ReloadSkin() {
 	m_MSFont.Destroy();
 	m_Font.Destroy();
 	LoadSkinFile();
+	Sleep(300);
 	sprintf(fontname,"D:\\Skins\\%s\\Font.xpr",skinname);
 	m_Font.Create(fontname);
 	sprintf(fontname,"D:\\Skins\\%s\\MsFont.xpr",skinname);

@@ -11,18 +11,8 @@ extern DWORD dwMenuItemColor;
 extern DWORD dwMenuTitleColor;
 extern char skinname[32];
 char menuBGpath[256];
-extern int iIGMContPosX;
-extern int iIGMContPosY;
-extern int iIGMContSetPosX;
-extern int iIGMContSetPosY;
-extern int iIGMLoadPosX;
-extern int iIGMLoadPosY;
-extern int iIGMSavePosX;
-extern int iIGMSavePosY;
-extern int iIGMMainPosX;
-extern int iIGMMainPosY;
-extern int iIGMVidSetPosX;
-extern int iIGMVidSetPosY;
+extern int iIGMMenuPosX;
+extern int iIGMMenuPosY;
 
 //freakdave
 enum Emulators
@@ -155,7 +145,7 @@ void MainMenu(void)
 	int nx = 640;
 	int ny = 480;
 
-	m_pMainMenu = XLMenu_Init(iIGMMainPosX,iIGMMainPosY,12,MENU_LEFT|MENU_WRAP,NULL);
+	m_pMainMenu = XLMenu_Init(iIGMMenuPosX,iIGMMenuPosY,12,MENU_LEFT|MENU_WRAP,NULL);
 
 	m_pMainMenu->itemcolor = dwMenuItemColor;
 	m_pMainMenu->parent = NULL;
@@ -371,7 +361,7 @@ void LoadStateMenu(void)
 	XLMenu_CurMenu = NULL;
 	XLMenu_SetFont(&m_Font);
 
-	m_pSettingsMenu = XLMenu_Init(iIGMLoadPosX,iIGMLoadPosY,5, MENU_LEFT|MENU_WRAP, NULL);
+	m_pSettingsMenu = XLMenu_Init(iIGMMenuPosX,iIGMMenuPosY,5, MENU_LEFT|MENU_WRAP, NULL);
 
 	m_pSettingsMenu->itemcolor = dwMenuItemColor;
 	m_pSettingsMenu->parent = m_pMainMenu;
@@ -445,7 +435,7 @@ void SaveStateMenu(void)
 	XLMenu_SetFont(&m_Font);
 
 
-	m_pSettingsMenu = XLMenu_Init(iIGMSavePosX,iIGMSavePosY,5, MENU_LEFT|MENU_WRAP, NULL);
+	m_pSettingsMenu = XLMenu_Init(iIGMMenuPosX,iIGMMenuPosY,5, MENU_LEFT|MENU_WRAP, NULL);
 
 	m_pSettingsMenu->itemcolor = dwMenuItemColor;
 	m_pSettingsMenu->parent = m_pMainMenu;
@@ -520,7 +510,7 @@ void VideoSettingsMenu(void)
 
     WCHAR currentname[120];
 
-	m_pSettingsMenu = XLMenu_Init(iIGMVidSetPosX,iIGMVidSetPosY,5, MENU_LEFT|MENU_WRAP, NULL);
+	m_pSettingsMenu = XLMenu_Init(iIGMMenuPosX,iIGMMenuPosY,5, MENU_LEFT|MENU_WRAP, NULL);
 
 	m_pSettingsMenu->itemcolor = dwMenuItemColor;
 	m_pSettingsMenu->parent = m_pMainMenu;
@@ -685,7 +675,7 @@ void ControllerSettingsMenu()
 
     WCHAR currentname[120];
 
-	m_pSettingsMenu = XLMenu_Init(iIGMContSetPosX,iIGMContSetPosY,3/*6*/, MENU_LEFT|MENU_WRAP, NULL);
+	m_pSettingsMenu = XLMenu_Init(iIGMMenuPosX,iIGMMenuPosY,3/*6*/, MENU_LEFT|MENU_WRAP, NULL);
 
 	m_pSettingsMenu->itemcolor = dwMenuItemColor;
 	m_pSettingsMenu->parent = m_pMainMenu;
@@ -835,7 +825,7 @@ void ControllerMenu(void)
 	XLMenu_CurMenu = NULL;
 	XLMenu_SetFont(&m_Font);
 
-	m_pSettingsMenu = XLMenu_Init(iIGMContPosX,iIGMContPosY,4, MENU_LEFT|MENU_WRAP, NULL);
+	m_pSettingsMenu = XLMenu_Init(iIGMMenuPosX,iIGMMenuPosY,4, MENU_LEFT|MENU_WRAP, NULL);
 
 	m_pSettingsMenu->itemcolor = dwMenuItemColor;
 	m_pSettingsMenu->parent = m_pMainMenu;
@@ -895,7 +885,7 @@ void Control()
 	XLMenu_CurMenu = NULL;
 	XLMenu_SetFont(&m_Font);
 
-	m_pControllerMenu = XLMenu_Init(iIGMContPosX,iIGMContPosY,1, MENU_LEFT|MENU_WRAP, NULL);
+	m_pControllerMenu = XLMenu_Init(iIGMMenuPosX,iIGMMenuPosY,1, MENU_LEFT|MENU_WRAP, NULL);
 
 	
 	m_pControllerMenu->parent = m_pSettingsMenu;
