@@ -11,13 +11,11 @@ extern DWORD dwMenuItemColor;
 extern DWORD dwNullItemColor;
 extern DWORD dwSelectedRomColor;
 extern char skinname[32];
-extern char menuBGpath[256];
-extern char menuBG2path[256];
 extern int MenuTrunc;
-CPanel m_MenuBgPanel;
-CPanel m_MenuBg2Panel;
-LPDIRECT3DTEXTURE8 menuBgTexture;
-LPDIRECT3DTEXTURE8 menuBg2Texture;
+extern CPanel m_MenuBgPanel;
+extern CPanel m_MenuBg2Panel;
+
+
 
 extern LPDIRECT3DDEVICE8 g_pd3dDevice;
 
@@ -37,11 +35,12 @@ XLMenu *XLMenu_Init(float x, float y, DWORD maxitems, DWORD flags, DWORD (*abort
 {
     XLMenu *m;
     BYTE *mem;
+
+
 	
-	D3DXCreateTextureFromFileEx( g_pd3dDevice, menuBGpath,D3DX_DEFAULT, D3DX_DEFAULT,	1, 0, D3DFMT_LIN_A8R8G8B8 ,	D3DPOOL_MANAGED,D3DX_FILTER_NONE , D3DX_FILTER_NONE, 0x00000000,NULL, NULL,&menuBgTexture);		
-	m_MenuBgPanel.Create(g_pd3dDevice,	menuBgTexture, true);
-    D3DXCreateTextureFromFileEx( g_pd3dDevice, menuBG2path,D3DX_DEFAULT, D3DX_DEFAULT,	1, 0, D3DFMT_LIN_A8R8G8B8 ,	D3DPOOL_MANAGED,D3DX_FILTER_NONE , D3DX_FILTER_NONE, 0x00000000,NULL, NULL,&menuBg2Texture);		
-	m_MenuBg2Panel.Create(g_pd3dDevice,	menuBg2Texture, true);
+	
+	
+    
    
 	assert(XLMenu_Font!=NULL);                // make sure font is set
 
@@ -68,6 +67,9 @@ XLMenu *XLMenu_Init(float x, float y, DWORD maxitems, DWORD flags, DWORD (*abort
 void XLMenu_Delete(XLMenu *m)
 {
     delete m;
+
+
+
 }
 
 void XLMenu_SetMaxShow(XLMenu *m, DWORD maxshow)
@@ -177,6 +179,7 @@ void XLMenu_SetItemText(XLMenuItem *mi, WCHAR *string)
 DWORD XLMenu_Activate(XLMenu *m)
 {
     XLMenu_CurMenu = m;
+	
 
     return 1;
 }
@@ -248,6 +251,9 @@ DWORD XLMenu_Routine(DWORD command)
     rectw = m->w+10;
     recth = m->h+20;
 
+	
+	
+
 	if(m->flags&(MENU_LEFT|MENU_RIGHT)){
 		m_MenuBgPanel.Render(rectx, recty);
 	}
@@ -309,6 +315,8 @@ DWORD XLMenu_Routine(DWORD command)
             }
 
             // draw menu highlight bar
+
+
             if(i==m->curitem)
             {
 				if(m->flags&(MENU_LEFT|MENU_RIGHT)){
@@ -461,8 +469,16 @@ DWORD XLMenu_Routine(DWORD command)
 
                 if(m->parent)                            // activate parent menu if it exists
                     XLMenu_Activate(m->parent);
-                else
+				else{
                     XLMenu_Activate(NULL);
+						/*m_MenuBgPanel.Destroy();
+						m_MenuBg2Panel.Destroy();
+
+						menuBgTexture->Release();
+						menuBg2Texture->Release();*/
+
+					
+				}
             }
             break;
 

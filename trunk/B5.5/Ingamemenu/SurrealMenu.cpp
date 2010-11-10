@@ -10,9 +10,14 @@
 extern DWORD dwMenuItemColor;
 extern DWORD dwMenuTitleColor;
 extern char skinname[32];
-char menuBGpath[256];
 extern int iIGMMenuPosX;
 extern int iIGMMenuPosY;
+extern int iPanelX;
+extern int iPanelY;
+extern int iPanelNW;
+extern int iPanelNH;
+
+
 
 //freakdave
 enum Emulators
@@ -131,7 +136,6 @@ RumblePak,
 extern bool tookscreenshot;
 void MainMenu(void)
 {
-	sprintf(menuBGpath,"D:\\Skins\\%s\\IGM\\MainMenuBG.png",skinname);
 	InitLogo();
 
 	DWORD dwMenuCommand = 0;
@@ -150,7 +154,7 @@ void MainMenu(void)
 	m_pMainMenu->itemcolor = dwMenuItemColor;
 	m_pMainMenu->parent = NULL;
 
-	while ((x != 320) || (y != 80) || (nx != 267) || (ny != 200))
+	while ((x != iPanelX) || (y != iPanelY) || (nx != iPanelNW) || (ny != iPanelNH))
 	{
 		g_pd3dDevice->Clear( 0, NULL, D3DCLEAR_TARGET|D3DCLEAR_ZBUFFER , D3DCOLOR_XRGB(0,0,0), 1.0f, 0 );
 		m_BgPanel.Render(0,0);
@@ -160,17 +164,17 @@ void MainMenu(void)
 		nx = nx - 38;
 		ny = ny - 28;
 
-		if (x >320)
-			x = 320;
+		if (x >iPanelX)
+			x = iPanelX;
 
-		if (y >80)
-			y = 80;
+		if (y >iPanelY)
+			y = iPanelY;
 
-		if (nx <267)
-			nx = 267;
+		if (nx <iPanelNW)
+			nx = iPanelNW;
 
-		if (ny <200)
-			ny = 200;
+		if (ny <iPanelNH)
+			ny = iPanelNH;
 
 		m_RenderPanel.Render(x ,y , nx , ny , false, 0);
 		g_pd3dDevice->Present( NULL, NULL, NULL, NULL );
@@ -354,7 +358,6 @@ switch (preferedemu)
 
 void LoadStateMenu(void)
 {
-	sprintf(menuBGpath,"D:\\Skins\\%s\\IGM\\LoadMenuBG.png",skinname);
 	DWORD dwMenuCommand = 0;
 
 	XLMenu_CurRoutine = NULL;
@@ -427,7 +430,6 @@ XLMenu_CurMenu = NULL;
 
 void SaveStateMenu(void)
 {
-	sprintf(menuBGpath,"D:\\Skins\\%s\\IGM\\SaveMenuBG.png",skinname);
 	DWORD dwMenuCommand = 0;
 
 	XLMenu_CurRoutine = NULL;
@@ -501,7 +503,6 @@ XLMenu_CurMenu = NULL;
 
 void VideoSettingsMenu(void)
 {
-	sprintf(menuBGpath,"D:\\Skins\\%s\\IGM\\VidSetMenuBG.png",skinname);
 	DWORD dwMenuCommand = 0;
 
 	XLMenu_CurRoutine = NULL;
@@ -666,7 +667,6 @@ void ToggleTextureFilter(bool inc)
 
 void ControllerSettingsMenu()
 {
-	sprintf(menuBGpath,"D:\\Skins\\%s\\IGM\\ContSetMenuBG.png",skinname);
 	DWORD dwMenuCommand = 0;
 
 	XLMenu_CurRoutine = NULL;
@@ -818,7 +818,7 @@ extern int ControllerConfig[72];
 
 void ControllerMenu(void)
 {
-	sprintf(menuBGpath,"D:\\Skins\\%s\\IGM\\ContSetMenuBG.png",skinname);
+
 	DWORD dwMenuCommand = 0;
 
 	XLMenu_CurRoutine = NULL;
@@ -878,7 +878,7 @@ Control();
 
 void Control()
 {
-	sprintf(menuBGpath,"D:\\Skins\\%s\\IGM\\ContMenuBG.png",skinname);
+
 	DWORD dwMenuCommand = 0;
 
 	XLMenu_CurRoutine = NULL;

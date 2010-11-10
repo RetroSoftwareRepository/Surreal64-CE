@@ -111,8 +111,8 @@ int iIGMTitleX = 305;
 int iIGMTitleY = 20;
 int iPanelX = 305;
 int iPanelY = 65;
-int iPanelNH = 267;
-int iPanelNW = 200;
+int iPanelNW = 267;
+int iPanelNH = 200;
 
 //RomList Coords
 int iRomListPosX = 45;
@@ -873,7 +873,7 @@ void LoadSkinFile(){
 		fgets(line23,100, f);
 		for(int i = 0; i < 100; i++) {
 			if(line23[i] == '=') {
-				iPanelNH  = (float) atof(&line23[i+1]); 
+				iPanelNW  = (float) atof(&line23[i+1]); 
 				break;
 			}
 		}
@@ -881,7 +881,7 @@ void LoadSkinFile(){
 		fgets(line24,100, f);
 		for(int i = 0; i < 100; i++) {
 			if(line24[i] == '=') {
-				iPanelNW  = (float) atof(&line24[i+1]); 
+				iPanelNH  = (float) atof(&line24[i+1]); 
 				break;
 			}
 		}
@@ -1000,8 +1000,8 @@ void WriteSkinFile(){
 			fprintf(f, "IGMTitleY=%d\n",iIGMTitleY);
 			fprintf(f, "PanelX=%d\n",iPanelX);
 			fprintf(f, "PanelY=%d\n",iPanelY);
-			fprintf(f, "PanelNH=%d\n",iPanelNH);
 			fprintf(f, "PanelNW=%d\n",iPanelNW);
+			fprintf(f, "PanelNH=%d\n",iPanelNH);
 
 			fprintf(f, "RomListPosX=%d\n",iRomListPosX);
 			fprintf(f, "RomListPosY=%d\n",iRomListPosY);

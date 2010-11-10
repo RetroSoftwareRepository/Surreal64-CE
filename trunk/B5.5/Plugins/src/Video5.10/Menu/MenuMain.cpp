@@ -18,6 +18,7 @@ static void SetupD3D()
 }
  
 extern void MainMenu(void);
+extern void ClearIGM();
 
 void RunIngameMenu()
 {
@@ -27,6 +28,7 @@ void RunIngameMenu()
 	SetupD3D();
 
 	MainMenu();
+	ClearIGM();
 	
 	g_d3dSave.PopRenderState();
 

@@ -4,8 +4,12 @@
 #include <xgraphics.h>
 
 #define VERSION L"Surreal64 XXX CE B5.5"
+
+//weinerschnitzel- Skin Control
 extern DWORD dwTitleColor;
 extern void LoadSkinFile();
+extern void ClearIGM();
+char menuBGpath[256];
 char menuBG2path[256];
 extern int iIGMTitleX;
 extern int iIGMTitleY;
@@ -14,14 +18,18 @@ extern int iPanelY;
 extern int iPanelNH;
 extern int iPanelNW;
 
+
+
 extern char romname[256];
 CPanel m_BgPanel;
-CPanel m_BoxPanel;
-CPanel m_PgPanel;
 CPanel m_RenderPanel;
-CPanel m_TargetPanel;
+//CPanel m_TargetPanel;
 LPDIRECT3DTEXTURE8 bgTexture;
-LPDIRECT3DTEXTURE8	GameTexture;
+//LPDIRECT3DTEXTURE8	GameTexture;
+CPanel m_MenuBgPanel;
+CPanel m_MenuBg2Panel;
+LPDIRECT3DTEXTURE8 menuBgTexture;
+LPDIRECT3DTEXTURE8 menuBg2Texture;
 extern CXBFont	m_Font;					// Font	for	text display
 extern LPDIRECT3DDEVICE8 g_pd3dDevice;
 
@@ -46,8 +54,9 @@ extern char skinname[32];
 void InitLogo(void)
 {
  
-	LoadSkinFile(); 
-	
+	LoadSkinFile();
+
+
   // thx to gamedev.net for the code - GogoAckman
   
   // get the back surface and its description
@@ -68,12 +77,24 @@ void InitLogo(void)
   surface->Release();
     
 	sprintf(menuBG2path,"D:\\Skins\\%s\\IGM\\hilight.png",skinname);
-
+	
 	m_RenderPanel.Create(g_pd3dDevice,	texture, true);
+
 	char gamebgname[256];
-	sprintf(gamebgname,"D:\\skins\\%s\\ingamebg.png",skinname);
+	sprintf(gamebgname,"D:\\skins\\%s\\ingamebg.jpg",skinname);
 	D3DXCreateTextureFromFileEx( g_pd3dDevice, gamebgname,D3DX_DEFAULT, D3DX_DEFAULT,	1, 0, D3DFMT_LIN_A8R8G8B8 ,	D3DPOOL_MANAGED,D3DX_FILTER_NONE , D3DX_FILTER_NONE, 0x00000000,NULL, NULL,&bgTexture);		
 	m_BgPanel.Create(g_pd3dDevice,	bgTexture, true);
+	
+	
+	sprintf(menuBGpath,"D:\\Skins\\%s\\IGM\\MainMenuBG.png",skinname);
+	D3DXCreateTextureFromFileEx( g_pd3dDevice, menuBGpath,D3DX_DEFAULT, D3DX_DEFAULT,	1, 0, D3DFMT_LIN_A8R8G8B8 ,	D3DPOOL_MANAGED,D3DX_FILTER_NONE , D3DX_FILTER_NONE, 0x00000000,NULL, NULL,&menuBgTexture);		
+	m_MenuBgPanel.Create(g_pd3dDevice,	menuBgTexture, true);
+
+	
+	sprintf(menuBG2path,"D:\\Skins\\%s\\IGM\\hilight.png",skinname);
+	D3DXCreateTextureFromFileEx( g_pd3dDevice, menuBG2path,D3DX_DEFAULT, D3DX_DEFAULT,	1, 0, D3DFMT_LIN_A8R8G8B8 ,	D3DPOOL_MANAGED,D3DX_FILTER_NONE , D3DX_FILTER_NONE, 0x00000000,NULL, NULL,&menuBg2Texture);		
+	m_MenuBg2Panel.Create(g_pd3dDevice,	menuBg2Texture, true);
+
 }
 
 void DrawLogo()
@@ -95,10 +116,10 @@ void DrawLogo()
 	swprintf(szMemStatus,L"%d MB Free",(memStat.dwAvailPhys /1024 /1024));
 	m_Font.DrawText(60, 35, dwTitleColor, szMemStatus, XBFONT_LEFT);
 	
-		// Ez0n3 - temp
-		//WCHAR szVidMemStatus[128];
-		//swprintf(szVidMemStatus,L"%d MB Free Vid",dwMaxVideoMem);
-		//m_Font.DrawText(60, 60, 0xFFFF7F7f, szVidMemStatus, XBFONT_LEFT);
+		/*// Ez0n3 - temp
+		WCHAR szVidMemStatus[128];
+		swprintf(szVidMemStatus,L"%d MB Free Vid",dwMaxVideoMem);
+		m_Font.DrawText(60, 60, 0xFFFF7F7f, szVidMemStatus, XBFONT_LEFT);*/
 	
 	}
 
@@ -112,8 +133,19 @@ D3DXCreateTextureFromFileEx( g_pd3dDevice, "D:\\Media\\black.jpg",D3DX_DEFAULT, 
 m_BgPanel.Create(g_pd3dDevice,	bgTexture, true);
 m_BgPanel.Render(0,0);
 
-m_BgPanel.Destroy();
+/*m_BgPanel.Destroy();
 m_RenderPanel.Destroy();
+bgTexture->Release();
+texture->Release();*/
+
+}
+//weinerschnitzel - function to clear skin resources when returning to game
+void ClearIGM(){
+	m_RenderPanel.Destroy();
+	m_BgPanel.Destroy();
+	m_MenuBgPanel.Destroy();
+	m_MenuBg2Panel.Destroy();
+
 }
 
 bool tookscreenshot=false;

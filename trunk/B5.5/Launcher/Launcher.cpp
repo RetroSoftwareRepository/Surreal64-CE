@@ -191,7 +191,6 @@ HRESULT	CXBoxSample::Initialize()
 
 	//weinerschnitzel - Load Skin
 	LoadSkinFile();
-	Sleep(300);
 
 	char fontname[256];
 	sprintf(fontname,"D:\\Skins\\%s\\Font.xpr",skinname);
