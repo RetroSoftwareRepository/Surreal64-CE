@@ -408,7 +408,7 @@ static int ChangeSkin(void)
 		sprintf(testname,"D:\\skins\\%s\\bg.png",skin_name);
 		break;
 	case 3 :
-		sprintf(testname,"D:\\skins\\%s\\ingamebg.png",skin_name);
+		sprintf(testname,"D:\\skins\\%s\\ingamebg.jpg",skin_name);
 		break;
 	case 4 :
 		sprintf(testname,"D:\\skins\\%s\\main.wma",skin_name);
