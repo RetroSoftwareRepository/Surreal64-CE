@@ -2,6 +2,7 @@
 #include <xtl.h>
 #include "../config.h"
 extern void MainMenu();
+extern void ClearIGM();
 #include "XBApp.h"
 
 extern IDirect3DDevice8	*g_pDevice;
@@ -81,5 +82,6 @@ void MenuMain()
 {
 SetupD3D();
 MainMenu();
+ClearIGM();
 RestoreD3D();
 }

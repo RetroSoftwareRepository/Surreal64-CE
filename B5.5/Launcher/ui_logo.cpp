@@ -33,6 +33,10 @@ LPDIRECT3DTEXTURE8 LoadBGTexture;
 LPDIRECT3DTEXTURE8 PgTexture;
 LPDIRECT3DTEXTURE8 BoxTexture;
 LPDIRECT3DTEXTURE8 BoxBGTexture;
+CPanel m_MenuBgPanel;
+CPanel m_MenuBg2Panel;
+LPDIRECT3DTEXTURE8 menuBgTexture;
+LPDIRECT3DTEXTURE8 menuBg2Texture;
 extern int romcounter;
 extern CXBFont	m_Font;					// Font	for	text display
 extern LPDIRECT3DDEVICE8 g_pd3dDevice;
@@ -59,7 +63,14 @@ void InitLogo(void)
 	sprintf(Infopath,"D:\\Skins\\%s\\Launcher\\InfoPanel.png",skinname);
 	D3DXCreateTextureFromFileEx( g_pd3dDevice, Infopath,D3DX_DEFAULT, D3DX_DEFAULT,	1, 0, D3DFMT_LIN_A8R8G8B8 ,	D3DPOOL_MANAGED,D3DX_FILTER_NONE , D3DX_FILTER_NONE, 0x00000000,NULL, NULL,&infoTexture);		
 	m_InfoPanel.Create(g_pd3dDevice,infoTexture, true);
-
+	
+	sprintf(menuBGpath,"D:\\Skins\\%s\\Launcher\\MainMenuBG.png",skinname);
+	D3DXCreateTextureFromFileEx( g_pd3dDevice, menuBGpath,D3DX_DEFAULT, D3DX_DEFAULT,	1, 0, D3DFMT_LIN_A8R8G8B8 ,	D3DPOOL_MANAGED,D3DX_FILTER_NONE , D3DX_FILTER_NONE, 0x00000000,NULL, NULL,&menuBgTexture);		
+	m_MenuBgPanel.Create(g_pd3dDevice,	menuBgTexture, true);
+	
+	sprintf(menuBG2path,"D:\\Skins\\%s\\Launcher\\hilight.png",skinname);
+	D3DXCreateTextureFromFileEx( g_pd3dDevice, menuBG2path,D3DX_DEFAULT, D3DX_DEFAULT,	1, 0, D3DFMT_LIN_A8R8G8B8 ,	D3DPOOL_MANAGED,D3DX_FILTER_NONE , D3DX_FILTER_NONE, 0x00000000,NULL, NULL,&menuBg2Texture);		
+	m_MenuBg2Panel.Create(g_pd3dDevice,	menuBg2Texture, true);
 
 	
 }
@@ -73,14 +84,14 @@ void DrawLogo(bool Menu)
 	DirectSoundDoWork();
 	music.Process();
 	sprintf(BoxartBGpath,"D:\\Skins\\%s\\Launcher\\BoxartBG.png",skinname);
-	sprintf(menuBGpath,"D:\\Skins\\%s\\Launcher\\MainMenuBG.png",skinname);
-	sprintf(menuBG2path,"D:\\Skins\\%s\\Launcher\\hilight.png",skinname);
+	
+	
 
 
 	m_BgPanel.Render(0,0);
 
 
-#ifdef DEBUG
+//#ifdef DEBUG
 	MEMORYSTATUS memStat;
 	WCHAR szMemStatus[128];
 
@@ -92,7 +103,7 @@ void DrawLogo(bool Menu)
 	m_Font.DrawText(60, 35, dwTitleColor, szMemStatus, XBFONT_LEFT);
 
 	m_Font.End();
-#endif
+//#endif
 
 	if (Menu){
 	m_Font.Begin();
