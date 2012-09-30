@@ -2,8 +2,8 @@
 // real pain this audio syncronization! :)
 
 //#include <windows.h>
-#include "ultra.h"
 #include <xtl.h>
+#include "ultra.h"
 
 /* Sync routines:
 **
@@ -18,6 +18,8 @@ static Timer retracetimer;
 static Timer longtimer;
 
 #define SOUNDTARGET      10000   // try to keep 20Kbytes of sound in buffer
+
+//bool bResynced = false;
 
 void sync_init(void)
 {
@@ -41,7 +43,7 @@ void sync_audio(void)
         {
             if(!st.audiorate) st.audiorate=32000;
             print("Sound initialized: %ihz\n",st.audiorate);
-			OutputDebugString("Line 42\n");
+			//OutputDebugString("Sound initialized : SYNC.cpp Line 44\n");
             sound_init(st.audiorate);
             sound_start(st.audiorate);
             st2.audioon=1;
@@ -77,17 +79,18 @@ void sync_audio(void)
         st2.audiobufferedcnt++;
 
         {
-            if(buffered>SOUNDTARGET*4)
+            if(/*!bResynced && */buffered>SOUNDTARGET*4)
             { // buffer overflowing, resync
-				OutputDebugString("Line 79\n");
+				//OutputDebugString("Buffer overflow, resync : SYNC.cpp Line 82\n");
                 sound_resync(SOUNDTARGET);
                 st2.audiostatus=9;
                 st2.audioresync++;
                 st2.audiobufferedcnt+=0x10000;
+				//bResynced = true;
             }
-            else if(buffered<SOUNDTARGET/4)
+            else if(/*!bResynced && */buffered<SOUNDTARGET/4)
             { // ran out of buffer! (4K safety)
-				OutputDebugString("Line 87\n");
+				//OutputDebugString("Ran out of buffer! 4k safety : SYNC.cpp Line 90\n");
 
 				buffered=sound_buffered(); // how many bytes in buffer
 
@@ -95,26 +98,37 @@ void sync_audio(void)
                 st2.audiostatus=-9;
                 st2.audioresync++;
                 st2.audiobufferedcnt+=0x10000;
+				//bResynced = true;
             }
             else if(buffered>SOUNDTARGET*6/4)
             { // too much data, slow down
+				//OutputDebugString("Too much data, slow down : SYNC.cpp Line 101\n");
+
                 st2.audiostatus=2;
                 st2.audioresync++;
+				//bResynced = false;
             }
             else if(buffered<SOUNDTARGET*2/4)
             { // too little data, more speed
+				//OutputDebugString("Too little data, more speed : SYNC.cpp Line 108\n");
                 st2.audiostatus=-2;
+				//bResynced = false;
             }
             else if(buffered>SOUNDTARGET*5/4)
             { // too much data, slow down
+				//OutputDebugString("Too much data, slow down : SYNC.cpp Line 113\n");
                 st2.audiostatus=1;
+				//bResynced = false;
             }
             else if(buffered<SOUNDTARGET*3/4)
             { // too little data, more speed
+				//OutputDebugString("Too little data, more speed : SYNC.cpp Line 118\n");
                 st2.audiostatus=-1;
+				//bResynced = false;
             }
             else
             { // about the correct amount, reset status when we cross target
+				//bResynced = false;
                 if(buffered<SOUNDTARGET && st2.audiostatus>0) st2.audiostatus=0;
                 if(buffered>SOUNDTARGET && st2.audiostatus<0) st2.audiostatus=0;
             }
@@ -201,7 +215,7 @@ void sync_gfxframedone(void)
     st2.ops+=(int)(st.cputime-st.synctime);
     st.synctime=st.cputime;
 
-    pad_drawframe();
+    //pad_drawframe();
 
     if(1)
     {
@@ -255,7 +269,8 @@ void sync_checkretrace(void)
 
             if(st2.pendingretraces>9)
             {
-                warning("retraces pending counter reset");
+                //warning("retraces pending counter reset");
+				//OutputDebugString("Warning: Retraces pending counter reset! : SYNC.cpp Line 264\n");
                 st2.pendingretraces=0;
             }
         }

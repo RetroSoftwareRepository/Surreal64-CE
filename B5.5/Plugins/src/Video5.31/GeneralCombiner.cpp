@@ -20,7 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "GeneralCombiner.h"
 
 //Ez0n3 - fix rice debug path
-extern bool onhd;
+//extern bool onhd;
 
 extern const int numOf3StageCombiners;
 extern const int numOf2StageCombiners;
@@ -919,14 +919,7 @@ int CGeneralCombiner::ParseDecodedMux()
 	{
 		FILE *fp=NULL;
 		
-		//Ez0n3 - don't think this matters much, but nothing should save to C:\. might have useful info if it's actually used.
-		//fp = fopen("C:\\rice\\RiceDaedalusMUX.log","a");
-		if (onhd){
-			fp = fopen("D:\\RiceDaedalusMUX.log","a");
-		}
-		else {
-			fp = fopen("T:\\RiceDaedalusMUX.log","a");
-		}
+		fp = fopen("T:\\Misc\\RiceDaedalusMUX.531.log","a");
 		
 		if( fp )
 		{

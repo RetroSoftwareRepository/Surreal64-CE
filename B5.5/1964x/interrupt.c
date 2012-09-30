@@ -316,7 +316,11 @@ void RunSPTask(void)
 			m_Font.DrawText(320, 240, dwTitleColor, szErrorMSG, XBFONT_CENTER_X);
 			m_Font.End();
 */
+#ifndef DEBUG
 			XLaunchNewImage("D:\\default.xbe", NULL);
+#else
+			TRACE0("Crash in RunSPTask");
+#endif
 		}
 #endif
 		DEBUG_SP_TASK_MACRO(TRACE0("SP GRX Task finished"));

@@ -356,7 +356,7 @@ void MIXER2 () { // Needs accuracy verification...
 	s32 gain    = (s16)(k0 & 0xFFFF)*2;
 	s32 temp;
 
-	for (int x=0; x < count; x+=2) { // I think I can do this a lot easier 
+	for (int x=0; (unsigned int)x < count; x+=2) { // I think I can do this a lot easier 
 
 		temp = (*(s16 *)(BufferSpace+dmemin+x) * gain) >> 16;
 		temp += *(s16 *)(BufferSpace+dmemout+x);
@@ -593,9 +593,9 @@ void ENVMIXER2 () {
 }
 
 void DUPLICATE2() {
-	WORD Count = (k0 >> 16) & 0xff;
-	WORD In  = k0&0xffff;
-	WORD Out = (t9>>16);
+	WORD Count = (WORD)((k0 >> 16) & 0xff);
+	WORD In  = (WORD)(k0&0xffff);
+	WORD Out = (WORD)((t9>>16));
 
 	WORD buff[64];
 	
@@ -640,9 +640,9 @@ void INTERL2 () { // Make your own...
 */
 
 void INTERL2 () {
-	short Count = k0 & 0xffff;
-	WORD  Out   = t9 & 0xffff;
-	WORD In     = (t9 >> 16);
+	short Count = (short)(k0 & 0xffff);
+	WORD  Out   = (WORD)(t9 & 0xffff);
+	WORD In     = (WORD)((t9 >> 16));
 
 	BYTE *src,*dst;//,tmp;
 	src=(BYTE *)(BufferSpace);//[In];
@@ -688,9 +688,9 @@ void INTERLEAVE2 () { // Needs accuracy verification...
 }
 
 void ADDMIXER () {
-	short Count   = (k0 >> 12) & 0x00ff0;
-	u16 InBuffer  = (t9 >> 16);
-	u16 OutBuffer = t9 & 0xffff;
+	short Count   = (short)((k0 >> 12) & 0x00ff0);
+	u16 InBuffer  = (unsigned short)(t9 >> 16);
+	u16 OutBuffer = (unsigned short)(t9 & 0xffff);
 
 	s16 *inp, *outp;
 	s32 temp;
@@ -704,10 +704,10 @@ void ADDMIXER () {
 }
 
 void HILOGAIN () {
-	u16 cnt = k0 & 0xffff;
-	u16 out = (t9 >> 16) & 0xffff;
+	u16 cnt = (unsigned short)(k0 & 0xffff);
+	u16 out = (unsigned short)((t9 >> 16) & 0xffff);
 	s16 hi  = (s16)((k0 >> 4) & 0xf000);
-	u16 lo  = (k0 >> 20) & 0xf;
+	u16 lo  = (unsigned short)((k0 >> 20) & 0xf);
 	s16 *src;
 
 	src = (s16 *)(BufferSpace+out);
@@ -719,7 +719,7 @@ void HILOGAIN () {
 		tmp = ((val * (s32)hi) >> 16) + (u32)(val * lo);
 		if ((s32)tmp > 32767) tmp = 32767;
 		else if ((s32)tmp < -32768) tmp = -32768;
-		*src = tmp;
+		*src = (short)tmp;
 		src++;
 		cnt -= 2;
 	}
@@ -832,14 +832,14 @@ void FILTER2 () {
 				out1[6] += inp2[4]*lutt6[3];
 				out1[6] += inp2[7]*lutt6[0];
 				out1[6] += inp2[6]*lutt6[1];
-				outp[1] = /*CLAMP*/((out1[1]+0x4000) >> 0xF);
-				outp[0] = /*CLAMP*/((out1[0]+0x4000) >> 0xF);
-				outp[3] = /*CLAMP*/((out1[3]+0x4000) >> 0xF);
-				outp[2] = /*CLAMP*/((out1[2]+0x4000) >> 0xF);
-				outp[5] = /*CLAMP*/((out1[5]+0x4000) >> 0xF);
-				outp[4] = /*CLAMP*/((out1[4]+0x4000) >> 0xF);
-				outp[7] = /*CLAMP*/((out1[7]+0x4000) >> 0xF);
-				outp[6] = /*CLAMP*/((out1[6]+0x4000) >> 0xF);
+				outp[1] = /*CLAMP*/(short)((out1[1]+0x4000) >> 0xF);
+				outp[0] = /*CLAMP*/(short)((out1[0]+0x4000) >> 0xF);
+				outp[3] = /*CLAMP*/(short)((out1[3]+0x4000) >> 0xF);
+				outp[2] = /*CLAMP*/(short)((out1[2]+0x4000) >> 0xF);
+				outp[5] = /*CLAMP*/(short)((out1[5]+0x4000) >> 0xF);
+				outp[4] = /*CLAMP*/(short)((out1[4]+0x4000) >> 0xF);
+				outp[7] = /*CLAMP*/(short)((out1[7]+0x4000) >> 0xF);
+				outp[6] = /*CLAMP*/(short)((out1[6]+0x4000) >> 0xF);
 				inp1 = inp2;
 				inp2 += 8;
 				outp += 8;

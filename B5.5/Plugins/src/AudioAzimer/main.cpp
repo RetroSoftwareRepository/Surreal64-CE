@@ -31,8 +31,10 @@ void   _AUDIO_AZIMER_DllTest ( HWND hParent ){
 // Note: We call CloseDLL just in case the audio plugin was already initialized...
 //AUDIO_INFO AudioInfo;
 AudioCode  snd;
-//DWORD Dacrate = 0;
-extern DWORD Dacrate; //freakdave - FIXME: split up in multiple projects/binaries
+
+DWORD DacrateAzi = 0; // rename - conflict with basic
+//extern DWORD Dacrate;
+
 void AiCallBack (DWORD Status);
 
  BOOL   _AUDIO_AZIMER_InitiateAudio (AUDIO_INFO Audio_Info){
@@ -63,18 +65,18 @@ void AiCallBack (DWORD Status);
  void   _AUDIO_AZIMER_RomClosed (void){
 	ChangeABI (0);
 	snd.StopAudio ();
-	Dacrate = 0;
+	DacrateAzi = 0;
 	snd.Initialize(AiCallBack, AudioInfo.hwnd);
 }
 
  void   _AUDIO_AZIMER_AiDacrateChanged (int  SystemType) {
 	DWORD Frequency;
-	if (Dacrate != *AudioInfo.AI_DACRATE_RG) {
-		Dacrate = *AudioInfo.AI_DACRATE_RG;
+	if (DacrateAzi != *AudioInfo.AI_DACRATE_RG) {
+		DacrateAzi = *AudioInfo.AI_DACRATE_RG;
 		switch (SystemType) {
-			case 0: Frequency = 48681812 / (Dacrate + 1); break;
-			case 1:  Frequency = 49656530 / (Dacrate + 1); break;
-			case 2: Frequency = 48628316 / (Dacrate + 1); break;
+			case SYSTEM_NTSC: Frequency = 48681812 / (DacrateAzi + 1); break;
+			case SYSTEM_PAL:  Frequency = 49656530 / (DacrateAzi + 1); break;
+			case SYSTEM_MPAL: Frequency = 48628316 / (DacrateAzi + 1); break;
 		}
 		snd.SetFrequency (Frequency);
 	}
@@ -93,6 +95,12 @@ void AiCallBack (DWORD Status);
  DWORD   _AUDIO_AZIMER_AiReadLength (void){
 	*AudioInfo.AI_LEN_RG = snd.GetReadStatus ();
 	return *AudioInfo.AI_LEN_RG;
+}
+
+BOOL bAudioBoostAzimer = FALSE;
+void _AUDIO_AZIMER_AudioBoost (BOOL Boost)
+{
+	bAudioBoostAzimer = Boost;
 }
 
 // Deprecated Functions

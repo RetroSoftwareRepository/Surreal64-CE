@@ -40,6 +40,8 @@ Config::Config(void)
 		m_buttonMap[i][N64ZTrigger]		= XboxLeftTrigger;
 		m_buttonMap[i][N64LeftTrigger]	= XboxBack;
 		m_buttonMap[i][N64RightTrigger]	= XboxRightTrigger;
+
+		m_buttonMap[i][InGameMenu]		= XboxRightThumbButton;
 	}
 
 	for (int i = 0; i < NUMBER_OF_CONTROLLERS; i++)
@@ -58,8 +60,8 @@ Config::~Config(void)
 bool Config::Load(int *cfgData)
 {
 	for (int i=0;i<4;i++) {
-		for (int j=0;j<18;j++){
-             m_buttonMap[i][j]=cfgData[(i*18)+j];
+		for (int j=0;j<19;j++){
+             m_buttonMap[i][j]=cfgData[(i*19)+j];
 		}}
 	
 	return true;
@@ -147,28 +149,28 @@ DWORD Config::GetXboxButtonValue(DWORD controller, byte xboxButton)
 		case XboxLeftThumbLeft:
 		{
 			if (g_Gamepads[controller].sThumbLX < -XBOX_CONTROLLER_DEAD_ZONE)
-				return abs(g_Gamepads[controller].sThumbLX) - XBOX_CONTROLLER_DEAD_ZONE;
+				return (DWORD)(abs(g_Gamepads[controller].sThumbLX) - XBOX_CONTROLLER_DEAD_ZONE);
 			else
 				return 0;
 		}
 		case XboxLeftThumbRight:
 		{
 			if (g_Gamepads[controller].sThumbLX > XBOX_CONTROLLER_DEAD_ZONE)
-				return abs(g_Gamepads[controller].sThumbLX) - XBOX_CONTROLLER_DEAD_ZONE;
+				return (DWORD)(abs(g_Gamepads[controller].sThumbLX) - XBOX_CONTROLLER_DEAD_ZONE);
 			else
 				return 0;
 		}
 		case XboxLeftThumbUp:
 		{
 			if (g_Gamepads[controller].sThumbLY > XBOX_CONTROLLER_DEAD_ZONE)
-				return abs(g_Gamepads[controller].sThumbLY) - XBOX_CONTROLLER_DEAD_ZONE;
+				return (DWORD)(abs(g_Gamepads[controller].sThumbLY) - XBOX_CONTROLLER_DEAD_ZONE);
 			else
 				return 0;
 		}
 		case XboxLeftThumbDown:
 		{
 			if (g_Gamepads[controller].sThumbLY < -XBOX_CONTROLLER_DEAD_ZONE)
-				return abs(g_Gamepads[controller].sThumbLY) - XBOX_CONTROLLER_DEAD_ZONE;
+				return (DWORD)(abs(g_Gamepads[controller].sThumbLY) - XBOX_CONTROLLER_DEAD_ZONE);
 			else
 				return 0;
 		}
@@ -177,28 +179,28 @@ DWORD Config::GetXboxButtonValue(DWORD controller, byte xboxButton)
 		case XboxRightThumbLeft:
 		{
 			if (g_Gamepads[controller].sThumbRX < -XBOX_CONTROLLER_DEAD_ZONE)
-				return abs(g_Gamepads[controller].sThumbRX) - XBOX_CONTROLLER_DEAD_ZONE;
+				return (DWORD)(abs(g_Gamepads[controller].sThumbRX) - XBOX_CONTROLLER_DEAD_ZONE);
 			else
 				return 0;
 		}
 		case XboxRightThumbRight:
 		{
 			if (g_Gamepads[controller].sThumbRX > XBOX_CONTROLLER_DEAD_ZONE)
-				return abs(g_Gamepads[controller].sThumbRX) - XBOX_CONTROLLER_DEAD_ZONE;
+				return (DWORD)(abs(g_Gamepads[controller].sThumbRX) - XBOX_CONTROLLER_DEAD_ZONE);
 			else
 				return 0;
 		}
 		case XboxRightThumbUp:
 		{
 			if (g_Gamepads[controller].sThumbRY > XBOX_CONTROLLER_DEAD_ZONE)
-				return abs(g_Gamepads[controller].sThumbRY) - XBOX_CONTROLLER_DEAD_ZONE;
+				return (DWORD)(abs(g_Gamepads[controller].sThumbRY) - XBOX_CONTROLLER_DEAD_ZONE);
 			else
 				return 0;
 		}
 		case XboxRightThumbDown:
 		{
 			if (g_Gamepads[controller].sThumbRY < -XBOX_CONTROLLER_DEAD_ZONE)
-				return abs(g_Gamepads[controller].sThumbRY) - XBOX_CONTROLLER_DEAD_ZONE;
+				return (DWORD)(abs(g_Gamepads[controller].sThumbRY) - XBOX_CONTROLLER_DEAD_ZONE);
 			else
 				return 0;
 		}
@@ -301,14 +303,29 @@ DWORD Config::GetN64ButtonValue(DWORD controller, byte n64Button)
 		// if we are mapping this axis to an xbox axis
 		if (IS_XBOX_AXIS(xboxButton))
 		{
-			//weinerschnitzel 
+			//weinerschnitzel
 			//N64 range 0-127, Xbox range 0-32768
 			//Dividing 32768 by 258 puts us just over the N64 range and can cause drifting
 			//So we use 259 as a range divisor to give us a fully usable range
 			//Since we dont want the Deadzone to subtract from our usable range, we multiply the range divisor
 			//by the difference between the usable range (with Deadzone) divided by the Xbox range
 			//Finally, we can use our sensitivity multiplier
-				return (GetXboxButtonValue(controller, xboxButton) / (259 * (32768 - XBOX_CONTROLLER_DEAD_ZONE) / (32768))) * (Sensitivity * .1f);
+
+			// f(x) = 128*tan(x)/(pi/2)
+			// function for n64 control stick (0-128)
+			// x is Xbox input, starting at 0 from Deadzone value
+			switch(Sensitivity)
+			{
+				case 0:		// Increasing Sensitivity as control stick aproaches edge
+					return (DWORD)( 128 * ( tan( GetXboxButtonValue(controller, xboxButton) / (32768 - XBOX_CONTROLLER_DEAD_ZONE))) / 1.57079633);
+					break;
+				case 11:	// Decreasing Sensitivity as control stick aproaches edge
+					return (DWORD)( 128 * ( sin( GetXboxButtonValue(controller, xboxButton) / (32768 - XBOX_CONTROLLER_DEAD_ZONE) * 1.57079633)));
+					break;
+				default:	// Linear Control Sensitivity
+					return (DWORD)((GetXboxButtonValue(controller, xboxButton) / (259 * (32768 - XBOX_CONTROLLER_DEAD_ZONE) / (32768))) * (Sensitivity * .1f));
+					break;
+			}
 		}
 		else // if we are mapping this axis to an xbox button
 		{

@@ -69,7 +69,7 @@ _s32 g_tempValue = 0;
  =======================================================================================================================
  =======================================================================================================================
  */
-void Interpret_Store_New(unsigned _int32 OPCODE)
+__forceinline void Interpret_Store_New(unsigned _int32 OPCODE)
 {
 	/*~~~~~~~~~~~~~*/
 	int temp, temp2;
@@ -493,7 +493,7 @@ extern void (*dyna4300i_cop1_Instruction[]) (OP_PARAMS);
  =======================================================================================================================
  */
 
-void dyna4300i_cop0(OP_PARAMS)
+__forceinline void dyna4300i_cop0(OP_PARAMS)
 {
 	dyna_cop0_rs_instruction[__RS](PASS_PARAMS);
 
@@ -504,7 +504,7 @@ void dyna4300i_cop0(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_cop1(OP_PARAMS)
+__forceinline void dyna4300i_cop1(OP_PARAMS)
 {
 	dyna4300i_cop1_Instruction[__RS](PASS_PARAMS);
 }
@@ -513,7 +513,7 @@ void dyna4300i_cop1(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-BOOL Init_Dynarec(void)
+BOOL __fastcall Init_Dynarec(void)
 {
 	compilerstatus.lCodePosition = 0;
 	AlreadyRecompiled = FALSE;
@@ -576,7 +576,7 @@ void Free_Dynarec(void)
     Only interrupt will enter here, exceptions will be served otherwhere
  =======================================================================================================================
  */
-void rc_Intr_Common(void)
+void __fastcall rc_Intr_Common(void)
 {
 	gHWS_COP0Reg[EPC] = gHWS_pc;
 	gHWS_COP0Reg[STATUS] |= EXL;	/* set EXL = 1 */
@@ -585,7 +585,7 @@ void rc_Intr_Common(void)
 }
 
 
-void InitRdRsRt(OP_PARAMS)
+__forceinline void InitRdRsRt(OP_PARAMS)
 {
 	memset(xRD, 0, sizeof(xRD));
 	memset(xRS, 0, sizeof(xRS));
@@ -605,7 +605,7 @@ void InitRdRsRt(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void SetRdRsRt32bit(OP_PARAMS)
+__forceinline void SetRdRsRt32bit(OP_PARAMS)
 {
 	memset(xRD, 0, sizeof(xRD));
 	memset(xRS, 0, sizeof(xRS));
@@ -625,7 +625,7 @@ void SetRdRsRt32bit(OP_PARAMS)
 		MapConst(xRD, 0);
 }
 
-void Set32bit(OP_PARAMS)
+__forceinline void Set32bit(OP_PARAMS)
 {
 	xRD->Is32bit = 1;
 	xRS->Is32bit = 1;
@@ -636,7 +636,7 @@ void Set32bit(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void SetRdRsRt64bit(OP_PARAMS)
+__forceinline void SetRdRsRt64bit(OP_PARAMS)
 {
 	memset(xRD, 0, sizeof(xRD));
 	memset(xRS, 0, sizeof(xRS));
@@ -657,7 +657,7 @@ void SetRdRsRt64bit(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_special(OP_PARAMS)
+__forceinline void dyna4300i_special(OP_PARAMS)
 {
 	dyna_special_instruction[__F](PASS_PARAMS);
 }
@@ -666,7 +666,7 @@ void dyna4300i_special(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_regimm(OP_PARAMS)
+__forceinline void dyna4300i_regimm(OP_PARAMS)
 {
 	dyna_regimm_instruction[__RT](PASS_PARAMS);
 }
@@ -675,7 +675,7 @@ void dyna4300i_regimm(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_cop2(OP_PARAMS)
+__forceinline void dyna4300i_cop2(OP_PARAMS)
 {
 	dyna_cop2_rs_instruction[__RS](PASS_PARAMS);
 }
@@ -684,7 +684,7 @@ void dyna4300i_cop2(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_cop0_rs_bc(OP_PARAMS)
+__forceinline void dyna4300i_cop0_rs_bc(OP_PARAMS)
 {
 	dyna_cop0_rt_instruction[__RT](PASS_PARAMS);
 }
@@ -693,7 +693,7 @@ void dyna4300i_cop0_rs_bc(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_cop0_tlb(OP_PARAMS)
+__forceinline void dyna4300i_cop0_tlb(OP_PARAMS)
 {
 	dyna_tlb_instruction[__F](PASS_PARAMS);
 }
@@ -702,7 +702,7 @@ void dyna4300i_cop0_tlb(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_invalid(OP_PARAMS)
+__forceinline void dyna4300i_invalid(OP_PARAMS)
 {
 	DisplayError("invalid instruction");
 }
@@ -711,7 +711,7 @@ void dyna4300i_invalid(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_reserved(OP_PARAMS)
+__forceinline void dyna4300i_reserved(OP_PARAMS)
 {
 	INTERPRET(UNUSED);
 }
@@ -720,7 +720,7 @@ void dyna4300i_reserved(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_lwl(OP_PARAMS)
+__forceinline void dyna4300i_lwl(OP_PARAMS)
 {
 	compilerstatus.cp0Counter += 1;
 	_SAFTY_CPU_(r4300i_lwl) SetRdRsRt64bit(PASS_PARAMS);
@@ -736,7 +736,7 @@ void dyna4300i_lwl(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_lwr(OP_PARAMS)
+__forceinline void dyna4300i_lwr(OP_PARAMS)
 {
 	compilerstatus.cp0Counter += 1;
 	_SAFTY_CPU_(r4300i_lwr) SetRdRsRt64bit(PASS_PARAMS);
@@ -752,7 +752,7 @@ void dyna4300i_lwr(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_lwu(OP_PARAMS)
+__forceinline void dyna4300i_lwu(OP_PARAMS)
 {
 	compilerstatus.cp0Counter += 1;
 	_SAFTY_CPU_(r4300i_lwu) SetRdRsRt64bit(PASS_PARAMS);
@@ -768,7 +768,7 @@ void dyna4300i_lwu(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_ldl(OP_PARAMS)
+__forceinline void dyna4300i_ldl(OP_PARAMS)
 {
 	compilerstatus.cp0Counter += 1;
 	_SAFTY_CPU_(r4300i_ldl) SetRdRsRt64bit(PASS_PARAMS);
@@ -784,7 +784,7 @@ void dyna4300i_ldl(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_ldr(OP_PARAMS)
+__forceinline void dyna4300i_ldr(OP_PARAMS)
 {
 	compilerstatus.cp0Counter += 1;
 	_SAFTY_CPU_(r4300i_ldr) SetRdRsRt64bit(PASS_PARAMS);
@@ -800,7 +800,7 @@ void dyna4300i_ldr(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_swl(OP_PARAMS)
+__forceinline void dyna4300i_swl(OP_PARAMS)
 {
 	compilerstatus.cp0Counter += 1;
 	_SAFTY_CPU_(r4300i_swl) SetRdRsRt64bit(PASS_PARAMS);
@@ -816,7 +816,7 @@ void dyna4300i_swl(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_sdl(OP_PARAMS)
+__forceinline void dyna4300i_sdl(OP_PARAMS)
 {
 	compilerstatus.cp0Counter += 1;
 	_SAFTY_CPU_(r4300i_sdl) SetRdRsRt64bit(PASS_PARAMS);
@@ -832,7 +832,7 @@ void dyna4300i_sdl(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_sdr(OP_PARAMS)
+__forceinline void dyna4300i_sdr(OP_PARAMS)
 {
 	compilerstatus.cp0Counter += 1;
 	_SAFTY_CPU_(r4300i_sdr) SetRdRsRt64bit(PASS_PARAMS);
@@ -848,7 +848,7 @@ void dyna4300i_sdr(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_swr(OP_PARAMS)
+__forceinline void dyna4300i_swr(OP_PARAMS)
 {
 	compilerstatus.cp0Counter += 1;
 	_SAFTY_CPU_(r4300i_swr) SetRdRsRt64bit(PASS_PARAMS);
@@ -864,7 +864,7 @@ void dyna4300i_swr(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_ll(OP_PARAMS)
+__forceinline void dyna4300i_ll(OP_PARAMS)
 {
 	compilerstatus.cp0Counter += 1;
 	_SAFTY_CPU_(r4300i_ll) SetRdRsRt64bit(PASS_PARAMS);
@@ -880,7 +880,7 @@ void dyna4300i_ll(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_lwc2(OP_PARAMS)
+__forceinline void dyna4300i_lwc2(OP_PARAMS)
 {
 	compilerstatus.cp0Counter += 1;
 #ifdef SAFE_LOADSTORE
@@ -898,7 +898,7 @@ void dyna4300i_lwc2(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_lld(OP_PARAMS)
+__forceinline void dyna4300i_lld(OP_PARAMS)
 {
 	compilerstatus.cp0Counter += 1;
 	_SAFTY_CPU_(r4300i_lld) SetRdRsRt64bit(PASS_PARAMS);
@@ -914,7 +914,7 @@ void dyna4300i_lld(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_ldc2(OP_PARAMS)
+__forceinline void dyna4300i_ldc2(OP_PARAMS)
 {
 	compilerstatus.cp0Counter += 1;
 #ifdef SAFE_LOADSTORE
@@ -932,7 +932,7 @@ void dyna4300i_ldc2(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_sc(OP_PARAMS)
+__forceinline void dyna4300i_sc(OP_PARAMS)
 {
 	compilerstatus.cp0Counter += 1;
 	_SAFTY_CPU_(r4300i_sc) SetRdRsRt64bit(PASS_PARAMS);
@@ -944,7 +944,7 @@ void dyna4300i_sc(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_swc2(OP_PARAMS)
+__forceinline void dyna4300i_swc2(OP_PARAMS)
 {
 	compilerstatus.cp0Counter += 1;
 #ifdef SAFE_LOADSTORE
@@ -962,7 +962,7 @@ void dyna4300i_swc2(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_scd(OP_PARAMS)
+__forceinline void dyna4300i_scd(OP_PARAMS)
 {
 	compilerstatus.cp0Counter += 1;
 	_SAFTY_CPU_(r4300i_scd) SetRdRsRt64bit(PASS_PARAMS);
@@ -974,7 +974,7 @@ void dyna4300i_scd(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_sdc2(OP_PARAMS)
+__forceinline void dyna4300i_sdc2(OP_PARAMS)
 {
 	/* INTERPRET_LOADSTORE(r4300i_sdc2); */
 }
@@ -983,7 +983,7 @@ void dyna4300i_sdc2(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_daddi(OP_PARAMS)
+__forceinline void dyna4300i_daddi(OP_PARAMS)
 {
 	compilerstatus.cp0Counter += 1;
 	_SAFTY_CPU_(r4300i_daddi) SetRdRsRt64bit(PASS_PARAMS);
@@ -1006,7 +1006,7 @@ void dyna4300i_daddi(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_daddiu(OP_PARAMS)
+__forceinline void dyna4300i_daddiu(OP_PARAMS)
 {
 	compilerstatus.cp0Counter += 1;
 	_SAFTY_CPU_(r4300i_daddiu) SetRdRsRt64bit(PASS_PARAMS);
@@ -1029,7 +1029,7 @@ void dyna4300i_daddiu(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_special_dadd(OP_PARAMS)
+__forceinline void dyna4300i_special_dadd(OP_PARAMS)
 {
 	compilerstatus.cp0Counter += 1;
 	_SAFTY_CPU_(r4300i_dadd) SetRdRsRt64bit(PASS_PARAMS);
@@ -1056,7 +1056,7 @@ void dyna4300i_special_dadd(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_special_daddu(OP_PARAMS)
+__forceinline void dyna4300i_special_daddu(OP_PARAMS)
 {
 	compilerstatus.cp0Counter += 1;
 	_SAFTY_CPU_(r4300i_daddu) SetRdRsRt64bit(PASS_PARAMS);
@@ -1083,7 +1083,7 @@ void dyna4300i_special_daddu(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_special_dsub(OP_PARAMS)
+__forceinline void dyna4300i_special_dsub(OP_PARAMS)
 {
 	compilerstatus.cp0Counter += 1;
 	_SAFTY_CPU_(r4300i_dsub) SetRdRsRt64bit(PASS_PARAMS);
@@ -1110,7 +1110,7 @@ void dyna4300i_special_dsub(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_special_dsubu(OP_PARAMS)
+__forceinline void dyna4300i_special_dsubu(OP_PARAMS)
 {
 	compilerstatus.cp0Counter += 1;
 	_SAFTY_CPU_(r4300i_dsubu) SetRdRsRt64bit(PASS_PARAMS);
@@ -1137,7 +1137,7 @@ void dyna4300i_special_dsubu(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_special_tge(OP_PARAMS)
+__forceinline void dyna4300i_special_tge(OP_PARAMS)
 {
 	compilerstatus.cp0Counter += 1;
 	_SAFTY_CPU_(r4300i_tge);
@@ -1149,7 +1149,7 @@ void dyna4300i_special_tge(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_special_tgeu(OP_PARAMS)
+__forceinline void dyna4300i_special_tgeu(OP_PARAMS)
 {
 	compilerstatus.cp0Counter += 1;
 	_SAFTY_CPU_(r4300i_tgeu) SetRdRsRt64bit(PASS_PARAMS);
@@ -1160,7 +1160,7 @@ void dyna4300i_special_tgeu(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_special_tlt(OP_PARAMS)
+__forceinline void dyna4300i_special_tlt(OP_PARAMS)
 {
 	compilerstatus.cp0Counter += 1;
 	_SAFTY_CPU_(r4300i_tlt) SetRdRsRt64bit(PASS_PARAMS);
@@ -1171,7 +1171,7 @@ void dyna4300i_special_tlt(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_special_tltu(OP_PARAMS)
+__forceinline void dyna4300i_special_tltu(OP_PARAMS)
 {
 	compilerstatus.cp0Counter += 1;
 	_SAFTY_CPU_(r4300i_tltu) SetRdRsRt64bit(PASS_PARAMS);
@@ -1182,7 +1182,7 @@ void dyna4300i_special_tltu(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_special_teq(OP_PARAMS)
+__forceinline void dyna4300i_special_teq(OP_PARAMS)
 {
 	compilerstatus.cp0Counter += 1;
 	_SAFTY_CPU_(r4300i_teq) SetRdRsRt64bit(PASS_PARAMS);
@@ -1193,7 +1193,7 @@ void dyna4300i_special_teq(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_special_tne(OP_PARAMS)
+__forceinline void dyna4300i_special_tne(OP_PARAMS)
 {
 	compilerstatus.cp0Counter += 1;
 	_SAFTY_CPU_(r4300i_tne) SetRdRsRt64bit(PASS_PARAMS);
@@ -1204,7 +1204,7 @@ void dyna4300i_special_tne(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_regimm_tgei(OP_PARAMS)
+__forceinline void dyna4300i_regimm_tgei(OP_PARAMS)
 {
 	compilerstatus.cp0Counter += 1;
 	_SAFTY_CPU_(r4300i_tgei) SetRdRsRt64bit(PASS_PARAMS);
@@ -1215,7 +1215,7 @@ void dyna4300i_regimm_tgei(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_regimm_tgeiu(OP_PARAMS)
+__forceinline void dyna4300i_regimm_tgeiu(OP_PARAMS)
 {
 	compilerstatus.cp0Counter += 1;
 	_SAFTY_CPU_(r4300i_tgeiu) SetRdRsRt64bit(PASS_PARAMS);
@@ -1226,7 +1226,7 @@ void dyna4300i_regimm_tgeiu(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_regimm_tlti(OP_PARAMS)
+__forceinline void dyna4300i_regimm_tlti(OP_PARAMS)
 {
 	compilerstatus.cp0Counter += 1;
 	_SAFTY_CPU_(r4300i_tlti) SetRdRsRt64bit(PASS_PARAMS);
@@ -1237,7 +1237,7 @@ void dyna4300i_regimm_tlti(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_regimm_tltiu(OP_PARAMS)
+__forceinline void dyna4300i_regimm_tltiu(OP_PARAMS)
 {
 	compilerstatus.cp0Counter += 1;
 	_SAFTY_CPU_(r4300i_tltiu) SetRdRsRt64bit(PASS_PARAMS);
@@ -1248,7 +1248,7 @@ void dyna4300i_regimm_tltiu(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_regimm_teqi(OP_PARAMS)
+__forceinline void dyna4300i_regimm_teqi(OP_PARAMS)
 {
 	compilerstatus.cp0Counter += 1;
 	_SAFTY_CPU_(r4300i_teqi) SetRdRsRt64bit(PASS_PARAMS);
@@ -1259,7 +1259,7 @@ void dyna4300i_regimm_teqi(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_regimm_tnei(OP_PARAMS)
+__forceinline void dyna4300i_regimm_tnei(OP_PARAMS)
 {
 	compilerstatus.cp0Counter += 1;
 	_SAFTY_CPU_(r4300i_tnei) SetRdRsRt64bit(PASS_PARAMS);
@@ -1270,7 +1270,7 @@ void dyna4300i_regimm_tnei(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_special_dsllv(OP_PARAMS)
+__forceinline void dyna4300i_special_dsllv(OP_PARAMS)
 {
 	compilerstatus.cp0Counter += 1;
 	_SAFTY_CPU_(r4300i_dsllv)
@@ -1286,7 +1286,7 @@ void dyna4300i_special_dsllv(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_special_dsrlv(OP_PARAMS)
+__forceinline void dyna4300i_special_dsrlv(OP_PARAMS)
 {
 	compilerstatus.cp0Counter += 1;
 	_SAFTY_CPU_(r4300i_dsrlv)
@@ -1304,7 +1304,7 @@ void dyna4300i_special_dsrlv(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_special_dsrav(OP_PARAMS)
+__forceinline void dyna4300i_special_dsrav(OP_PARAMS)
 {
 	compilerstatus.cp0Counter += 1;
 	_SAFTY_CPU_(r4300i_dsrav)
@@ -1320,7 +1320,7 @@ void dyna4300i_special_dsrav(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_special_dsll(OP_PARAMS)
+__forceinline void dyna4300i_special_dsll(OP_PARAMS)
 {
 	compilerstatus.cp0Counter += 1;
 	_SAFTY_CPU_(r4300i_dsll)
@@ -1338,7 +1338,7 @@ void dyna4300i_special_dsll(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_special_dsrl(OP_PARAMS)
+__forceinline void dyna4300i_special_dsrl(OP_PARAMS)
 {
 	compilerstatus.cp0Counter += 1;
 	_SAFTY_CPU_(r4300i_dsrl)
@@ -1356,7 +1356,7 @@ void dyna4300i_special_dsrl(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_special_dsra(OP_PARAMS)
+__forceinline void dyna4300i_special_dsra(OP_PARAMS)
 {
 	SetRdRsRt64bit(PASS_PARAMS);
 
@@ -1381,7 +1381,7 @@ void dyna4300i_special_dsra(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_special_dmult(OP_PARAMS)
+__forceinline void dyna4300i_special_dmult(OP_PARAMS)
 {
 	compilerstatus.cp0Counter += 2;
 
@@ -1398,7 +1398,7 @@ void dyna4300i_special_dmult(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_special_dmultu(OP_PARAMS)
+__forceinline void dyna4300i_special_dmultu(OP_PARAMS)
 {
 	compilerstatus.cp0Counter += 2;
 
@@ -1415,7 +1415,7 @@ void dyna4300i_special_dmultu(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_special_ddiv(OP_PARAMS)
+__forceinline void dyna4300i_special_ddiv(OP_PARAMS)
 {
 	SetRdRsRt64bit(PASS_PARAMS);
 
@@ -1445,7 +1445,7 @@ void dyna4300i_special_ddiv(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_special_ddivu(OP_PARAMS)
+__forceinline void dyna4300i_special_ddivu(OP_PARAMS)
 {
 	SetRdRsRt64bit(PASS_PARAMS);
 
@@ -1475,7 +1475,7 @@ void dyna4300i_special_ddivu(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_cop0_rs_mf(OP_PARAMS)
+__forceinline void dyna4300i_cop0_rs_mf(OP_PARAMS)
 {
 	compilerstatus.cp0Counter += 1;
 	_SAFTY_CPU_(r4300i_COP0_mfc0) SetRdRsRt32bit(PASS_PARAMS);
@@ -1488,7 +1488,7 @@ void dyna4300i_cop0_rs_mf(OP_PARAMS)
     Is this an op???????????????????????????????????
  =======================================================================================================================
  */
-void dyna4300i_cop0_rs_dmf(OP_PARAMS)
+__forceinline void dyna4300i_cop0_rs_dmf(OP_PARAMS)
 {
 	/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 	_u32	rd = (unsigned long) &(_u32) reg->COP0Reg[__RD];
@@ -1512,7 +1512,7 @@ void dyna4300i_cop0_rs_dmf(OP_PARAMS)
     Is this an op???????????????????????????????????
  =======================================================================================================================
  */
-void dyna4300i_cop0_rs_cf(OP_PARAMS)
+__forceinline void dyna4300i_cop0_rs_cf(OP_PARAMS)
 {
 	SetRdRsRt32bit(PASS_PARAMS);
 
@@ -1530,7 +1530,7 @@ void dyna4300i_cop0_rs_cf(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_cop0_rs_mt(OP_PARAMS)
+__forceinline void dyna4300i_cop0_rs_mt(OP_PARAMS)
 {
 	compilerstatus.cp0Counter += 1;
 	_SAFTY_CPU_(r4300i_COP0_mtc0) SetRdRsRt64bit(PASS_PARAMS);
@@ -1542,7 +1542,7 @@ void dyna4300i_cop0_rs_mt(OP_PARAMS)
     Is this an op???????????????????????????????????
  =======================================================================================================================
  */
-void dyna4300i_cop0_rs_dmt(OP_PARAMS)
+__forceinline void dyna4300i_cop0_rs_dmt(OP_PARAMS)
 {
 	/* SAFTY_CPU_(r4300i_cop0_rs_dmt) */
 	compilerstatus.cp0Counter += 1;
@@ -1556,7 +1556,7 @@ void dyna4300i_cop0_rs_dmt(OP_PARAMS)
     Is this an op???????????????????????????????????
  =======================================================================================================================
  */
-void dyna4300i_cop0_rs_ct(OP_PARAMS)
+__forceinline void dyna4300i_cop0_rs_ct(OP_PARAMS)
 {
 	/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 	_u32	fs = (unsigned long) &reg->COP0Con[__FS];
@@ -1580,7 +1580,7 @@ void dyna4300i_cop0_rs_ct(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_cop0_rt_bcf(OP_PARAMS)
+__forceinline void dyna4300i_cop0_rt_bcf(OP_PARAMS)
 {
 	compilerstatus.cp0Counter += 1;
 	DisplayError("%08X: Unhandled BCFC0", reg->pc);
@@ -1590,7 +1590,7 @@ void dyna4300i_cop0_rt_bcf(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_cop0_rt_bct(OP_PARAMS)
+__forceinline void dyna4300i_cop0_rt_bct(OP_PARAMS)
 {
 	compilerstatus.cp0Counter += 1;
 	DisplayError("%08X: Unhandled BCTC0", reg->pc);
@@ -1600,7 +1600,7 @@ void dyna4300i_cop0_rt_bct(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_cop0_rt_bcfl(OP_PARAMS)
+__forceinline void dyna4300i_cop0_rt_bcfl(OP_PARAMS)
 {
 	compilerstatus.cp0Counter += 1;
 	DisplayError("%08X: Unhandled BCFL0", reg->pc);
@@ -1610,7 +1610,7 @@ void dyna4300i_cop0_rt_bcfl(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_cop0_rt_bctl(OP_PARAMS)
+__forceinline void dyna4300i_cop0_rt_bctl(OP_PARAMS)
 {
 	compilerstatus.cp0Counter += 1;
 	DisplayError("%08X: Unhandled BCTL0", reg->pc);
@@ -1620,7 +1620,7 @@ void dyna4300i_cop0_rt_bctl(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_cop0_tlbr(OP_PARAMS)
+__forceinline void dyna4300i_cop0_tlbr(OP_PARAMS)
 {
 	compilerstatus.cp0Counter += 1;
 	_SAFTY_CPU_(r4300i_COP0_tlbr) SetRdRsRt64bit(PASS_PARAMS);
@@ -1632,7 +1632,7 @@ void dyna4300i_cop0_tlbr(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_cop0_tlbwi(OP_PARAMS)
+__forceinline void dyna4300i_cop0_tlbwi(OP_PARAMS)
 {
 	compilerstatus.cp0Counter += 1;
 	_SAFTY_CPU_(r4300i_COP0_tlbwi) SetRdRsRt64bit(PASS_PARAMS);
@@ -1644,7 +1644,7 @@ void dyna4300i_cop0_tlbwi(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_cop0_tlbwr(OP_PARAMS)
+__forceinline void dyna4300i_cop0_tlbwr(OP_PARAMS)
 {
 	compilerstatus.cp0Counter += 1;
 	_SAFTY_CPU_(r4300i_COP0_tlbwr) SetRdRsRt64bit(PASS_PARAMS);
@@ -1656,7 +1656,7 @@ void dyna4300i_cop0_tlbwr(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_cop0_tlbp(OP_PARAMS)
+__forceinline void dyna4300i_cop0_tlbp(OP_PARAMS)
 {
 	compilerstatus.cp0Counter += 1;
 	_SAFTY_CPU_(r4300i_COP0_tlbp) SetRdRsRt64bit(PASS_PARAMS);
@@ -1668,7 +1668,7 @@ void dyna4300i_cop0_tlbp(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_cop2_rs_not_implemented(OP_PARAMS)
+__forceinline void dyna4300i_cop2_rs_not_implemented(OP_PARAMS)
 {
 	compilerstatus.cp0Counter += 1;
 	TRACE1("%08X: There isnt a COP2\n", reg->pc);
@@ -1679,7 +1679,7 @@ void dyna4300i_cop2_rs_not_implemented(OP_PARAMS)
     This function is called by add and addi
  =======================================================================================================================
  */
-void DoConstAddi(_int32 Constant)
+__forceinline void DoConstAddi(_int32 Constant)
 {
 	if(ConstMap[xRS->mips_reg].IsMapped == 1)
 		MapConst(xRT, ((_s32) ConstMap[xRS->mips_reg].value + (_s32) Constant));
@@ -1712,7 +1712,7 @@ void DoConstAddi(_int32 Constant)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_addi(OP_PARAMS)
+__forceinline void dyna4300i_addi(OP_PARAMS)
 {
 	compilerstatus.cp0Counter += 1;
 	SetRdRsRt32bit(PASS_PARAMS);
@@ -1732,7 +1732,7 @@ void dyna4300i_addi(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_addiu(OP_PARAMS)
+__forceinline void dyna4300i_addiu(OP_PARAMS)
 {
 	compilerstatus.cp0Counter += 1;
 	SetRdRsRt32bit(PASS_PARAMS);
@@ -1750,7 +1750,7 @@ void dyna4300i_addiu(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_special_slt(OP_PARAMS)
+__forceinline void dyna4300i_special_slt(OP_PARAMS)
 {
 	compilerstatus.cp0Counter += 1;
 	SetRdRsRt64bit(PASS_PARAMS);
@@ -1845,7 +1845,7 @@ void dyna4300i_special_slt(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_special_sltu(OP_PARAMS)
+__forceinline void dyna4300i_special_sltu(OP_PARAMS)
 {
 	int Use32bit = 0;
 
@@ -2063,7 +2063,7 @@ void dyna4300i_slti(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_sltiu(OP_PARAMS)
+__forceinline void dyna4300i_sltiu(OP_PARAMS)
 {
 	/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 	_s64	ConstInt = (_s64) (_s32) __I;
@@ -2168,7 +2168,7 @@ void dyna4300i_sltiu(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_andi(OP_PARAMS)
+__forceinline void dyna4300i_andi(OP_PARAMS)
 {
 	compilerstatus.cp0Counter += 1;
 	SetRdRsRt32bit(PASS_PARAMS);
@@ -2206,7 +2206,7 @@ void dyna4300i_andi(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_ori(OP_PARAMS)
+__forceinline void dyna4300i_ori(OP_PARAMS)
 {
 	/*~~~~~~~~~~~~~*/
 	int Use32bit = 0;
@@ -2261,7 +2261,7 @@ void dyna4300i_ori(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_xori(OP_PARAMS)
+__forceinline void dyna4300i_xori(OP_PARAMS)
 {
 	/*~~~~~~~~~~~~~*/
 	int Use32bit = 0;
@@ -2326,7 +2326,7 @@ extern x86regtyp	x86reg[];
  =======================================================================================================================
  */
 
-void dyna4300i_lui(OP_PARAMS)
+__forceinline void dyna4300i_lui(OP_PARAMS)
 {
 	compilerstatus.cp0Counter += 1;
 	_SAFTY_CPU_(r4300i_lui) SetRdRsRt32bit(PASS_PARAMS);
@@ -2344,7 +2344,7 @@ extern _int32	r4300i_lh_faster(uint32 QuerAddr);
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_lh(OP_PARAMS)
+__forceinline void dyna4300i_lh(OP_PARAMS)
 {
 	/*~~~~~~~~~~~~~*/
 	_u32	QuerAddr;
@@ -2482,7 +2482,7 @@ extern char * ((**phys_write_fast) (_u32 addr));
  =======================================================================================================================
  =======================================================================================================================
  */
-void MemoryCase1(void)
+__forceinline void MemoryCase1(void)
 {
 	if((xRT->x86reg != Reg_EAX) && (xRT->HiWordLoc != Reg_EAX))
 	{
@@ -2515,7 +2515,7 @@ void MemoryCase1(void)
  =======================================================================================================================
  =======================================================================================================================
  */
-void MemoryCase2(void)
+__forceinline void MemoryCase2(void)
 {
 	if(xRT->x86reg != Reg_EAX)
 	{
@@ -2551,7 +2551,7 @@ extern x86regtyp	x86reg[8];
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_lw(OP_PARAMS)
+__forceinline void dyna4300i_lw(OP_PARAMS)
 {
 	/*~~~~~~~~~~*/
 	_s32	value;
@@ -2815,7 +2815,7 @@ extern uint32	HardwareStart;
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_sw(OP_PARAMS)
+__forceinline void dyna4300i_sw(OP_PARAMS)
 {
 	/*~~~~~~~~~~~~~*/
 	_u32	QuerAddr;
@@ -2964,7 +2964,7 @@ _Default:
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_ld(OP_PARAMS)
+__forceinline void dyna4300i_ld(OP_PARAMS)
 {
 	/*~~~~~~~~~~*/
 	_s32	value;
@@ -3138,7 +3138,7 @@ extern void r4300i_sd_faster(uint32 QuerAddr, uint32 rt_ft);
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_sd(OP_PARAMS)
+__forceinline void dyna4300i_sd(OP_PARAMS)
 {
 	/*~~~~~~~~~~*/
 	int		temp;
@@ -3219,7 +3219,7 @@ extern _int32	r4300i_lb_faster(uint32 QuerAddr);
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_lb(OP_PARAMS)
+__forceinline void dyna4300i_lb(OP_PARAMS)
 {
 	/*~~~~~~*/
 	_s8 value;
@@ -3404,7 +3404,7 @@ _Default:
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_lbu(OP_PARAMS)
+__forceinline void dyna4300i_lbu(OP_PARAMS)
 {
 	/*~~~~~~~~~~~~~*/
 	_u32	QuerAddr;
@@ -3586,7 +3586,7 @@ _Default:
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_lhu(OP_PARAMS)
+__forceinline void dyna4300i_lhu(OP_PARAMS)
 {
 	/*~~~~~~~~~~~~~*/
 	_u32	QuerAddr;
@@ -3724,7 +3724,7 @@ _Default:
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_sb(OP_PARAMS)
+__forceinline void dyna4300i_sb(OP_PARAMS)
 {
 	/*~~~~~~~~~~*/
 	int		temp;
@@ -3804,7 +3804,7 @@ void dyna4300i_sb(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_sh(OP_PARAMS)
+__forceinline void dyna4300i_sh(OP_PARAMS)
 {
 	/*~~~~~~~~~~*/
 	int		temp;
@@ -3885,7 +3885,7 @@ void dyna4300i_sh(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_cache(OP_PARAMS)
+__forceinline void dyna4300i_cache(OP_PARAMS)
 {
 	compilerstatus.cp0Counter += 1;
 	SetRdRsRt64bit(PASS_PARAMS);
@@ -3906,7 +3906,7 @@ void dyna4300i_cache(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void r4300i_shift(uint32 Instruction)
+__forceinline void r4300i_shift(uint32 Instruction)
 {
 	/* Interpret the shift. (For debugging purposes.) */
 	switch(Instruction & 0x3F)
@@ -3951,7 +3951,7 @@ void r4300i_shift(uint32 Instruction)
     MapRT_To(xRD, 1, MOV_MemoryToReg)
  =======================================================================================================================
  */
-void Map_RD_NE_RT(void)
+__forceinline void Map_RD_NE_RT(void)
 {
 	/*~~~~~~~~~~~~~~~*/
 	int tempRT, tempRD;
@@ -4003,7 +4003,7 @@ void Map_RD_NE_RT(void)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_special_shift(OP_PARAMS)
+__forceinline void dyna4300i_special_shift(OP_PARAMS)
 {
 	compilerstatus.cp0Counter += 1;
 	SetRdRsRt32bit(PASS_PARAMS);
@@ -4116,7 +4116,7 @@ void dyna4300i_special_shift(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void r4300i_shift_var(uint32 Instruction)
+__forceinline void r4300i_shift_var(uint32 Instruction)
 {
 	/* Interpret the shift. (For debugging purposes.) */
 	switch(Instruction & 0x3f)
@@ -4131,7 +4131,7 @@ void r4300i_shift_var(uint32 Instruction)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_shift_var(OP_PARAMS)
+__forceinline void dyna4300i_shift_var(OP_PARAMS)
 {
 	/*~~*/
 	int k;
@@ -4278,7 +4278,7 @@ void dyna4300i_shift_var(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void prepare_run_exception(uint32 exception_code)
+__forceinline void prepare_run_exception(uint32 exception_code)
 {
 	gHWS_COP0Reg[CAUSE] &= NOT_EXCCODE;
 	gHWS_COP0Reg[CAUSE] |= exception_code;
@@ -4299,7 +4299,7 @@ void prepare_run_exception(uint32 exception_code)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna_set_exception(OP_PARAMS, uint32 exception_code, uint32 vector)
+__forceinline void dyna_set_exception(OP_PARAMS, uint32 exception_code, uint32 vector)
 {
 	FlushAllRegisters();
 	MOV_ImmToMemory(1, ModRM_disp32, (unsigned long) &reg->pc, reg->pc);
@@ -4314,7 +4314,7 @@ void dyna_set_exception(OP_PARAMS, uint32 exception_code, uint32 vector)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_special_syscall(OP_PARAMS)
+__forceinline void dyna4300i_special_syscall(OP_PARAMS)
 {
 	//if(debug_opcode) DisplayError("TODO: OpcodeDebugger: syscall");
 
@@ -4335,7 +4335,7 @@ void dyna4300i_special_syscall(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_special_break(OP_PARAMS)
+__forceinline void dyna4300i_special_break(OP_PARAMS)
 {
 	compilerstatus.cp0Counter += 1;
 	_SAFTY_CPU_(r4300i_break);
@@ -4372,7 +4372,7 @@ void	COMPARE_SwitchToDynarec(void);
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_cop1_with_exception(OP_PARAMS)
+__forceinline void dyna4300i_cop1_with_exception(OP_PARAMS)
 {
 	/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 	MapConstant LocalTempConstMap[NUM_CONSTS];
@@ -4448,7 +4448,7 @@ void dyna4300i_cop1_with_exception(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_special_sync(OP_PARAMS)
+__forceinline void dyna4300i_special_sync(OP_PARAMS)
 {
 	compilerstatus.cp0Counter += 1;
 }
@@ -4457,7 +4457,7 @@ void dyna4300i_special_sync(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void r4300i_mf_mt(uint32 Instruction)
+__forceinline void r4300i_mf_mt(uint32 Instruction)
 {
 	switch(Instruction & 0x1f)
 	{
@@ -4472,7 +4472,7 @@ void r4300i_mf_mt(uint32 Instruction)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_mf_mt(OP_PARAMS)
+__forceinline void dyna4300i_mf_mt(OP_PARAMS)
 {
 	/*~~~~~~~~~~~~~*/
 	int Use32bit = 0;
@@ -4537,7 +4537,7 @@ void dyna4300i_mf_mt(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void r4300i_mul(uint32 Instruction)
+__forceinline void r4300i_mul(uint32 Instruction)
 {
 	switch(Instruction & 0x3f)
 	{
@@ -4550,7 +4550,7 @@ void r4300i_mul(uint32 Instruction)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_special_mul(OP_PARAMS)
+__forceinline void dyna4300i_special_mul(OP_PARAMS)
 {
 	/*~~~~~~~~~~~~*/
 	int High = __HI;
@@ -4631,7 +4631,7 @@ void dyna4300i_special_mul(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_special_div(OP_PARAMS)
+__forceinline void dyna4300i_special_div(OP_PARAMS)
 {
 	/*~~~~~~~~*/
 	int temp, k;
@@ -4719,7 +4719,7 @@ void dyna4300i_special_div(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_special_divu(OP_PARAMS)
+__forceinline void dyna4300i_special_divu(OP_PARAMS)
 {
 	/*~~~~~~~~*/
 	int temp, k;
@@ -4808,7 +4808,7 @@ void dyna4300i_special_divu(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void MipsAdd(subtraction)
+__forceinline void MipsAdd(subtraction)
 {
 	if((ConstMap[xRT->mips_reg].IsMapped == 1) && (ConstMap[xRS->mips_reg].IsMapped == 1))
 	{
@@ -5014,7 +5014,7 @@ void MipsAdd(subtraction)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_special_add(OP_PARAMS)
+__forceinline void dyna4300i_special_add(OP_PARAMS)
 {
 	compilerstatus.cp0Counter += 1;
 	SetRdRsRt32bit(PASS_PARAMS);
@@ -5031,7 +5031,7 @@ void dyna4300i_special_add(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_special_addu(OP_PARAMS)
+__forceinline void dyna4300i_special_addu(OP_PARAMS)
 {
 	compilerstatus.cp0Counter += 1;
 	SetRdRsRt32bit(PASS_PARAMS);
@@ -5048,7 +5048,7 @@ void dyna4300i_special_addu(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_special_sub(OP_PARAMS)
+__forceinline void dyna4300i_special_sub(OP_PARAMS)
 {
 	compilerstatus.cp0Counter += 1;
 	SetRdRsRt32bit(PASS_PARAMS);
@@ -5065,7 +5065,7 @@ void dyna4300i_special_sub(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_special_subu(OP_PARAMS)
+__forceinline void dyna4300i_special_subu(OP_PARAMS)
 {
 	compilerstatus.cp0Counter += 1;
 	SetRdRsRt32bit(PASS_PARAMS);
@@ -5082,7 +5082,7 @@ void dyna4300i_special_subu(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_special_and(OP_PARAMS)
+__forceinline void dyna4300i_special_and(OP_PARAMS)
 {
 	/*~~~~~~~~~~~~~*/
 	int Use32bit = 0;
@@ -5178,7 +5178,7 @@ void dyna4300i_special_and(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_special_or(OP_PARAMS)
+__forceinline void dyna4300i_special_or(OP_PARAMS)
 {
 	/*~~~~~~~~~~~~~*/
 	int Use32bit = 0;
@@ -5322,7 +5322,7 @@ void dyna4300i_special_or(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_special_xor(OP_PARAMS)
+__forceinline void dyna4300i_special_xor(OP_PARAMS)
 {
 	/*~~~~~~~~~~~~~*/
 	int Use32bit = 0;
@@ -5479,7 +5479,7 @@ void dyna4300i_special_xor(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_special_nor(OP_PARAMS)
+__forceinline void dyna4300i_special_nor(OP_PARAMS)
 {
 	/*~~~~~~~~~~~~~*/
 	int Use32bit = 0;
@@ -5582,7 +5582,7 @@ void dyna4300i_special_nor(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_special_dsll32(OP_PARAMS)
+__forceinline void dyna4300i_special_dsll32(OP_PARAMS)
 {
 	/*~~~~~~~~~~~~~*/
 	int Use32bit = 0;
@@ -5633,7 +5633,7 @@ extern void StoreMipsCpuRegister(unsigned long iMipsReg, unsigned char iIntelReg
  =======================================================================================================================
  */
 
-void dyna4300i_special_dsrl32(OP_PARAMS)
+__forceinline void dyna4300i_special_dsrl32(OP_PARAMS)
 {
 	compilerstatus.cp0Counter += 1;
 	SetRdRsRt64bit(PASS_PARAMS);
@@ -5660,7 +5660,7 @@ void dyna4300i_special_dsrl32(OP_PARAMS)
  =======================================================================================================================
  =======================================================================================================================
  */
-void dyna4300i_special_dsra32(OP_PARAMS)
+__forceinline void dyna4300i_special_dsra32(OP_PARAMS)
 {
 	/*~~~~~~~~~~~~~*/
 	int Use32bit = 0;

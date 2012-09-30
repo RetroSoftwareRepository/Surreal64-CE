@@ -1105,9 +1105,9 @@ DWORD ConvertYUV16ToR8G8B8(int Y, int U, int V)
 	int B = int(g_convc0 *(Y-16) + g_convc4 * U);
 	*/
 
-	int R = Y + (1.370705f * (V-128));
-	int G = Y - (0.698001f * (V-128)) - (0.337633f * (U-128));
-	int B = Y + (1.732446f * (U-128));
+	int R = (int)(Y + (1.370705f * (V-128)));
+	int G = (int)(Y - (0.698001f * (V-128)) - (0.337633f * (U-128)));
+	int B = (int)(Y + (1.732446f * (U-128)));
 
 	R = R<0 ? 0 : R;
 	G = G<0 ? 0 : G;

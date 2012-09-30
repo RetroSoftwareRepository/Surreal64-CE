@@ -1,3 +1,6 @@
+
+// lets try relying on ./config.cpp instead
+/*
 #include "config.h"
 
 //freakdave
@@ -5,13 +8,16 @@ int dw1964DynaMem=8;
 int dw1964PagingMem=4;
 int dwPJ64DynaMem=16;
 int dwPJ64PagingMem=4;
-bool bUseLLERSP=false; // Ez0n3 - use iAudioPlugin instead, but leave this in case it's set in ini
+bool bUseLLERSP=false; // use iAudioPlugin instead, but leave this in case it's set in ini
 int dwMaxVideoMem=4;
+bool bUseRspAudio=true; // control a listing
 
-// Ez0n3 - audio plugins
+// audio plugins
 int iAudioPlugin=_AudioPluginJttl; // 2=JttL
 // video plugins
 int videoplugin=_VideoPluginRice560; // 2=Rice560
+// rsp plugins
+int iRspPlugin=_RSPPluginNone;
 
 int FlickerFilter = 1;
 bool SoftDisplayFilter = 0;
@@ -40,6 +46,15 @@ bool EnableController4 = false;
 extern int actualrom;
 extern int preferedemu;
 
+
+
+// FIXME
+// Ez0n3 - these ConfigAppLoad and ConfigAppSave functions don't seem to be used
+// the file "d:\\ini\\surreal-ce.ini" never gets written out and therefore never read
+// all current calls to ConfigAppLoad and ConfigAppSave seem to be calling .\config.cpp
+// IE: the only file on the hd is: "D:\\ini\\surreal-xxx.ini" from .\config.cpp
+// are two separate functions with the same name needed anymore?
+
 // Read in the config file for the whole application
 int ConfigAppLoad()
 {
@@ -47,7 +62,7 @@ int ConfigAppLoad()
 	FILE *h;
 
 
-	if ((h = fopen("d:\\ini\\surreal-xxx.ini", "rt")) == NULL) {
+	if ((h = fopen("d:\\ini\\surreal-ce.ini", "rt")) == NULL) {
 		return 1;
 	}
 
@@ -99,6 +114,8 @@ int ConfigAppLoad()
 		
 		// Ez0n3 - audio plugins
 		VAR(iAudioPlugin);
+		VAR(iRspPlugin);
+		BOL(bUseRspAudio);
 
 
 #undef STR
@@ -119,10 +136,10 @@ int ConfigAppSave()
 	//
 	FILE *h;
 
-	if ((h = fopen("d:\\ini\\surreal-xxx.ini", "wt")) == NULL) return 1;
+	if ((h = fopen("d:\\ini\\surreal-ce.ini", "wt")) == NULL) return 1;
 
 	// Write title
-	fprintf(h,"// Surreal64 XXX Config File\n\n");
+	fprintf(h,"// Surreal64 CE Config File\n\n");
 	fprintf(h,"// Don't edit this file manually unless you know what you're doing\n");
 	fprintf(h,"// Surreal will restore default settings when this file is deleted\n");
 
@@ -157,9 +174,8 @@ int ConfigAppSave()
 
 	// Ez0n3 - audio plugins
 	VAR(iAudioPlugin);
-		
-		
-	
+	VAR(iRspPlugin);
+	BOL(bUseRspAudio);
 	
 
 #undef STR
@@ -352,3 +368,4 @@ int QuoteRead(char** pszQuote, char** pszEnd, char* szSrc)		// Read a quoted str
 	
 	return 0;
 }
+*/

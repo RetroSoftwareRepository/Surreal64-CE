@@ -48,3 +48,8 @@ void SaveRecentFiles         ( void );
 void SaveRomOptions          ( void );
 void SetRecentRomDir         ( DWORD Index );
 void SetRomDirectory         ( char * Directory, BOOL IgnoreDefaultDir );
+
+#define INVALID_FILE_ATTRIBUTES ((DWORD)-1)
+extern BOOL PathFileExists(const char *pszPath);
+
+extern char g_szPathSaves[256];

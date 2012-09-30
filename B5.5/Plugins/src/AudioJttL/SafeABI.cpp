@@ -35,7 +35,7 @@ void smDetect () {
 	static int runonce = 0;
 	static int alist=0;
 
-	dfile = fopen ("d:\\HLEInfo.txt", "wt");
+	dfile = fopen ("T:\\Misc\\HLEInfo.txt", "wt");
 
 	fprintf (dfile, "--------- Audio List #%i --------\n\n", ++alist);
 	fprintf (dfile, "LQV: %04X %04X %04X %04X %04X %04X %04X %04X\n", 

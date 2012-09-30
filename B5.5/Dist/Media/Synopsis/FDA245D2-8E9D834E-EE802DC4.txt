@@ -1,0 +1,37 @@
+Extreme-G
+Platform: Nintendo 64
+Media: Cartridge
+Genre: Racing > Fantasy
+Release Year: 1997
+Developer: Probe Entertainment
+Publisher: Acclaim Entertainment
+Players: Single-player, multiplayer
+_________________________
+
+Plot
+
+Extreme-G is set in the distant future where Earth is a mere wasteland. From their new found planet the human colonists watch with joy as their remote controlled power-bikes wreak havoc through their ancient cities. There is only one winner, the first to cross the line... or the last to survive.
+
+Overview
+
+As with all Extreme-G games, futuristic racing pilots race plasma-powered bikes in an intergalactic Grand Prix at speeds that are over 750 km/h making it the third fastest racing game on the Nintendo 64, only beaten by F-Zero X and Star Wars: Episode I Racer. The emphasis is on speed and creative racetrack design, with tracks looping through like roller coasters.
+
+At the beginning of each round, the player is given three "nitro" powerups which provide a temporary speed boost (these powerups cannot be replenished). Also, falling off cliffs or, in some cases, the track itself results in simply losing time rather than losing 'lives'; bikes are teleported back to the track and must rebuild their speed and lost time from a dead standstill. Some parts of many tracks are shown to be hundreds of feet in the air.
+
+This is the only game in the series where a vehicle is unable to reach Mach Speed but nothing is impossible.
+
+Gameplay
+
+The gameplay of Extreme-G consists mainly of fast-paced racing through an array of futuristic environments. An impressive array of defensive and offensive weapons is available on-track. These include multi-homing/reverse missiles, magnetic/laser mines, and shield-boosting power-ups. Special weapons can also be found such as invisibility, phosphorus flash and the mighty Wally-Warp which if not avoided, can instantly transport a bike right to the back of the pack.
+
+Vehicles
+
+Each of the machines has their own strengths and weaknesses. These are decided by the following 5 characteristics:
+
+Accel (acceleration)
+Speed (maximum velocity)
+Turns (handling)
+Shield (electronic armor battery life)
+Weap (primary weapons battery life)
+
+Another variable between the bikes is the type of primary weapon the bike has installed. There are three types Pulse, Laser and Excel; again each having its own strengths and weaknesses. With the characteristics varying considerably between vehicles, some will be better than others at reaching specific goals.

@@ -388,7 +388,7 @@ char DMARead(_u32 length)
 			_u32	i;
 			BOOL	found = FALSE;
 
-			for( i = 0; i < ucodeInfos[gUcode].noOfDMAMaps; i++ )
+			for( i = 0; i < (_u32)(ucodeInfos[gUcode].noOfDMAMaps); i++ )
 			{
 				IMEM_DMA_FunctionMapType *pmap = ucodeInfos[gUcode].DMAMaps;
 				if( length+1 == pmap[i].DMALength && (DMEM_Address & 0x1FFF) == pmap[i].IMEMaddr &&

@@ -4,7 +4,7 @@
 #include <string>
 using namespace std;
 
-#define NUMBER_OF_N64_BUTTONS		18
+#define NUMBER_OF_N64_BUTTONS		19
 #define NUMBER_OF_XBOX_BUTTONS		24
 
 #define NUMBER_OF_CONTROLLERS		4
@@ -73,7 +73,9 @@ enum N64Button
 
 	N64ZTrigger,				
 	N64LeftTrigger,		
-	N64RightTrigger			
+	N64RightTrigger,
+
+	InGameMenu
 };
 
 class Config

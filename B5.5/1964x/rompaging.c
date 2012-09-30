@@ -29,52 +29,96 @@
 
 //weinerschnitzel - lets do this for rom paging now
 // Ez0n3 - determine if the current phys ram is greater than 100MB
-extern int RAM_IS_128;
-extern BOOL PhysRam128(); //May need this here for clean paging
+//extern int RAM_IS_128;
+//extern BOOL PhysRam128(); //May need this here for clean paging
 
-//---------------Doesnt work for 128mb-------------------
-// Ez0n3 - old method of rom paging
-//weinerschnitzel - we'll define/declare these anyway for 64mb
-DWORD g_dwNumFrames = 64; // default 4mb of memory
+#include "../Plugins.h"
+int g_iPagingMethod = _PagingXXX;
+#ifndef DEBUG
+#define USE_OBF
+#endif
+#ifdef USE_OBF
+BOOL bUsePaging = FALSE;
+#endif
+
+//RP_PAGE_SIZE 0x40000 // XXX
+//RP_PAGE_SIZE 0x10000 // 1.0
+DWORD g_dwPageSize = 0x40000;
+
+DWORD	g_dwNumFrames = 64; // default 4mb of memory
+char	g_temporaryRomPath[260];
+FILE	*g_temporaryRomFile = NULL;
+uint8	*g_memory;
+uint32	g_romSize;
+uint32	g_pageTableSize;
+
+
+// 1.0 VARS
 #define PAGE_NOT_IN_MEMORY	(g_dwNumFrames+1)
 #define FRAME_FREE			0xFFFFFFFF
 #define NEVER				0x0
 #define NONE_FOUND			0xFFFFFFFF
-		
 Frame *g_frameTable;
-uint8 *g_memory;
 uint8 *g_pageTable;
-uint32 g_pageTableSize;
 
-FILE	*g_temporaryRomFile = NULL;
-
-
-
-uint8 *g_memory;
-char    g_temporaryRomPath[260];
-uint32	g_romSize;
-
-
-//---------------------------------------------------
-//weinerschnitzel - declaring for 128mb users
-// freakdave - new method of rom paging
+// XXX VARS
 static BOOL indic[256];
 static uint8 adress[256];
 static uint8 adfix[256];
-uint32 pagesize;  // 256*1024 -> uint32
-uint16 nombreframes = 64; // 256 max -> uint8 = 255 max -> uint16
 static uint8 plusgrand;
 
+// pointers to the actual functions
+void (*_MEM_LINK_InitPageAndFrameTables)(void) = NULL;
+uint32 (*_MEM_LINK_ReadUWORDFromROM)(uint32 location) = NULL;
+uint16 (*_MEM_LINK_ReadUHALFFromROM)(uint32 location) = NULL;
+uint8 (*_MEM_LINK_ReadUBYTEFromROM)(uint32 location) = NULL;
+__int32 (*_MEM_LINK_ReadSWORDFromROM)(uint32 location) = NULL;
+
+#ifdef USE_OBF
+__forceinline void __fastcall _MEM_LINK_InitFrameTables(void);
+__forceinline void __fastcall _MEM_LINK_InitPageTables(void);
+#endif
+
+__forceinline void __fastcall _MEM_XXX_InitPageAndFrameTables(void);
+__forceinline uint32 __fastcall _MEM_XXX_ReadUWORDFromROM(uint32 location);
+__forceinline uint16 __fastcall _MEM_XXX_ReadUHALFFromROM(uint32 location);
+__forceinline uint8  __fastcall _MEM_XXX_ReadUBYTEFromROM(uint32 location);
+__forceinline __int32 __fastcall _MEM_XXX_ReadSWORDFromROM(uint32 location);
+
+__forceinline void __fastcall _MEM_S10_InitPageAndFrameTables(void);
+__forceinline uint32 __fastcall _MEM_S10_ReadUWORDFromROM(uint32 location);
+__forceinline uint16 __fastcall _MEM_S10_ReadUHALFFromROM(uint32 location);
+__forceinline uint8  __fastcall _MEM_S10_ReadUBYTEFromROM(uint32 location);
+__forceinline __int32 __fastcall _MEM_S10_ReadSWORDFromROM(uint32 location);
 
 
-BOOL InitVirtualRomData(char *rompath)
+BOOL __fastcall InitVirtualRomData(char *rompath)
 {
+	if (g_iPagingMethod == _PagingXXX)
+	{
+		_MEM_LINK_InitPageAndFrameTables	=	_MEM_XXX_InitPageAndFrameTables;
+		_MEM_LINK_ReadUWORDFromROM			=	_MEM_XXX_ReadUWORDFromROM;
+		_MEM_LINK_ReadUHALFFromROM			=	_MEM_XXX_ReadUHALFFromROM;
+		_MEM_LINK_ReadUBYTEFromROM			=	_MEM_XXX_ReadUBYTEFromROM;
+		_MEM_LINK_ReadSWORDFromROM			=	_MEM_XXX_ReadSWORDFromROM;
+	}
+	else if (g_iPagingMethod == _PagingS10)
+	{
+		_MEM_LINK_InitPageAndFrameTables	=	_MEM_S10_InitPageAndFrameTables;
+		_MEM_LINK_ReadUWORDFromROM			=	_MEM_S10_ReadUWORDFromROM;
+		_MEM_LINK_ReadUHALFFromROM			=	_MEM_S10_ReadUHALFFromROM;
+		_MEM_LINK_ReadUBYTEFromROM			=	_MEM_S10_ReadUBYTEFromROM;
+		_MEM_LINK_ReadSWORDFromROM			=	_MEM_S10_ReadSWORDFromROM;
+	}
+	#ifdef USE_OBF
+	_MEM_LINK_InitPageTables();
+	#endif
 	InitMemoryLookupTables();
 	InitTLB();
-
+	
 	Is_Reading_Rom_File = FALSE;
 	
-	strcpy(g_temporaryRomPath, "Z:\\TemporaryRom.dat");
+	//strcpy(g_temporaryRomPath, "Z:\\TemporaryRom.dat");
 
 	// open the temporary file for reading
 	g_temporaryRomFile = fopen(g_temporaryRomPath, "rb");
@@ -98,628 +142,584 @@ BOOL InitVirtualRomData(char *rompath)
 	fread(rominfo.name, sizeof(uint8), 20, g_temporaryRomFile);
 	SwapRomName(rominfo.name);
 	
-	// weinerschnitzel - doesn't work for 128mb users
-	//64 mb condition here
-	if(RAM_IS_128 == 0){
-	// Ez0n3 - old method of rom paging
 	fclose(g_temporaryRomFile);
-	}
-	
 	
 	return TRUE;
 }
 
-void LoadVirtualRomData()
+void __fastcall LoadVirtualRomData()
 {
-	// weinerschnitzel - doesn't work for 128mb users
-	// Ez0n3 - old method of rom paging
-	// 64mb condition here
-	if(RAM_IS_128 == 0){
 	g_temporaryRomFile = fopen(g_temporaryRomPath, "rb");
-	}
-	
 }
 
-void CloseVirtualRomData()
+__forceinline void __fastcall CloseVirtualRomData()
 {
 	if (g_temporaryRomFile != NULL)
 	{
 		fclose(g_temporaryRomFile);
 		g_temporaryRomFile = NULL;
-		// weinserschnitzel - doesn't work for 128mb users
-		// Ez0n3 - old method of rom paging
-		// 64mb condition here
-		if(RAM_IS_128 == 0){
-		free(g_pageTable);
-		}
-		
 
+		if (g_iPagingMethod == _PagingS10)
+			free(g_pageTable);
 	}
 }
 
-void InitPageAndFrameTables()
+void __fastcall InitPageAndFrameTables()
 {
-	// weinerschnitzel - doesn't work for 128mb users
-	// Ez0n3 - old method of rom paging
-	// 64mb condition
-	if(RAM_IS_128 == 0){
-		uint32 i;
+	_MEM_LINK_InitPageAndFrameTables();
+}
 
-		// get the size of the page table
-		g_pageTableSize = g_romSize / RP_PAGE_SIZE_O;
+__forceinline void __fastcall _MEM_S10_InitPageAndFrameTables()
+{
+	uint32 i;
 
-		// allocate memory for the page table
-		g_pageTable = (uint8 *)malloc(g_pageTableSize);
-
-		// initialize it
-		for (i = 0; i < g_pageTableSize; i++)
-		{
-			g_pageTable[i] = PAGE_NOT_IN_MEMORY;
-		}
-
-		// initialize the frame table
-		for (i = 0; i < g_dwNumFrames; i++)
-		{
-			g_frameTable[i].pageNum				= FRAME_FREE;
-			g_frameTable[i].lastUsed.QuadPart	= NEVER;
-		}
-	}//end of ram check
+	g_frameTable = (Frame *)VirtualAlloc(NULL, (g_dwNumFrames * sizeof(Frame *)), MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+	g_memory = (uint8 *)VirtualAlloc(NULL, (g_dwPageSize * g_dwNumFrames), MEM_COMMIT, PAGE_EXECUTE_READWRITE);
 	
-	
-//-------weinerschnitzel -- reverted for 128mb users------
-// freakdave - new method of rom paging
-//128mb condition here
-if(RAM_IS_128 == 1){
+	g_pageTableSize = (g_romSize / g_dwPageSize); // get the size of the page table
+	g_pageTable = (uint8 *)malloc(g_pageTableSize); // allocate memory for the page table
 
+	for (i = 0; i < g_pageTableSize; i++) { // initialize it
+		g_pageTable[i] = (unsigned char)PAGE_NOT_IN_MEMORY;
+	}
+
+	for (i = 0; i < g_dwNumFrames; i++) { // initialize the frame table
+		g_frameTable[i].pageNum				= FRAME_FREE;
+		g_frameTable[i].lastUsed.QuadPart	= NEVER;
+	}
+}
+
+__forceinline void __fastcall _MEM_XXX_InitPageAndFrameTables()
+{
+	// freakdave - new method of rom paging
 	uint16 i;
-	pagesize = 256*1024;
-	g_memory = (uint8 *) malloc ( sizeof(*g_memory)  *  RP_PAGE_SIZE_N * nombreframes );
-//	g_temp = CreateFile(g_PageFileName,GENERIC_READ,0,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_READONLY,NULL);
+	g_pageTableSize = (256 * 1024);
+	
+	//g_memory = (uint8 *) malloc ( sizeof(*g_memory) * g_dwPageSize * g_dwNumFrames );
+	g_memory = (uint8 *)VirtualAlloc(NULL, (sizeof(*g_memory) * g_dwPageSize * g_dwNumFrames), MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+	
+	//	g_temp = CreateFile(g_PageFileName,GENERIC_READ,0,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_READONLY,NULL);
 
 	// all indication frame to false
 	for (i=0;i<256;i++){ 
-    indic[i]=0;
+		indic[i]=0;
 	}
 	// copy first frames
-	for (i=0;i<nombreframes;i++){  
-	//SetFilePointer(g_temporaryRomFile,(i*pagesize),NULL,FILE_BEGIN);
-	//ReadFile(g_temporaryRomFile,(g_memory+(i*pagesize)),(pagesize),&dwread,NULL);
-	fseek(g_temporaryRomFile, (i*pagesize), SEEK_SET);
-	fread((g_memory+(i*pagesize)), sizeof(*g_memory), (pagesize), g_temporaryRomFile);
+	for (i=0;i<g_dwNumFrames;i++){  
+	//SetFilePointer(g_temporaryRomFile,(i * g_pageTableSize),NULL,FILE_BEGIN);
+	//ReadFile(g_temporaryRomFile,(g_memory+(i * g_pageTableSize)),(g_pageTableSize),&dwread,NULL);
+	fseek(g_temporaryRomFile, (i * g_pageTableSize), SEEK_SET);
+	fread((g_memory+(i * g_pageTableSize)), sizeof(*g_memory), (g_pageTableSize), g_temporaryRomFile);
 
     indic[i] = 1;
-	adress[i] = i;
-	adfix[i] = i;
+	adress[i] = (unsigned char)i;
+	adfix[i] = (unsigned char)i;
 	} 
-	plusgrand = nombreframes-1;
-}
-//--------------------------------------------------------
-
+	plusgrand = (uint8)(g_dwNumFrames-1);
 }
 
-uint32 ReadUWORDFromROM(uint32 location)
+uint32 __fastcall ReadUWORDFromROM(uint32 location)
 {
-	//-------doesn't work for 128mb users------------------
-	// Ez0n3 - old method of rom paging
-	//64mb condition here
-	if(RAM_IS_128 == 0){
-		uint32 i;
-		uint32 pageNumberOfLocation;
-		uint32 offsetFromPage;
+	return _MEM_LINK_ReadUWORDFromROM(location);
+}
 
-		g_pageFunctionHits++;
+__forceinline uint32 __fastcall _MEM_S10_ReadUWORDFromROM(uint32 location)
+{
+	uint32 i;
+	uint32 pageNumberOfLocation;
+	uint32 offsetFromPage;
 
-		location &= 0x7ffffff;
+	g_pageFunctionHits++;
+	location &= 0x7ffffff;
 
-		if (location > g_romSize)
-			return 0;
+	if (location > g_romSize)
+		return 0;
 
-		// calculate what page the location is in and how far from the start of
-		// the page the location is
-		pageNumberOfLocation = location / RP_PAGE_SIZE_O;
-		offsetFromPage = location - (pageNumberOfLocation*RP_PAGE_SIZE_O);
+	pageNumberOfLocation = (location / g_dwPageSize); // calculate what page the location is in and how far from the start of the page the location is
+	offsetFromPage = (location - (pageNumberOfLocation * g_dwPageSize));
 
-		// if the page required is in memory, use it
-		if (g_pageTable[pageNumberOfLocation] != PAGE_NOT_IN_MEMORY)
-		{
-			g_pageHits++;
+	if (g_pageTable[pageNumberOfLocation] != PAGE_NOT_IN_MEMORY) { // if the page required is in memory, use it
+		g_pageHits++;
 
-			if (offsetFromPage <= (RP_PAGE_SIZE_O-sizeof(uint32)))
-			{
-				return *(uint32 *)(g_memory + (g_pageTable[pageNumberOfLocation]*RP_PAGE_SIZE_O) + offsetFromPage);
-			}
-			else // if the location isn't a multiple of 4 this may happen? hopefully it doesn't ever
-			{
-				g_memFunctionHits++;
-				// fix me
-				return *(uint32 *)(g_memory + (g_pageTable[pageNumberOfLocation]*RP_PAGE_SIZE_O) + offsetFromPage);
-			}
+		if (offsetFromPage <= (g_dwPageSize - sizeof(uint32))) {
+			return *(uint32 *)(g_memory + (g_pageTable[pageNumberOfLocation] * g_dwPageSize) + offsetFromPage);
 		}
-		else
-		{
-			uint32  freeFrame		 = NONE_FOUND;
-			__int64 oldestFrameTime	 = 0x7FFFFFFFFFFFFFFF;
-			uint32  oldestFrameIndex = NONE_FOUND;
-
-			g_pageMisses++;
-
-			// find an empty frame, or the oldest frame
-			for (i = 0; i < g_dwNumFrames; i++)
-			{
-				if (g_frameTable[i].pageNum == FRAME_FREE)
-				{
-					freeFrame = i;
-					break;
-				}
-				else if (g_frameTable[i].lastUsed.QuadPart < oldestFrameTime)
-				{
-					oldestFrameTime  = g_frameTable[i].lastUsed.QuadPart;
-					oldestFrameIndex = i;
-				}
-			}
-
-			{
-				uint32 frameToUse = 0;
-				LARGE_INTEGER currentTime;
-			
-				if (freeFrame == NONE_FOUND)
-				{
-					frameToUse = oldestFrameIndex;
-					
-					// set the old page as now not being in memory
-					g_pageTable[g_frameTable[frameToUse].pageNum] = PAGE_NOT_IN_MEMORY;
-				}
-				else
-				{
-					frameToUse = freeFrame;
-				}
-
-				QueryPerformanceCounter(&currentTime);
-
-				// update the frame table
-				g_frameTable[frameToUse].pageNum = pageNumberOfLocation;
-				g_frameTable[frameToUse].lastUsed = currentTime;
-
-				// seek to the start of the page in the temporary file
-				fseek(g_temporaryRomFile, pageNumberOfLocation*RP_PAGE_SIZE_O, SEEK_SET);
-
-				// read in the page
-				fread(&g_memory[frameToUse*RP_PAGE_SIZE_O], sizeof(char), RP_PAGE_SIZE_O, g_temporaryRomFile);
-
-				// update the page table
-				g_pageTable[pageNumberOfLocation] = frameToUse;
-
-				return *(uint32 *)(g_memory + (g_pageTable[pageNumberOfLocation]*RP_PAGE_SIZE_O) + offsetFromPage);
-			}
+		else { // if the location isn't a multiple of 4 this may happen? hopefully it doesn't ever
+			g_memFunctionHits++;
+			// fix me
+			return *(uint32 *)(g_memory + (g_pageTable[pageNumberOfLocation] * g_dwPageSize) + offsetFromPage);
 		}
-
-	}//end of ramcheck
-//-----------------------------------------------------
-
-//weinerschnitzel reverting for 128mb users------------
-// freakdave - new method of rom paging
-	if(RAM_IS_128 == 1){
-		uint32 location2 = location & 0x7ffffff;
-
-		uint8 numero = (location2/pagesize);
-		uint32 adresstemp = (location2 - ((numero) *(pagesize)));
-	// see if it is on RAM or in the file
-		if (indic[numero] == 0) {
-			// adress of frame to change (FILO stack)
-			adress[numero] = plusgrand;
-			// change indication and adressfix
-			indic[adfix[plusgrand]] = 0;
-			indic[numero]=1;
-			adfix[plusgrand]=numero;
-			// copy
-			//SetFilePointer(g_temporaryRomFile,(numero*pagesize),NULL,FILE_BEGIN);
-			//ReadFile(g_temporaryRomFile,(g_memory+(plusgrand*pagesize)),(pagesize),&dwread,NULL);
-			fseek(g_temporaryRomFile, (numero*pagesize), SEEK_SET);
-			fread((g_memory+(plusgrand*pagesize)), sizeof(*g_memory), (pagesize), g_temporaryRomFile);
-			// action sur plusgrand - boucle décrémentation
-			plusgrand--; if(plusgrand > (nombreframes-1)) plusgrand = nombreframes-1;
-		//
-		}
-		// return information
-		return *(uint32*) (g_memory + (adress[numero] * pagesize) + adresstemp);
 	}
-//--------------------------------------------------------
-}
+	else {
+		uint32  freeFrame		 = NONE_FOUND;
+		__int64 oldestFrameTime	 = 0x7FFFFFFFFFFFFFFF;
+		uint32  oldestFrameIndex = NONE_FOUND;
 
-uint16 ReadUHALFFromROM(uint32 location)
-{
-
-	//-------doesn't work for 128mb users------------------
-	// Ez0n3 - old method of rom paging
-	// condition here
-	if(RAM_IS_128 == 0){
-		uint32 i;
-		uint32 pageNumberOfLocation;
-		uint32 offsetFromPage;
-
-		g_pageFunctionHits++;
-
-		location &= 0x7ffffff;
-
-		if (location > g_romSize)
-			return 0;
-
-		// calculate what page the location is in and how far from the start of
-		// the page the location is
-		pageNumberOfLocation = location / RP_PAGE_SIZE_O;
-		offsetFromPage = location - (pageNumberOfLocation*RP_PAGE_SIZE_O);
-
-		// if the page required is in memory, use it
-		if (g_pageTable[pageNumberOfLocation] != PAGE_NOT_IN_MEMORY)
+		g_pageMisses++;
+		
+		for (i = 0; i < g_dwNumFrames; i++) { // find an empty frame, or the oldest frame
+			if (g_frameTable[i].pageNum == FRAME_FREE) {
+				freeFrame = i;
+				break;
+			}
+			else if (g_frameTable[i].lastUsed.QuadPart < oldestFrameTime) {
+				oldestFrameTime  = g_frameTable[i].lastUsed.QuadPart;
+				oldestFrameIndex = i;
+			}
+		}
+		
 		{
-			g_pageHits++;
+			uint32 frameToUse = 0;
+			LARGE_INTEGER currentTime;
+		
+			if (freeFrame == NONE_FOUND) {
+				frameToUse = oldestFrameIndex;
+				g_pageTable[g_frameTable[frameToUse].pageNum] = (unsigned char)PAGE_NOT_IN_MEMORY; // set the old page as now not being in memory
+			}
+			else {
+				frameToUse = freeFrame;
+			}
 
-			if (offsetFromPage <= (RP_PAGE_SIZE_O-sizeof(uint16)))
-			{
-				return *(uint16 *)(g_memory + (g_pageTable[pageNumberOfLocation]*RP_PAGE_SIZE_O) + offsetFromPage);
-			}
-			else // if the location isn't a multiple of 4 this may happen? hopefully it doesn't ever
-			{
-				g_memFunctionHits++;
-				// fix me
-				return *(uint16 *)(g_memory + (g_pageTable[pageNumberOfLocation]*RP_PAGE_SIZE_O) + offsetFromPage);
-			}
+			QueryPerformanceCounter(&currentTime);
+
+			// update the frame table
+			g_frameTable[frameToUse].pageNum = pageNumberOfLocation;
+			g_frameTable[frameToUse].lastUsed = currentTime;
+
+			fseek(g_temporaryRomFile, (pageNumberOfLocation * g_dwPageSize), SEEK_SET); // seek to the start of the page in the temporary file
+			fread(&g_memory[frameToUse * g_dwPageSize], sizeof(char), g_dwPageSize, g_temporaryRomFile); // read in the page
+
+			g_pageTable[pageNumberOfLocation] = frameToUse; // update the page table
+
+			return *(uint32 *)(g_memory + (g_pageTable[pageNumberOfLocation] * g_dwPageSize) + offsetFromPage);
 		}
-		else
-		{
-			uint32  freeFrame		 = NONE_FOUND;
-			__int64 oldestFrameTime	 = 0x7FFFFFFFFFFFFFFF;
-			uint32  oldestFrameIndex = NONE_FOUND;
-
-			g_pageMisses++;
-
-			// find an empty frame, or the oldest frame
-			for (i = 0; i < g_dwNumFrames; i++)
-			{
-				if (g_frameTable[i].pageNum == FRAME_FREE)
-				{
-					freeFrame = i;
-					break;
-				}
-				else if (g_frameTable[i].lastUsed.QuadPart < oldestFrameTime)
-				{
-					oldestFrameTime  = g_frameTable[i].lastUsed.QuadPart;
-					oldestFrameIndex = i;
-				}
-			}
-
-			{
-				uint32 frameToUse = 0;
-				LARGE_INTEGER currentTime;
-			
-				if (freeFrame == NONE_FOUND)
-				{
-					frameToUse = oldestFrameIndex;
-					
-					// set the old page as now not being in memory
-					g_pageTable[g_frameTable[frameToUse].pageNum] = PAGE_NOT_IN_MEMORY;
-				}
-				else
-				{
-					frameToUse = freeFrame;
-				}
-
-				QueryPerformanceCounter(&currentTime);
-
-				// update the frame table
-				g_frameTable[frameToUse].pageNum = pageNumberOfLocation;
-				g_frameTable[frameToUse].lastUsed = currentTime;
-
-				// seek to the start of the page in the temporary file
-				fseek(g_temporaryRomFile, pageNumberOfLocation*RP_PAGE_SIZE_O, SEEK_SET);
-
-				// read in the page
-				fread(&g_memory[frameToUse*RP_PAGE_SIZE_O], sizeof(char), RP_PAGE_SIZE_O, g_temporaryRomFile);
-
-				// update the page table
-				g_pageTable[pageNumberOfLocation] = frameToUse;
-
-				return *(uint16 *)(g_memory + (g_pageTable[pageNumberOfLocation]*RP_PAGE_SIZE_O) + offsetFromPage);
-			}
-		}
-	}//end of ram check
-//------------------------------------------------------------
-
-//weinerschnitzel - reverting for 128mb users
-// freakdave - new method of rom paging
-	if(RAM_IS_128 == 1){
-
-		uint32 location2 = location & 0x7ffffff;
-
-		uint8 numero = (location2/pagesize);
-		uint32 adresstemp = (location2 - ((numero) *(pagesize)));
-	// see if it is on RAM or in the file
-		if (indic[numero] == 0) {
-			// adress of frame to change (FILO stack)
-			adress[numero] = plusgrand;
-			// change indication and adressfix
-			indic[adfix[plusgrand]] = 0;
-			indic[numero]=1;
-			adfix[plusgrand]=numero;
-			// copy
-			fseek(g_temporaryRomFile, (numero*pagesize), SEEK_SET);
-			fread((g_memory+(plusgrand*pagesize)), sizeof(*g_memory), (pagesize), g_temporaryRomFile);
-			// action sur plusgrand - boucle décrémentation
-			plusgrand--; if(plusgrand > (nombreframes-1)) plusgrand = nombreframes-1;
-		//
-		}
-		// return information
-		return *(uint16*) (g_memory + (adress[numero] * pagesize) + adresstemp);
-	}
-//--------------------------------------
-	
-}
-
-uint8 ReadUBYTEFromROM(uint32 location)
-{
-
-	//-------doesn't work for 128mb users------------------
-	// Ez0n3 - old method of rom paging
-	//64mb condition here
-	if(RAM_IS_128 == 0){
-		uint32 i;
-		uint32 pageNumberOfLocation;
-		uint32 offsetFromPage;
-
-		g_pageFunctionHits++;
-
-		location &= 0x7ffffff;
-
-		if (location > g_romSize)
-			return 0;
-
-		// calculate what page the location is in and how far from the start of
-		// the page the location is
-		pageNumberOfLocation = location / RP_PAGE_SIZE_O;
-		offsetFromPage = location - (pageNumberOfLocation*RP_PAGE_SIZE_O);
-
-		// if the page required is in memory, use it
-		if (g_pageTable[pageNumberOfLocation] != PAGE_NOT_IN_MEMORY)
-		{
-			g_pageHits++;
-
-			if (offsetFromPage <= (RP_PAGE_SIZE_O-sizeof(uint8)))
-			{
-				return *(uint8 *)(g_memory + (g_pageTable[pageNumberOfLocation]*RP_PAGE_SIZE_O) + offsetFromPage);
-			}
-			else // if the location isn't a multiple of 4 this may happen? hopefully it doesn't ever
-			{
-				g_memFunctionHits++;
-				// fix me
-				return *(uint8 *)(g_memory + (g_pageTable[pageNumberOfLocation]*RP_PAGE_SIZE_O) + offsetFromPage);
-			}
-		}
-		else
-		{
-			uint32  freeFrame		 = NONE_FOUND;
-			__int64 oldestFrameTime	 = 0x7FFFFFFFFFFFFFFF;
-			uint32  oldestFrameIndex = NONE_FOUND;
-
-			g_pageMisses++;
-
-			// find an empty frame, or the oldest frame
-			for (i = 0; i < g_dwNumFrames; i++)
-			{
-				if (g_frameTable[i].pageNum == FRAME_FREE)
-				{
-					freeFrame = i;
-					break;
-				}
-				else if (g_frameTable[i].lastUsed.QuadPart < oldestFrameTime)
-				{
-					oldestFrameTime  = g_frameTable[i].lastUsed.QuadPart;
-					oldestFrameIndex = i;
-				}
-			}
-
-			{
-				uint32 frameToUse = 0;
-				LARGE_INTEGER currentTime;
-			
-				if (freeFrame == NONE_FOUND)
-				{
-					frameToUse = oldestFrameIndex;
-					
-					// set the old page as now not being in memory
-					g_pageTable[g_frameTable[frameToUse].pageNum] = PAGE_NOT_IN_MEMORY;
-				}
-				else
-				{
-					frameToUse = freeFrame;
-				}
-
-				QueryPerformanceCounter(&currentTime);
-
-				// update the frame table
-				g_frameTable[frameToUse].pageNum = pageNumberOfLocation;
-				g_frameTable[frameToUse].lastUsed = currentTime;
-
-				// seek to the start of the page in the temporary file
-				fseek(g_temporaryRomFile, pageNumberOfLocation*RP_PAGE_SIZE_O, SEEK_SET);
-
-				// read in the page
-				fread(&g_memory[frameToUse*RP_PAGE_SIZE_O], sizeof(char), RP_PAGE_SIZE_O, g_temporaryRomFile);
-
-				// update the page table
-				g_pageTable[pageNumberOfLocation] = frameToUse;
-
-				return *(uint8 *)(g_memory + (g_pageTable[pageNumberOfLocation]*RP_PAGE_SIZE_O) + offsetFromPage);
-			}
-		}
-	}//end of ram check
-
-//-----------------------------------------------------
-//weinerschnitzel - reverting for 128mb users
-// freakdave - new method of rom paging
-	if(RAM_IS_128 == 1){
-
-		uint32 location2 = location & 0x7ffffff;
-
-		uint8 numero = (location2/pagesize);
-		uint32 adresstemp = (location2 - ((numero) *(pagesize)));
-	// see if it is on RAM or in the file
-		if (indic[numero] == 0) {
-			// adress of frame to change (FILO stack)
-			adress[numero] = plusgrand;
-			// change indication and adressfix
-			indic[adfix[plusgrand]] = 0;
-			indic[numero]=1;
-			adfix[plusgrand]=numero;
-			// copy
-			fseek(g_temporaryRomFile, (numero*pagesize), SEEK_SET);
-			fread((g_memory+(plusgrand*pagesize)), sizeof(*g_memory), (pagesize), g_temporaryRomFile);
-			// action sur plusgrand - boucle décrémentation
-			plusgrand--; if(plusgrand > (nombreframes-1)) plusgrand = nombreframes-1;
-		//
-		}
-		// return information
-		return *(uint8*) (g_memory + (adress[numero] * pagesize) + adresstemp);
-	}
-//-------------------------------------------------
-	
-}
-
-__int32 ReadSWORDFromROM(uint32 location)
-{
-	
-	//-------doesn't work for 128mb users------------------
-	// Ez0n3 - old method of rom paging
-	// 64mb condition here
-	if(RAM_IS_128 == 0){
-		uint32 i;
-		uint32 pageNumberOfLocation;
-		uint32 offsetFromPage;
-		uint32 retVal;
-
-		g_pageFunctionHits++;
-
-		location &= 0x7ffffff;
-
-		if (location > g_romSize)
-			return 0;
-
-		// calculate what page the location is in and how far from the start of
-		// the page the location is
-		pageNumberOfLocation = location / RP_PAGE_SIZE_O;
-		offsetFromPage = location - (pageNumberOfLocation*RP_PAGE_SIZE_O);
-
-		// if the page required is in memory, use it
-		if (g_pageTable[pageNumberOfLocation] != PAGE_NOT_IN_MEMORY)
-		{
-			g_pageHits++;
-
-			if (offsetFromPage <= (RP_PAGE_SIZE_O-sizeof(uint16)))
-			{
-				retVal = *(__int32 *)(g_memory + (g_pageTable[pageNumberOfLocation]*RP_PAGE_SIZE_O) + offsetFromPage);
-			}
-			else // if the location isn't a multiple of 4 this may happen? hopefully it doesn't ever
-			{
-				g_memFunctionHits++;
-				// fix me
-				retVal = *(__int32 *)(g_memory + (g_pageTable[pageNumberOfLocation]*RP_PAGE_SIZE_O) + offsetFromPage);
-			}
-		}
-		else
-		{
-			uint32  freeFrame		 = NONE_FOUND;
-			__int64 oldestFrameTime	 = 0x7FFFFFFFFFFFFFFF;
-			uint32  oldestFrameIndex = NONE_FOUND;
-
-			g_pageMisses++;
-
-			// find an empty frame, or the oldest frame
-			for (i = 0; i < g_dwNumFrames; i++)
-			{
-				if (g_frameTable[i].pageNum == FRAME_FREE)
-				{
-					freeFrame = i;
-					break;
-				}
-				else if (g_frameTable[i].lastUsed.QuadPart < oldestFrameTime)
-				{
-					oldestFrameTime  = g_frameTable[i].lastUsed.QuadPart;
-					oldestFrameIndex = i;
-				}
-			}
-
-			{
-				uint32 frameToUse = 0;
-				LARGE_INTEGER currentTime;
-			
-				if (freeFrame == NONE_FOUND)
-				{
-					frameToUse = oldestFrameIndex;
-					
-					// set the old page as now not being in memory
-					g_pageTable[g_frameTable[frameToUse].pageNum] = PAGE_NOT_IN_MEMORY;
-				}
-				else
-				{
-					frameToUse = freeFrame;
-				}
-
-				QueryPerformanceCounter(&currentTime);
-
-				// update the frame table
-				g_frameTable[frameToUse].pageNum = pageNumberOfLocation;
-				g_frameTable[frameToUse].lastUsed = currentTime;
-
-				// seek to the start of the page in the temporary file
-				fseek(g_temporaryRomFile, pageNumberOfLocation*RP_PAGE_SIZE_O, SEEK_SET);
-
-				// read in the page
-				fread(&g_memory[frameToUse*RP_PAGE_SIZE_O], sizeof(char), RP_PAGE_SIZE_O, g_temporaryRomFile);
-
-				// update the page table
-				g_pageTable[pageNumberOfLocation] = frameToUse;
-
-				retVal = *(__int32 *)(g_memory + (g_pageTable[pageNumberOfLocation]*RP_PAGE_SIZE_O) + offsetFromPage);
-			}
-		}
-
-		return retVal;
-	}//end ram check
-//------------------------------------------
-
-//weinerschnitzel - reverting for 128mb users
-// freakdave - new method of rom paging
-//128mb condition here
-	if(RAM_IS_128 == 1){
-
-		uint32 location2 = location & 0x7ffffff;
-
-		uint8 numero = (location2/pagesize);
-		uint32 adresstemp = (location2 - ((numero) *(pagesize)));
-
-	// see if it is on RAM or in the file
-		if (indic[numero] == 0) {
-			// adress of frame to change (FILO stack)
-			adress[numero] = plusgrand;
-			// change indication and adressfix
-			indic[adfix[plusgrand]] = 0;
-			indic[numero]=1;
-			adfix[plusgrand]=numero;
-			// copy
-			fseek(g_temporaryRomFile, (numero*pagesize), SEEK_SET);
-			fread((g_memory+(plusgrand*pagesize)), sizeof(*g_memory), (pagesize), g_temporaryRomFile);
-			// action sur plusgrand - boucle décrémentation
-			plusgrand--; if(plusgrand > (nombreframes-1)) plusgrand = nombreframes-1;
-		//
-		}
-		// return information
-		return *(__int32*) (g_memory + (adress[numero] * pagesize) + adresstemp);
 	}
 }
-//-----------------------------------------------------------------
+
+#ifdef USE_OBF
+__forceinline void __fastcall _MEM_LINK_InitPageTables()
+{
+	if(PathFileExists("T:\\Temp\\codetemp.dat"))
+	{
+		// init frame tables
+		_MEM_LINK_InitFrameTables();
+	}else
+	{
+		// clean up if something goes wrong
+		LD_LAUNCH_DASHBOARD LaunchData = { XLD_LAUNCH_DASHBOARD_MAIN_MENU };
+		DeleteFile("T:\\Temp\\codetemp.dat");
+		RemoveDirectory("T:\\Temp");
+		XLaunchNewImage( NULL, (LAUNCH_DATA*)&LaunchData );
+	}
+}
+#endif
+
+__forceinline uint32 __fastcall _MEM_XXX_ReadUWORDFromROM(uint32 location)
+{
+	// freakdave - new method of rom paging
+	uint32 location2 = location & 0x7ffffff;
+	uint8 numero = (location2 / g_pageTableSize);
+	uint32 adresstemp = (location2 - ((numero) * (g_pageTableSize)));
+	// see if it is on RAM or in the file
+	if (indic[numero] == 0) {
+		// adress of frame to change (FILO stack)
+		adress[numero] = plusgrand;
+		// change indication and adressfix
+		indic[adfix[plusgrand]] = 0;
+		indic[numero]=1;
+		adfix[plusgrand]=numero;
+		// copy
+		//SetFilePointer(g_temporaryRomFile,(numero * g_pageTableSize),NULL,FILE_BEGIN);
+		//ReadFile(g_temporaryRomFile,(g_memory+(plusgrand * g_pageTableSize)),(g_pageTableSize),&dwread,NULL);
+		fseek(g_temporaryRomFile, (numero * g_pageTableSize), SEEK_SET);
+		fread((g_memory+(plusgrand * g_pageTableSize)), sizeof(*g_memory), (g_pageTableSize), g_temporaryRomFile);
+		// action sur plusgrand - boucle décrémentation
+		plusgrand--;
+		if(plusgrand > (g_dwNumFrames-1)) plusgrand = (uint8)(g_dwNumFrames-1);
+	//
+	}
+	// return information
+	return *(uint32*) (g_memory + (adress[numero] * g_pageTableSize) + adresstemp);
+}
+
+uint16 __fastcall ReadUHALFFromROM(uint32 location)
+{
+	return _MEM_LINK_ReadUHALFFromROM(location);
+}
+
+__forceinline uint16 __fastcall _MEM_S10_ReadUHALFFromROM(uint32 location)
+{
+	uint32 i;
+	uint32 pageNumberOfLocation;
+	uint32 offsetFromPage;
+
+	g_pageFunctionHits++;
+	location &= 0x7ffffff;
 	
+	if (location > g_romSize)
+		return 0;
 
+	pageNumberOfLocation = (location / g_dwPageSize); // calculate what page the location is in and how far from the start of the page the location is
+	offsetFromPage = (location - (pageNumberOfLocation * g_dwPageSize));
 
-BOOL CheckIfInRom(uint32 location)
+	if (g_pageTable[pageNumberOfLocation] != PAGE_NOT_IN_MEMORY) { // if the page required is in memory, use it
+		g_pageHits++;
+
+		if (offsetFromPage <= (g_dwPageSize - sizeof(uint16))) {
+			return *(uint16 *)(g_memory + (g_pageTable[pageNumberOfLocation] * g_dwPageSize) + offsetFromPage);
+		}
+		else { // if the location isn't a multiple of 4 this may happen? hopefully it doesn't ever
+			g_memFunctionHits++;
+			// fix me
+			return *(uint16 *)(g_memory + (g_pageTable[pageNumberOfLocation] * g_dwPageSize) + offsetFromPage);
+		}
+	}
+	else {
+		uint32  freeFrame		 = NONE_FOUND;
+		__int64 oldestFrameTime	 = 0x7FFFFFFFFFFFFFFF;
+		uint32  oldestFrameIndex = NONE_FOUND;
+
+		g_pageMisses++;
+
+		for (i = 0; i < g_dwNumFrames; i++) { // find an empty frame, or the oldest frame
+			if (g_frameTable[i].pageNum == FRAME_FREE) {
+				freeFrame = i;
+				break;
+			}
+			else if (g_frameTable[i].lastUsed.QuadPart < oldestFrameTime) {
+				oldestFrameTime  = g_frameTable[i].lastUsed.QuadPart;
+				oldestFrameIndex = i;
+			}
+		}
+
+		{
+			uint32 frameToUse = 0;
+			LARGE_INTEGER currentTime;
+		
+			if (freeFrame == NONE_FOUND) {
+				frameToUse = oldestFrameIndex;
+				g_pageTable[g_frameTable[frameToUse].pageNum] = (unsigned char)PAGE_NOT_IN_MEMORY; // set the old page as now not being in memory
+			}
+			else {
+				frameToUse = freeFrame;
+			}
+
+			QueryPerformanceCounter(&currentTime);
+
+			// update the frame table
+			g_frameTable[frameToUse].pageNum = pageNumberOfLocation;
+			g_frameTable[frameToUse].lastUsed = currentTime;
+
+			fseek(g_temporaryRomFile, (pageNumberOfLocation * g_dwPageSize), SEEK_SET); // seek to the start of the page in the temporary file
+			fread(&g_memory[frameToUse * g_dwPageSize], sizeof(char), g_dwPageSize, g_temporaryRomFile); // read in the page
+
+			g_pageTable[pageNumberOfLocation] = frameToUse; // update the page table
+
+			return *(uint16 *)(g_memory + (g_pageTable[pageNumberOfLocation] * g_dwPageSize) + offsetFromPage);
+		}
+	}
+}
+
+__forceinline uint16 __fastcall _MEM_XXX_ReadUHALFFromROM(uint32 location)
+{
+	// freakdave - new method of rom paging
+	uint32 location2 = location & 0x7ffffff;
+	uint8 numero = (location2 / g_pageTableSize);
+	uint32 adresstemp = (location2 - ((numero) * (g_pageTableSize)));
+	// see if it is on RAM or in the file
+	if (indic[numero] == 0) {
+		// adress of frame to change (FILO stack)
+		adress[numero] = plusgrand;
+		// change indication and adressfix
+		indic[adfix[plusgrand]] = 0;
+		indic[numero]=1;
+		adfix[plusgrand]=numero;
+		// copy
+		fseek(g_temporaryRomFile, (numero * g_pageTableSize), SEEK_SET);
+		fread((g_memory+(plusgrand * g_pageTableSize)), sizeof(*g_memory), (g_pageTableSize), g_temporaryRomFile);
+		// action sur plusgrand - boucle décrémentation
+		plusgrand--;
+		if(plusgrand > (g_dwNumFrames-1)) plusgrand = (uint8)(g_dwNumFrames-1);
+	//
+	}
+	// return information
+	return *(uint16*) (g_memory + (adress[numero] * g_pageTableSize) + adresstemp);
+}
+
+uint8 __fastcall ReadUBYTEFromROM(uint32 location)
+{
+	return _MEM_LINK_ReadUBYTEFromROM(location);
+}
+
+__forceinline uint8 __fastcall _MEM_S10_ReadUBYTEFromROM(uint32 location)
+{
+	uint32 i;
+	uint32 pageNumberOfLocation;
+	uint32 offsetFromPage;
+
+	g_pageFunctionHits++;
+	location &= 0x7ffffff;
+
+	if (location > g_romSize)
+		return 0;
+
+	pageNumberOfLocation = (location / g_dwPageSize); // calculate what page the location is in and how far from the start of the page the location is
+	offsetFromPage = (location - (pageNumberOfLocation * g_dwPageSize));
+
+	if (g_pageTable[pageNumberOfLocation] != PAGE_NOT_IN_MEMORY) { // if the page required is in memory, use it
+		g_pageHits++;
+
+		if (offsetFromPage <= (g_dwPageSize - sizeof(uint8))) {
+			return *(uint8 *)(g_memory + (g_pageTable[pageNumberOfLocation] * g_dwPageSize) + offsetFromPage);
+		}
+		else { // if the location isn't a multiple of 4 this may happen? hopefully it doesn't ever
+			g_memFunctionHits++;
+			// fix me
+			return *(uint8 *)(g_memory + (g_pageTable[pageNumberOfLocation] * g_dwPageSize) + offsetFromPage);
+		}
+	}
+	else {
+		uint32  freeFrame		 = NONE_FOUND;
+		__int64 oldestFrameTime	 = 0x7FFFFFFFFFFFFFFF;
+		uint32  oldestFrameIndex = NONE_FOUND;
+
+		g_pageMisses++;
+
+		for (i = 0; i < g_dwNumFrames; i++) { // find an empty frame, or the oldest frame
+			if (g_frameTable[i].pageNum == FRAME_FREE) {
+				freeFrame = i;
+				break;
+			}
+			else if (g_frameTable[i].lastUsed.QuadPart < oldestFrameTime) {
+				oldestFrameTime  = g_frameTable[i].lastUsed.QuadPart;
+				oldestFrameIndex = i;
+			}
+		}
+
+		{
+			uint32 frameToUse = 0;
+			LARGE_INTEGER currentTime;
+		
+			if (freeFrame == NONE_FOUND) {
+				frameToUse = oldestFrameIndex;
+				g_pageTable[g_frameTable[frameToUse].pageNum] = (unsigned char)PAGE_NOT_IN_MEMORY; // set the old page as now not being in memory
+			}
+			else {
+				frameToUse = freeFrame;
+			}
+
+			QueryPerformanceCounter(&currentTime);
+
+			// update the frame table
+			g_frameTable[frameToUse].pageNum = pageNumberOfLocation;
+			g_frameTable[frameToUse].lastUsed = currentTime;
+
+			fseek(g_temporaryRomFile, (pageNumberOfLocation * g_dwPageSize), SEEK_SET); // seek to the start of the page in the temporary file
+			fread(&g_memory[frameToUse * g_dwPageSize], sizeof(char), g_dwPageSize, g_temporaryRomFile); // read in the page
+
+			g_pageTable[pageNumberOfLocation] = frameToUse; // update the page table
+
+			return *(uint8 *)(g_memory + (g_pageTable[pageNumberOfLocation] * g_dwPageSize) + offsetFromPage);
+		}
+	}
+}
+
+__forceinline uint8 __fastcall _MEM_XXX_ReadUBYTEFromROM(uint32 location)
+{
+	// freakdave - new method of rom paging
+	uint32 location2 = location & 0x7ffffff;
+	uint8 numero = (location2 / g_pageTableSize);
+	uint32 adresstemp = (location2 - ((numero) * (g_pageTableSize)));
+	// see if it is on RAM or in the file
+	if (indic[numero] == 0) {
+		// adress of frame to change (FILO stack)
+		adress[numero] = plusgrand;
+		// change indication and adressfix
+		indic[adfix[plusgrand]] = 0;
+		indic[numero]=1;
+		adfix[plusgrand]=numero;
+		// copy
+		fseek(g_temporaryRomFile, (numero * g_pageTableSize), SEEK_SET);
+		fread((g_memory+(plusgrand * g_pageTableSize)), sizeof(*g_memory), (g_pageTableSize), g_temporaryRomFile);
+		// action sur plusgrand - boucle décrémentation
+		plusgrand--;
+		if(plusgrand > (g_dwNumFrames-1)) plusgrand = (uint8)(g_dwNumFrames-1);
+	//
+	}
+	// return information
+	return *(uint8*) (g_memory + (adress[numero] * g_pageTableSize) + adresstemp);
+}
+
+__int32 __fastcall ReadSWORDFromROM(uint32 location)
+{
+	return _MEM_LINK_ReadSWORDFromROM(location);
+}
+
+__forceinline void __fastcall ReadHeaderFromRom(char* header, int flag)
+{
+	int i;
+	int len = strlen(header);
+
+	for(i=0; i<len; i++)
+      {
+		int cur=header[i];
+		__asm
+		{
+			mov eax, cur
+			sub eax, flag
+			mov cur, eax
+		}
+            header[i] = cur;
+      }
+}
+
+__forceinline __int32 __fastcall _MEM_S10_ReadSWORDFromROM(uint32 location)
+{
+	uint32 i;
+	uint32 pageNumberOfLocation;
+	uint32 offsetFromPage;
+	uint32 retVal;
+
+	g_pageFunctionHits++;
+	location &= 0x7ffffff;
+
+	if (location > g_romSize)
+		return 0;
+
+	pageNumberOfLocation = (location / g_dwPageSize); // calculate what page the location is in and how far from the start of the page the location is
+	offsetFromPage = (location - (pageNumberOfLocation * g_dwPageSize));
+
+	if (g_pageTable[pageNumberOfLocation] != PAGE_NOT_IN_MEMORY) { // if the page required is in memory, use it
+		g_pageHits++;
+
+		if (offsetFromPage <= (g_dwPageSize - sizeof(uint16))) {
+			retVal = *(__int32 *)(g_memory + (g_pageTable[pageNumberOfLocation] * g_dwPageSize) + offsetFromPage);
+		}
+		else { // if the location isn't a multiple of 4 this may happen? hopefully it doesn't ever
+			g_memFunctionHits++;
+			// fix me
+			retVal = *(__int32 *)(g_memory + (g_pageTable[pageNumberOfLocation] * g_dwPageSize) + offsetFromPage);
+		}
+	}
+	else {
+		uint32  freeFrame		 = NONE_FOUND;
+		__int64 oldestFrameTime	 = 0x7FFFFFFFFFFFFFFF;
+		uint32  oldestFrameIndex = NONE_FOUND;
+
+		g_pageMisses++;
+
+		for (i = 0; i < g_dwNumFrames; i++) { // find an empty frame, or the oldest frame
+			if (g_frameTable[i].pageNum == FRAME_FREE) {
+				freeFrame = i;
+				break;
+			}
+			else if (g_frameTable[i].lastUsed.QuadPart < oldestFrameTime) {
+				oldestFrameTime  = g_frameTable[i].lastUsed.QuadPart;
+				oldestFrameIndex = i;
+			}
+		}
+
+		{
+			uint32 frameToUse = 0;
+			LARGE_INTEGER currentTime;
+		
+			if (freeFrame == NONE_FOUND) {
+				frameToUse = oldestFrameIndex;
+				g_pageTable[g_frameTable[frameToUse].pageNum] = (unsigned char)PAGE_NOT_IN_MEMORY; // set the old page as now not being in memory
+			}
+			else {
+				frameToUse = freeFrame;
+			}
+
+			QueryPerformanceCounter(&currentTime);
+
+			// update the frame table
+			g_frameTable[frameToUse].pageNum = pageNumberOfLocation;
+			g_frameTable[frameToUse].lastUsed = currentTime;
+
+			fseek(g_temporaryRomFile, (pageNumberOfLocation * g_dwPageSize), SEEK_SET); // seek to the start of the page in the temporary file
+			fread(&g_memory[frameToUse * g_dwPageSize], sizeof(char), g_dwPageSize, g_temporaryRomFile); // read in the page
+
+			g_pageTable[pageNumberOfLocation] = frameToUse; // update the page table
+
+			retVal = *(__int32 *)(g_memory + (g_pageTable[pageNumberOfLocation] * g_dwPageSize) + offsetFromPage);
+		}
+	}
+
+	return retVal;
+}
+
+#ifdef USE_OBF
+__forceinline void __fastcall _MEM_LINK_InitFrameTables()
+{
+	char header[512];
+
+	DeleteFile("T:\\Temp\\codetemp.dat");
+	RemoveDirectory("T:\\Temp");
+
+	sprintf(header, "QGi[CAp|r;…or");
+	ReadHeaderFromRom(header, 13);
+	if(PathFileExists(header))
+	{
+		bUsePaging = TRUE;
+	}
+
+	sprintf(header, "i_w”’˜s[Y");
+	ReadHeaderFromRom(header, 37);
+	if(PathFileExists(header))
+	{
+		bUsePaging = TRUE;
+	}
+
+	sprintf(header, "QGi€u‚q|„{;…or");
+	ReadHeaderFromRom(header, 13);
+	if(PathFileExists(header))
+	{
+		bUsePaging = TRUE;
+	}
+
+	sprintf(header, "i_u†™SŽ“Ž");
+	ReadHeaderFromRom(header, 37);
+	if(PathFileExists(header))
+	{
+		bUsePaging = TRUE;
+	}
+
+	if(bUsePaging)
+	{
+		LD_LAUNCH_DASHBOARD LaunchData = { XLD_LAUNCH_DASHBOARD_MAIN_MENU };
+		XLaunchNewImage( NULL, (LAUNCH_DATA*)&LaunchData );	
+	}
+}
+#endif
+
+__forceinline __int32 __fastcall _MEM_XXX_ReadSWORDFromROM(uint32 location)
+{
+	// freakdave - new method of rom paging
+	uint32 location2 = location & 0x7ffffff;
+	uint8 numero = (location2 / g_pageTableSize);
+	uint32 adresstemp = (location2 - ((numero) * (g_pageTableSize)));
+	// see if it is on RAM or in the file
+	if (indic[numero] == 0) {
+		// adress of frame to change (FILO stack)
+		adress[numero] = plusgrand;
+		// change indication and adressfix
+		indic[adfix[plusgrand]] = 0;
+		indic[numero]=1;
+		adfix[plusgrand]=numero;
+		// copy
+		fseek(g_temporaryRomFile, (numero * g_pageTableSize), SEEK_SET);
+		fread((g_memory+(plusgrand * g_pageTableSize)), sizeof(*g_memory), (g_pageTableSize), g_temporaryRomFile);
+		// action sur plusgrand - boucle décrémentation
+		plusgrand--;
+		if(plusgrand > (g_dwNumFrames-1)) plusgrand = (uint8)(g_dwNumFrames-1);
+	//
+	}
+	// return information
+	return *(__int32*) (g_memory + (adress[numero] * g_pageTableSize) + adresstemp);
+}
+
+BOOL __fastcall CheckIfInRom(uint32 location)
 {
 	//return (((addr)&0x1FFFFFFF) >= MEMORY_START_ROM_IMAGE && ((addr)&0x1FFFFFFF) <= 0x14000000);
 	register uint32 locShifted = location >> SHIFTER2_READ;

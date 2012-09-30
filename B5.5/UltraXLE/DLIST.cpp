@@ -11,8 +11,8 @@
 
 //#define SHOWBPP
 
-#define MAXVX      64
-#define TEXCACHE   256 // textures in cache
+#define MAXVX      256//64
+#define TEXCACHE   512//256 // textures in cache
 #define CACHEDELAY 16
 #define CACHERAND  2  // randomization to delay
 
@@ -1975,8 +1975,8 @@ void dlist_execute(OSTask_t *task)
     if(cmdnum>50000)
     {
         error("dlist: display list too large (%i commands)\n",cmdnum);
-        dlist_abort();
-        return;
+        //dlist_abort();
+        //return;
     }
 
     dlpnt=task->m_data_ptr;
@@ -2000,8 +2000,8 @@ void dlist_execute(OSTask_t *task)
         if(errorcount>n/4)
         {
             error("dlist: display list doesn't look right (ecnt=%i/%i)",errorcount,n/4);
-            dlist_abort();
-            return;
+            //dlist_abort();
+            //return;
         }
         errorcount=0;
     }
@@ -2044,18 +2044,18 @@ void dlist_execute(OSTask_t *task)
         //}
         dlpnt+=8;
 
-        if(cmdcnt++>21000)
+        if(cmdcnt++>100000/*21000*/)//fd - 007 was freezing here with 21002 commands!
         {
             error("dlist: display list too large (%i commands)\n",cmdcnt);
-            dlist_abort();
-            return;
+            //dlist_abort();
+            //return;
         }
         if(errors>100)
         {
             error("dlist: display list has too many errors",cmdnum);
             errors=0;
-            dlist_abort();
-            return;
+            //dlist_abort();
+            //return;
         }
 
         if(c==0xEF)

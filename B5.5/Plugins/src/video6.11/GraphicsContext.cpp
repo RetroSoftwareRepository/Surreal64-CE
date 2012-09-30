@@ -122,11 +122,15 @@ void CGraphicsContext::InitWindowInfo()
 bool CGraphicsContext::Initialize(HWND hWnd, HWND hWndStatus, uint32 dwWidth, uint32 dwHeight, BOOL bWindowed )
 {
 #ifdef _XBOX
-	windowSetting.uDisplayWidth = windowSetting.uFullScreenDisplayWidth;
+	/*windowSetting.uDisplayWidth = windowSetting.uFullScreenDisplayWidth;
 	windowSetting.uDisplayHeight = windowSetting.uFullScreenDisplayHeight;
 
 	windowSetting.statusBarHeight = windowSetting.toolbarHeight = 
 		windowSetting.statusBarHeightToUse = windowSetting.toolbarHeightToUse = 0;
+		*/
+	windowSetting.uDisplayWidth = dwWidth;
+	windowSetting.uDisplayHeight = dwHeight;
+
 #else
 	if( windowSetting.bDisplayFullscreen )
 	{

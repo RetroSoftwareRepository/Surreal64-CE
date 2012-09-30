@@ -1,0 +1,17 @@
+Ogre Battle 64 - Person of Lordly Caliber
+Platform: Nintendo 64
+Media: Cartridge
+Genre: Strategy > Realtime > Role Playing Game
+Release Year: 2000
+Developer: Quest, Dual Corporation
+Publisher: Atlus
+Players: Single-player
+_________________________
+
+Plot
+
+The story follows Magnus Gallant, a recent graduate of the Ischka Military Academy, and fledgling captain in Palatinus' Southern region, Alba. As civil war erupts in the country, Magnus eventually decides to join the revolution with its leader, Frederick Raskin, first liberating the southern region with the Zenobians' aid, then Nirdam and uniting with them, then returning the Eastern Region of Capitrium to the Orthodox church, and finally marching on the capital of Latium. However, along the way, Magnus' battalion, the Blue Knights, finds its enemies escalating, from the puppet kingdom of Palatinus, to the might of the Holy Lodis Empire, to the Dark Hordes of the Netherworld. There are six possible Endings, some where Magnus gets expelled from the revolutionary army, because they consider him a "monster" who settles everything by force, realizing his actions are naught he disappears and people forget about the great general who once saved them, thus ensuring Palatinus' destruction. In another he is named "General Magnus Gallant, the guardian of Palatinus." And the last, where Frederick dies in the war against the tribes Of the East of Gallea and Zeteginia, who wanted to invade Palatinus right after Lodis weakened it, he is named: "Magnus Gallant, The Paladian King." his rule forever to be remembered and his son Aeneas Gallant takes the Throne, following his father's footsteps.
+
+Classes
+
+One of the trademarks of the series is the class system. Each character belongs to a certain class, and the vast majority can be changed into different classes. The classes determine the type of attacks the character can use in battle, what equipment it can carry, as well as effects on the unit's statistics. Many classes are most efficient in certain positions of a unit. All classes are divided into 3 major groups: Male, female, and non-human.

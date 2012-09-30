@@ -19,7 +19,7 @@
 */
 
 #include "stdafx.h"
-
+extern bool bEnableHDTV;
 CGraphicsContext* CGraphicsContext::g_pGraphicsContext = NULL;
 bool CGraphicsContext::needCleanScene = false;
 CGraphicsContext * CGraphicsContext::Get(void)
@@ -63,7 +63,7 @@ void CGraphicsContext::InitWindowInfo()
 
 bool CGraphicsContext::Initialize(HWND hWnd, HWND hWndStatus, DWORD dwWidth, DWORD dwHeight, BOOL bWindowed )
 {
-	if( windowSetting.bDisplayFullscreen )
+	/*if( windowSetting.bDisplayFullscreen )
 	{
 		windowSetting.uDisplayWidth = windowSetting.uFullScreenDisplayWidth;
 		windowSetting.uDisplayHeight = windowSetting.uFullScreenDisplayHeight;
@@ -72,13 +72,19 @@ bool CGraphicsContext::Initialize(HWND hWnd, HWND hWndStatus, DWORD dwWidth, DWO
 	{
 		windowSetting.uDisplayWidth = windowSetting.uWindowDisplayWidth;
 		windowSetting.uDisplayHeight= windowSetting.uWindowDisplayHeight;
-	}
-	
+	}*/
 
+	if(bEnableHDTV){
+	windowSetting.uDisplayWidth = 1280;
+	windowSetting.uDisplayHeight = 720;
+	}else{
+	windowSetting.uDisplayWidth = 640;
+	windowSetting.uDisplayHeight = 480;
+	}
 	RECT rcScreen;
 	SetRect(&rcScreen, 0,0, windowSetting.uDisplayWidth, windowSetting.uDisplayHeight);
-	rcScreen.bottom += statusBarHeight;
-	rcScreen.bottom += toolbarHeight;
+	//rcScreen.bottom += statusBarHeight;
+	//rcScreen.bottom += toolbarHeight;
 
  
 	return true;

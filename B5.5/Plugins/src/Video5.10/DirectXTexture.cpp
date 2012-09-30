@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <xgraphics.h>
 #endif
 
-extern BYTE g_ucTempBuffer[1024*1024*4];
+extern BYTE g_ucTempBuffer[1024*1024*2];
 
 CDirectXTexture::CDirectXTexture(DWORD dwWidth, DWORD dwHeight, bool asRenderTarget) :
 	CTexture(dwWidth,dwHeight,asRenderTarget)
@@ -85,31 +85,13 @@ bool CDirectXTexture::StartUpdate(DrawInfo *di)
 	if (m_pTexture == NULL)
 		return false;
 
-#ifdef _XBOX
+
 	di->lpSurface = g_ucTempBuffer;
 	di->dwWidth = m_dwCreatedTextureWidth;
 	di->dwHeight = m_dwCreatedTextureHeight;
 	di->lPitch = m_dwCreatedTextureWidth * GetPixelSize();
  
 	return true;
-#else
-	D3DLOCKED_RECT d3d_lr;
-	HRESULT hr = LPDIRECT3DTEXTURE8(m_pTexture)->LockRect(0, &d3d_lr, NULL, D3DLOCK_NOSYSLOCK);
-	if (SUCCEEDED(hr))
-	{
-		di->dwHeight = (WORD)m_dwHeight;
-		di->dwWidth = (WORD)m_dwWidth;
-		di->dwCreatedHeight = m_dwCreatedTextureHeight;
-		di->dwCreatedWidth = m_dwCreatedTextureWidth;
-		di->lpSurface = d3d_lr.pBits;
-		di->lPitch    = d3d_lr.Pitch;
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-#endif
 }
 
 ///////////////////////////////////////////////////
@@ -145,8 +127,8 @@ LPDAEDALUSTEXTURE CDirectXTexture::CreateTexture(DWORD dwWidth, DWORD dwHeight)
 	LPDIRECT3DDEVICE8 pD3DDev;
 	unsigned int dwNumMaps = 1;
 
-	//D3DFORMAT pf = D3DFMT_A4R4G4B4;	// Force to use 16 bit texture
-	D3DFORMAT pf = D3DFMT_A8R8G8B8;	// Force to use 32 bit texture
+	D3DFORMAT pf = D3DFMT_A4R4G4B4;	// Force to use 16 bit texture
+	//D3DFORMAT pf = D3DFMT_A8R8G8B8;	// Force to use 32 bit texture
 	//D3DFORMAT pf = ((CDirectXGraphicsContext*)(CGraphicsContext::g_pGraphicsContext))->GetFormat();
 
 	switch( pf )

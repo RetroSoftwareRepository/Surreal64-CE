@@ -17,13 +17,21 @@
 #include <stdio.h>
 #include <xtl.h>
 #include <math.h>			// For sqrt()
-#define XFONT_TRUETYPE // use true type fonts
-#include <xfont.h>
- 
-#include <d3dx8.h>
- 
-#include <vector>
 #include <iostream>
+
+#if _MSC_VER > 1200
+#include "xmmintrin.h"
+#endif
+
+
+#include <process.h>
+
+#include <d3d8.h>
+#include <d3dx8.h>
+#include <d3d8types.h>
+#include <D3dx8math.h>
+
+#include <vector>
 
 // TODO: reference additional headers your program requires here
 #ifndef _DEBUG
@@ -117,7 +125,7 @@
 #include "CSortedList.h"
 #include "CritSect.h"
 #include "Timing.h"
- 
+
 extern WindowSettingStruct windowSetting;
 
 extern BOOL g_bCRCCheck;			// Apply a crc-esque check to each texture each frame
@@ -136,14 +144,6 @@ extern unsigned char *g_pu8RamBase;
 extern unsigned char * g_pu8SpMemBase;
 extern GFX_INFO g_GraphicsInfo;
 
-extern BOOL g_bMenuWaiting;
-extern BOOL g_bTempMessage;
-extern DWORD g_dwTempMessageStart;
-extern char g_szTempMessage[100];
-extern XFONT *g_defaultTrueTypeFont;
-
-void XboxCheckMenuAndDebugInfo();
-void XboxDrawTemporaryMessage();
 
 //#define ENABLE_PROFILER
 

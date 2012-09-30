@@ -550,7 +550,7 @@ BOOL Machine_LoadState(void) {
 	HANDLE hSaveFile;
 	//unzFile file;
 
-	sprintf(FileName, "T:\\%08X-%08X-%02X.%i", *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x14)), *((BYTE *)(RomHeader + 0x3D)), SaveStateIndex);
+	sprintf(FileName, "%s%08X\\%08X-%08X-%02X.%i", g_szPathSaves, *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x14)), *((BYTE *)(RomHeader + 0x3D)), SaveStateIndex);
 
 	/*if (strlen(LoadFileName) == 0) {
 		strcpy(Directory,"T:\\");
@@ -826,8 +826,10 @@ BOOL Machine_SaveState(void) {
 		return FALSE;
 	}
 
-	sprintf(FileName, "T:\\%08X-%08X-%02X.%i", *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x14)), *((BYTE *)(RomHeader + 0x3D)), SaveStateIndex);
+	sprintf(FileName, "%s%08X\\%08X-%08X-%02X.%i", g_szPathSaves, *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x14)), *((BYTE *)(RomHeader + 0x3D)), SaveStateIndex);
 
+	strcpy(Directory, g_szPathSaves);
+	
 	/*if (strlen(SaveAsFileName) == 0) {
 		strcpy(Directory,"T:\\");
 		sprintf(FileName,"%s%s",Directory,RomName);
@@ -1127,11 +1129,12 @@ void SetCoreToStepping ( void ) {
 	CPU_Action.Stepping = TRUE;
 }
 
+extern char g_temporaryRomPath[260];
 void StartEmulation ( void ) {
 
 	DWORD  count;
 
-	FILE *tmpFile = fopen("Z:\\TemporaryRom.dat", "rb");
+	FILE *tmpFile = fopen(g_temporaryRomPath, "rb");
 	if (!tmpFile) {
 		Sleep(1000);
 	}

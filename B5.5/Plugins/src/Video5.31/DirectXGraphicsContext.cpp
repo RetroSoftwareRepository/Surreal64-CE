@@ -21,16 +21,15 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <xbapp.h>
 #include <xbresource.h>
-#include <xbfont.h>
 
-CXBFont		m_Font;					// Font	for	text display
-CXBFont		m_MSFont;					// Font	for	buttons
+extern void XboxDrawOSD();
+extern int AntiAliasMode;
+char emuvidname[128];
 
 LPDIRECT3DDEVICE8 g_pD3DDev = NULL;
 D3DCAPS8 g_D3DDeviceCaps;
-D3DPRESENT_PARAMETERS d3dpp;
-extern char skinname[32];
-extern "C" char emuname[256];
+//D3DPRESENT_PARAMETERS d3dpp;
+
 /*
  *	Constants
  */
@@ -59,9 +58,9 @@ BufferSettingInfo DirectXDepthBufferSetting[] =
 {
 	"16-bit (def)",				D3DFMT_D16,				D3DFMT_D16,
 	//"16-bit signed",			D3DFMT_D15S1,			D3DFMT_D15S1,
-	//"16-bit lockable",			D3DFMT_D16_LOCKABLE,	D3DFMT_D16_LOCKABLE,
+	"16-bit lockable",			D3DFMT_D16_LOCKABLE,	D3DFMT_D16_LOCKABLE,
 	//"32-bit",					D3DFMT_D32,				D3DFMT_D32,
-	//"32-bit signed",			D3DFMT_D24S8,			D3DFMT_D24S8,
+	"32-bit signed",			D3DFMT_D24S8,			D3DFMT_D24S8,
 	//"32-bit D24X8",				D3DFMT_D24X4S4,			D3DFMT_D24X4S4,
 	//"32-bit D24X4S4",			D3DFMT_D24X8,			D3DFMT_D24X8,
 };
@@ -145,67 +144,43 @@ bool FrameBufferInRDRAMCheckCRC();
 void ClearFrameBufferToBlack(DWORD left=0, DWORD top=0, DWORD width=0, DWORD height=0);
 bool ProcessFrameWriteRecord();
 extern RECT frameWriteByCPURect;
-extern bool bloadstate[5];
-extern bool bsavestate[5];
+extern bool bloadstate[MAX_SAVE_STATES];
+extern bool bsavestate[MAX_SAVE_STATES];
 extern "C" void __EMU_SaveState(int index);
 extern "C" void __EMU_LoadState(int index);
-extern bool onhd;
-extern bool showdebug;
-extern DWORD dwTitleColor;
+extern bool bSatesUpdated;
 
-void CDirectXGraphicsContext::UpdateFrame(bool swaponly)
+__forceinline void CDirectXGraphicsContext::UpdateFrame(bool swaponly)
 {
-	HRESULT hr;
+	//HRESULT hr; //unreferenced
 
-				for (int i=0;i<5;i++){
-			if (bloadstate [i]) {
+	if (bSatesUpdated) {
+		bSatesUpdated = false;
+		
+		for (int i=0; i<MAX_SAVE_STATES; i++) {
+			if (bloadstate[i]) {
 				__EMU_LoadState(i+1);
-			    bloadstate[i]=false;}
-			if (bsavestate [i]) {
+				bloadstate[i]=false;
+				break;
+			}
+			else if (bsavestate[i]) {
 				__EMU_SaveState(i+1);
-			    bsavestate[i]=false;}
+				bsavestate[i]=false;
+				break;
+			}
 		}
+	}
 
 	CGraphicsContext::UpdateFrameBufferBeforeUpdateFrame();
+	
+#ifndef OLDTXTCACHE
+	if (!g_bUseSetTextureMem)
+		gTextureCache.FreeTextures();
+#endif
 
+	XboxDrawOSD();
 
-		static DWORD lastTick = GetTickCount() / 1000;
-		static int lastTickFPS = 0;
-		static int frameCount = 0;
-
-		if (lastTick != GetTickCount() / 1000)
-		{
-			lastTickFPS = frameCount;
-			frameCount = 0;
-			lastTick = GetTickCount() / 1000;
-		}
-frameCount++;
-WCHAR str[10];
-swprintf(str,L"%i fps", lastTickFPS);
-MEMORYSTATUS memStat;
-WCHAR szMemStatus[128];
-
-GlobalMemoryStatus(&memStat);
-//Check Memory, Warn User, Return to Launcher
-if (memStat.dwAvailPhys / 1024 / 1024 < 1)
-	{
-		swprintf(szMemStatus,L"Out of Memory! Returning to Launcher...");
-		m_Font.Begin();
-		m_Font.DrawText(320, 240, dwTitleColor, szMemStatus, XBFONT_CENTER_X);
-		m_Font.End();
-		XLaunchNewImage("D:\\default.xbe", NULL);
-	}
-if (showdebug) {
-	swprintf(szMemStatus,L"%d Mb Free",(memStat.dwAvailPhys /1024 /1024));
-	WCHAR debugemu[256];
-	swprintf(debugemu,L"%S",emuname);
-
-	m_Font.Begin();
-	m_Font.DrawText(60, 35, dwTitleColor, szMemStatus, XBFONT_LEFT);
-	m_Font.DrawText(60, 50, dwTitleColor, str, XBFONT_LEFT);
-	m_Font.DrawText(60, 65, dwTitleColor, debugemu, XBFONT_LEFT);
-	m_Font.End();
-}
+/*
 	Lock();
 	if (m_pd3dDevice == NULL)
 	{
@@ -243,13 +218,63 @@ if (showdebug) {
 #endif
 
 	}
-exit:
+//exit: // unrefrenced
 	
-	Unlock();
+	Unlock();*/
+
+	if( !currentRomOptions.forceBufferClear ){
+		Clear(CLEAR_DEPTH_BUFFER);}
+
+	m_pd3dDevice->Present( NULL, NULL, NULL, NULL );
+
+	m_backBufferIsSaved = false;
+	if( m_ToSaveNextBackBuffer )
+	{
+		SaveBackBuffer();
+		m_backBufferIsSaved = false;
+	}
 
 	if( currentRomOptions.forceBufferClear )	needCleanScene = true;
 }
 
+//-----------------------------------------------------------------------------
+// Name: SetAntiAliasMode()
+// Desc: Surreal64 function to set the antialiasing mode determined by the
+//       Launcher. Edge AntiAliasing may work better on the xbox compared to
+//	     the FSAA modes. 4x Gaussian is the reccomended then to 2x Quincunx if 
+//	     the framerate plunges. Linear modes are also available if those
+//	     methods are prefered.
+//-----------------------------------------------------------------------------
+DWORD SetAntiAliasMode(int AAMode){
+	DWORD useAAMode;
+	switch (AAMode)
+	{
+		case 0:
+			useAAMode = D3DMULTISAMPLE_NONE;
+		break;
+
+		case 1:
+			useAAMode = D3DMULTISAMPLE_NONE;
+		break;
+
+		case 2:
+			useAAMode = D3DMULTISAMPLE_2_SAMPLES_MULTISAMPLE_LINEAR;
+		break;
+
+		case 3:
+			useAAMode = D3DMULTISAMPLE_2_SAMPLES_MULTISAMPLE_QUINCUNX;
+		break;
+
+		case 4:
+			useAAMode = D3DMULTISAMPLE_4_SAMPLES_MULTISAMPLE_LINEAR;
+		break;
+
+		case 5:
+			useAAMode = D3DMULTISAMPLE_4_SAMPLES_MULTISAMPLE_GAUSSIAN;
+		break;
+	}
+	return useAAMode;
+}
 //-----------------------------------------------------------------------------
 // Name: FindDepthStencilFormat()
 // Desc: Finds a depth/stencil format for the given device that is compatible
@@ -269,7 +294,7 @@ BOOL CDirectXGraphicsContext::FindDepthStencilFormat( UINT iAdapter, D3DDEVTYPE 
 //
 //*****************************************************************************
 extern "C" void _INPUT_LoadButtonMap(int *cfgData); 
-extern int ControllerConfig[72];
+extern int ControllerConfig[76];
 bool CDirectXGraphicsContext::Initialize(HWND hWnd, HWND hWndStatus,
 									 DWORD dwWidth, DWORD dwHeight,
 									 BOOL bWindowed )
@@ -346,15 +371,10 @@ bool CDirectXGraphicsContext::Initialize(HWND hWnd, HWND hWndStatus,
 
 	// GogoAckman
 	g_pd3dDevice = g_pD3DDev;
-	char fontname[256];
-	sprintf(fontname,"D:\\Skins\\%s\\Font.xpr",skinname);
-	m_Font.Create(fontname);
-	sprintf(fontname,"D:\\Skins\\%s\\MsFont.xpr",skinname);
-	m_MSFont.Create(fontname); 
-	d3dpp = m_d3dpp;
+	sprintf(emuvidname,"Video 5.31");
+	//d3dpp = m_d3dpp;
 
 	_INPUT_LoadButtonMap(ControllerConfig);
-    strcat(emuname," Video 5.31");
 
 	return hr==S_OK;
 }
@@ -397,29 +417,44 @@ HRESULT CDirectXGraphicsContext::InitializeD3DEnvironment()
     ZeroMemory( &m_d3dpp, sizeof(m_d3dpp) );
     m_d3dpp.Windowed               = FALSE;
     m_d3dpp.BackBufferCount        = 1;
-	//m_d3dpp.MultiSampleType        = D3DMULTISAMPLE_2_SAMPLES_MULTISAMPLE_QUINCUNX;
+	//m_d3dpp.BackBufferWidth  = pModeInfo->Width;
+    //m_d3dpp.BackBufferHeight = pModeInfo->Height;
+	m_d3dpp.BackBufferWidth = 640;
+	m_d3dpp.BackBufferHeight = 480;
+    //m_d3dpp.BackBufferFormat = D3DFMT_LIN_R5G6B5;
+	m_d3dpp.BackBufferFormat = D3DFMT_A8R8G8B8;
+	m_d3dpp.MultiSampleType        = SetAntiAliasMode(AntiAliasMode);
     //m_d3dpp.SwapEffect             = bufferSettings[curBufferSetting].swapEffect;
     m_d3dpp.SwapEffect             =  D3DSWAPEFFECT_COPY;
 	m_d3dpp.EnableAutoDepthStencil = TRUE; /*m_bUseDepthBuffer;*/
     //m_d3dpp.AutoDepthStencilFormat = pModeInfo->DepthStencilFormat;
 	m_d3dpp.AutoDepthStencilFormat = D3DFMT_D16;
     m_d3dpp.hDeviceWindow          = m_hWnd;
-	m_d3dpp.FullScreen_PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
+
+
+	switch (VSync){
+		case 0 : 	m_d3dpp.FullScreen_PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
+			break;
+		case 1 : 	m_d3dpp.FullScreen_PresentationInterval = D3DPRESENT_INTERVAL_ONE;
+			break;
+		case 2 : 	m_d3dpp.FullScreen_PresentationInterval = D3DPRESENT_INTERVAL_ONE_OR_IMMEDIATE;
+			break;
+/*		case 2 : 	m_d3dpp.FullScreen_PresentationInterval = D3DPRESENT_INTERVAL_TWO;
+			break;
+		case 3 : 	m_d3dpp.FullScreen_PresentationInterval = D3DPRESENT_INTERVAL_THREE;
+			break;
+		case 4 : 	m_d3dpp.FullScreen_PresentationInterval = D3DPRESENT_INTERVAL_DEFAULT;
+			break;
+		case 5 : 	m_d3dpp.FullScreen_PresentationInterval = D3DPRESENT_INTERVAL_ONE_OR_IMMEDIATE;
+			break;
+		case 6 : 	m_d3dpp.FullScreen_PresentationInterval = D3DPRESENT_INTERVAL_TWO_OR_IMMEDIATE;
+			break;
+		case 7 : 	m_d3dpp.FullScreen_PresentationInterval = D3DPRESENT_INTERVAL_THREE_OR_IMMEDIATE;
+			break;*/
+	}
 	
-	m_d3dpp.FullScreen_RefreshRateInHz = D3DPRESENT_RATE_DEFAULT;
+	m_d3dpp.FullScreen_RefreshRateInHz = 60;//D3DPRESENT_RATE_DEFAULT;
 	//m_d3dpp.Flags = D3DPRESENTFLAG_EMULATE_REFRESH_RATE;
-
-    //m_d3dpp.BackBufferWidth  = pModeInfo->Width;
-    //m_d3dpp.BackBufferHeight = pModeInfo->Height;
-	m_d3dpp.BackBufferWidth = 640;
-	m_d3dpp.BackBufferHeight = 480;
-    m_d3dpp.BackBufferFormat = D3DFMT_LIN_R5G6B5;
-	//m_d3dpp.BackBufferFormat = D3DFMT_A8R8G8B8;
-    
-	windowSetting.uDisplayWidth = m_d3dpp.BackBufferWidth;
-	windowSetting.uDisplayHeight = m_d3dpp.BackBufferHeight;
-
-	m_desktopFormat = D3DFMT_LIN_R5G6B5;
 
 
 	DWORD videoFlags = XGetVideoFlags();
@@ -437,50 +472,58 @@ HRESULT CDirectXGraphicsContext::InitializeD3DEnvironment()
 		m_d3dpp.Flags = D3DPRESENTFLAG_WIDESCREEN;
 	 }
 
+	if(XGetAVPack() == XC_AV_PACK_HDTV){
+		
+		//720p
+
+		if( videoFlags & XC_VIDEO_FLAGS_HDTV_720p && bEnableHDTV){
+			m_d3dpp.BackBufferWidth = 1280;
+			m_d3dpp.BackBufferHeight = 720;
+			m_d3dpp.Flags = D3DPRESENTFLAG_PROGRESSIVE | D3DPRESENTFLAG_WIDESCREEN;
+			m_d3dpp.BackBufferFormat = D3DFMT_A8R8G8B8;
+		}
 		//480p
-	 if(XGetAVPack() == XC_AV_PACK_HDTV){
-		if( videoFlags & XC_VIDEO_FLAGS_HDTV_480p){
+
+		else if( videoFlags & XC_VIDEO_FLAGS_HDTV_480p){
 			m_d3dpp.Flags = D3DPRESENTFLAG_PROGRESSIVE;
 			m_d3dpp.BackBufferFormat = D3DFMT_A8R8G8B8;
 		}
 	 }
 
-	
+	//apply final width and height. Leave this here!
+	windowSetting.uDisplayWidth = m_d3dpp.BackBufferWidth;
+	windowSetting.uDisplayHeight = m_d3dpp.BackBufferHeight;
+
+	m_desktopFormat = D3DFMT_A8R8G8B8;//D3DFMT_LIN_R5G6B5;
+
     // Create the device
-//freakdave
 	if(VertexMode == 0){
     // Create the device
     hr = m_pD3D->CreateDevice( D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL,
 								NULL, D3DCREATE_PUREDEVICE, &m_d3dpp,
 								&m_pd3dDevice );
-
 	}
 
-
-	if(VertexMode == 1){
+	else if(VertexMode == 1){
     // Create the device
     hr = m_pD3D->CreateDevice( D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL,
 								NULL, D3DCREATE_SOFTWARE_VERTEXPROCESSING, &m_d3dpp,
 								&m_pd3dDevice );
-
 	}
 
-	if(VertexMode == 2){
+	else if(VertexMode == 2){
     // Create the device
     hr = m_pD3D->CreateDevice( D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL,
 								NULL, D3DCREATE_HARDWARE_VERTEXPROCESSING, &m_d3dpp,
 								&m_pd3dDevice );
-
 	}
 
-	if(VertexMode == 3){
+	else if(VertexMode == 3){
     // Create the device
     hr = m_pD3D->CreateDevice( D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL,
 								NULL, D3DCREATE_MIXED_VERTEXPROCESSING, &m_d3dpp,
 								&m_pd3dDevice );
-
 	}
-	 
 	 
 	if(  m_pd3dDevice )
 	{
@@ -503,15 +546,15 @@ HRESULT CDirectXGraphicsContext::InitializeD3DEnvironment()
         m_dwCreateFlags = D3DCREATE_PUREDEVICE;
 		}
 
-		if(VertexMode == 1){
+		else if(VertexMode == 1){
         m_dwCreateFlags = D3DCREATE_SOFTWARE_VERTEXPROCESSING;
 		}
 
-		if(VertexMode == 2){
+		else if(VertexMode == 2){
         m_dwCreateFlags = D3DCREATE_HARDWARE_VERTEXPROCESSING;
 		}
 
-		if(VertexMode == 3){
+		else if(VertexMode == 3){
         m_dwCreateFlags = D3DCREATE_MIXED_VERTEXPROCESSING;
 		}
  
@@ -540,12 +583,9 @@ HRESULT CDirectXGraphicsContext::InitializeD3DEnvironment()
 		SAFE_RELEASE( m_pd3dDevice );
 	}
 	else
-	{
-			
+	{	
 	}
-  
     // If that failed, fall back to the reference rasterizer (removed)
-	
     return hr;
 }
 
@@ -612,7 +652,7 @@ HRESULT CDirectXGraphicsContext::DoToggleFullscreen()
 //       and/or adapter
 //-----------------------------------------------------------------------------
 HRESULT CDirectXGraphicsContext::ForceWindowed()
-{
+{/*
     HRESULT hr;
     D3DAdapterInfo* pAdapterInfoCur = &m_Adapters[m_dwAdapter];
     D3DDeviceInfo*  pDeviceInfoCur  = &pAdapterInfoCur->devices[pAdapterInfoCur->dwCurrentDevice];
@@ -675,7 +715,7 @@ HRESULT CDirectXGraphicsContext::ForceWindowed()
     if( FAILED( hr = InitializeD3DEnvironment() ) )
         return DisplayErrorMsg( hr, MSGERR_APPMUSTEXIT );
     m_bReady = true;
-	
+	*/
     return S_OK;
 }
 

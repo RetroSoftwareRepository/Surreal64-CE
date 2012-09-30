@@ -1,3 +1,6 @@
+
+// NOT USED!!!
+
 /*
  * 1964 Copyright (C) 1999-2002 Joel Middendorf, <schibo@emulation64.com> This
  * program is free software; you can redistribute it and/or modify it under the
@@ -17,21 +20,21 @@
 
 #include "memory.h"
 
-BOOL InitVirtualRomData(char *rompath);
-void LoadVirtualRomData();
-void CloseVirtualRomData();
+BOOL __fastcall InitVirtualRomData(char *rompath);
+void __fastcall LoadVirtualRomData();
+void __fastcall CloseVirtualRomData();
 
-void InitPageAndFrameTables();
+void __fastcall InitPageAndFrameTables();
 
-uint32 ReadUWORDFromROM(uint32 location);
-uint16 ReadUHALFFromROM(uint32 location);
-uint8  ReadUBYTEFromROM(uint32 location);
+uint32 __fastcall ReadUWORDFromROM(uint32 location);
+uint16 __fastcall ReadUHALFFromROM(uint32 location);
+uint8  __fastcall ReadUBYTEFromROM(uint32 location);
 
-__int32 ReadSWORDFromROM(uint32 location);
+__int32 __fastcall ReadSWORDFromROM(uint32 location);
 
-BOOL CheckIfInRom(uint32 location);
+BOOL __fastcall CheckIfInRom(uint32 location);
 
-__forceinline __int32 ReadSWORDFromROM_EAXOnly(uint32 location)
+static __forceinline __int32 ReadSWORDFromROM_EAXOnly(uint32 location)
 {
 	{
 		__int32 temp;

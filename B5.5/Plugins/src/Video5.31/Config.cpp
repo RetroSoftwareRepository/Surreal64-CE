@@ -21,12 +21,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "_BldNum.h"
 #include "../../../config.h"
 
-WindowSettingStruct windowSetting;
-GlobalOptions options;
-RomOptions defaultRomOptions;
-RomOptions currentRomOptions;
-FrameBufferOptions frameBufferOptions;
-
 char *frameBufferSettings[] =
 {
 	"None (default)",
@@ -50,10 +44,16 @@ const char *screenUpdateSettings[] =
 	"At the 1st drawing"
 };
 
+WindowSettingStruct windowSetting;
+GlobalOptions options;
+RomOptions defaultRomOptions;
+RomOptions currentRomOptions;
+FrameBufferOptions frameBufferOptions;
+
 //=======================================================
 
 extern IniFile *g_pIniFile;
-
+/*
 const char *resolutions[] =
 {
 	"320 x 240",
@@ -91,7 +91,7 @@ const char *fullScreenFrequencies[] = {
 	"120 Hz",
 };
 const int numberOffullScreenFrequencies = sizeof(fullScreenFrequencies)/sizeof(char*);
-
+*/
 
 const RenderEngineSetting RenderEngineSettings[] =
 {
@@ -132,20 +132,20 @@ const SettingInfo TextureEnhancementControlSettings[] =
 	"2xSaI smooth", TEXTURE_ENHANCEMENT_WITH_SMOOTH_FILTER_3,
 	"Less 2xSaI smooth", TEXTURE_ENHANCEMENT_WITH_SMOOTH_FILTER_4,
 };
-
+/*
 const SettingInfo openGLColorBufferSettings[] =
 {
 	"16-bit",	TEXTURE_FMT_A4R4G4B4,
 	"32-bit (def)",	TEXTURE_FMT_A8R8G8B8,
 };
-
+*/
 
 const SettingInfo openGLDepthBufferSettings[] =
 {
 	"16-bit (def)",	16,
 	"32-bit",	32,
 };
-
+/*
 const RenderEngineSetting OpenGLRenderSettings[] =
 {
 	"To Fit Your Video Card",	OGL_DEVICE,
@@ -154,39 +154,29 @@ const RenderEngineSetting OpenGLRenderSettings[] =
 	"OpenGL 1.4",				OGL_1_4_DEVICE,
 	"OpenGL for Nvidia TNT or better",		OGL_TNT2_DEVICE,
 	"OpenGL for Nvidia Geforce or better ",	NVIDIA_OGL_DEVICE,
-};
+};*/
 
 const int numberOfRenderEngineSettings = sizeof(RenderEngineSettings)/sizeof(RenderEngineSetting);
-const int numberOfOpenGLRenderEngineSettings = sizeof(OpenGLRenderSettings)/sizeof(RenderEngineSetting);
+//const int numberOfOpenGLRenderEngineSettings = sizeof(OpenGLRenderSettings)/sizeof(RenderEngineSetting);
 
 #define MAIN_RICE_DAEDALUS_4		"Software\\RICEDAEDALUS520\\WINDOW"
-#define RICE_DAEDALUS_INI_FILE		"D:\\RiceDaedalus5.3.1.ini"
-
+//#define RICE_DAEDALUS_INI_FILE		"D:\\RiceDaedalus5.3.1.ini"
+#define RICE_DAEDALUS_INI_FILE		"RiceDaedalus5.3.1.ini"
 
 extern int TextureMode;
 void WriteConfiguration(void);
 void GenerateCurrentRomOptions();
 
-HWND	g_hwndTT=NULL;
-HWND	g_hwndDlg=NULL;
-HHOOK	g_hhk = NULL;
-extern	HINSTANCE myhInst;
-
-extern "C" BOOL __stdcall EnumChildProc(HWND hwndCtrl, LPARAM lParam);
-LRESULT CALLBACK GetMsgProc(int nCode, WPARAM wParam, LPARAM lParam);
-VOID OnWMNotify(LPARAM lParam);
-BOOL CreateDialogTooltip(void);
-
 
 //////////////////////////////////////////////////////////////////////////
 void GenerateFrameBufferOptions(void)
 {
-	if( CDeviceBuilder::GetGeneralDeviceType() == OGL_DEVICE && currentRomOptions.N64FrameBufferEmuType != FRM_NONE )
+	/*if( CDeviceBuilder::GetGeneralDeviceType() == OGL_DEVICE && currentRomOptions.N64FrameBufferEmuType != FRM_NONE )
 	{
 		// OpenGL does not support much yet
 		currentRomOptions.N64FrameBufferEmuType = FRM_IGNORE;
 	}
-
+	*/
 	//currentRomOptions.N64FrameBufferEmuType = FRM_NONE;
 
 	frameBufferOptions.bUpdateCIInfo			= false;
@@ -271,7 +261,6 @@ uint32 ReadRegistryDwordVal(char *MainKey, char *Field)
 	return(0);
 }
 
-
 bool isMMXSupported() 
 { 
 	int IsMMXSupported; 
@@ -315,120 +304,117 @@ void ReadConfiguration(void)
 	options.enableHacks = TRUE;
 	options.enableSSE = TRUE;
 
-	defaultRomOptions.screenUpdateSetting = SCREEN_UPDATE_AT_VI_CHANGE;
-	defaultRomOptions.dwEnableObjBG = TRUE;
-	status.isMMXSupported = isMMXSupported();
-	status.isSSESupported = isSSESupported();
+	defaultRomOptions.screenUpdateSetting = SCREEN_UPDATE_AT_VI_CHANGE;//SCREEN_UPDATE_AT_VI_UPDATE;//
+	defaultRomOptions.dwEnableObjBG = 1;
+	status.isMMXSupported = 1;//isMMXSupported();
+	status.isSSESupported = 0;//isSSESupported();
 	defaultRomOptions.N64FrameBufferEmuType = FRM_NONE;
 
-	if(TestRegistry() == FALSE)
-	{
-		options.bWinFrameMode=FALSE;
-		options.enableFog = TRUE;
-		options.bForceSoftwareTnL = FALSE;
-		options.enableSSE = TRUE;
-		options.RenderBufferSetting=1;
-		options.forceTextureFilter = 0;
-		options.DirectXDepthBufferSetting = 0;
-		options.OpenglDepthBufferSetting = 16;
-		options.OpenglColorBufferSetting = TEXTURE_FMT_A8R8G8B8;
-		options.textureEnhancement = 0;
-		options.textureEnhancementControl = 0;
-		options.OpenglRenderSetting = OGL_DEVICE;
-		options.skipFrame = FrameSkip;
-		options.bDisplayTooltip = FALSE;
 
-		defaultRomOptions.N64FrameBufferEmuType = FRM_NONE;
+	DWORD videoFlags = XGetVideoFlags();
 
-		defaultRomOptions.forceBufferClear = FALSE;
-		defaultRomOptions.bSupportSelfRenderTexture = TRUE;
-		defaultRomOptions.normalAlphaBlender = FALSE;
-		defaultRomOptions.bFastTexCRC=TRUE;
-		defaultRomOptions.normalColorCombiner = FALSE;
-		defaultRomOptions.accurateTextureMapping = TRUE;
-		windowSetting.uFullScreenFrequency = 0;	// 0 is the default value, means to use Window default frequency
-		//freakdave - override default texture filter setting
-		options.forceTextureFilter = TextureMode;
-		WriteConfiguration();
-		return;
-	}
-	else
-	{
 		windowSetting.uWindowDisplayWidth = ReadRegistryDwordVal(MAIN_RICE_DAEDALUS_4, "WinModeWidth");
-		if( windowSetting.uWindowDisplayWidth == 0 )
-		{
-			windowSetting.uWindowDisplayWidth = 640;
+	if( windowSetting.uWindowDisplayWidth == 0 )
+	{
+		windowSetting.uWindowDisplayWidth = 640;
+
+		if(XGetAVPack() == XC_AV_PACK_HDTV) {
+			if(videoFlags & XC_VIDEO_FLAGS_HDTV_720p && bEnableHDTV) {
+				windowSetting.uWindowDisplayWidth = 1280;
+			}
 		}
+			
+	}
 
 		windowSetting.uWindowDisplayHeight = ReadRegistryDwordVal(MAIN_RICE_DAEDALUS_4, "WinModeHeight");
-		if( windowSetting.uWindowDisplayHeight == 0 )
-		{
-			windowSetting.uWindowDisplayHeight = 480;
+	if( windowSetting.uWindowDisplayHeight == 0 )
+	{
+		windowSetting.uWindowDisplayHeight = 480;
+
+		if(XGetAVPack() == XC_AV_PACK_HDTV) {
+			if(videoFlags & XC_VIDEO_FLAGS_HDTV_720p && bEnableHDTV) {
+				windowSetting.uWindowDisplayHeight = 720;
+			}
 		}
+	}
 		
 		windowSetting.uDisplayWidth = windowSetting.uWindowDisplayWidth;
 		windowSetting.uDisplayHeight = windowSetting.uWindowDisplayHeight;
 
 
 		windowSetting.uFullScreenDisplayWidth = ReadRegistryDwordVal(MAIN_RICE_DAEDALUS_4, "FulScreenWidth");
-		if( windowSetting.uFullScreenDisplayWidth == 0 )
-		{
-			windowSetting.uFullScreenDisplayWidth = 640;
-		}
-		windowSetting.uFullScreenDisplayHeight = ReadRegistryDwordVal(MAIN_RICE_DAEDALUS_4, "FulScreenHeight");
-		if( windowSetting.uFullScreenDisplayHeight == 0 )
-		{
-			windowSetting.uFullScreenDisplayHeight = 480;
-		}
+	if( windowSetting.uFullScreenDisplayWidth == 0 )
+	{
+		windowSetting.uWindowDisplayWidth = 640;
 
-		options.bWinFrameMode = ReadRegistryDwordVal(MAIN_RICE_DAEDALUS_4, "WinModeMode");
-		//options.enableHacks = ReadRegistryDwordVal(MAIN_RICE_DAEDALUS_4, "EnableHacks");
-		defaultRomOptions.N64FrameBufferEmuType = ReadRegistryDwordVal(MAIN_RICE_DAEDALUS_4, "FrameBufferSetting");
-		//defaultRomOptions.screenUpdateSetting = ReadRegistryDwordVal(MAIN_RICE_DAEDALUS_4, "ScreenUpdateSetting");
-		defaultRomOptions.normalAlphaBlender = ReadRegistryDwordVal(MAIN_RICE_DAEDALUS_4, "NormalAlphaBlender");
-		//defaultRomOptions.dwEnableObjBG = ReadRegistryDwordVal(MAIN_RICE_DAEDALUS_4, "EnableObjBG");
-		options.enableFog = ReadRegistryDwordVal(MAIN_RICE_DAEDALUS_4, "EnableFog");
-		options.bForceSoftwareTnL = ReadRegistryDwordVal(MAIN_RICE_DAEDALUS_4, "ForceSoftwareTnL");
-		options.enableSSE = ReadRegistryDwordVal(MAIN_RICE_DAEDALUS_4, "EnableSSE");
-		options.skipFrame = ReadRegistryDwordVal(MAIN_RICE_DAEDALUS_4, "SkipFrame");
-		options.bDisplayTooltip = ReadRegistryDwordVal(MAIN_RICE_DAEDALUS_4, "DisplayTooltip");
-		options.RenderBufferSetting = ReadRegistryDwordVal(MAIN_RICE_DAEDALUS_4, "FrameBufferType");
-		options.textureEnhancement = ReadRegistryDwordVal(MAIN_RICE_DAEDALUS_4, "TextureEnhancement");
-		options.textureEnhancementControl = ReadRegistryDwordVal(MAIN_RICE_DAEDALUS_4, "TextureEnhancementControl");
-		options.forceTextureFilter = ReadRegistryDwordVal(MAIN_RICE_DAEDALUS_4, "ForceTextureFilter");
-		defaultRomOptions.bFastTexCRC = ReadRegistryDwordVal(MAIN_RICE_DAEDALUS_4, "FastTextureLoading");
-		CDeviceBuilder::SelectDeviceType( (DaedalusSupportedDeviceType)ReadRegistryDwordVal(MAIN_RICE_DAEDALUS_4, "RenderEngine") );
-		g_dwDirectXCombinerType = ReadRegistryDwordVal(MAIN_RICE_DAEDALUS_4, "DirectXCombiner");
-		options.DirectXDepthBufferSetting = ReadRegistryDwordVal(MAIN_RICE_DAEDALUS_4, "DirectXDepthBufferSetting");
-		options.OpenglDepthBufferSetting = ReadRegistryDwordVal(MAIN_RICE_DAEDALUS_4, "OpenGLDepthBufferSetting");
-		options.OpenglColorBufferSetting = ReadRegistryDwordVal(MAIN_RICE_DAEDALUS_4, "OpenGLColorBufferSetting");
-		options.OpenglRenderSetting = ReadRegistryDwordVal(MAIN_RICE_DAEDALUS_4, "OpenGLRenderSetting");
-		defaultRomOptions.bFastTexCRC = ReadRegistryDwordVal(MAIN_RICE_DAEDALUS_4, "FastTextureLoading");
-		defaultRomOptions.forceBufferClear = ReadRegistryDwordVal(MAIN_RICE_DAEDALUS_4, "ForceBufferClear");
-		defaultRomOptions.bSupportSelfRenderTexture = ReadRegistryDwordVal(MAIN_RICE_DAEDALUS_4, "SelfRenderTexture");
-		defaultRomOptions.accurateTextureMapping = ReadRegistryDwordVal(MAIN_RICE_DAEDALUS_4, "AccurateTextureMapping");
-		windowSetting.uFullScreenFrequency = ReadRegistryDwordVal(MAIN_RICE_DAEDALUS_4, "FullScreenFrequency");
-		options.forceTextureFilter = TextureMode;
+		if(XGetAVPack() == XC_AV_PACK_HDTV) {
+			if(videoFlags & XC_VIDEO_FLAGS_HDTV_720p && bEnableHDTV) {
+				windowSetting.uWindowDisplayWidth = 1280;
+			}
+		}
+	}
+		windowSetting.uFullScreenDisplayHeight = ReadRegistryDwordVal(MAIN_RICE_DAEDALUS_4, "FulScreenHeight");
+	if( windowSetting.uFullScreenDisplayHeight == 0 )
+	{
+		windowSetting.uWindowDisplayHeight = 480;
+
+		if(XGetAVPack() == XC_AV_PACK_HDTV) {
+			if(videoFlags & XC_VIDEO_FLAGS_HDTV_720p && bEnableHDTV) {
+				windowSetting.uWindowDisplayHeight = 720;
+			}
+		}
 	}
 
-	//freakdave
-	//0 = None (valid for Mips only)
-	//1 = Point
-	//2 = Linear
-	//3 = Anisotropic
-	//4 = Flatcubic
-	//5 = Gaussiancubic
-	//get TextureFilter information from ini file
-	options.forceTextureFilter = TextureMode;
+	
+		options.bWinFrameMode = 0;
 
+		defaultRomOptions.normalAlphaBlender = 0;
+		defaultRomOptions.normalColorCombiner = 0;
+
+		options.enableFog = TRUE;
+		options.enableSSE = TRUE;
+		options.skipFrame = FrameSkip;
+
+		options.RenderBufferSetting = 0;//1;
+
+		options.textureEnhancement = 0;
+		options.textureEnhancementControl = 0;
+
+		options.bForceSoftwareTnL = 0;
+		
+		//fd - We only need ConfigAppLoad2 here (seems to work without this call)
+		//ConfigAppLoad2();
+		//fd - override default texture filter setting
+		options.forceTextureFilter = TextureMode;
+		
+		CDeviceBuilder::SelectDeviceType(XBOX_DIRECTX_DEVICE);
+		g_dwDirectXCombinerType = DX_2_STAGES;
+		options.DirectXDepthBufferSetting = 0;
+		defaultRomOptions.bFastTexCRC = TRUE;
+
+		options.bDisplayTooltip = 0;
+		defaultRomOptions.forceBufferClear = 0;
+		defaultRomOptions.accurateTextureMapping = 1;
+
+		defaultRomOptions.bSupportSelfRenderTexture = 1;
+		
+		windowSetting.uFullScreenFrequency = 0;	// 0 is the default value, means to use Window default frequency
+		
+	if (status.isMMXSupported)
+		MsgInfo("MMX Enabled");
+	else
+		MsgInfo("MMX Disabled");
+		
 	status.isSSEEnabled = status.isSSESupported && options.enableSSE;
 	if( status.isSSEEnabled )
 	{
 		SetNewVertexInfo = SetNewVertexInfoSSE;
+		MsgInfo("SSE Enabled");
 	}
 	else
 	{
 		SetNewVertexInfo = SetNewVertexInfoNoSSE;
+		MsgInfo("SSE Disabled");
 	}
 }
 	
@@ -442,15 +428,17 @@ BOOL InitConfiguration(void)
 		g_pIniFile = new IniFile(RICE_DAEDALUS_INI_FILE);
 		if (g_pIniFile == NULL)
 		{
+			ReadConfiguration(); //defaults
 			return FALSE;
 		}
 
 		if (!g_pIniFile->ReadIniFile())
 		{
 			ErrorMsg("Unable to read Daedalus.ini file from disk");
+			ReadConfiguration(); //defaults
+			g_pIniFile->WriteIniFile();
 			return FALSE;
 		}
-
 	}
 
 	ReadConfiguration();
@@ -586,7 +574,7 @@ void Ini_GetRomOptions(LPROMINFO pRomInfo)
 	pRomInfo->dwFrameBufferOption	= g_pIniFile->sections[i].dwFrameBufferOption;
 	pRomInfo->dwScreenUpdateSetting	= g_pIniFile->sections[i].dwScreenUpdateSetting;
 }
-
+/*
 void Ini_StoreRomOptions(LPROMINFO pRomInfo)
 {
 	LONG i;
@@ -665,7 +653,7 @@ void Ini_StoreRomOptions(LPROMINFO pRomInfo)
 	}
 }
 
- 
+ */
 
 
 

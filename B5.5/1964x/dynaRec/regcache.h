@@ -25,9 +25,9 @@
 
 /* The following are macros that help us debug the dynarec */
 
-//#ifdef _DEBUG
-#define CRASHABLE 1 //weinerschnitzel - let's try enabling this in release and see what we can do
-//#endif
+#ifdef _DEBUG
+#define CRASHABLE 1 
+#endif
 
 //#define NO_CONSTS 1
 //#define SAFE_SLT 1

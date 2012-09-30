@@ -36,14 +36,19 @@ public:
 	string GetRomName();
 	string GetProperName();
 	string GetBoxArtFilename();
+	string GetVideoFilename();
 	string GetComments();
 	dword GetRomSize();
+	
+	string GetCleanName(); // clean name
+	string GetCleanTruncName(int iMaxChars); // clean trunc name
 
 	RomIniEntry *GetIniEntry();
 
 	
 	string m_szFilename;
 	string m_szBoxArtFilename;
+	string m_szVideoFilename;
 
 	bool m_bLoaded;
 

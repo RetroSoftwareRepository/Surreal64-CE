@@ -2,13 +2,17 @@
 //#include <windows.h>
 //#include <windowsx.h>
 //#include <mmsystem.h>
-//#include <dsound.h>
+#include <dsound.h>
 #include "stdsdk.h"
 #include <stdio.h>
 #include "ultra.h"
-
-
+#include <string>
+#include <cstring>
+#include <assert.h>
+using namespace std;
 extern void debugprint(char *str,...);
+
+bool g_bAudioBoost = FALSE;
 
 static LPDIRECTSOUND		ds;
 static LPDIRECTSOUNDBUFFER	sbuf;
@@ -38,7 +42,7 @@ typedef struct
 
 static void dserror(HRESULT hErr,char *text)
 {
-    char *err;
+    //char *err;
 
 	/*switch (hErr)
 	{
@@ -60,16 +64,16 @@ static void dserror(HRESULT hErr,char *text)
         default :                       err="Unknown Error";            break;
 	}*/
 
-    print("DirectSound Error %08X at %s: %s\n", hErr,text,err);
-	OutputDebugString((LPCTSTR)hErr);
-	OutputDebugString(text);
+    //print("DirectSound Error %08X at %s: %s\n", hErr,text,err);
+	//OutputDebugString((LPCTSTR)hErr);
+	//OutputDebugString(text);
 	//PostQuitMessage(0);
 }
 
 int sound_init(int rate)
 {
     HRESULT e;
-    HWND    hwnd;
+    //HWND    hwnd;
 
 	
     if(initdone) return(0);
@@ -81,8 +85,8 @@ int sound_init(int rate)
     e=DirectSoundCreate(NULL,&ds,NULL);
     if(e!=DS_OK) return(-1);
 
-    e=IDirectSound_SetCooperativeLevel(ds,hwnd,DSSCL_NORMAL);
-    if(e!=DS_OK) return(-1);
+    //e=IDirectSound_SetCooperativeLevel(ds,hwnd,DSSCL_NORMAL);
+    //if(e!=DS_OK) return(-1);
 	ReleaseMutex(hMutex);
     if(!ds) return(0);
 
@@ -99,10 +103,11 @@ void sound_start(int rate)
 
     if(!initdone) 
 	{
-		OutputDebugString("void sound_start Line 96\n");
+		//OutputDebugString("sound_start : SOUND.cpp Line 103\n");
 		return;
 	}
     bufrate=rate;
+
 	WaitForSingleObject(hMutex, MS);
     // Set up wave format structure.
     memset(&form, 0, sizeof(WAVEFORMATEX));
@@ -121,7 +126,7 @@ void sound_start(int rate)
     desc.dwFlags             = NULL;
     desc.dwBufferBytes       = bufsize;
     desc.lpwfxFormat         = (LPWAVEFORMATEX)&form;
-
+	
 
     if((e=IDirectSound_CreateSoundBuffer(ds, &desc, &sbuf, NULL))!=DS_OK)
     {
@@ -130,12 +135,36 @@ void sound_start(int rate)
         return;
     }
 
+	e=IDirectSoundBuffer_SetVolume(sbuf, DSBVOLUME_MAX);
+	e=IDirectSoundBuffer_SetHeadroom(sbuf, DSBHEADROOM_MIN);
+	
+	if (g_bAudioBoost) {
+	DSMIXBINS dsmb;
+
+	DSMIXBINVOLUMEPAIR dsmbvp[8] = {
+    {DSMIXBIN_FRONT_LEFT, DSBVOLUME_MAX},
+    {DSMIXBIN_FRONT_RIGHT, DSBVOLUME_MAX},
+    {DSMIXBIN_FRONT_CENTER, DSBVOLUME_MAX},
+    {DSMIXBIN_FRONT_CENTER, DSBVOLUME_MAX},
+    {DSMIXBIN_BACK_LEFT, DSBVOLUME_MAX},
+    {DSMIXBIN_BACK_RIGHT, DSBVOLUME_MAX},
+    {DSMIXBIN_LOW_FREQUENCY, DSBVOLUME_MAX},
+    {DSMIXBIN_LOW_FREQUENCY, DSBVOLUME_MAX}};
+    
+	dsmb.dwMixBinCount = 8;
+	dsmb.lpMixBinVolumePairs = dsmbvp;
+	
+	e=IDirectSoundBuffer_SetMixBins(sbuf, &dsmb);
+	}
+
     if((e=IDirectSoundBuffer_Play(sbuf,0,0,DSBPLAY_LOOPING))!=DS_OK)
     {
         dserror(e,"startsound");
     }
 	ReleaseMutex(hMutex);
     wpos=bufsize/2;
+
+	
 }
 
 void sound_stop(void)
@@ -143,7 +172,7 @@ void sound_stop(void)
     HRESULT e;
     if(!initdone) 
 	{
-		OutputDebugString("void sound_stop Line 140\n");	
+		//OutputDebugString("void sound_stop Line 152\n");
 		return;
 	}
 	WaitForSingleObject(hMutex, MS);
@@ -166,7 +195,7 @@ int  sound_buffered(void)
     int playpos,safepos,a;
     if(!initdone || !sbuf) 
 	{
-		OutputDebugString("void sound_buffered Line 161\n");
+		//OutputDebugString("sound_buffered : SOUND.cpp Line 175\n");
 		return(0);
 	}
 	WaitForSingleObject(hMutex, MS);
@@ -184,7 +213,7 @@ int  sound_position(int *bufsizeptr)
     int playpos,safepos;
     if(!initdone || !sbuf) 
 	{
-		OutputDebugString("void sound_position Line 180\n");
+		//OutputDebugString("sound_position : SOUND.cpp Line 193\n");
 		return(0);
 	}
 	WaitForSingleObject(hMutex, MS);
@@ -202,12 +231,12 @@ int  sound_add(short *data0,int bytes)
 
     if(!initdone || !sbuf) 
 	{
-		OutputDebugString("void sound_add return -2 Line 197\n");	
+		//OutputDebugString("sound_add return -2 : SOUND.cpp Line 211\n");	
 		return(-2);
 	}
     if(bytes<=0 || bytes>65535) 
 	{
-		OutputDebugString("void sound_add return -1 Line 202\n");	
+		//OutputDebugString("sound_add return -1 : SOUND.cpp Line 216\n");	
 		return(-1);
 	}
     {
@@ -215,6 +244,7 @@ int  sound_add(short *data0,int bytes)
         DWORD   size1;
         LPVOID  data2;
         DWORD   size2;
+
 		WaitForSingleObject(hMutex, MS);
         if((e=IDirectSoundBuffer_Lock(sbuf,wpos,bytes,&data1,&size1,&data2,&size2,0))!=DS_OK)
         {
@@ -223,12 +253,37 @@ int  sound_add(short *data0,int bytes)
         }
         if(size1>0)
         {
-            memcpy(data1,data,size1);
+			
+			__try
+			{
+				memcpy(data1,data,size1);
+			}
+			__except(NULL, EXCEPTION_EXECUTE_HANDLER)
+			{
+				OutputDebugString("memcpy(data1,data,size1) : SOUND.cpp Line 241\n");
+			}
+			/*catch(...)
+			{
+				assert(0);
+			}*/
+
             data+=size1;
         }
         if(size2>0)
         {
-            memcpy(data2,data,size2);
+			
+			__try
+			{
+				memcpy(data2,data,size2);
+			}
+			__except(NULL, EXCEPTION_EXECUTE_HANDLER)
+			{
+				OutputDebugString("memcpy(data2,data,size2) : SOUND.cpp Line 258\n");
+			}
+			/*catch(...)
+			{
+				assert(0);
+			}*/
             data+=size2;
         }
         if((e=IDirectSoundBuffer_Unlock(sbuf,data1,size1,data2,size2))!=DS_OK)
@@ -255,7 +310,7 @@ void sound_resync(int target)
     int playpos,safepos;
     if(!initdone || !sbuf) 
 	{
-		OutputDebugString("void sound_resync Line 248\n");
+		//OutputDebugString("sound_resync : SOUND.cpp Line 265\n");
 		return;
 	}
 	WaitForSingleObject(hMutex, MS);
@@ -270,11 +325,35 @@ void sound_resync(int target)
     }
     if(size1>0)
     {
-        memset(data1,0,size1);
+		
+		__try
+		{
+			memset(data1,0,size1);
+		}
+		__except(NULL, EXCEPTION_EXECUTE_HANDLER)
+		{
+			OutputDebugString("memset(data1,0,size1) : SOUND.cpp Line 311\n");
+		}
+		/*catch(...)
+		{
+			assert(0);
+		}*/
     }
     if(size2>0)
     {
-        memset(data2,0,size2);
+		
+		__try
+		{
+			memset(data2,0,size2);
+		}
+		__except(NULL, EXCEPTION_EXECUTE_HANDLER)
+		{
+			OutputDebugString("memset(data2,0,size2) : SOUND.cpp Line 326\n");
+		}
+		/*catch(...)
+		{
+			assert(0);
+		}*/
     }
     if((e=IDirectSoundBuffer_Unlock(sbuf,data1,size1,data2,size2))!=DS_OK)
     {

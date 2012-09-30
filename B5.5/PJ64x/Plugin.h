@@ -327,6 +327,10 @@ extern WORD RSPVersion;
 
 
 // Ez0n3 - use iAudioPlugin instead to determine if basic audio is used
-//extern BOOL g_bUseLLERspPlugin;
-//extern BOOL g_bUseBasicAudio;
+//extern BOOL g_bUseLLERspPlugin; // not used anymore
+//extern BOOL g_bUseBasicAudio; // not used anymore
+extern BOOL g_bUseRspAudio; // control a listing
+
+extern int g_iRspPlugin;
 extern int g_iAudioPlugin;
+extern BOOL g_bAudioBoost;

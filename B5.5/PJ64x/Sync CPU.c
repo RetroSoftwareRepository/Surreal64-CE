@@ -104,8 +104,21 @@ void AllocateSyncMemory ( void ) {
 	memcpy(SyncTlb,tlb,sizeof(tlb));
 }
 
-void Error_Message (char * Message, ...) {
-	 
+void Error_Message (char * Message, ...)
+{
+//#ifdef DEBUG
+	char Msg[400];
+	va_list ap;
+
+	va_start( ap, Message );
+	vsprintf( Msg, Message, ap );
+	va_end( ap );
+	
+	OutputDebugString(Msg);
+/*#else
+	OutputDebugString(Message);
+#endif*/
+	OutputDebugString("\n");
 }
 
 void FreeSyncMemory (void) {

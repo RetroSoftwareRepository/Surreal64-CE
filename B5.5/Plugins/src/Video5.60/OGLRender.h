@@ -80,7 +80,7 @@ public:
 	void DrawObjBGCopy(uObjBg &info);
 	void DrawText(const char* str, RECT *rect);
 
-	void SetFogMinMax(float fMin, float fMax);
+	void SetFogMinMax(float fMin, float fMax, float fMul, float fOffset);
 	void SetFogEnable(BOOL bEnable);
 	void TurnFogOnOff(BOOL flag);
 	void SetFogColor(DWORD r, DWORD g, DWORD b, DWORD a);

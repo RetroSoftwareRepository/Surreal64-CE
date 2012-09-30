@@ -197,8 +197,8 @@ More notes intermixed with the definitions, read on.
 
 // how often to:
 #define CYCLES_BURST        5000      // break burst (=burst length)
-#define CYCLES_CHECKOFTEN   5000      // check common hw
-#define CYCLES_CHECKSELDOM  50000     // check not so common hw
+#define CYCLES_CHECKOFTEN   2000/*5000*/      // check common hw
+#define CYCLES_CHECKSELDOM  5000/*50000*/     // check not so common hw
 #define CYCLES_CHECKUI      200000    // check user interface
 #define CYCLES_RETRACE      25000     // min cycles between retraces
 

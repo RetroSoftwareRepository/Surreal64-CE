@@ -38,6 +38,7 @@
 //#include "kaillera/Kaillera.h"
 #include "gamesave.h"
 //#include "netplay.h"
+#include <time.h>
 
 _u8 EEProm_Status_Byte = 0x00;
 
@@ -95,6 +96,9 @@ void Close_iPIF(void)
 		{
 			if(gamesave.mempak_used[i] && gamesave.mempak_written[i])
 			{
+#ifdef DEBUG_PAKS
+				TRACE1("Close_iPIF:FileIO_WriteMemPak (%i)", i);
+#endif
 				FileIO_WriteMemPak(i);
 				gamesave.mempak_used[i] = FALSE;
 				gamesave.mempak_written[i] = FALSE;
@@ -183,6 +187,9 @@ void ReadControllerPak(int device, char *cmd)
 	{
 		if(!gamesave.mempak_used[device])
 		{
+#ifdef DEBUG_PAKS
+			TRACE1("ReadControllerPak:FileIO_LoadMemPak (%i)", device);
+#endif
 			FileIO_LoadMemPak(device);
 			gamesave.mempak_used[device] = TRUE;
 
@@ -215,6 +222,9 @@ void WriteControllerPak(int device, char *cmd)
 	{
 		if(!gamesave.mempak_used[device])
 		{
+#ifdef DEBUG_PAKS
+			TRACE1("WriteControllerPak:FileIO_LoadMemPak (%i)", device);
+#endif
 			FileIO_LoadMemPak(device);
 			gamesave.mempak_used[device] = TRUE;
 
@@ -225,6 +235,9 @@ void WriteControllerPak(int device, char *cmd)
 		}
 
 		/* Copy Data to Mempak */
+#ifdef DEBUG_PAKS
+		TRACE1("WriteControllerPak:FileIO_WriteMemPak (%i)", device);
+#endif
 		memcpy(&(gamesave.mempak[device][offset * 32]), &cmd[3], 32);
 		gamesave.mempak_written[device] = TRUE;
 		FileIO_WriteMemPak(device);		//Save the file to disk
@@ -366,6 +379,9 @@ label_Jump:
 		switch(Controls[device].Plugin)
 		{
 		case PLUGIN_MEMPAK:
+#ifdef DEBUG_PAKS
+			TRACE1("ControllerCommand:ReadControllerPak (%i)", device);
+#endif
 			ReadControllerPak(device, &cmd[2]);
 			break;
 		case PLUGIN_RUMBLE_PAK:
@@ -397,6 +413,9 @@ label_Jump:
 		switch(Controls[device].Plugin)
 		{
 		case PLUGIN_MEMPAK:
+#ifdef DEBUG_PAKS
+			TRACE1("ControllerCommand:WriteControllerPak (%i)", device);
+#endif
 			WriteControllerPak(device, &cmd[2]);
 			break;
 		case PLUGIN_RUMBLE_PAK:
@@ -530,9 +549,20 @@ void WriteEEprom(char *src, long offset)
  =======================================================================================================================
     Handles all Commands which are sent to the EEprom
  =======================================================================================================================
+//This Section is patched
  */
+
+unsigned char byte2bcd(int n)
+{
+	n %= 100;
+	return ((n / 10) << 4) | (n % 10);
+}
+
 BOOL EEpromCommand(_u8 *cmd, int device)
 {
+	time_t curtime_time;
+    struct tm curtime;
+	
 	switch(cmd[2])
 	{
 	/* reporting eeprom state ... hmmm */
@@ -541,7 +571,7 @@ BOOL EEpromCommand(_u8 *cmd, int device)
 #ifdef DEBUG_SI_EEPROM
 		if(debugoptions.debug_si_eeprom)
 		{
-			TRACE0("Execute EEPROM GetStatis Commands");
+			TRACE0("Execute EEPROM GetStatus Commands");
 		}
 #endif
 		cmd[3] = 0x00;
@@ -556,8 +586,48 @@ BOOL EEpromCommand(_u8 *cmd, int device)
 
 	/* Write to Eeprom */
 	case 0x05:
-		WriteEEprom(&cmd[4], cmd[3] * 8);
+		WriteEEprom((char*)&cmd[4], cmd[3] * 8);
 		break;
+
+	/* RTC, credit: Mupen64 source */
+	case 0x06:
+		// RTC status query
+	    cmd[3] = 0x00;
+	    cmd[4] = 0x10;
+	    cmd[5] = 0x00;
+		break;
+
+	case 0x07:
+		// read RTC block
+		switch (cmd[3]) { // block number
+			case 0:
+			    cmd[4] = 0x00;
+			    cmd[5] = 0x02;
+			    cmd[12] = 0x00;
+			    break;
+			case 1:
+				//DebugMessage(M64MSG_ERROR, "RTC command in EepromCommand(): read block %d", Command[2]);
+			    break;
+			case 2:
+				time(&curtime_time);
+			    memcpy(&curtime, localtime(&curtime_time), sizeof(curtime)); // fd's fix
+			    cmd[4] = byte2bcd(curtime.tm_sec);
+			    cmd[5] = byte2bcd(curtime.tm_min);
+			    cmd[6] = 0x80 + byte2bcd(curtime.tm_hour);
+			    cmd[7] = byte2bcd(curtime.tm_mday);
+			    cmd[8] = byte2bcd(curtime.tm_wday);
+			    cmd[9] = byte2bcd(curtime.tm_mon + 1);
+			    cmd[10] = byte2bcd(curtime.tm_year);
+			    cmd[11] = byte2bcd(curtime.tm_year / 100);
+			    cmd[12] = 0x00;	// status
+			    break;
+		}
+		break;
+	case 0x08:
+		// write RTC block
+		//DebugMessage(M64MSG_ERROR, "RTC write in EepromCommand(): %d not yet implemented", Command[2]);
+		break;
+
 
 	default:
 		break;
@@ -833,7 +903,8 @@ uint32 SrcCodeLUT[] = {
 0x0006001A, 0x006900A7, 0x02000070, 0x00C00001, //
 0x0006001A, 0x006A00A8, 0x02000080, 0x00000001, //
 0x0006001A, 0x006A00A9, 0x02000090, 0x00400001, //
-0x0006001A, 0x006A00AA, 0x020000A0, 0x00800001  //
+0x0006001A, 0x006A00AA, 0x020000A0, 0x00800001, //
+0x8FBB1DB8, 0x76B63CEC, 0x025BEAED, 0xEC803A6B, // weinersch - RTC patch
 };
 
 uint32 ResCodeLUT[] = {
@@ -1103,7 +1174,8 @@ uint32 ResCodeLUT[] = {
  0x6E6C4E40, 0xF94BECD6, 0x006EECC6, 0x9FBFF9CB,
  0x6E6C8CAA, 0x55D5F9DB, 0x00717171, 0xF9F9F9CB,
  0x551517B7, 0x4E404ED0, 0x005555B5, 0xC6A88C5A,
- 0xE6C46EEE, 0x993955D5, 0x00171717, 0xF9F971E1
+ 0xE6C46EEE, 0x993955D5, 0x00171717, 0xF9F971E1,
+ 0xDEB04FDB, 0x4CF76A13, 0x000B73E7, 0x4AC64045, //RTC patch
 	};
 
 /*
@@ -1217,12 +1289,18 @@ void iPifCheck(void)
 		case 3:
 			if(Controls[device].RawData)
 			{
+#ifdef DEBUG_PAKS
+				TRACE1("iPifCheck:ReadRawData (%i)", device);
+#endif
 				CONTROLLER_ControllerCommand(device, cmd);
 				CONTROLLER_ReadController(device, cmd);
 				break;
 			}
 			else
 			{
+#ifdef DEBUG_PAKS
+				TRACE1("iPifCheck:ControllerCommand (%i)", device);
+#endif
 				if(!ControllerCommand(cmd, device))
 				{
 					count = 64;

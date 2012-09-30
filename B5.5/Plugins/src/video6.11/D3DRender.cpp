@@ -113,11 +113,25 @@ bool D3DRender::InitDeviceObjects()
 	gD3DDevWrapper.SetRenderState( D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
 	gD3DDevWrapper.SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
 	
+#ifdef _XBOX
+
+	if(AntiAliasMode>1){
+		gD3DDevWrapper.SetRenderState( D3DRS_MULTISAMPLEANTIALIAS , TRUE);
+	}else if(AntiAliasMode==1){
+		gD3DDevWrapper.SetRenderState( D3DRS_MULTISAMPLEANTIALIAS , FALSE);
+		gD3DDevWrapper.SetRenderState( D3DRS_ALPHABLENDENABLE , TRUE);
+		gD3DDevWrapper.SetRenderState( D3DRS_EDGEANTIALIAS , TRUE);
+	}else{
+		gD3DDevWrapper.SetRenderState( D3DRS_MULTISAMPLEANTIALIAS , FALSE);
+	}
+
+#else
+
 	if( ((CDXGraphicsContext*)CGraphicsContext::g_pGraphicsContext)->IsFSAAEnable() )
 		gD3DDevWrapper.SetRenderState( D3DRS_MULTISAMPLEANTIALIAS , TRUE);
 	else
 		gD3DDevWrapper.SetRenderState( D3DRS_MULTISAMPLEANTIALIAS, FALSE);
-
+#endif
 	// Initialize all the renderstate to our defaults.
 	SetShadeMode( gRSP.shadeMode );
 	gD3DDevWrapper.SetRenderState( D3DRS_TEXTUREFACTOR, 0xFFFFFFFF );
@@ -129,7 +143,7 @@ bool D3DRender::InitDeviceObjects()
 //#ifdef _XBOX
 	gD3DDevWrapper.SetRenderState( D3DRS_FOGTABLEMODE, D3DFOG_NONE );
 //#else
-	//gD3DDevWrapper.SetRenderState( D3DRS_FOGTABLEMODE, D3DFOG_LINEAR );
+//	gD3DDevWrapper.SetRenderState( D3DRS_FOGTABLEMODE, D3DFOG_LINEAR );
 //#endif
 
 	// Dafault is ZBuffer disabled
@@ -202,8 +216,8 @@ bool D3DRender::InitDeviceObjects()
 			status.isVertexShaderEnabled = false;
 		}
 	}
-
-/*#if DIRECTX_VERSION == 8
+/*
+#if DIRECTX_VERSION == 8
 	D3DCLIPSTATUS8 clippingstatus;
 #else
 	D3DCLIPSTATUS9 clippingstatus;
@@ -213,8 +227,8 @@ bool D3DRender::InitDeviceObjects()
 	clippingstatus.ClipIntersection = 0xFFFFFFFF;
 	g_pD3DDev->SetClipStatus(&clippingstatus);
 	g_pD3DDev->GetClipStatus(&clippingstatus);
-	g_pD3DDev->SetRenderState(D3DRS_CLIPPING, TRUE);*/
-
+	g_pD3DDev->SetRenderState(D3DRS_CLIPPING, TRUE);
+*/
 
 	//freakdave
 	g_pD3DDev->SetTextureStageState(0, D3DTSS_MINFILTER, TextureMode);
@@ -315,13 +329,13 @@ bool D3DRender::RenderFlushTris()
 	else
 	{
 		gD3DDevWrapper.SetFVF(RICE_FVF_TLITVERTEX);
-		/*if( options.bForceSoftwareClipper )
+		if( options.bForceSoftwareClipper )
 		{
 			ClipVertexes();
 			if( g_clippedVtxCount > 0 )
 			g_pD3DDev->DrawPrimitiveUP(D3DPT_TRIANGLELIST, g_clippedVtxCount/3, g_clippedVtxBuffer, sizeof(TLITVERTEX));
 		}
-		else*/
+		else
 		{
 			g_pD3DDev->DrawPrimitiveUP(D3DPT_TRIANGLELIST, gRSP.numVertices/3, g_vtxBuffer, sizeof(TLITVERTEX));
 		}
@@ -836,7 +850,18 @@ void D3DRender::BeginRendering(void)
 
 void D3DRender::CaptureScreen(char *filename)
 {
-
+#ifndef _XBOX
+	MYLPDIRECT3DSURFACE surface;
+#if DIRECTX_VERSION == 8
+	g_pD3DDev->GetRenderTarget(&surface);
+#else
+	g_pD3DDev->GetRenderTarget(0,&surface);
+#endif
+	((CDXGraphicsContext*)CGraphicsContext::g_pGraphicsContext)->SaveSurfaceToFile(filename, surface, false);
+	//D3DXSaveSurfaceToFile(filename,D3DXIFF_BMP,surface,NULL,NULL);
+	surface->Release();
+	TRACE1("Capture screen to %s", filename);
+#endif
 }
 
 void D3DRender::SetCullMode(bool bCullFront, bool bCullBack)

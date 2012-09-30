@@ -216,7 +216,7 @@ protected:
 	TxtrCacheEntry * GetPrimLODFracTexture(uint8 fac);
 
     void MakeTextureYoungest(TxtrCacheEntry *pEntry);
-	DWORD m_currentTextureMemUsage; // Ez0n3 - already old way
+	DWORD m_currentTextureMemUsage;
 	TxtrCacheEntry *m_pYoungestTexture;
 	TxtrCacheEntry *m_pOldestTexture;
 
@@ -233,6 +233,10 @@ public:
 	void RecheckHiresForAllTextures();
 	bool CleanUp();
 	
+#ifndef OLDTXTCACHE
+	void FreeTextures();
+#endif
+	
 #ifdef _DEBUG
 	TxtrCacheEntry * GetCachedTexture(uint32 tex);
 	uint32 GetNumOfCachedTexture();
@@ -243,9 +247,8 @@ extern CTextureManager gTextureManager;		// The global instance of CTextureManag
 extern void DumpCachedTexture(TxtrCacheEntry &entry);
 
 
-// Ez0n3 - reinstate max video mem until freakdave finishes this
+// reinstate max video mem
 extern bool g_bUseSetTextureMem;
 extern DWORD g_maxTextureMemUsage;
-
 
 #endif

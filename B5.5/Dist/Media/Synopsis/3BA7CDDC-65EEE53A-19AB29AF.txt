@@ -1,0 +1,37 @@
+Paper Mario
+Platform: Nintendo 64
+Media: Cartridge
+Genre: Action > Role Playing Game
+Release Year: 2001
+Developer: Intelligent Systems
+Publisher: Nintendo
+Players: Single-player
+Alternate Title: Mario Story
+_________________________
+
+Gameplay
+
+Paper Mario combines traditional role-playing game (RPG) elements with concepts and features from the Mario series. For the majority of the games, the player controls Mario, who can jump and use his hammer to overcome physical obstacles placed in the game's overworld. Many of the game's puzzles and boundaries are based upon the abilities of Mario's partners, who each have a specialised skill required for progression in the game. The player accumulates partners as they advance into different locations; only one partner can accompany Mario in the overworld, although the player can interchange between them at any time. These characters also assist Mario in the game's turn-based battles, where damage inflicted against them results in temporary paralysis as the characters do not have individual HP statistics. Attacks in the game are similar to those in traditional RPGs, although the player can influence the power of a move when attacking or defending by timing a button-press accurately or performing some other action command as required. Mario and his partners have a finite capacity to perform special moves, with each of these consuming a particular number of flower points (FP) when performed. Such statistics can be increased by earning Star Points (experience points) in combat to level up. There is also an on-screen gauge to display Star Energy, which is required to perform another type of move that accumulate in number as the player advances through the game. The player can locate hidden battle upgrades in the game's overworld, which promotes one partner character to a new rank at a time.
+
+Progression through Paper Mario depends upon interaction with the game's non-player characters (NPCs), who will often offer clues or detail the next event in the storyline. As in other RPGs, the player can find or purchase items from NPCs to help in and outside of combat. Badges can also be obtained that yield bonuses ranging from added moves to gradual health restoration during combat; each consumes a set number of Badge Points (BP), meaning Mario can only equip a limited number of badges at a time.[8] Princess Peach is playable at particular points in the game as a recurring sidequest. The objectives and actions of each transition to Peach vary, although most are stealth-based.
+
+Plot and setting
+
+The game is set in Mushroom Kingdom, beginning as Mario and Luigi are relaxing in their house when the mail Parakoopa, Parakarry, arrives with a letter. Mario sends Luigi to fetch the mail, which turns out to be an invitation from Peach to a party. Mario and Luigi then head to the castle, and as Mario is about to have some quiet time with Peach, Bowser appears. After Bowser's invasion and victory over Mario, the castle becomes attached to Bowser's fortress, which serves as the location for playable side quests of the kidnapped Peach. In the main quest, Mario tries to retrieve all of the Star Spirits on land,[8] where most of the locations are linked to the central Toad Town, which acts as the game's hub area. The story's main conflict arises when Bowser invades Star Haven, the residence for the seven Star Spirits, and steals the Star Rod.
+
+Story and characters
+
+The game's story centers on Mario as he tries to reclaim the seven Star Spirits, who have been incarcerated in playing cards by Bowser and Kammy Koopa. Their combined power is required to negate the effects of the Star Rod, which makes Bowser invincible. Once Mario rescues all of them, he uses their assistance to defeat Bowser and rescue Peach. The story is presented in the context of a novel, with each adventure involving the rescue of a Star Spirit denoted as a single chapter. Peach is playable between chapters, where she allies with a star named Twink in the castle to relay vital information to Mario regarding his quest. During the final boss scene, Peach gives Twink a wish to defeat Bowser's assistant, Kammy Koopa.
+
+Mario allies with eight partners in total, each of whom represents a different type of enemy from the Mario series. These allies are:
+
+Goombario (Kurio (?)) the Goomba, who has the ability to tell the player about any character, any environment, and any enemy.
+Kooper (Kameki (?)) the Koopa, with the ability to throw his shell at otherwise unreachable objects.
+Bombette (Pinky (? Pinki?)) the Bob-omb, with the ability to blow up weak parts of walls.
+Parakarry (Paretta (?) the Paratroopa, with the ability to help Mario cross gaps too large to jump across.
+Lady Bow (Resaresa (?)) the Boo, with the ability to make Mario become invisible and transparent.
+Watt (Akarin (?)) the Li'l Sparky, with the ability to light up rooms (also, the only ally in the game with the ability to penetrate an enemy's defenses). Also has the ability to see hidden objects.
+Sushie (Opuku (?)) the Cheep-Cheep, with the ability to allow Mario to swim
+Lakilester (Pokopi (? Pokopi?)) the Lakitu, with the ability to allow Mario to traverse dangerous environments, such as spikes.
+
+Near the end of the game, Mario recounts his tale to Luigi, who had remained at home while Mario went on the adventure.

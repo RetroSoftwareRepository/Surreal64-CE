@@ -80,7 +80,7 @@ long					OnOpcodeDebuggerCommands(HWND hWnd, UINT message, WPARAM wParam, LPARAM
 void					OnFreshRomList();
 void					DisableNetplayMemu();
 
-//weinerschnitzel - lets do this for rom paging now
+/*//weinerschnitzel - lets do this for rom paging now
 // Ez0n3 - determine if the current phys ram is greater than 100MB
 extern int	RAM_IS_128 = 0; //assume we are 64mb
 extern BOOL PhysRam128(){
@@ -93,8 +93,13 @@ extern BOOL PhysRam128(){
 	  RAM_IS_128 = 1;
 	  return TRUE;
   }
-}
+}*/
 
+#ifdef DEBUG
+char tracemessage[256];
+#endif
+
+char g_szPathSaves[256] = "D:\\Saves\\";
 
 // Ez0n3 - reinstate max video mem until freakdave finishes this
 extern void _VIDEO_SetMaxTextureMem(DWORD mem);
@@ -109,16 +114,28 @@ BOOL MessageBox(HWND hWnd, LPCTSTR lpText, LPCTSTR lpCaption, UINT uType)
 void __EMU_SaveState(int index)
 {
 	char buf[_MAX_PATH];
-	sprintf(buf, "T:\\%08X-%08X-%02X.%i", currentromoptions.crc1, currentromoptions.crc2, currentromoptions.countrycode, index);
+	sprintf(buf, "%s%08x\\%08X-%08X-%02X.%i", g_szPathSaves, currentromoptions.crc1, currentromoptions.crc1, currentromoptions.crc2, currentromoptions.countrycode, index);
 	FileIO_ExportPJ64State(buf);
 }
 
 void __EMU_LoadState(int index)
 {
 	char buf[_MAX_PATH];
-	sprintf(buf, "T:\\%08X-%08X-%02X.%i", currentromoptions.crc1, currentromoptions.crc2, currentromoptions.countrycode, index);
+	sprintf(buf, "%s%08x\\%08X-%08X-%02X.%i", g_szPathSaves, currentromoptions.crc1, currentromoptions.crc1, currentromoptions.crc2, currentromoptions.countrycode, index);
 	FileIO_ImportPJ64State(buf);
 }
+
+void __EMU_GetStateFilename(int index, char *filename, int mode)
+{
+	if(mode == 0){
+		sprintf(filename, "%s%08x\\%08X-%08X-%02X.%i", g_szPathSaves, currentromoptions.crc1, currentromoptions.crc1, currentromoptions.crc2, currentromoptions.countrycode, index);
+	}
+	else if(mode == 1){
+		sprintf(filename, "%s%08x\\%08X-%08X-%02X.%i.bmp", g_szPathSaves, currentromoptions.crc1, currentromoptions.crc1, currentromoptions.crc2, currentromoptions.countrycode, index);
+	}
+	return;
+}
+
 int avail;
 MEMORYSTATUS stat;
 char buf[100];
@@ -127,12 +144,18 @@ extern int loaddw1964PagingMem();
 extern int loaddw1964DynaMem();
 
 // Ez0n3 - use iAudioPlugin instead to determine if basic audio is used
-//extern int loadbUseLLERSP();
+//extern int loadbUseLLERSP(); // not used anymore
+extern int loadbUseRspAudio();
+extern int loadiRspPlugin();
 extern int loadiAudioPlugin();
 
 // Ez0n3 - reinstate max video mem
 extern int loaddwMaxVideoMem();
 
+extern int loadiPagingMethod();
+extern int loadbAudioBoost();
+
+extern void GetPathSaves(char *pszPathSaves);
 
 
 char emuname[256];
@@ -142,44 +165,71 @@ void __cdecl main()
 	// mount the common drives
 	Mount("A:","cdrom0");
 	Mount("E:","Harddisk0\\Partition1");
-	Mount("Z:","Harddisk0\\Partition2");
+	//Mount("C:","Harddisk0\\Partition2");
+	//Mount("X:","Harddisk0\\Partition3");
+	//Mount("Y:","Harddisk0\\Partition4");
+	//Mount("Z:","Harddisk0\\Partition5");
 	Mount("F:","Harddisk0\\Partition6");
 	Mount("G:","Harddisk0\\Partition7");
+	
+	// utility shoud be mounted automatically
+	if(XGetDiskSectorSize("Z:\\") == 0)
+		Mount("Z:","Harddisk0\\Partition5");
+	
+	// make sure there's a temp rom
+	if (PathFileExists("Z:\\TemporaryRom.dat")) {
+		DisplayError("Z:\\TemporaryRom.dat File Found!");
+		strcpy(g_temporaryRomPath, "Z:\\TemporaryRom.dat");
+	}
+	else {
+		DisplayError("Z:\\TemporaryRom.dat File Not Found!");
+		
+		// if debugging, a temp rom can be placed in T to skip the launcher
+		if (PathFileExists("T:\\Data\\TemporaryRom.dat")) {
+			DisplayError("T:\\Data\\TemporaryRom.dat File Found!");
+			strcpy(g_temporaryRomPath, "T:\\Data\\TemporaryRom.dat");
+		}
+		else {
+			DisplayError("T:\\Data\\TemporaryRom.dat File Not Found!");
+			Sleep(100);
+			XLaunchNewImage("D:\\default.xbe", NULL);
+		}
+	}
 
 	loadinis();
 	sprintf(emuname,"1964x");
+	
+	GetPathSaves(g_szPathSaves);
 
 	//freakdave - check for 128mb
-	PhysRam128();
+	//PhysRam128();
 
-	//weinerscnitzel reverted to act like xxxb5 for 128mb users
-	if(RAM_IS_128 == 1){
-	Enable128MegCaching();//added by freakdave
-	}
 	g_dwRecompCodeSize = loaddw1964DynaMem() * 1024 * 1024;
 	
 	
-	
-	//weinerschnitzel - use old method if 64mb
-	// Ez0n3 - old method of rom paging - but still using 128MB var
-	if(RAM_IS_128 == 0){
-	//g_dwNumFrames = 64; //default 64 set in rompaging.h at and assigned in 128meg.c
-	Enable128MegCaching();
-	g_frameTable = (Frame *)VirtualAlloc(NULL, g_dwNumFrames * sizeof(Frame *), MEM_COMMIT, PAGE_EXECUTE_READWRITE);
-	g_memory = (uint8 *)VirtualAlloc(NULL, RP_PAGE_SIZE_O * g_dwNumFrames, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+	g_iPagingMethod = loadiPagingMethod();
+	if (g_iPagingMethod == _PagingXXX) {
+		g_dwPageSize = 0x40000;
 	}
+	else if (g_iPagingMethod == _PagingS10) {
+		g_dwPageSize = 0x10000;
+	}
+	Enable128MegCaching();
+
 	
+	// max texture mem, 0 = auto
+	_VIDEO_SetMaxTextureMem(loaddwMaxVideoMem());
 	
-	
-	// Ez0n3 - reinstate max video mem until freakdave finishes this
-	//_VIDEO_SetMaxTextureMem(pLd->dwMaxVideoMem);
-	_VIDEO_SetMaxTextureMem(loaddwMaxVideoMem());	
+	g_bAudioBoost = (loadbAudioBoost() == 1 ? TRUE : FALSE); // set before audio init
 	
 	// Ez0n3 - use iAudioPlugin instead to determine if basic audio is used
-	//g_bUseLLERspPlugin = loadbUseLLERSP();
+	//g_bUseLLERspPlugin = loadbUseLLERSP(); // not used anymore
+	g_bUseRspAudio = loadbUseRspAudio(); // control a listing
+	g_iRspPlugin = loadiRspPlugin();
 	g_iAudioPlugin = loadiAudioPlugin();
 	
 	LoadAudioPlugin();
+	LoadRSPPlugin();
 
 	// start the emulator
 	gui.szBaseWindowTitle = "1964 0.8.5";
@@ -212,26 +262,41 @@ void __cdecl main()
 
 //	if(WinLoadRomStep2(pLd->szFilename))
 //	{
-	WinLoadRomStep2("Z:\\TemporaryRom.dat");
+	WinLoadRomStep2(g_temporaryRomPath);
+	
 		Play(emuoptions.auto_full_screen); /* autoplay*/ 
 /*	}
 	else
 	{
 		OutputDebugString("Rom load failed");
 	}*/
-
+	
+	{ // create the save directory if it doesn't exist
+		char szPathSaves[_MAX_PATH];
+		sprintf(szPathSaves, "%s%08x", g_szPathSaves, currentromoptions.crc1);
+		if (!PathFileExists(szPathSaves)) {
+			if (!CreateDirectory(szPathSaves, NULL)) {
+				DisplayError("%s Could Not Be Created!", szPathSaves);
+			}
+		}
+	}
+	
 	while (TRUE)
 	{
-/*		MEMORYSTATUS stat;
-		char buf[100];*/
-
+#ifdef DEBUG
+		char buf[100];
+		MEMORYSTATUS stat;
+		GlobalMemoryStatus(&stat);
+		sprintf(buf, "\n%.2fMB of RAM available\n", (float)(stat.dwAvailPhys / 1024.0f / 1024.0f));
+		OutputDebugString(buf);
+#endif
 		Sleep(1000);
-	
-/*		GlobalMemoryStatus(&stat);
-		sprintf(buf, "\n%.2fMB of RAM available\n", (float)stat.dwAvailPhys / 1024.0f / 1024.0f);
-		OutputDebugString(buf);*/
-
 	}
+}
+
+BOOL PathFileExists(const char *pszPath)
+{   
+    return GetFileAttributes(pszPath) != INVALID_FILE_ATTRIBUTES;   
 }
 
 /*
@@ -590,7 +655,7 @@ void PrepareBeforePlay(int IsFullScreen)
 	}
 	else
 	{
-		if(rominfo.TV_System == 0)					/* PAL */
+		if(rominfo.TV_System == TV_SYSTEM_PAL)					/* PAL */
 		{
 			vips_speed_limits[MAXFPS_AUTO_SYNC] = vips_speed_limits[MAXFPS_PAL_50];
 		}

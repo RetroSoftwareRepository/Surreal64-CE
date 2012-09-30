@@ -26,9 +26,51 @@ HINSTANCE	hRSPHandle = NULL;
 BOOL		rsp_plugin_is_loaded = FALSE;
 
 // Ez0n3 - use iAudioPlugin instead to determine if basic audio is used
-//BOOL	g_bUseBasicAudio = FALSE;
+//BOOL	g_bUseBasicAudio = FALSE; 
 //int g_iAudioPlugin = _AudioPluginJttl; // set default to jttl
+//BOOL	g_bUseLLERspPlugin = FALSE;
+BOOL g_bUseRspAudio = FALSE; // control a listing
+int g_iRspPlugin = _RSPPluginHLE; // default hle
 
+void (*_RSP_LINK_CloseDLL)(void) = NULL;
+DWORD (*_RSP_LINK_DoRspCycles)(DWORD Cycles) = NULL;
+void (*_RSP_LINK_InitiateRSP)(RSP_INFO Rsp_Info, DWORD *CycleCount) = NULL;
+void (*_RSP_LINK_RomClosed)(void) = NULL;
+void (*_RSP_LINK_GetDllInfo)(PLUGIN_INFO *PluginInfo) = NULL;
+void (*_RSP_LINK_DllConfig)(HWND hWnd) = NULL;
+
+BOOL LoadRSPPlugin(){
+	if(g_iRspPlugin == _RSPPluginNone)
+	{
+		/*_RSP_LINK_CloseDLL		=	_RSP_NONE_CloseDLL;
+		_RSP_LINK_DoRspCycles	=	_RSP_NONE_DoRspCycles;
+		_RSP_LINK_InitiateRSP	=	_RSP_NONE_InitiateRSP;
+		_RSP_LINK_RomClosed		=	_RSP_NONE_RomClosed;*/
+	}
+	else if(g_iRspPlugin == _RSPPluginLLE)
+	{
+		_RSP_LINK_CloseDLL		=	_RSP_CloseDLL;
+		_RSP_LINK_DoRspCycles	=	_RSP_DoRspCycles;
+		_RSP_LINK_InitiateRSP	=	_RSP_InitiateRSP;
+		_RSP_LINK_RomClosed		=	_RSP_RomClosed;
+	}
+	else if(g_iRspPlugin == _RSPPluginHLE)
+	{
+		_RSP_LINK_CloseDLL		=	_RSP_HLE_CloseDLL;
+		_RSP_LINK_DoRspCycles	=	_RSP_HLE_DoRspCycles;
+		_RSP_LINK_InitiateRSP	=	_RSP_HLE_InitiateRSP;
+		_RSP_LINK_RomClosed		=	_RSP_HLE_RomClosed;
+	}
+	else if(g_iRspPlugin == _RSPPluginM64p)
+	{
+		_RSP_LINK_CloseDLL		=	_RSP_M64p_CloseDLL;
+		_RSP_LINK_DoRspCycles	=	_RSP_M64p_DoRspCycles;
+		_RSP_LINK_InitiateRSP	=	_RSP_M64p_InitiateRSP;
+		_RSP_LINK_RomClosed		=	_RSP_M64p_RomClosed;
+	}
+
+	return TRUE;
+}
 
 //
 // ----------------------------------------------------------------------------
@@ -67,7 +109,8 @@ void RspCheckInterrupts(void)
 //
 void RSPCloseDLL( void )
 {
-	_RSP_CloseDLL();
+	//_RSP_CloseDLL();
+	_RSP_LINK_CloseDLL();
 }
 
 void RSPDllAbout( HWND hWnd )
@@ -80,7 +123,8 @@ void RSPDllConfig( HWND hWnd )
 
 void RSPRomClosed( void )
 {
-	_RSP_RomClosed();
+	//_RSP_RomClosed();
+	_RSP_LINK_RomClosed();
 }
 
 DWORD DoRspCycles( DWORD cycles )
@@ -88,14 +132,15 @@ DWORD DoRspCycles( DWORD cycles )
 	DWORD retval;
 	DWORD sp_pc_save = SP_PC_REG;
 	SP_PC_REG &= 0xFFC;
-	retval = _RSP_DoRspCycles(cycles);
+	retval = _RSP_LINK_DoRspCycles(cycles);
 	SP_PC_REG = sp_pc_save;
 	return retval;
 }
 
 void InitiateRSP( RSP_INFO rspinfo, DWORD * cycles)
 {
-	_RSP_InitiateRSP(rspinfo, cycles);
+	//_RSP_InitiateRSP(rspinfo, cycles);
+	_RSP_LINK_InitiateRSP(rspinfo, cycles);
 }
 
 //
@@ -110,7 +155,18 @@ void InitializeRSP (void)
 
 	RspInfo.CheckInterrupts = RspCheckInterrupts;
 	RspInfo.ProcessDList = ProcessDList;
-	RspInfo.ProcessAList = NULL;
+	
+	// going to use rsp audio bool here instead of the use lle rsp bool
+	// this was always NULL before
+	if (g_bUseRspAudio) // g_bUseLLERspPlugin // g_iAudioPlugin == _AudioPluginLleRsp
+	{
+		RspInfo.ProcessAList = NULL;
+	}
+	else
+	{
+		RspInfo.ProcessAList = ProcessAList;
+	}	
+	
 	RspInfo.ProcessRdpList = ProcessRDPList;
 	RspInfo.ShowCFB = ShowCFB;
 
@@ -151,12 +207,14 @@ void InitializeRSP (void)
 /*BOOL LoadRSPPlugin(char * libname) 
 {
 	PLUGIN_INFO pi;
-	_RSP_GetDllInfo(&pi);
+	//_RSP_GetDllInfo(&pi);
+	_RSP_LINK_GetDllInfo(&pi);
 	return TRUE;
 }
 
 void CloseRSPPlugin (void) 
 {
-	_RSP_CloseDLL(); 
+	//_RSP_CloseDLL();
+	_RSP_LINK_CloseDLL(); 
 }*/
 

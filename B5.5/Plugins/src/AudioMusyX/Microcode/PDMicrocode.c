@@ -5,6 +5,10 @@
 #include "Microcode.h"
 #include "TestMacros.h"
 
+extern void rsp_srv(_u32 instruction);
+extern void Tooie1FB0_1FF4(void);
+extern void Tooie1B9C_1C58(void);
+
 void _PDData(_u32 StartAddress);
 
 

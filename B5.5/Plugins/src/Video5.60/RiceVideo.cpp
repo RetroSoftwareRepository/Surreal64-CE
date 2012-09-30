@@ -19,6 +19,17 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "stdafx.h"
 #include "_BldNum.h"
 
+extern bool bEnableHDTV;
+extern bool bFullScreen;
+
+BOOL g_bTempMessage = FALSE;
+DWORD g_dwTempMessageStart = 0;
+char g_szTempMessage[100];
+
+// reinstate max video mem
+extern bool g_bUseSetTextureMem;
+extern DWORD g_maxTextureMemUsage;
+
 PluginStatus status;
 char generalText[256];
 
@@ -55,10 +66,6 @@ RECT frameWriteByCPURectArray[20][20];
 bool frameWriteByCPURectFlag[20][20];
 std::vector<DWORD> frameWriteRecord;
 
-// Ez0n3 - reinstate max video mem
-extern bool g_bUseSetTextureMem;
-extern DWORD g_maxTextureMemUsage;
-
 //---------------------------------------------------------------------------------------
 
 BOOL APIENTRY DllMain(HINSTANCE hinstDLL,  // DLL module handle
@@ -91,7 +98,11 @@ BOOL APIENTRY DllMain(HINSTANCE hinstDLL,  // DLL module handle
 
 void GetPluginDir( char * Directory ) 
 {
- 
+#ifdef _XBOX
+	//strcpy(Directory,"D:\\");
+	strcpy(Directory,"T:\\");
+#else
+#endif
 }
 
 //-------------------------------------------------------------------------------------
@@ -229,6 +240,7 @@ void StartVideo(void)
 		
 		windowSetting.bDisplayFullscreen = FALSE;
 		bool res = CGraphicsContext::Get()->Initialize(g_GraphicsInfo.hWnd, g_GraphicsInfo.hStatusBar, 640, 480, TRUE);
+		
 		CDeviceBuilder::GetBuilder()->CreateRender();
 		CRender::GetRender()->Initialize();
 		
@@ -741,12 +753,67 @@ EXPORT BOOL CALL _VIDEO_InitiateGFX(GFX_INFO Gfx_Info)
 
 void __cdecl MsgInfo (char * Message, ...)
 {
- 
+#ifndef _XBOX
+	char Msg[400];
+	va_list ap;
+
+	va_start( ap, Message );
+	vsprintf( Msg, Message, ap );
+	va_end( ap );
+
+	sprintf(generalText, "Rice's Video Plugin %d.%d.%d",FILE_VERSION0,FILE_VERSION1,FILE_VERSION2);
+	MessageBox(NULL,Msg,generalText,MB_OK|MB_ICONINFORMATION);
+#else
+
+	OutputDebugString("Rice MSG: ");
+//#ifdef DEBUG
+	char Msg[400];
+	
+	va_list ap;
+	va_start( ap, Message );
+	vsprintf( Msg, Message, ap );
+	va_end( ap );
+	
+	OutputDebugString(Msg);
+/*#else
+	OutputDebugString(Message);
+#endif*/
+	OutputDebugString("\n");
+#endif
 }
 
 void __cdecl ErrorMsg (char * Message, ...)
 {
-	 
+#ifndef _XBOX
+	char Msg[400];
+	va_list ap;
+	
+	va_start( ap, Message );
+	vsprintf( Msg, Message, ap );
+	va_end( ap );
+	
+	sprintf(generalText, "Rice's Video Plugin %d.%d.%d",FILE_VERSION0,FILE_VERSION1,FILE_VERSION2);
+	if( status.ToToggleFullScreen || (CGraphicsContext::g_pGraphicsContext && !CGraphicsContext::g_pGraphicsContext->IsWindowed()) )
+		SetWindowText(g_GraphicsInfo.hStatusBar,Msg);
+	else
+		MessageBox(NULL,Msg,generalText,MB_OK|MB_ICONERROR);
+#else
+
+	OutputDebugString("Rice ERR: ");
+//#ifdef DEBUG
+	char Msg[400];
+	
+	va_list ap;
+	va_start( ap, Message );
+	vsprintf( Msg, Message, ap );
+	va_end( ap );
+	
+	OutputDebugString(Msg);
+/*#else
+	OutputDebugString(Message);
+#endif*/
+	OutputDebugString("\n");
+#endif
 }
 
 //---------------------------------------------------------------------------------------
@@ -955,34 +1022,30 @@ output:   Values are return in the FrameBufferInfo structure
   output:   none
 *******************************************************************/ 
 
-void __VIDEO_FBWrite(DWORD addr, DWORD size)
+/*void __VIDEO_FBWrite(DWORD addr, DWORD size)
 {
 	FrameBufferWriteByCPU(addr, size);
-}
+}*/
 
 void _VIDEO_SetMaxTextureMem(DWORD mem) // supposed to be double underscore?? //	__VIDEO_SetMaxTextureMem(DWORD mem)
 {
-	// Ez0n3 - reinstate max video mem until freakdave finishes this
-	if (mem == 0)
+	if (mem == 0) // auto mem
 	{
 		g_bUseSetTextureMem = false;
 	}
-	else
+	else // set mem
 	{
 		g_bUseSetTextureMem = true;
 		g_maxTextureMemUsage = mem * 1024 * 1024;
 	}
 }
 
-/*
 void _VIDEO_DisplayTemporaryMessage(const char *msg)
 {
-	//g_bTempMessage = TRUE;
-	//strncpy(g_szTempMessage, msg, 99);
-	//g_dwTempMessageStart = GetTickCount();
+	g_bTempMessage = TRUE;
+	strncpy(g_szTempMessage, msg, 99);
+	g_dwTempMessageStart = GetTickCount();
 }
-*/
-
 
 typedef struct
 {
@@ -1031,9 +1094,47 @@ EXPORT void CALL _VIDEO_FBGetFrameBufferInfo(void *p)
 //}
 
 // Plugin spec 1.3 functions
- 
+#ifndef _XBOX
+void CALL ShowCFB (void)
+{
+	status.toShowCFB = true;
+}
+#endif
 
 void CALL CaptureScreen ( char * Directory )
 {
-	 
+#ifndef _XBOX
+	if( status.bGameIsRunning && status.gDlistCount > 0 )
+	{
+		if( !PathFileExists(Directory) )
+		{
+			if( !CreateDirectory(Directory, NULL) )
+			{
+				//DisplayError("Can not create new folder: %s", pathname);
+				return;
+			}
+		}
+
+		strcpy(status.screenCaptureFilename, Directory);
+		if( Directory[strlen(Directory)-1] != '\\' && Directory[strlen(Directory)-1] != '/'  )
+		{
+			strcat(status.screenCaptureFilename,"\\");
+		}
+		
+		strcat(status.screenCaptureFilename, g_curRomInfo.szGameName);
+
+		char tempname[MAX_PATH];
+		for( int i=0; ; i++)
+		{
+			sprintf(tempname, "%s-%d.bmp", status.screenCaptureFilename, i);
+			if( !PathFileExists(tempname) )
+			{
+				break;
+			}
+		}
+
+		strcpy(status.screenCaptureFilename, tempname);
+		status.toCaptureScreen = true;
+	}
+#endif
 }

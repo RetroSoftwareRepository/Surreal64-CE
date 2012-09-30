@@ -133,6 +133,22 @@ bool D3DRender::RestoreDeviceObjects()
 	g_pD3DDev->SetRenderState( D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
 	SetD3DRSZWriteEnable( TRUE);
 	
+	//weinersch - do xbox antialiasing here
+	// Rice 5.10 PC does not have FSAA
+#ifdef _XBOX
+
+	if(AntiAliasMode>1){
+		g_pD3DDev->SetRenderState( D3DRS_MULTISAMPLEANTIALIAS , TRUE);
+	}else if(AntiAliasMode==1){
+		g_pD3DDev->SetRenderState( D3DRS_MULTISAMPLEANTIALIAS , FALSE);
+		g_pD3DDev->SetRenderState( D3DRS_ALPHABLENDENABLE , TRUE);
+		g_pD3DDev->SetRenderState( D3DRS_EDGEANTIALIAS , TRUE);
+	}else{
+		g_pD3DDev->SetRenderState( D3DRS_MULTISAMPLEANTIALIAS , FALSE);
+	}
+
+#endif
+
 	// Initialize all the renderstate to our defaults.
 	SetShadeMode( gRSP.shadeMode );
 	g_pD3DDev->SetRenderState( D3DRS_TEXTUREFACTOR, m_dwTextureFactor );
@@ -220,8 +236,8 @@ bool D3DRender::RestoreDeviceObjects()
 	((CDirectXColorCombiner*)m_pColorCombiner)->Initialize();
 
 
-
-	ConfigAppLoad();
+	//FIXME: Do we really need this call?
+	ConfigAppLoad2();
 	//freakdave
 	g_pD3DDev->SetTextureStageState(0, D3DTSS_MINFILTER, TextureMode);
 	g_pD3DDev->SetTextureStageState(0, D3DTSS_MAGFILTER, TextureMode);
@@ -391,22 +407,38 @@ void D3DRender::DrawSimpleRect(LONG nX0, LONG nY0, LONG nX1, LONG nY1, DWORD dwC
 
 void D3DRender::SetTextureUFlag(TextureUVFlag dwFlag, DWORD tile)
 {
-	for( int i=0; i<m_curCombineInfo.nStages; i++ )
+	TileUFlags[tile] = dwFlag;
+	if( gRDP.otherMode.cycle_type  >= CYCTYPE_COPY )
 	{
-		if( m_curCombineInfo.stages[i].dwTexture == tile-gRSP.curTile )
+		D3DSetAddressU( 0, DirectXUVFlagMaps[dwFlag].realFlag );
+	}
+	else
+	{
+		for( int i=0; i<m_curCombineInfo.nStages; i++ )
 		{
-			D3DSetAddressU( i, DirectXUVFlagMaps[dwFlag].realFlag );
+			if( m_curCombineInfo.stages[i].dwTexture == tile-gRSP.curTile )
+			{
+				D3DSetAddressU( i, DirectXUVFlagMaps[dwFlag].realFlag );
+			}
 		}
 	}
 }
 
 void D3DRender::SetTextureVFlag(TextureUVFlag dwFlag, DWORD tile)
 {
-	for( int i=0; i<m_curCombineInfo.nStages; i++ )
+	TileVFlags[tile] = dwFlag;
+	if( gRDP.otherMode.cycle_type  >= CYCTYPE_COPY )
 	{
-		if( m_curCombineInfo.stages[i].dwTexture == tile-gRSP.curTile )
+		D3DSetAddressV(0, DirectXUVFlagMaps[dwFlag].realFlag );
+	}
+	else
+	{
+		for( int i=0; i<m_curCombineInfo.nStages; i++ )
 		{
-			D3DSetAddressV( i, DirectXUVFlagMaps[dwFlag].realFlag );
+			if( m_curCombineInfo.stages[i].dwTexture == tile-gRSP.curTile )
+			{
+				D3DSetAddressV( i, DirectXUVFlagMaps[dwFlag].realFlag );
+			}
 		}
 	}
 }
@@ -474,24 +506,32 @@ void D3DRender::SetZBias(int bias)
 }
 
 //freakdave
-TextureFilterMap DXnTextureFilterMap[6]=
+
+TextureFilterMap DXTexFilterMap[6]=
 {
 	{FILTER_NONE, D3DTEXF_NONE},
 	{FILTER_POINT, D3DTEXF_POINT},
 	{FILTER_LINEAR, D3DTEXF_LINEAR},
 	{FILTER_ANISOTROPIC, D3DTEXF_ANISOTROPIC},
-	//{FILTER_FLATCUBIC, D3DTEXF_FLATCUBIC}, //wtf is going on here ??
-	{FILTER_FLATCUBIC, 4}, //it works this way though,hm,strange...
+	{FILTER_FLATCUBIC, D3DTEXF_QUINCUNX},
 	{FILTER_GAUSSIANCUBIC, D3DTEXF_GAUSSIANCUBIC},
 };
 
 void D3DRender::ApplyTextureFilter()
 {
 
-	for( int i=0; i<m_curCombineInfo.nStages; i++ )
+	if( gRDP.otherMode.cycle_type  >= CYCTYPE_COPY )
 	{
-		D3DSetMinFilter( i, DXnTextureFilterMap[m_dwMinFilter].realFilter );
-		D3DSetMagFilter( i, DXnTextureFilterMap[m_dwMagFilter].realFilter );
+		D3DSetMinFilter( 0, DXTexFilterMap[m_dwMinFilter].realFilter );
+		D3DSetMagFilter( 0, DXTexFilterMap[m_dwMagFilter].realFilter );
+	}
+	else
+	{
+		for( int i=0; i<m_curCombineInfo.nStages; i++ )
+		{
+			D3DSetMinFilter( i, DXTexFilterMap[m_dwMinFilter].realFilter );
+			D3DSetMagFilter( i, DXTexFilterMap[m_dwMagFilter].realFilter );
+		}
 	}
 }
 

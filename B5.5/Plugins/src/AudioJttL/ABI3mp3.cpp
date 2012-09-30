@@ -491,8 +491,8 @@ void InnerLoop () {
 					//Clamp(v0);
 					//Clamp(v18);
 					// clamp???
-					*(s16 *)(mp3data+(outPtr^2)) = v0;
-					*(s16 *)(mp3data+((outPtr+2)^2)) = v18;
+					*(s16 *)(mp3data+(outPtr^2)) = (short)v0;
+					*(s16 *)(mp3data+((outPtr+2)^2)) = (short)v18;
 					outPtr+=4;
 					addptr += 0x30;
 					offset += 0x38;
@@ -512,10 +512,10 @@ void InnerLoop () {
 				s32 mult4 = *(s32 *)(mp3data+0xCEC);
 				if (t4 & 0x2) {
 					v2 = (v2 * *(u32 *)(mp3data+0xCE8)) >> 0x10;
-					*(s16 *)(mp3data+(outPtr^2)) = v2;
+					*(s16 *)(mp3data+(outPtr^2)) = (short)v2;
 				} else {
 					v4 = (v4 * *(u32 *)(mp3data+0xCE8)) >> 0x10;
-					*(s16 *)(mp3data+(outPtr^2)) = v4;
+					*(s16 *)(mp3data+(outPtr^2)) = (short)v4;
 					mult4 = *(u32 *)(mp3data+0xCE8);
 				}
 				addptr -= 0x50;
@@ -541,8 +541,8 @@ void InnerLoop () {
 					//Clamp(v0);
 					//Clamp(v18);
 					// clamp???
-					*(s16 *)(mp3data+((outPtr+2)^2)) = v0;
-					*(s16 *)(mp3data+((outPtr+4)^2)) = v18;
+					*(s16 *)(mp3data+((outPtr+2)^2)) = (short)v0;
+					*(s16 *)(mp3data+((outPtr+4)^2)) = (short)v18;
 					outPtr+=4;
 					addptr -= 0x50;
 				}
@@ -566,15 +566,15 @@ void InnerLoop () {
 					// v17
 					v = (*(s16 *)(mp3data+((tmp-0x30)^2)) * hi0);
 					if (v > 32767) v = 32767; else if (v < -32767) v = -32767;
-					*(s16 *)((u8 *)mp3data+((tmp-0x30)^2)) = v;
+					*(s16 *)((u8 *)mp3data+((tmp-0x30)^2)) = (short)v;
 					// v2
 					v = (*(s16 *)(mp3data+((tmp-0x1E)^2)) * hi1);
 					if (v > 32767) v = 32767; else if (v < -32767) v = -32767;
-					*(s16 *)((u8 *)mp3data+((tmp-0x1E)^2)) = v;
+					*(s16 *)((u8 *)mp3data+((tmp-0x1E)^2)) = (short)v;
 					// v4
 					v = (*(s16 *)(mp3data+((tmp-0xE)^2)) * hi1);
 					if (v > 32767) v = 32767; else if (v < -32767) v = -32767;
-					*(s16 *)((u8 *)mp3data+((tmp-0xE)^2)) = v;
+					*(s16 *)((u8 *)mp3data+((tmp-0xE)^2)) = (short)v;
 					tmp += 2;
 				}
 }

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2003 Rice1964
+Copyright (C) 2003-2009 Rice1964
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -32,6 +32,8 @@ extern FiddledVtx * g_pVtxBase;
 #define Z_CLIP_MIN	0x20
 
 #ifdef ENABLE_CLIP_TRI
+
+
 
 inline void RSP_Vtx_Clipping(int i)
 {
@@ -122,10 +124,8 @@ D3DXVECTOR4	g_vtxNonTransformed[MAX_VERTS];
 D3DXVECTOR4	g_vecProjected[MAX_VERTS];
 D3DXVECTOR4	g_vtxTransformed[MAX_VERTS];
 #endif
-#ifndef _XBOX
 float		g_vtxProjected5[1000][5];
 float		g_vtxProjected5Clipped[2000][5];
-#endif
 //uint32		g_dwVtxFlags[MAX_VERTS];			// Z_POS Z_NEG etc
 VECTOR2		g_fVtxTxtCoords[MAX_VERTS];
 uint32		g_dwVtxDifColor[MAX_VERTS];
@@ -137,10 +137,8 @@ float		g_fFogCoord[MAX_VERTS];
 EXTERNAL_VERTEX	g_vtxForExternal[MAX_VERTS];
 
 TLITVERTEX			g_vtxBuffer[1000];
-#ifndef _XBOX
 TLITVERTEX			g_clippedVtxBuffer[2000];
 uint8				g_oglVtxColors[1000][4];
-#endif
 int					g_clippedVtxCount=0;
 TLITVERTEX			g_texRectTVtx[4];
 unsigned int		g_vtxIndex[1000];
@@ -535,7 +533,7 @@ l2:
 
 void NormalizeNormalVec()
 {
-	float w = 1/sqrt(g_normal.x*g_normal.x + g_normal.y*g_normal.y + g_normal.z*g_normal.z);
+	float w = 1/sqrtf(g_normal.x*g_normal.x + g_normal.y*g_normal.y + g_normal.z*g_normal.z);
 	g_normal.x *= w;
 	g_normal.y *= w;
 	g_normal.z *= w;
@@ -730,7 +728,6 @@ void ComputeLOD(bool openGL)
 	RenderTexture &tex0 = g_textures[gRSP.curTile];
 
 	float d,dt;
-#ifndef _XBOX
 	if( openGL )
 	{
 		float x = g_vtxProjected5[0][0] / g_vtxProjected5[0][4] - g_vtxProjected5[1][0] / g_vtxProjected5[1][4];
@@ -738,14 +735,13 @@ void ComputeLOD(bool openGL)
 
 		x = windowSetting.vpWidthW*x/windowSetting.fMultX/2;
 		y = windowSetting.vpHeightW*y/windowSetting.fMultY/2;
-		d = sqrt(x*x+y*y);
+		d = sqrtf(x*x+y*y);
 	}
 	else
-#endif
 	{
 		float x = (v0.x - v1.x)/ windowSetting.fMultX;
 		float y = (v0.y - v1.y)/ windowSetting.fMultY;
-		d = sqrt(x*x+y*y);
+		d = sqrtf(x*x+y*y);
 	}
 
 	float s0 = v0.tcord[0].u * tex0.m_fTexWidth;
@@ -753,13 +749,13 @@ void ComputeLOD(bool openGL)
 	float s1 = v1.tcord[0].u * tex0.m_fTexWidth;
 	float t1 = v1.tcord[0].v * tex0.m_fTexHeight;
 
-	dt = sqrt((s0-s1)*(s0-s1)+(t0-t1)*(t0-t1));
+	dt = sqrtf((s0-s1)*(s0-s1)+(t0-t1)*(t0-t1));
 
 	float lod = dt/d;
-	float frac = log10(lod)/log10(2.0f);
+	float frac = log10f(lod)/log10f(2.0f);
 	//DEBUGGER_IF_DUMP(pauseAtNext,{DebuggerAppendMsg("LOD frac = %f", frac);});
-	frac = (lod / pow(2.0f,floor(frac)));
-	frac = frac - floor(frac);
+	frac = (lod / powf(2.0f,floorf(frac)));
+	frac = frac - floorf(frac);
 	//DEBUGGER_IF_DUMP(pauseAtNext,{DebuggerAppendMsg("LOD = %f, frac = %f", lod, frac);});
 	gRDP.LODFrac = (uint32)(frac*255);
 	CRender::g_pRender->SetCombinerAndBlender();
@@ -774,7 +770,6 @@ void InitVertex(uint32 dwV, uint32 vtxIndex, bool bTexture, bool openGL)
 
 	TLITVERTEX &v = g_vtxBuffer[vtxIndex];
 
-#ifndef _XBOX
 	VTX_DUMP(TRACE4("  Trans: x=%f, y=%f, z=%f, w=%f",  g_vtxTransformed[dwV].x,g_vtxTransformed[dwV].y,g_vtxTransformed[dwV].z,g_vtxTransformed[dwV].w));
 	if( openGL )
 	{
@@ -787,7 +782,6 @@ void InitVertex(uint32 dwV, uint32 vtxIndex, bool bTexture, bool openGL)
 		if( g_vtxTransformed[dwV].w < 0 )	g_vtxProjected5[vtxIndex][4] = 0;
 		g_vtxIndex[vtxIndex] = vtxIndex;
 	}
-#endif
 
 	if( !openGL || options.bOGLVertexClipper == TRUE )
 	{
@@ -801,22 +795,18 @@ void InitVertex(uint32 dwV, uint32 vtxIndex, bool bTexture, bool openGL)
 		if( gRSP.bProcessSpecularColor )
 		{
 			v.dcSpecular = CRender::g_pRender->PostProcessSpecularColor();
-//#ifdef _XBOX
 			if( gRSP.bFogEnabled )
 			{
 				v.dcSpecular &= 0x00FFFFFF;
 				uint32	fogFct = 0xFF-(uint8)((g_fFogCoord[dwV]-gRSPfFogMin)*gRSPfFogDivider);
 				v.dcSpecular |= (fogFct<<24);
 			}
-//#endif
 		}
-//#ifdef _XBOX
 		else if( gRSP.bFogEnabled )
 		{
 			uint32	fogFct = 0xFF-(uint8)((g_fFogCoord[dwV]-gRSPfFogMin)*gRSPfFogDivider);
 			v.dcSpecular = (fogFct<<24);
 		}
-//#endif
 	}
 	VTX_DUMP(TRACE2("  (U,V): %f, %f",  g_fVtxTxtCoords[dwV].x,g_fVtxTxtCoords[dwV].y));
 
@@ -840,7 +830,6 @@ void InitVertex(uint32 dwV, uint32 vtxIndex, bool bTexture, bool openGL)
 		v.dcDiffuse = g_dwVtxDifColor[dwV];
 	}
 
-#ifndef _XBOX
 	if( openGL )
 	{
 		g_oglVtxColors[vtxIndex][0] = v.r;
@@ -848,7 +837,6 @@ void InitVertex(uint32 dwV, uint32 vtxIndex, bool bTexture, bool openGL)
 		g_oglVtxColors[vtxIndex][2] = v.b;
 		g_oglVtxColors[vtxIndex][3] = v.a;
 	}
-#endif
 
 	if( bTexture )
 	{
@@ -981,7 +969,7 @@ uint32 LightVert(D3DXVECTOR4 & norm, int vidx)
 
 				D3DXVECTOR3 dir(gRSPlights[l].x - v.x, gRSPlights[l].y - v.y, gRSPlights[l].z - v.z);
 				//D3DXVECTOR3 dir(v.x-gRSPlights[l].x, v.y-gRSPlights[l].y, v.z-gRSPlights[l].z);
-				float d2 = sqrt(dir.x*dir.x+dir.y*dir.y+dir.z*dir.z);
+				float d2 = sqrtf(dir.x*dir.x+dir.y*dir.y+dir.z*dir.z);
 				dir.x /= d2;
 				dir.y /= d2;
 				dir.z /= d2;
@@ -1228,14 +1216,12 @@ void ProcessVertexDataSSE(uint32 dwAddr, uint32 dwV0, uint32 dwNum)
 
 		SSEVec3Transform(i);
 
-//#ifdef _XBOX
 		if( gRSP.bFogEnabled )
 		{
 			g_fFogCoord[i] = g_vecProjected[i].z;
 			if( g_vecProjected[i].w < 0 || g_vecProjected[i].z < 0 || g_fFogCoord[i] < gRSPfFogMin )
 				g_fFogCoord[i] = gRSPfFogMin;
 		}
-//#endif
 		ReplaceAlphaWithFogFactor(i);
 
 
@@ -1353,14 +1339,12 @@ void ProcessVertexDataNoSSE(uint32 dwAddr, uint32 dwV0, uint32 dwNum)
 			g_vecProjected[i].z = g_vtxTransformed[i].z * g_vecProjected[i].w;
 		}
 
-//#ifdef _XBOX
 		if( gRSP.bFogEnabled )
 		{
 			g_fFogCoord[i] = g_vecProjected[i].z;
 			if( g_vecProjected[i].w < 0 || g_vecProjected[i].z < 0 || g_fFogCoord[i] < gRSPfFogMin )
 				g_fFogCoord[i] = gRSPfFogMin;
 		}
-//#endif
 
 		VTX_DUMP( 
 		{
@@ -1594,16 +1578,9 @@ void ModifyVertexInfo(uint32 where, uint32 vertex, uint32 val)
 		break;
 	case RSP_MV_WORD_OFFSET_POINT_XYSCREEN:		// Modify X,Y
 		{
-			uint16 nX = (uint16)(val>>16);
-			short x = *((short*)&nX);
-			x /= 4;
-
-			uint16 nY = uint16(val&0xFFFF);
-			short y = *((short*)&nY);
-			y /= 4;
-
-			// Should do viewport transform.
-
+			uint16 x = (uint16)((val>>16) / 4.0f);
+			uint16 y = (uint16)((val & 0xFFFF) / 4.0f);
+			// Should do viewport transform
 
 			x -= windowSetting.uViWidth/2;
 			y = windowSetting.uViHeight/2-y;
@@ -1642,6 +1619,9 @@ void ModifyVertexInfo(uint32 where, uint32 vertex, uint32 val)
 			LOG_UCODE("      Setting vertex %d tu/tv to %f, %f", vertex, (float)tu, (float)tv);
 			CRender::g_pRender->SetVtxTextureCoord(vertex, ftu/gRSP.fTexScaleX, ftv/gRSP.fTexScaleY);
 		}
+		break;
+	default:
+		RSP_RDP_NOIMPL("RSP_GBI1_ModifyVtx: Setting unk value: 0x%02x, 0x%08x", dwWhere, dwValue);
 		break;
 	}
 	DEBUGGER_PAUSE_AND_DUMP(NEXT_VERTEX_CMD,{TRACE0("Paused at ModVertex Cmd");});
@@ -1713,14 +1693,12 @@ void ProcessVertexDataDKR(uint32 dwAddr, uint32 dwV0, uint32 dwNum)
 		VTX_DUMP(TRACE5("vtx %d: %f, %f, %f, %f", i, 
 			g_vtxTransformed[i].x,g_vtxTransformed[i].y,g_vtxTransformed[i].z,g_vtxTransformed[i].w));
 
-//#ifdef _XBOX
 		if( gRSP.bFogEnabled )
 		{
 			g_fFogCoord[i] = g_vecProjected[i].z;
 			if( g_vecProjected[i].w < 0 || g_vecProjected[i].z < 0 || g_fFogCoord[i] < gRSPfFogMin )
 				g_fFogCoord[i] = gRSPfFogMin;
 		}
-//#endif
 
 		RSP_Vtx_Clipping(i);
 
@@ -1794,11 +1772,9 @@ void ProcessVertexDataPD(uint32 dwAddr, uint32 dwV0, uint32 dwNum)
 			g_vecProjected[i].z = g_vtxTransformed[i].z * g_vecProjected[i].w;
 		}
 
-//#ifdef _XBOX
 		g_fFogCoord[i] = g_vecProjected[i].z;
 		if( g_vecProjected[i].w < 0 || g_vecProjected[i].z < 0 || g_fFogCoord[i] < gRSPfFogMin )
 			g_fFogCoord[i] = gRSPfFogMin;
-//#endif
 
 		RSP_Vtx_Clipping(i);
 
@@ -1907,11 +1883,9 @@ void ProcessVertexDataConker(uint32 dwAddr, uint32 dwV0, uint32 dwNum)
 			g_vecProjected[i].z = g_vtxTransformed[i].z * g_vecProjected[i].w;
 		}
 
-//#ifdef _XBOX
 		g_fFogCoord[i] = g_vecProjected[i].z;
 		if( g_vecProjected[i].w < 0 || g_vecProjected[i].z < 0 || g_fFogCoord[i] < gRSPfFogMin )
 			g_fFogCoord[i] = gRSPfFogMin;
-//#endif
 
 		VTX_DUMP( 
 		{
@@ -2061,11 +2035,10 @@ void ProcessVertexData_Rogue_Squadron(uint32 dwXYZAddr, uint32 dwColorAddr, uint
 				g_vecProjected[i].x,g_vecProjected[i].y,g_vecProjected[i].z,g_vecProjected[i].w);
 		});
 
-//#ifdef _XBOX
 		g_fFogCoord[i] = g_vecProjected[i].z;
 		if( g_vecProjected[i].w < 0 || g_vecProjected[i].z < 0 || g_fFogCoord[i] < gRSPfFogMin )
 			g_fFogCoord[i] = gRSPfFogMin;
-//#endif
+
 		RSP_Vtx_Clipping(i);
 
 		if( gRSP.bLightingEnable )
@@ -2244,7 +2217,7 @@ float HackZ(float z)
 		z = (.1f+z)/2;
 	else if( z < 0 )
 		//return (10+z)/100;
-		z = (exp(z)/20);
+		z = (expf(z)/20);
 	return z;
 }
 
@@ -2267,7 +2240,6 @@ void HackZAll()
 			g_vtxBuffer[i].z = HackZ(g_vtxBuffer[i].z);
 		}
 	}
-#ifndef _XBOX
 	else
 	{
 		for( uint32 i=0; i<gRSP.numVertices; i++)
@@ -2276,7 +2248,6 @@ void HackZAll()
 			g_vtxProjected5[i][2] = HackZ(g_vtxProjected5[i][2]/w)*w;
 		}
 	}
-#endif
 }
 
 
@@ -2323,4 +2294,694 @@ void UpdateCombinedMatrix()
 	//	gRSP.bWorldMatrixIsUpdated = false;
 	//	gRSP.bLightIsUpdated = false;
 	//}
+}
+
+
+//////////////////////////////////////////////////////////////////////////
+/*
+ *	Manual vertex clipper Rice 5.60
+ */
+//////////////////////////////////////////////////////////////////////////
+typedef struct {
+	double d;
+	double x;
+	double y;
+} LineEuqationType;
+LineEuqationType lines[3];
+double EvaLine(LineEuqationType &li, double x, double y)
+{
+	return li.x*x+li.y*y+li.d;
+}
+inline D3DXVECTOR3 Split( D3DXVECTOR3 &a, D3DXVECTOR3 &b, LineEuqationType &line  )
+{
+	double aDot = (a.x*line.x + a.y*line.y);
+	double bDot = (b.x*line.x + b.y*line.y);
+
+	double scale = ( - line.d - aDot) / ( bDot - aDot );
+
+	return a + ((b - a) * (float)scale );
+}
+// Clipping using the Sutherland-Hodgeman algorithm
+bool ClipFor1LineXY( std::vector<D3DXVECTOR3> &in, std::vector<D3DXVECTOR3> &out, LineEuqationType &line )
+{
+	int insize = in.size();
+	int thisInd=insize-1;
+	int nextInd=0;
+
+	double thisRes = EvaLine( line, in[thisInd].x, in[thisInd].y );
+	double nextRes;
+
+	out.clear();
+
+	for( nextInd=0; nextInd<insize; nextInd++ )
+	{
+		nextRes = EvaLine( line, in[nextInd].x, in[nextInd].y );
+
+		if( thisRes >= 0 )
+		{
+			// Add the point
+			out.push_back(in[thisInd]);
+		}
+
+		if( ( thisRes < 0 && nextRes >= 0 ) || ( thisRes >= 0 && nextRes < 0 ) )
+		{
+			// Add the split point
+			out.push_back( Split(in[thisInd], in[nextInd], line ));
+		}
+
+		thisInd = nextInd;
+		thisRes = nextRes;
+	}
+	if( (int)out.size() >= insize )
+	{
+		return true;
+	}
+	return false;
+}
+// Clipping using the Sutherland-Hodgeman algorithm
+bool ClipFor1LineZ( std::vector<D3DXVECTOR3> &in, std::vector<D3DXVECTOR3> &out, bool nearplane )
+{
+	const float nearz = 1e-4f;
+	const float farz = 1-1e-4f;
+
+	int insize = in.size();
+	int thisInd=insize-1;
+	int nextInd=0;
+
+	bool thisRes = nearplane ? (in[thisInd].z >= nearz) : (in[thisInd].z <= farz) ;
+	bool nextRes;
+
+	out.clear();
+
+	for( nextInd=0; nextInd<insize; nextInd++ )
+	{
+		nextRes = nearplane ? (in[nextInd].z >= nearz) : (in[nextInd].z <= farz) ;
+
+		if( thisRes )
+		{
+			// Add the point
+			out.push_back(in[thisInd]);
+		}
+
+		if( ( !thisRes && nextRes ) || ( thisRes && !nextRes ) )
+		{
+			// Add the split point
+			D3DXVECTOR3 newvtx;
+			D3DXVECTOR3 &v1 = in[thisInd];
+			D3DXVECTOR3 &v2 = in[nextInd];
+
+			newvtx.z = nearplane ? nearz : farz;
+
+			float r = (v1.z - newvtx.z )/(v1.z-v2.z);
+			if( r != r )
+			{
+				r = (v1.z - newvtx.z )/(v1.z-v2.z);
+			}
+			newvtx.x = v1.x - r*(v1.x-v2.x);
+			newvtx.y = v1.y - r*(v1.y-v2.y);
+			out.push_back( newvtx );
+		}
+
+		thisInd = nextInd;
+		thisRes = nextRes;
+	}
+	if( (int)out.size() >= insize )
+	{
+		return true;
+	}
+	return false;
+}
+void Create1LineEq(LineEuqationType &l, TLITVERTEX &v1, TLITVERTEX &v2, TLITVERTEX &v3)
+{
+	// Line between (x1,y1) to (x2,y2)
+	l.x = v2.y-v1.y;
+	l.y = v1.x-v2.x;
+	l.d = -(l.x*v2.x+(l.y)*v2.y);
+	if( EvaLine(l,v3.x,v3.y)*v3.rhw<0 )
+	{
+		l.x = -l.x ;
+		l.y = -l.y ;
+		l.d = -l.d;
+	}
+}
+
+void CopyVertexData(int oriidx, TLITVERTEX *oribuf, int dstidx, TLITVERTEX *dstbuf)
+{
+	memcpy(dstbuf+dstidx,oribuf+oriidx, sizeof(TLITVERTEX));
+}
+
+#define interp(a,b,r)	(((a)-(r)*(b))/	(1-(r)))
+void SetVtx(TLITVERTEX &v, TLITVERTEX &v1, TLITVERTEX &v2, float r)
+{
+	v.x = interp(v1.x,v2.x,r);
+	v.y = interp(v1.y,v2.y,r);
+	//v.z = (v1.z-r*v2.z)/(1-r);
+	v.dcSpecular = v2.dcSpecular; //fix me here
+	v.r = (BYTE)(interp((int)v1.r,(int)v2.r,r));
+	v.g = (BYTE)(interp((int)v1.g,(int)v2.g,r));
+	v.b = (BYTE)(interp((int)v1.b,(int)v2.b,r));
+	v.a = (BYTE)(interp((int)v1.a,(int)v2.a,r));
+
+	for( int i=0; i<2; i++ )
+	{
+		v.tcord[i].u = interp(v1.tcord[i].u,v2.tcord[i].u,r);
+		v.tcord[i].v = interp(v1.tcord[i].v,v2.tcord[i].v,r);
+	}
+}
+
+
+
+void SwapVertexPos(int firstidx)
+{
+	TLITVERTEX &v1 = g_vtxBuffer[firstidx];
+	TLITVERTEX &v2 = g_vtxBuffer[firstidx+1];
+	TLITVERTEX &v3 = g_vtxBuffer[firstidx+2];
+
+	if( v1.rhw >= v2.rhw && v1.rhw >= v3.rhw ) return;
+
+	TLITVERTEX tempv;
+	memcpy(&tempv,&g_vtxBuffer[firstidx], sizeof(TLITVERTEX));
+
+	if( v2.rhw > v1.rhw && v2.rhw >= v3.rhw )
+	{
+		// v2 is the largest one
+		memcpy(&g_vtxBuffer[firstidx],&g_vtxBuffer[firstidx+1], sizeof(TLITVERTEX));
+		memcpy(&g_vtxBuffer[firstidx+1],&g_vtxBuffer[firstidx+2], sizeof(TLITVERTEX));
+		memcpy(&g_vtxBuffer[firstidx+2],&tempv, sizeof(TLITVERTEX));
+	}
+	else
+	{
+		memcpy(&g_vtxBuffer[firstidx],&g_vtxBuffer[firstidx+2], sizeof(TLITVERTEX));
+		memcpy(&g_vtxBuffer[firstidx+2],&g_vtxBuffer[firstidx+1], sizeof(TLITVERTEX));
+		memcpy(&g_vtxBuffer[firstidx+1],&tempv, sizeof(TLITVERTEX));
+	}
+}
+/************************************************************************/
+/* Manually clipping vertexes                                           */
+/* DirectX won't clip transformed vertex, unless the vertex is transfor-*/
+/* med by DirectX, so we have to do vertex clipping ourself. Otherwise  */
+/* this plugin works very bad on newest video cards, like ATI Radeons.  */
+/************************************************************************/
+bool Clip1TriangleForNegW(TLITVERTEX &v1, TLITVERTEX &v2, TLITVERTEX &v3, int &dstidx);
+bool Clip1TriangleForZ(TLITVERTEX &v1, TLITVERTEX &v2, TLITVERTEX &v3, int &dstidx);
+
+void ClipVertexes()
+{
+	// transverse the list of transformed vertex for each triangles
+	// - If z values of all 3 vertexes of the triangle are greater than 1, then ignore this triangle
+	// - If non z value of all 3 vertexes of the triangle is greater than 1, then this triangle is ok
+	// - If one or two z values are greater than 1, then split this triangle to 2 triangles
+
+	int dstidx = 0;
+
+	for( uint32 i=0; i<gRSP.numVertices/3; i++)
+	{
+		int firstidx = i*3;
+		TLITVERTEX &v1 = g_vtxBuffer[firstidx];
+		TLITVERTEX &v2 = g_vtxBuffer[firstidx+1];
+		TLITVERTEX &v3 = g_vtxBuffer[firstidx+2];
+
+		if( v1.rhw < 0 && v2.rhw < 0 && v3.rhw < 0 )
+			continue;	// Skip this triangle
+
+		if( v1.rhw >= 0 && v2.rhw >= 0 && v3.rhw >= 0 )	
+		//if( v1.rhw >= 0 && v2.rhw >= 0 && v3.rhw >= 0 &&
+		//	v1.x>=0 && v1.x < windowSetting.uViWidth && v1.y>=0 && v1.y<windowSetting.uViHeight &&
+		//	v2.x>=0 && v2.x < windowSetting.uViWidth && v2.y>=0 && v2.y<windowSetting.uViHeight &&
+		//	v3.x>=0 && v3.x < windowSetting.uViWidth && v3.y>=0 && v3.y<windowSetting.uViHeight )	
+		{
+			if( v1.z < 0 || v2.z < 0 || v3.z < 0 )
+			{
+				if( !gRDP.otherMode.z_cmp )
+				{
+					// Do nothing about this triangle
+					CopyVertexData(firstidx, g_vtxBuffer, dstidx++, g_clippedVtxBuffer);
+					CopyVertexData(firstidx+1, g_vtxBuffer, dstidx++, g_clippedVtxBuffer);
+					CopyVertexData(firstidx+2, g_vtxBuffer, dstidx++, g_clippedVtxBuffer);
+					continue;
+				}
+				else if( v1.z < 0 && v2.z < 0 && v3.z < 0 )
+					continue;
+				else
+				{
+					// Clipping this triangle for z
+#ifdef _DEBUG
+					if( pauseAtNext && logTriangles ) 
+					{
+						TRACE1("Clip triangle %d against near plane", i);
+						TRACE3("Old triangle z values: %f, %f, %f", v1.z, v2.z, v3.z);
+					}
+#endif
+					Clip1TriangleForZ(v1, v2, v3, dstidx);
+					continue;
+				}
+			}
+			else if( v1.z > 1 || v2.z > 1 || v3.z > 1 )
+			{
+				if( v1.z > 1 && v2.z > 1 && v3.z > 1 )
+					continue;
+				else
+				{
+					// Clipping this triangle for z
+#ifdef _DEBUG
+					if( pauseAtNext && logTriangles ) 
+					{
+						TRACE1("Clip triangle %d against far plane", i);
+						TRACE3("Old triangle z values: %f, %f, %f", v1.z, v2.z, v3.z);
+					}
+#endif
+					Clip1TriangleForZ(v1, v2, v3, dstidx);
+					continue;
+				}
+			}
+			else
+			{
+				// Do nothing about this triangle
+				CopyVertexData(firstidx, g_vtxBuffer, dstidx++, g_clippedVtxBuffer);
+				CopyVertexData(firstidx+1, g_vtxBuffer, dstidx++, g_clippedVtxBuffer);
+				CopyVertexData(firstidx+2, g_vtxBuffer, dstidx++, g_clippedVtxBuffer);
+			}
+			continue;
+		}
+
+#ifdef _DEBUG
+		if( pauseAtNext && logTriangles ) 
+		{
+			TRACE1("Clip triangle %d for negative w", i);
+			TRACE3("Old triangle w values: %f, %f, %f", v1.rhw, v2.rhw, v3.rhw);
+		}
+#endif
+		SwapVertexPos(firstidx);
+
+#ifdef _DEBUG
+		if( pauseAtNext && logTriangles ) 
+		{
+			TRACE3("Old triangle w values: %f, %f, %f", v1.rhw, v2.rhw, v3.rhw);
+		}
+#endif
+
+		Clip1TriangleForNegW(v1, v2, v3, dstidx);
+	}
+
+	g_clippedVtxCount = dstidx;
+
+}
+
+float inline interp3p(float a, float b, float c, double r1, double r2)
+{
+	return (float)((a)+(((b)+((c)-(b))*(r2))-(a))*(r1));
+}
+
+void Interp1PtZ(D3DXVECTOR3 &v, TLITVERTEX &v1, TLITVERTEX &v2, TLITVERTEX &v3)
+{
+	if( abs(v.x-v1.x)<1 && abs(v.y-v1.y) < 1 )
+	{
+		v.z = v1.z;
+		return;
+	}
+	if( abs(v.x-v2.x)<1 && abs(v.y-v2.y) < 1 )
+	{
+		v.z = v2.z;
+		return;
+	}
+	if( abs(v.x-v3.x)<1 && abs(v.y-v3.y) < 1 )
+	{
+		v.z = v3.z;
+		return;
+	}
+
+	LineEuqationType line;
+	Create1LineEq(line, v2, v3, v1);
+
+	D3DXVECTOR3 tempv1(v1.x, v1.y, 0);
+	double aDot = (v.x*line.x + v.y*line.y);
+	double bDot = (v1.x*line.x + v1.y*line.y);
+
+	double scale1 = ( - line.d - aDot) / ( bDot - aDot );
+
+	D3DXVECTOR3 tempv;
+	tempv = v + ((float)scale1 * (tempv1 - v));
+
+	double s1 = (v.x-v1.x)/(tempv.x-v1.x);
+	if( !_finite(s1) )
+	{
+		s1 = (v.y-v1.y)/(tempv.y-v1.y);
+	}
+	double s2 = (tempv.x-v2.x)/(v3.x-v2.x);
+	if( !_finite(s2) )
+	{
+		s2 = (tempv.y-v2.y)/(v3.y-v2.y);
+	}
+
+	v.z = interp3p(v1.z,v2.z,v3.z,s1,s2);
+
+#ifdef _DEBUG
+	if( !_finite(v.z) )
+	{
+		TRACE0("Z value is #INF, check me");
+	}
+
+	if( abs(v.z) > 10 )
+	{
+		TRACE0("Large Z");
+	}
+#endif
+}
+
+bool Interp1Pt(D3DXVECTOR3 &v, TLITVERTEX &v1, TLITVERTEX &v2, TLITVERTEX &v3, TLITVERTEX &out)
+{
+	LineEuqationType line;
+	Create1LineEq(line, v2, v3, v1);
+
+	D3DXVECTOR3 tempv1(v1.x, v1.y, 0);
+
+	double aDot = (v.x*line.x + v.y*line.y);
+	double bDot = (v1.x*line.x + v1.y*line.y);
+
+	double scale1 = ( - line.d - aDot) / ( bDot - aDot );
+
+	D3DXVECTOR3 tempv;
+	tempv = v + ((float)scale1 * (tempv1 - v));
+
+	double s1 = (v.x-v1.x)/(tempv.x-v1.x);
+	if( !_finite(s1) )
+	{
+		s1 = (v.y-v1.y)/(tempv.y-v1.y);
+	}
+	double s2 = (tempv.x-v2.x)/(v3.x-v2.x);
+
+	if( !_finite(s2) )
+	{
+		s2 = (tempv.y-v2.y)/(v3.y-v2.y);
+	}
+
+	if( !_finite(s1) || !_finite(s2) )
+	{
+		memcpy(&out, &v3, sizeof(TLITVERTEX) );
+		TRACE0("s1 or s2 is still infinite, it is a coplaner triangle");
+		return false;
+	}
+
+	//out.x = interp3p(v1.x,v2.x,v3.x,s1,s2);
+	out.x = v.x;
+	out.y = v.y;
+	//out.y = interp3p(v1.y,v2.y,v3.y,s1,s2);
+	out.z = interp3p(v1.z,v2.z,v3.z,s1,s2);
+	out.rhw = interp3p(v1.rhw,v2.rhw,v3.rhw,s1,s2);
+#ifdef _DEBUG
+	if( !_finite(out.z) || !_finite(out.rhw) )
+	{
+		TRACE0("Z or RHW value is #INF, check me");
+	}
+#endif
+
+
+#ifdef _DEBUG
+	if( out.rhw < 0 )	
+	{
+		DebuggerAppendMsg("Warning: rhw<0");
+		DebuggerAppendMsg("nx=[%f %f %f %f];\n",v1.x, v2.x, v3.x, v1.x);
+		DebuggerAppendMsg("ny=[%f %f %f %f];\n",v1.y, v2.y, v3.y, v1.y);
+		DebuggerAppendMsg("nz=[%f %f %f %f];\n",v1.z, v2.z, v3.z, v1.z);
+		DebuggerAppendMsg("newx=[%f %f %f];\n",v1.x, v.x, tempv.x);
+		DebuggerAppendMsg("newy=[%f %f %f];\n",v1.y, v.y, tempv.y);
+		DebuggerAppendMsg("newz=[%f %f %f];\n",v1.z, v.z, tempv.z);
+	}
+	if( out.z < 0 )	
+		DebuggerAppendMsg("Warning: z<0");
+	if( out.z > 1 )	
+		DebuggerAppendMsg("Warning: z>1");
+#endif
+
+
+
+	out.dcSpecular = v2.dcSpecular; //fix me here
+	if( gRSP.bFogEnabled )
+	{
+		float f1 = (v1.dcSpecular>>24)*v1.rhw;
+		float f2 = (v2.dcSpecular>>24)*v2.rhw;
+		float f3 = (v3.dcSpecular>>24)*v3.rhw;
+		float f = interp3p(f1,f2,f3,s1,s2)/out.rhw;	
+		if( f < 0 )	f = 0;
+		if( f > 255 ) f = 255;
+		DWORD fb = (BYTE)f;
+		out.dcSpecular &= 0x00FFFFFF;
+		out.dcSpecular |= (fb<<24);
+	}
+
+	float r = interp3p(v1.r*v1.rhw,v2.r*v2.rhw,v3.r*v3.rhw,s1,s2)/out.rhw;	
+	if( r<0 )	r=0; 
+	if( r>255 )	r=255;
+	out.r = (BYTE)r;
+	float g = interp3p(v1.g*v1.rhw,v2.g*v2.rhw,v3.g*v3.rhw,s1,s2)/out.rhw;
+	if( g<0 )	g=0; 
+	if( g>255 )	g=255;
+	out.g = (BYTE)g;
+	float b = interp3p(v1.b*v1.rhw,v2.b*v2.rhw,v3.b*v3.rhw,s1,s2)/out.rhw;
+	if( b<0 )	b=0; 
+	if( b>255 )	b=255;
+	out.b = (BYTE)b;
+	float a = interp3p(v1.a*v1.rhw,v2.a*v2.rhw,v3.a*v3.rhw,s1,s2)/out.rhw;
+	if( a<0 )	a=0; 
+	if( a>255 )	a=255;
+	out.a = (BYTE)a;
+
+	for( int i=0; i<2; i++ )
+	{
+		out.tcord[i].u = interp3p(v1.tcord[i].u*v1.rhw,v2.tcord[i].u*v2.rhw,v3.tcord[i].u*v3.rhw,s1,s2)/out.rhw;
+		out.tcord[i].v = interp3p(v1.tcord[i].v*v1.rhw,v2.tcord[i].v*v2.rhw,v3.tcord[i].v*v3.rhw,s1,s2)/out.rhw;
+	}
+
+	if( out.rhw < 0 )	
+	{
+		return false;
+	}
+	else
+		return true;
+}
+
+bool Clip1TriangleForNegW(TLITVERTEX &v1, TLITVERTEX &v2, TLITVERTEX &v3, int &dstidx)
+{
+#ifdef _DEBUG
+	if( pauseAtNext && logTriangles ) 
+	{
+		TRACE0("To clip triangle for negative w:");
+		TRACE4("Vtx 1: %f, %f, %f, %f", v1.x, v1.y, v1.z, 1/v1.rhw);
+		TRACE4("Vtx 2: %f, %f, %f, %f", v2.x, v2.y, v2.z, 1/v2.rhw);
+		TRACE4("Vtx 3: %f, %f, %f, %f", v3.x, v3.y, v3.z, 1/v3.rhw);
+	}
+#endif
+
+	int lno = 0;
+	if( v1.rhw >= 0 || v2.rhw >= 0 )	Create1LineEq(lines[lno++],v1,v2,v3);
+	if( abs(EvaLine(lines[0],v3.x, v3.y) ) < 1 )	// v1, v2, v3 are linear
+	{
+		return false;
+	}
+
+	if( v1.rhw >= 0 || v3.rhw >= 0 )	Create1LineEq(lines[lno++],v1,v3,v2);
+	if( v2.rhw >= 0 || v3.rhw >= 0 )	Create1LineEq(lines[lno++],v2,v3,v1);
+
+	std::vector<D3DXVECTOR3> pts[2];
+
+	D3DXVECTOR3 p;
+	p.x = 0;
+	p.y = 0;
+	pts[0].push_back(p);
+	p.x = windowSetting.uDisplayWidth;
+	p.y = 0;
+	pts[0].push_back(p);
+	p.x = windowSetting.uDisplayWidth;
+	p.y = windowSetting.uDisplayHeight;
+	pts[0].push_back(p);
+	p.x = 0;
+	p.y = windowSetting.uDisplayHeight;
+	pts[0].push_back(p);
+
+
+	for( int j=0; j<lno; j++ )
+	{
+		ClipFor1LineXY(pts[j%2], pts[(j+1)%2], lines[j]);
+		if( pts[(j+1)%2].size() < 3 )
+			return false;
+	}
+
+	std::vector<D3DXVECTOR3> &ps = pts[lno%2];
+	int size = ps.size();
+
+	if( gRDP.otherMode.z_cmp )
+	{
+		for( int k=0; k<size; k++ )
+		{
+			Interp1PtZ(ps[k],v1,v2,v3);
+		}
+
+		ClipFor1LineZ(pts[lno%2], pts[(lno+1)%2], true);	// Clip for near plane
+		if( pts[(lno+1)%2].size() < 3 )
+			return false;
+		ClipFor1LineZ(pts[(lno+1)%2], pts[lno%2], false);	// clip for far plane
+		if( pts[lno%2].size() < 3 )
+			return false;
+
+		size = ps.size();
+	}
+
+	// now compute z and rhw values
+	int i;
+	TLITVERTEX  *newvertexes = new TLITVERTEX[size];
+
+	for( i=0; i<size; i++ )
+	{
+		D3DXVECTOR3 &p = ps[i];
+		if( abs(p.x-v1.x)<1 && abs(p.y-v1.y)<1 )
+		{
+			memcpy(&newvertexes[i], &v1, sizeof(TLITVERTEX) );
+			continue;
+		}
+		else if( abs(p.x-v2.x)<1 && abs(p.y-v2.y)<1 )
+		{
+			memcpy(&newvertexes[i], &v2, sizeof(TLITVERTEX) );
+			continue;
+		}
+		if( abs(p.x-v3.x)<1 && abs(p.y-v3.y)<1 )
+		{
+			memcpy(&newvertexes[i], &v3, sizeof(TLITVERTEX) );
+			continue;
+		}
+
+		TLITVERTEX newvtx;
+        if( Interp1Pt(ps[i],v1,v2,v3,newvtx) )
+		{
+			memcpy(&newvertexes[i], &newvtx, sizeof(TLITVERTEX) );
+		}
+		else
+		{
+			// negative w
+			memcpy(&newvertexes[i], &newvtx, sizeof(TLITVERTEX) );
+			//return false;	
+		}
+	}
+
+#ifdef _DEBUG
+	if( pauseAtNext && logTriangles ) 
+	{
+		TRACE0("Clipped x and y:");
+		for( i=0; i<size; i++ )
+		{
+			DebuggerAppendMsg("Vtx %d: %f, %f", i, ps[i].x, ps[i].y);
+		}
+		TRACE0("Generated new vertexes after clipping for W:");
+		for( i=0; i<size; i++ )
+		{
+			DebuggerAppendMsg("Vtx %d: %f, %f, %f, %f", i, newvertexes[i].x, newvertexes[i].y, newvertexes[i].z, 1/newvertexes[i].rhw);
+		}
+	}
+#endif
+
+	for( i=0; i<size-2; i++ )
+	{
+		CopyVertexData(0,   newvertexes, dstidx++, g_clippedVtxBuffer);
+		CopyVertexData(i+1, newvertexes, dstidx++, g_clippedVtxBuffer);
+		CopyVertexData(i+2, newvertexes, dstidx++, g_clippedVtxBuffer);
+	}
+
+	delete [] newvertexes;
+
+	return true;
+}
+
+
+bool Clip1TriangleForZ(TLITVERTEX &v1, TLITVERTEX &v2, TLITVERTEX &v3, int &dstidx)
+{
+#ifdef _DEBUG
+	if( pauseAtNext && logTriangles ) 
+	{
+		TRACE0("To clip triangle for z:");
+		TRACE4("Vtx 1: %f, %f, %f, %f", v1.x, v1.y, v1.z, 1/v1.rhw);
+		TRACE4("Vtx 2: %f, %f, %f, %f", v2.x, v2.y, v2.z, 1/v2.rhw);
+		TRACE4("Vtx 3: %f, %f, %f, %f", v3.x, v3.y, v3.z, 1/v3.rhw);
+	}
+#endif
+
+	std::vector<D3DXVECTOR3> pts[2];
+
+	D3DXVECTOR3 p;
+	p.x = v1.x;
+	p.y = v1.y;
+	p.z = v1.z;
+	pts[0].push_back(p);
+	p.x = v2.x;
+	p.y = v2.y;
+	p.z = v2.z;
+	pts[0].push_back(p);
+	p.x = v3.x;
+	p.y = v3.y;
+	p.z = v3.z;
+	pts[0].push_back(p);
+
+
+	ClipFor1LineZ(pts[0], pts[1], true);	// Clip for near plane
+	if( pts[1].size() < 3 )
+	return false;
+	ClipFor1LineZ(pts[1], pts[0], false);	// clip for far plane
+	if( pts[0].size() < 3 )
+	return false;
+
+	std::vector<D3DXVECTOR3> &ps = pts[0];
+	int size = ps.size();
+
+	// now compute x, y and rhw values
+	int i;
+	TLITVERTEX  *newvertexes = new TLITVERTEX[size];
+
+	for( i=0; i<size; i++ )
+	{
+		D3DXVECTOR3 &p = ps[i];
+		if( abs(p.x-v1.x)<1 && abs(p.y-v1.y)<1 )
+		{
+			memcpy(&newvertexes[i], &v1, sizeof(TLITVERTEX) );
+			continue;
+		}
+		else if( abs(p.x-v2.x)<1 && abs(p.y-v2.y)<1 )
+		{
+			memcpy(&newvertexes[i], &v2, sizeof(TLITVERTEX) );
+			continue;
+		}
+		if( abs(p.x-v3.x)<1 && abs(p.y-v3.y)<1 )
+		{
+			memcpy(&newvertexes[i], &v3, sizeof(TLITVERTEX) );
+			continue;
+		}
+
+		TLITVERTEX newvtx;
+		Interp1Pt(ps[i],v1,v2,v3,newvtx);
+		memcpy(&newvertexes[i], &newvtx, sizeof(TLITVERTEX) );
+	}
+
+#ifdef _DEBUG
+	if( pauseAtNext && logTriangles ) 
+	{
+		TRACE0("Clipped z:");
+		for( i=0; i<size; i++ )
+		{
+			DebuggerAppendMsg("Vtx %d: %f, %f, %f", i, ps[i].x, ps[i].y, ps[i].z);
+		}
+		TRACE0("Generated new vertexes after clipping for z:");
+		for( i=0; i<size; i++ )
+		{
+			DebuggerAppendMsg("Vtx %d: %f, %f, %f, %f", i, newvertexes[i].x, newvertexes[i].y, newvertexes[i].z, 1/newvertexes[i].rhw);
+		}
+	}
+#endif
+
+	for( i=0; i<size-2; i++ )
+	{
+		CopyVertexData(0,   newvertexes, dstidx++, g_clippedVtxBuffer);
+		CopyVertexData(i+1, newvertexes, dstidx++, g_clippedVtxBuffer);
+		CopyVertexData(i+2, newvertexes, dstidx++, g_clippedVtxBuffer);
+	}
+
+	delete [] newvertexes;
+
+	return true;
 }

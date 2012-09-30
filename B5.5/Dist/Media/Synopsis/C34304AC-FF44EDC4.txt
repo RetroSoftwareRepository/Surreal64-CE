@@ -1,0 +1,31 @@
+Mortal Kombat Mythologies - Sub-Zero
+Platform: Nintendo 64
+Media: Cartridge
+Genre: Adventure
+Release Year: 1997
+Developer: Avalanche Software
+Publisher: Midway
+Players: Single-player
+_________________________
+
+Plot
+
+Long ago, (before the events that took place in MK1) the Lin Kuei were hired by the sorcerer Quan Chi to steal a map of elements from a Shaolin temple. The Grandmaster sent his most cunning assassin, Sub-Zero, to do the job. Battling through the Shaolin monks who guarded the map, Sub-Zero reached the map room and was accosted by his rival, Scorpion. In a grueling battle, Sub-Zero mercilessly killed Scorpion and escaped the temple with the map. Back at the headquarters of the Lin Kuei, Sub-Zero delivered the map to Quan Chi, who had repaid the Lin Kuei by eliminating all the members of Scorpion's ninja clan the Shirai Ryu, the Lin Kuei's rival clan. Quan Chi also revealed he had hired Scorpion in case Sub-Zero has failed his mission, something that did not settle well with Sub-Zero. Retaining the Lin Kuei's services, Quan Chi had Sub-Zero follow the map to the Temple of Elements, where an amulet of "sentimental value" was resting.
+
+Sub-Zero reached the temple and went through its many challenges and obstacles, eliminating the gods of Wind, Earth, Water, and Fire that protected the amulet. Just as Sub-Zero reached out for it, Quan Chi appeared and took the amulet, saying that it was actually the source of power for a fallen Elder God named Shinnok. Quan Chi disappeared through a portal, and the thunder god Raiden accosted Sub-Zero, ordering him to go to the Netherealm to retrieve the amulet.
+
+Sub-Zero was sent to the Netherealm and was immediately trapped in the Prison of Souls by Quan Chi's guards. There, he was met by the undead spectre of his archnemsis, Scorpion, who blamed Sub-Zero for the destruction of his clan and family. Although Scorpion couldn't die, he was beaten by Sub-Zero and forced to retreat. Sub-Zero escaped and fought Quan Chi's underlings: Kia, Sareena, and Jataaka. He killed Kia and Jataaka, but spared Sareena. Retrieving their transportation crystals, he was able to get to Quan Chi's fortress. Quan Chi then revealed to Sub-Zero that the only reason he was able to retain his mortality was because of the evil in his heart from being the ruthless assassin he had been known as. Suddenly, Sareena appeared and helped Sub-Zero defeat the sorcerer. She then begged Sub-Zero to take her away from the Netherealm, but she was quickly killed by Shinnok, who was now powered by his amulet. Using his cunning, Sub-Zero grabbed the amulet from Shinnok, who then morphed into a giant demon. Rather than facing certain death, Sub-Zero escaped through a portal created by Raiden, and delivered the amulet to the god. When Sub-Zero questioned what Quan Chi said to him, Raiden confirmed it, but reminded the young warrior that only he could change his own fate.
+
+Returning to the Lin Kuei headquarters, Sub-Zero was once again hired by another sorcerer named Shang Tsung. The Lin Kuei warrior was asked to compete in a tournament on Tsung's behalf. It was called Mortal Kombat...
+
+Gameplay
+
+Although Mythologies is classified as an action-adventure game, its play controls are very similar to the 2D Mortal Kombat fighting games. The player has four attack buttons, along with a block button and a run button like in Mortal Kombat 3. The player controls Sub-Zero as they would in a fighting game, including the use of command-based special moves, to fight enemies and venture through levels. A "turn" button is used to change the direction Sub-Zero is facing, while an "action" button is used to pick up or use items. The player also has access to a status screen which keeps tracks of the player's inventory, experience points, and special moves they gain during the game.
+
+The player begins the game with a small health gauge and a limited number of extra lives. As the player progress through the game, they can gain experience points by performing combos against enemies, which are then used to increase their character's strength and gain access to special moves. An "ice meter" will appear after the player begins to acquire special moves. Special moves requires ice power in order to be performed. Health and ice power can be replenish by picking up items (although the ice meter will gradually replenish itself over time as well). The player will also need to retrieve key items.
+
+Passwords are used to keep track of the player's progress.
+
+Development
+
+The making of MKM: SZ spanned about fourteen months from start to finish. The main design team was located at Midway's Chicago offices and consisted of five artists, two programmers and a sound designer. The graphics in MKM: SZ were created using many different techniques. While Sub-Zero and many of the more humanoid characters were created using MK's trademark of digitizing live actors, many of the more ominous enemies as well as all of the backgrounds were done in real time 3D. This combination provides for a more realistic look than has ever been achieved in the previous MK games. Another addition to the MK universe was to use detailed cinematic sequences to help tell the story while the player progresses through the game. This was done by combining live actors with digital elements. The actors were taped in front of a green screen then they were digitally combined with 3D backdrops. The actual video shoot for these sequences took about a week to complete. The crew was kept to a minimum and the entire process from taping to post-production work took about a month.

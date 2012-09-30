@@ -131,7 +131,7 @@ const SettingInfo TextureEnhancementControlSettings[] =
 	"2xSaI smooth", TEXTURE_ENHANCEMENT_WITH_SMOOTH_FILTER_3,
 	"Less 2xSaI smooth", TEXTURE_ENHANCEMENT_WITH_SMOOTH_FILTER_4,
 };
-
+/*
 const SettingInfo openGLColorBufferSettings[] =
 {
 	"16 bits",	TEXTURE_FMT_A4R4G4B4,
@@ -146,12 +146,13 @@ const RenderEngineSetting OpenGLRenderSettings[] =
 	"OpenGL for Nvidia TNT or better",		OGL_TNT2_DEVICE,
 	"OpenGL for Nvidia Geforce or better ",	NVIDIA_OGL_DEVICE,
 };
-
+*/
 const int numberOfRenderEngineSettings = sizeof(RenderEngineSettings)/sizeof(RenderEngineSetting);
-const int numberOfOpenGLRenderEngineSettings = sizeof(OpenGLRenderSettings)/sizeof(RenderEngineSetting);
+//const int numberOfOpenGLRenderEngineSettings = sizeof(OpenGLRenderSettings)/sizeof(RenderEngineSetting);
 
 #define MAIN_RICE_DAEDALUS_4		"Software\\RICEDAEDALUS510\\WINDOW"
-#define RICE_DAEDALUS_INI_FILE		"D:\\RiceDaedalus5.1.0.ini"
+//#define RICE_DAEDALUS_INI_FILE		"D:\\RiceDaedalus5.1.0.ini"
+#define RICE_DAEDALUS_INI_FILE		"RiceDaedalus5.1.0.ini"
 
 void WriteConfiguration(void);
 void GenerateCurrentRomOptions();
@@ -185,7 +186,6 @@ uint32 ReadRegistryDwordVal(char *MainKey, char *Field)
 	return(0);
 }
 
-
 bool isMMXSupported() 
 { 
 	int IsMMXSupported; 
@@ -204,6 +204,7 @@ bool isMMXSupported()
 
 bool isSSESupported() 
 { 
+#if _MSC_VER > 1200
 	int SSESupport;
 
 	// And finally, check the CPUID for Streaming SIMD Extensions support.
@@ -218,29 +219,53 @@ bool isSSESupported()
 		return true; 
 	else 
 		return false; 
+#else
+	return false;
+#endif
 } 
 
 void ReadConfiguration(void)
 {
+
+	//fd - We only need ConfigAppLoad2 here
+	//ConfigAppLoadTemp();
+	//ConfigAppLoad();
+	ConfigAppLoad2(); // load this at the top
+
 	options.enableHacks = TRUE;
 	options.enableSSE = TRUE;
 
-	defaultRomOptions.screenUpdateSetting = SCREEN_UPDATE_AT_VI_UPDATE;
+	defaultRomOptions.screenUpdateSetting = SCREEN_UPDATE_AT_VI_CHANGE;//SCREEN_UPDATE_AT_VI_UPDATE;
 	defaultRomOptions.dwEnableObjBG = TRUE;
 	status.isMMXSupported = 1;
 	status.isSSESupported = 0;
 	defaultRomOptions.N64FrameBufferEmuType = FRM_DISABLE;
+
+	DWORD videoFlags = XGetVideoFlags();
  
 	windowSetting.uWindowDisplayWidth = ReadRegistryDwordVal(MAIN_RICE_DAEDALUS_4, "WinModeWidth");
 	if( windowSetting.uWindowDisplayWidth == 0 )
 	{
 		windowSetting.uWindowDisplayWidth = 640;
+
+		if(XGetAVPack() == XC_AV_PACK_HDTV) {
+			if(videoFlags & XC_VIDEO_FLAGS_HDTV_720p && bEnableHDTV) {
+				windowSetting.uWindowDisplayWidth = 1280;
+			}
+		}
+			
 	}
 
 	windowSetting.uWindowDisplayHeight = ReadRegistryDwordVal(MAIN_RICE_DAEDALUS_4, "WinModeHeight");
 	if( windowSetting.uWindowDisplayHeight == 0 )
 	{
 		windowSetting.uWindowDisplayHeight = 480;
+
+		if(XGetAVPack() == XC_AV_PACK_HDTV) {
+			if(videoFlags & XC_VIDEO_FLAGS_HDTV_720p && bEnableHDTV) {
+				windowSetting.uWindowDisplayHeight = 720;
+			}
+		}
 	}
 	
 	windowSetting.uDisplayWidth = windowSetting.uWindowDisplayWidth;
@@ -250,12 +275,24 @@ void ReadConfiguration(void)
 	windowSetting.uFullScreenDisplayWidth = ReadRegistryDwordVal(MAIN_RICE_DAEDALUS_4, "FulScreenWidth");
 	if( windowSetting.uFullScreenDisplayWidth == 0 )
 	{
-		windowSetting.uFullScreenDisplayWidth = 640;
+		windowSetting.uWindowDisplayWidth = 640;
+
+		if(XGetAVPack() == XC_AV_PACK_HDTV) {
+			if(videoFlags & XC_VIDEO_FLAGS_HDTV_720p && bEnableHDTV) {
+				windowSetting.uWindowDisplayWidth = 1280;
+			}
+		}
 	}
 	windowSetting.uFullScreenDisplayHeight = ReadRegistryDwordVal(MAIN_RICE_DAEDALUS_4, "FulScreenHeight");
 	if( windowSetting.uFullScreenDisplayHeight == 0 )
 	{
-		windowSetting.uFullScreenDisplayHeight = 480;
+		windowSetting.uWindowDisplayHeight = 480;
+
+		if(XGetAVPack() == XC_AV_PACK_HDTV) {
+			if(videoFlags & XC_VIDEO_FLAGS_HDTV_720p && bEnableHDTV) {
+				windowSetting.uWindowDisplayHeight = 720;
+			}
+		}
 	}
 
 	options.bWinFrameMode = 0;
@@ -272,17 +309,8 @@ void ReadConfiguration(void)
 	options.gamma_correction = 0;
 	options.textureEnhancement = 0;
 	options.textureEnhancementControl = 0;
-	//freakdave
-	//0 = None (valid for Mips only)
-	//1 = Point
-	//2 = Linear
-	//3 = Anisotropic
-	//4 = Flatcubic
-	//5 = Gaussiancubic
-	//get TextureFilter information from ini file
-	ConfigAppLoadTemp();
-	ConfigAppLoad();
-	ConfigAppLoad2();
+
+	
 	
 	options.forceTextureFilter = TextureMode;
 	
@@ -294,14 +322,21 @@ void ReadConfiguration(void)
 	defaultRomOptions.forceBufferClear = 0;
 	defaultRomOptions.accurateTextureMapping = 1;
 
+	if (status.isMMXSupported)
+		MsgInfo("MMX Enabled");
+	else
+		MsgInfo("MMX Disabled");
+		
 	status.isSSEEnabled = status.isSSESupported && options.enableSSE;
 	if( status.isSSEEnabled )
 	{
 		SetNewVertexInfo = SetNewVertexInfoSSE;
+		MsgInfo("SSE Enabled");
 	}
 	else
 	{
 		SetNewVertexInfo = SetNewVertexInfoNoSSE;
+		MsgInfo("SSE Disabled");
 	}
 }
 	
@@ -315,15 +350,17 @@ BOOL InitConfiguration(void)
 		g_pIniFile = new IniFile(RICE_DAEDALUS_INI_FILE);
 		if (g_pIniFile == NULL)
 		{
+			ReadConfiguration(); //defaults
 			return FALSE;
 		}
 
 		if (!g_pIniFile->ReadIniFile())
 		{
 			ErrorMsg("Unable to read Daedalus.ini file from disk");
+			ReadConfiguration(); //defaults
+			g_pIniFile->WriteIniFile();
 			return FALSE;
 		}
-
 	}
 
 	ReadConfiguration();

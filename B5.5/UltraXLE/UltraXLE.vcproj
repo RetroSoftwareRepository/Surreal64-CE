@@ -12,11 +12,218 @@
 	</Platforms>
 	<Configurations>
 		<Configuration
+			Name="Debug|Xbox"
+			OutputDirectory="$(SolutionDir)Debug"
+			IntermediateDirectory="obj\Debug"
+			ConfigurationType="1"
+			CharacterSet="2">
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="0"
+				OptimizeForProcessor="2"
+				AdditionalIncludeDirectories="..\Plugins\include;..\Include"
+				PreprocessorDefinitions="DEBUG;_XBOX"
+				BasicRuntimeChecks="0"
+				RuntimeLibrary="0"
+				StructMemberAlignment="4"
+				BufferSecurityCheck="FALSE"
+				EnableFunctionLevelLinking="TRUE"
+				EnableEnhancedInstructionSet="1"
+				UsePrecompiledHeader="0"
+				PrecompiledHeaderFile="$(IntDir)\$(ProjectName).pch"
+				BrowseInformation="1"
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="FALSE"
+				DebugInformationFormat="4"
+				CallingConvention="1"/>
+			<Tool
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xboxkrnl.lib xbdm.lib Input.lib"
+				OutputFile="$(OutDir)/UltraHLE.exe"
+				LinkIncremental="1"
+				AdditionalLibraryDirectories="..\Plugins\lib"
+				IgnoreAllDefaultLibraries="FALSE"
+				IgnoreDefaultLibraryNames=""
+				GenerateDebugInformation="TRUE"
+				ProgramDatabaseFile="$(OutDir)/$(ProjectName).pdb"
+				SubSystem="2"
+				OptimizeForWindows98="1"
+				TargetMachine="1"
+				FixedBaseAddress="0"/>
+			<Tool
+				Name="VCPostBuildEventTool"/>
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+			<Tool
+				Name="XboxDeploymentTool"
+				RemotePath="xe:\Surreal64 CE\UltraHLE.xbe"/>
+			<Tool
+				Name="XboxImageTool"
+				FileName="$(TargetDir)UltraHLE.xbe"
+				StackSize="65536"
+				LimitAvailableMemoryTo64MB="FALSE"
+				DontMountUD="FALSE"
+				IncludeDebugInfo="TRUE"
+				NoLibWarn="TRUE"
+				TitleID="0x64CE64CE"
+				TitleName="Surreal 64 CE - UltraXLE ($(ConfigurationName))"/>
+		</Configuration>
+		<Configuration
+			Name="Profile|Xbox"
+			OutputDirectory="$(SolutionDir)Profile"
+			IntermediateDirectory="obj\Profile"
+			ConfigurationType="1"
+			CharacterSet="2"
+			WholeProgramOptimization="FALSE">
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="3"
+				GlobalOptimizations="TRUE"
+				InlineFunctionExpansion="2"
+				EnableIntrinsicFunctions="TRUE"
+				FavorSizeOrSpeed="1"
+				OmitFramePointers="TRUE"
+				EnableFiberSafeOptimizations="TRUE"
+				OptimizeForProcessor="2"
+				AdditionalIncludeDirectories="..\Plugins\include;..\Include"
+				PreprocessorDefinitions="NDEBUG;_XBOX;PROFILE"
+				StringPooling="TRUE"
+				RuntimeLibrary="0"
+				StructMemberAlignment="4"
+				BufferSecurityCheck="FALSE"
+				EnableFunctionLevelLinking="TRUE"
+				EnableEnhancedInstructionSet="1"
+				UsePrecompiledHeader="0"
+				PrecompiledHeaderFile="$(IntDir)\$(ProjectName).pch"
+				BrowseInformation="1"
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="FALSE"
+				DebugInformationFormat="3"
+				CallingConvention="1"
+				CompileAs="2"/>
+			<Tool
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="xapilib.lib d3d8i.lib d3dx8.lib xgraphics.lib dsound.lib dmusici.lib xboxkrnl.lib xbdm.lib Input.lib"
+				OutputFile="$(OutDir)/UltraHLE.exe"
+				LinkIncremental="1"
+				AdditionalLibraryDirectories="..\Plugins\lib"
+				IgnoreAllDefaultLibraries="FALSE"
+				IgnoreDefaultLibraryNames=""
+				GenerateDebugInformation="TRUE"
+				ProgramDatabaseFile="$(OutDir)/$(ProjectName).pdb"
+				SubSystem="2"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				OptimizeForWindows98="1"
+				SetChecksum="TRUE"
+				TargetMachine="1"/>
+			<Tool
+				Name="VCPostBuildEventTool"/>
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+			<Tool
+				Name="XboxDeploymentTool"
+				RemotePath="xe:\Surreal64 CE\UltraHLE.xbe"/>
+			<Tool
+				Name="XboxImageTool"
+				FileName="$(TargetDir)UltraHLE.xbe"
+				StackSize="65536"
+				IncludeDebugInfo="TRUE"
+				LimitAvailableMemoryTo64MB="FALSE"
+				DontMountUD="FALSE"
+				UDCluster="3"
+				NoLibWarn="TRUE"
+				TitleID="0x64CE64CE"
+				TitleName="Surreal 64 CE - UltraXLE ($(ConfigurationName))"/>
+		</Configuration>
+		<Configuration
+			Name="Profile_FastCap|Xbox"
+			OutputDirectory="$(SolutionDir)Profile_FastCap"
+			IntermediateDirectory="obj\Profile_FastCap"
+			ConfigurationType="1"
+			CharacterSet="2"
+			WholeProgramOptimization="FALSE">
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="3"
+				GlobalOptimizations="TRUE"
+				InlineFunctionExpansion="2"
+				EnableIntrinsicFunctions="TRUE"
+				FavorSizeOrSpeed="1"
+				OmitFramePointers="TRUE"
+				EnableFiberSafeOptimizations="TRUE"
+				OptimizeForProcessor="2"
+				AdditionalIncludeDirectories="..\Plugins\include;..\Include"
+				PreprocessorDefinitions="NDEBUG;_XBOX;PROFILE;FASTCAP"
+				StringPooling="TRUE"
+				RuntimeLibrary="0"
+				StructMemberAlignment="4"
+				BufferSecurityCheck="FALSE"
+				EnableFunctionLevelLinking="TRUE"
+				EnableEnhancedInstructionSet="1"
+				UsePrecompiledHeader="0"
+				PrecompiledHeaderFile="$(IntDir)\$(ProjectName).pch"
+				BrowseInformation="1"
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="FALSE"
+				DebugInformationFormat="3"
+				CallingConvention="1"
+				CompileAs="2"
+				FastCAP="TRUE"/>
+			<Tool
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="xapilib.lib d3d8i.lib d3dx8.lib xgraphics.lib dsound.lib dmusici.lib xboxkrnl.lib xbdm.lib Input.lib"
+				OutputFile="$(OutDir)/UltraHLE.exe"
+				LinkIncremental="1"
+				AdditionalLibraryDirectories="..\Plugins\lib"
+				IgnoreAllDefaultLibraries="FALSE"
+				IgnoreDefaultLibraryNames=""
+				GenerateDebugInformation="TRUE"
+				ProgramDatabaseFile="$(OutDir)/$(ProjectName).pdb"
+				SubSystem="2"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				OptimizeForWindows98="1"
+				SetChecksum="TRUE"
+				TargetMachine="1"/>
+			<Tool
+				Name="VCPostBuildEventTool"/>
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+			<Tool
+				Name="XboxDeploymentTool"
+				RemotePath="xe:\Surreal64 CE\UltraHLE.xbe"/>
+			<Tool
+				Name="XboxImageTool"
+				FileName="$(TargetDir)UltraHLE.xbe"
+				StackSize="65536"
+				IncludeDebugInfo="TRUE"
+				LimitAvailableMemoryTo64MB="FALSE"
+				DontMountUD="FALSE"
+				UDCluster="3"
+				NoLibWarn="TRUE"
+				TitleID="0x64CE64CE"
+				TitleName="Surreal 64 CE - UltraXLE ($(ConfigurationName))"/>
+		</Configuration>
+		<Configuration
 			Name="Release|Xbox"
 			OutputDirectory="$(SolutionDir)Release"
 			IntermediateDirectory="obj\Release"
 			ConfigurationType="1"
-			CharacterSet="2">
+			CharacterSet="2"
+			WholeProgramOptimization="TRUE">
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="2"
@@ -28,27 +235,32 @@
 				OmitFramePointers="TRUE"
 				EnableFiberSafeOptimizations="TRUE"
 				OptimizeForProcessor="2"
-				AdditionalIncludeDirectories="..\Plugins\include\;$(SolutionDir)Include"
+				AdditionalIncludeDirectories="..\Plugins\include;..\Include"
 				PreprocessorDefinitions="NDEBUG;_XBOX"
 				StringPooling="TRUE"
 				RuntimeLibrary="0"
 				StructMemberAlignment="4"
 				BufferSecurityCheck="FALSE"
 				EnableFunctionLevelLinking="TRUE"
-				EnableEnhancedInstructionSet="0"
-				PrecompiledHeaderThrough=""
-				PrecompiledHeaderFile="$(OutDir)/$(ProjectName).pch"
+				EnableEnhancedInstructionSet="1"
+				UsePrecompiledHeader="0"
+				PrecompiledHeaderFile="$(IntDir)\$(ProjectName).pch"
+				BrowseInformation="1"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
 				DebugInformationFormat="3"
-				CallingConvention="1"/>
+				CallingConvention="1"
+				CompileAs="2"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xboxkrnl.lib ..\Plugins\lib\Input.lib"
+				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xboxkrnl.lib xbdm.lib Input.lib"
 				OutputFile="$(OutDir)/UltraHLE.exe"
 				LinkIncremental="1"
+				AdditionalLibraryDirectories="..\Plugins\lib"
+				IgnoreAllDefaultLibraries="FALSE"
+				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(OutDir)/$(ProjectName).pdb"
 				SubSystem="2"
@@ -65,54 +277,62 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="XboxDeploymentTool"
-				ExcludedFromBuild="FALSE"
-				RemotePath="xe:\Surreal64 XXX CE\UltraHLE.xbe"/>
+				RemotePath="xe:\Surreal64 CE\UltraHLE.xbe"/>
 			<Tool
 				Name="XboxImageTool"
+				FileName="$(TargetDir)UltraHLE.xbe"
 				StackSize="65536"
-				LimitAvailableMemoryTo64MB="TRUE"
+				LimitAvailableMemoryTo64MB="FALSE"
 				DontMountUD="FALSE"
 				UDCluster="3"
-				TitleID="0xA64FEA57"
-				TitleName="Surreal 64 - UltraXLE"/>
+				NoLibWarn="TRUE"
+				TitleID="0x64CE64CE"
+				TitleName="Surreal 64 CE - UltraXLE"/>
 		</Configuration>
 		<Configuration
-			Name="Debug|Xbox"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			Name="Release_LTCG|Xbox"
+			OutputDirectory="$(SolutionDir)Release_LTCG"
+			IntermediateDirectory="obj\Release_LTCG"
 			ConfigurationType="1"
-			CharacterSet="2">
+			CharacterSet="2"
+			WholeProgramOptimization="TRUE">
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="2"
+				Optimization="3"
 				GlobalOptimizations="TRUE"
 				InlineFunctionExpansion="2"
-				EnableIntrinsicFunctions="TRUE"
+				EnableIntrinsicFunctions="FALSE"
 				ImproveFloatingPointConsistency="FALSE"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="TRUE"
 				EnableFiberSafeOptimizations="TRUE"
 				OptimizeForProcessor="2"
-				AdditionalIncludeDirectories="..\Plugins\include\;$(SolutionDir)Include"
-				PreprocessorDefinitions="DEBUG;_XBOX"
+				AdditionalIncludeDirectories="..\Plugins\include;..\Include"
+				PreprocessorDefinitions="NDEBUG;_XBOX;LTCG"
 				StringPooling="TRUE"
 				RuntimeLibrary="0"
 				StructMemberAlignment="4"
 				BufferSecurityCheck="FALSE"
 				EnableFunctionLevelLinking="TRUE"
-				PrecompiledHeaderThrough=""
-				PrecompiledHeaderFile="$(OutDir)/$(ProjectName).pch"
+				EnableEnhancedInstructionSet="1"
+				UsePrecompiledHeader="0"
+				PrecompiledHeaderFile="$(IntDir)\$(ProjectName).pch"
+				BrowseInformation="1"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
 				DebugInformationFormat="3"
-				CallingConvention="1"/>
+				CallingConvention="1"
+				CompileAs="2"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xboxkrnl.lib ..\Plugins\lib\Input.lib"
+				AdditionalDependencies="xapilib.lib d3d8ltcg.lib d3dx8.lib xgraphicsltcg.lib dsound.lib dmusicltcg.lib xboxkrnl.lib xbdm.lib Input.lib"
 				OutputFile="$(OutDir)/UltraHLE.exe"
 				LinkIncremental="1"
+				AdditionalLibraryDirectories="..\Plugins\lib"
+				IgnoreAllDefaultLibraries="FALSE"
+				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(OutDir)/$(ProjectName).pdb"
 				SubSystem="2"
@@ -129,15 +349,17 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="XboxDeploymentTool"
-				ExcludedFromBuild="FALSE"
-				RemotePath="xe:\Surreal64 XXX CE\UltraHLE.xbe"/>
+				RemotePath="xe:\Surreal64 CE\UltraHLE.xbe"/>
 			<Tool
 				Name="XboxImageTool"
+				FileName="$(TargetDir)UltraHLE.xbe"
 				StackSize="65536"
-				LimitAvailableMemoryTo64MB="TRUE"
+				LimitAvailableMemoryTo64MB="FALSE"
 				DontMountUD="FALSE"
-				TitleID="0xA64FEA57"
-				TitleName="Surreal 64 - UltraXLE"/>
+				UDCluster="3"
+				NoLibWarn="TRUE"
+				TitleID="0x64CE64CE"
+				TitleName="Surreal 64 CE - UltraXLE"/>
 		</Configuration>
 	</Configurations>
 	<References>
@@ -298,19 +520,66 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="Ingame Menu"
+			Name="Xbox Additions"
 			Filter="">
 			<File
-				RelativePath=".\Menu\Common.h">
+				RelativePath="..\config.cpp">
 			</File>
 			<File
-				RelativePath=".\MenuMain.cpp">
+				RelativePath="..\config.h">
 			</File>
 			<Filter
-				Name="Menu"
+				Name="Common"
 				Filter="">
 				<File
-					RelativePath="..\controller.cpp">
+					RelativePath="..\Plugins\src\Common\Video\XboxOSD.cpp">
+				</File>
+				<Filter
+					Name="Menu"
+					Filter="">
+					<File
+						RelativePath="..\Plugins\src\Common\Video\Menu\Common.h">
+					</File>
+					<File
+						RelativePath="..\Plugins\src\Common\Video\Menu\D3DSave.cpp">
+					</File>
+					<File
+						RelativePath="..\Plugins\src\Common\Video\Menu\D3DSave.h">
+					</File>
+					<File
+						RelativePath=".\Menu\MenuMain.cpp">
+					</File>
+					<File
+						RelativePath="..\Plugins\src\Common\Video\Menu\Util.cpp">
+					</File>
+					<File
+						RelativePath="..\Plugins\src\Common\Video\Menu\Util.h">
+					</File>
+				</Filter>
+			</Filter>
+			<Filter
+				Name="Ingame Menu"
+				Filter="">
+				<File
+					RelativePath="..\Ingamemenu\controller.cpp">
+					<FileConfiguration
+						Name="Debug|Xbox">
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Profile|Xbox">
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Profile_FastCap|Xbox">
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+					</FileConfiguration>
 					<FileConfiguration
 						Name="Release|Xbox">
 						<Tool
@@ -318,7 +587,7 @@
 							ObjectFile="$(IntDir)/$(InputName)1.obj"/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="Debug|Xbox">
+						Name="Release_LTCG|Xbox">
 						<Tool
 							Name="VCCLCompilerTool"
 							ObjectFile="$(IntDir)/$(InputName)1.obj"/>
@@ -341,36 +610,6 @@
 				</File>
 			</Filter>
 			<Filter
-				Name="Graphics"
-				Filter="">
-				<File
-					RelativePath=".\Menu\D3DSave.cpp">
-				</File>
-				<File
-					RelativePath=".\Menu\D3DSave.h">
-				</File>
-			</Filter>
-			<Filter
-				Name="Input"
-				Filter="">
-				<File
-					RelativePath="..\config.cpp">
-				</File>
-				<File
-					RelativePath="..\config.h">
-				</File>
-			</Filter>
-			<Filter
-				Name="Misc"
-				Filter="">
-				<File
-					RelativePath=".\Menu\Util.cpp">
-				</File>
-				<File
-					RelativePath=".\Menu\Util.h">
-				</File>
-			</Filter>
-			<Filter
 				Name="Include"
 				Filter="">
 				<File
@@ -384,6 +623,24 @@
 				</File>
 				<File
 					RelativePath="..\Include\xbinput.h">
+				</File>
+				<File
+					RelativePath="..\Include\xbprofiling.cpp">
+					<FileConfiguration
+						Name="Debug|Xbox"
+						ExcludedFromBuild="true">
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Xbox"
+						ExcludedFromBuild="true">
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release_LTCG|Xbox"
+						ExcludedFromBuild="true">
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath="..\Include\xbprofiling.h">
 				</File>
 				<File
 					RelativePath="..\Include\xbresource.cpp">

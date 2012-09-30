@@ -292,6 +292,8 @@ void inifile_command(char *cmd)
     }
 }
 
+extern bool PathFileExists(const char *pszPath);
+
 // reads global settings from ini file,
 // then adds cart specific settings (if cartname!=NULL)
 void inifile_read(char *cartnamep)
@@ -309,8 +311,28 @@ void inifile_read(char *cartnamep)
     strcpy(cartname,cartnamep);
     strlwr(cartname);
 
-    strcpy(inifile,init.rootpath);
-    strcat(inifile,"ultra.ini");
+    //strcpy(inifile,init.rootpath);
+    //strcat(inifile,"ultra.ini");
+	sprintf(inifile, "T:\\ultra.ini");
+	if(!PathFileExists(inifile)) {
+		OutputDebugString(inifile);
+		OutputDebugStringA(" Failed to Load!\n");
+		sprintf(inifile, "D:\\ultra.ini");
+		if(!PathFileExists(inifile)) {
+			OutputDebugString(inifile);
+			OutputDebugStringA(" Failed to Load!\n");
+			// FIXME!
+			//sprintf(inifile, "T:\\ultra.ini");
+			// WRITE INI FILE
+		} else {
+			OutputDebugString(inifile);
+			OutputDebugStringA(" Successfully Loaded!\n");
+		}
+	} else {
+		OutputDebugString(inifile);
+		OutputDebugStringA(" Successfully Loaded!\n");
+	}
+	
     f1=fopen(inifile,"rt");
     if(!f1)
     {

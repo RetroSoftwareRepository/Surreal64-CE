@@ -16,6 +16,7 @@
 #include "Rom.h"
 #include "Util.h"
 #include "BoxArtTable.h"
+#include "VideoTable.h"
 
 #include "zlib/zlib.h"
 #include "zlib/unzip.h"
@@ -177,9 +178,10 @@ bool Rom::Load(const string &szFilename)
 		}
 	}
 
-	// get the filename for the box art image
+	// get the filename for the previews
 	{
 		m_szBoxArtFilename = g_boxArtTable.GetBoxArtFilename(m_dwCrc1);
+		m_szVideoFilename = g_VideoTable.GetVideoFilename(m_dwCrc1);
 	}
 
 	m_bLoaded = true;
@@ -244,9 +246,62 @@ string Rom::GetProperName()
 	return string(m_iniEntry->szAltTitle);
 }
 
+
+// clean the roms name
+string Rom::GetCleanName()
+{
+	char szRomName[120];
+	sprintf(szRomName, "%s", GetProperName().c_str());
+
+	bool caps = true;
+	bool end = false;
+	for (int j=0;j<120;j++){
+		if (j==0){
+			if (!(szRomName[j]>=97) && (szRomName[j]<=122))
+				if (!(szRomName[j]>=65) && (szRomName[j]<=90))
+					if (!(szRomName[j]>=48) && (szRomName[j]<=57))
+			{
+				sprintf(szRomName,"Unknown");
+				break;
+			}
+		}
+		if (caps) {
+			if ((szRomName[j]>=97) && (szRomName[j]<=122)) {
+			szRomName[j] = szRomName[j]-32;
+			}
+			caps = false;
+		}
+		else {
+			if ((szRomName[j]>=65) && (szRomName[j]<=90)) {
+			szRomName[j] = szRomName[j]+32;
+			}
+		}
+		if (szRomName[j]==' ' || szRomName[j]=='-') caps=true;
+		if ((szRomName[j]=='(')|| (szRomName[j]=='[')) end=true;
+		if (end) 
+		{szRomName[j]='\0';break;}
+	}
+
+	return Trim(string(szRomName));
+}
+
+// trunc the roms name
+string Rom::GetCleanTruncName(int iMaxChars)
+{
+	/*string szRomName (GetCleanName().c_str(), 0, iMaxChars); // 120 chars
+	return Trim(szRomName);*/
+	return Truncate(GetCleanName(), iMaxChars, false);
+}
+
+
 string Rom::GetBoxArtFilename()
 {
 	return m_szBoxArtFilename;
+}
+
+string Rom::GetVideoFilename()
+{
+	return m_szVideoFilename;
 }
 
 string Rom::GetComments()

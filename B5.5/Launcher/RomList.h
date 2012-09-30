@@ -36,10 +36,17 @@ public:
 	int FindRom(Rom *rom, int mode);
 
 	int m_iBaseIndex;
+	
+	bool m_bUseCache; // toggle cache file
+	bool IsListEmpty(int mode); // test list before switching to it
 
 private:
 	void Build();
 	void Destroy();
+	
+	void LoadDatFile(int mode);
+	void SaveDatFile(int mode);
+	void RemoveFromDatFile(Rom *rom, int mode);
 
 public:
 	vector<Rom *> m_romList;

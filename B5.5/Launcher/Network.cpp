@@ -1,55 +1,6 @@
 #include "Network.h"
-//Basic Network / HTTP(1.1) support added by freakdave
-/*
-The code for the HTTP protocol and gethostbyname() was borrowed from XBMC.
-The code for getting the host adress was borrowed from LinksBoks.
-Rest is my code..
-You can find my old http code in Network_old.cpp (actually it is working, but it lacks support for binary files, chunked transfer, etc..,
-so i decided to take already existing sources. Why reinvent the wheel ?).
-Note: All Update funtions are running as separate threads.
 
-What's left to do:
-
-- Add Download new executable/archive (PRIO: high)
-- Add Download progress bar (PRIO: high)
-- Clean up code (PRIO: normal)
-
-- Implement a simple webserver (PRIO: very low)
-	-> Edit settings and launch roms from pc
-	-> Users will be able to access their *sites*(IP/DNS), browse their roms directory
-	   and download/exchange their roms
-
-How this code is meant to be working:
-- Add Update option in the menu
-- On entering the update option the code should create a new thread and call the Update function
-- Surreal will then try to download and replace the requested file
-- and clean up afterwards...
-
-Misc: Don't forget to update HTTP.cpp, if you're planning to change the host(name)!
-
-*/
-
-//#define DEBUG // -> 192.168.0.26
-
-
-
-/* Variables */
-INT err; //Error
-
-//Tells us whether or not an Ethernet cable is connected to the XBOX
-//Deactivated for now..
-BOOL IsXboxConnected()
-{/*
-	DWORD dwStatus = XNetGetEthernetLinkStatus();
-	if(dwStatus != 0){
-	   return TRUE;
-   }
-   else
-   {
-	   return FALSE;
-   }*/
-	return FALSE;
-}
+XNetwork g_xNet;
 
 //Wrapper for gethostbyname() -> not implemented in Winsock for XDK
 struct hostent* _cdecl gethostbyname(const char* _name)
@@ -67,7 +18,7 @@ struct hostent* _cdecl gethostbyname(const char* _name)
 	}
 	else
 	{
-		INT err = XNetDnsLookup(_name, hEvent, &pDns);
+		int err = XNetDnsLookup(_name, hEvent, &pDns);
 		WaitForSingleObject(hEvent, INFINITE);
 		if( !pDns || pDns->iStatus )
 		{
@@ -95,24 +46,45 @@ struct hostent* _cdecl gethostbyname(const char* _name)
 
 
 // Returns host adress (borrowed from LinksBoks)
-DWORD GetHostAddress(const char *host)
+DWORD XNetwork::GetHostAddress(const char *host)
 {
     struct hostent *phe;
     char *p;
 
     phe = gethostbyname( host );
+
             
     if(phe==NULL)
         return 0;
     
     p = *phe->h_addr_list;
+	OutputDebugString("GetHostAddress succeeded for: ");
+	OutputDebugString(host);
+	OutputDebugString("\n");
     return *((DWORD*)p);
 }
 
-//Initialize our Network
-//TODO: Mess with Buffer sizes
-BOOL InitNetwork(void){
-	OutputDebugString("Initializing Network\n");
+XNetwork::XNetwork(void)
+{
+}
+
+XNetwork::~XNetwork(void)
+{
+}
+
+bool XNetwork::IsXboxConnected(void)
+{
+	DWORD dwStatus = XNetGetEthernetLinkStatus();
+	if(dwStatus != 0){
+	   return true;
+	}
+
+	return false;
+}
+
+bool XNetwork::InitNetwork(void)
+{
+	OutputDebugString("Initializing Network...\n");
 	XNetStartupParams xnsp;
 	memset(&xnsp, 0, sizeof(xnsp));
 	xnsp.cfgSizeOfStruct = sizeof(XNetStartupParams);
@@ -122,85 +94,155 @@ BOOL InitNetwork(void){
 
 	if(err != 0){
 		XNetCleanup();//Terminate Network
-		OutputDebugString("Could not initialize Network\n");
-		return FALSE;
+		OutputDebugString("Could not initialize Network!\n");
+		return false;
 	}
-return TRUE;
+return true;
 }
 
-//Init Winsock
-BOOL InitWinsock(void){
-OutputDebugString("Initializing Winsock\n");
-WSADATA wsaData;
-err = WSAStartup( MAKEWORD(2,2), &wsaData );
+bool XNetwork::InitWinsock(void)
+{
+	OutputDebugString("Initializing Winsock\n");
+	WSADATA wsaData;
 
-if(err != 0){
-	WSACleanup();//Terminate Winsock
-	XNetCleanup();//Terminate Network
-	OutputDebugString("Could not initialize Winsock\n");
-	return FALSE;
+    if(WSAStartup(MAKEWORD(2,2),&wsaData)!=0)
+    {
+        OutputDebugString("Error initializing Winsock 2.2\n");
+        CleanupWinsock();
+		CleanupNetwork();
+		return false;
+    }
+return true;
 }
-return TRUE;
+
+//DownloadFile("myserver.com", "/myfolder/myfile.ini", "D:\\new.ini");
+bool XNetwork::DownloadFile(const char *host, const char *path_and_filename, const char *save_dir)
+{
+    HANDLE fhand;
+    string request;
+    int sendret;
+    int iRecv;
+    int iResponseLength=0;
+    int offset;
+    DWORD dw;
+    string res2;
+    char recvBuffer[BUFFER_SIZE]={0};
+    string response;
+    const char lb[]="\r\n\r\n";
+    const char http[]="http\x3a//";
+
+	//struct hostent *h;
+    struct sockaddr_in sa;
+    SOCKET server1;
+
+
+	sa.sin_addr.s_addr = GetHostAddress(host);
+	sa.sin_family = AF_INET;
+	sa.sin_port = htons(80);
+
+	server1 = socket(AF_INET,SOCK_STREAM,IPPROTO_TCP);
+
+	if(connect(server1,(struct sockaddr *)&sa,sizeof(sa)) == SOCKET_ERROR)
+    {
+        OutputDebugString("connect() failed!\n");
+		CleanupWinsock();
+		CleanupNetwork();
+		return false;
+    }
+
+	OutputDebugString("Connected to server at port 80...");
+
+	//Construct the HTTP request header
+	request += "GET ";
+    request += path_and_filename;
+    request += " HTTP/1.0";
+    request += &lb[2];
+    request += "Host: ";
+    request += host;
+    request += lb;
+    OutputDebugString("HTTP request constructed successfully:\n");
+    OutputDebugString(request.c_str());
+
+	//Send the query
+	sendret = send(server1, request.c_str(), request.length(), 0);
+    if(sendret == SOCKET_ERROR)
+    {
+        OutputDebugString("send() failed!\n");
+        CleanupWinsock();
+		CleanupNetwork();
+		return false;
+    }
+	OutputDebugString("HTTP request sent successfully...\n");
+
+	//Fill the buffer
+	OutputDebugString("Downloading file...\n");
+	fhand = CreateFile(save_dir, GENERIC_WRITE, FILE_SHARE_READ, 0, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
+	if(fhand == INVALID_HANDLE_VALUE)
+	{
+        OutputDebugString("Could not create file!\n");
+        CleanupWinsock();
+		CleanupNetwork();
+		return false;
+	}
+
+	char buf[1024];
+	//Receive the data
+	while((iRecv = recv(server1, recvBuffer, BUFFER_SIZE-1, 0)) > 0)
+    {
+        response.append(recvBuffer, iRecv);
+        iResponseLength += iRecv;
+        ZeroMemory(recvBuffer, BUFFER_SIZE);
+		sprintf(buf, "%d\n", iResponseLength);
+		OutputDebugString(buf);
+	}
+	if(iRecv==SOCKET_ERROR)
+    {
+        OutputDebugString("recv() failed!\n");
+    }
+
+
+	offset = response.find(lb) + 4;
+    if(offset != string::npos)
+    {
+		char buffer[256];
+        OutputDebugString("File starts at offset ");
+		sprintf(buffer,"%d\n", offset);
+		OutputDebugString(buffer);
+        OutputDebugString("Initial response from server:\n");
+        for(int j=0;j<offset;++j)
+        {
+			sprintf(buffer,"%c", response[j]);
+            OutputDebugString(buffer);
+        }
+        res2.assign(response,offset,response.size());
+        if(WriteFile(fhand, res2.data() ,res2.size(), &dw, 0) == 0)
+        {
+            OutputDebugString("Could not write to file!\n");
+            CleanupWinsock();
+			CleanupNetwork();
+			return false;
+        }
+        else
+        {
+            OutputDebugString("File successfully downloaded and saved to ");
+            OutputDebugString(save_dir);
+			OutputDebugString("\n");
+        }
+    }
+
+
+return true;
 }
 
-
-
-//Clean up Network
-BOOL TerminateNetwork(void){
-OutputDebugString("Cleaning up Network\n");
-XNetCleanup();
-return TRUE;
-}
 
 //Clean up Winsock
-BOOL TerminateWinsock(void){
-OutputDebugString("Cleaning up Winsock\n");
-WSACleanup();
-return TRUE;
+void XNetwork::CleanupWinsock(void){
+	OutputDebugString("Cleaning up Winsock\n");
+	WSACleanup();
 }
 
-
-//Main UpdateRiceIni function (needs rewriting)
-BOOL UpdateIni(int Version)
-{
-CHTTP http;
-InitNetwork();
-InitWinsock();
-
-switch (Version)
-{
-	case 510:
-#ifdef DEBUG
-		http.Download("http://192.168.0.26/ini/RiceDaedalus5.1.0.ini","D:\\RiceDaedalus5.1.0.ini");
-#else
-		http.Download("http://freakdave.xbox-scene.com/ini/RiceDaedalus5.1.0.ini","D:\\RiceDaedalus5.1.0.ini");
-#endif
-		break;
-	case 531:
-#ifdef DEBUG
-		http.Download("http://192.168.0.26/ini/RiceDaedalus5.3.1.ini","D:\\RiceDaedalus5.3.1.ini");
-#else
-		http.Download("http://freakdave.xbox-scene.com/ini/RiceDaedalus5.3.1.ini","D:\\RiceDaedalus5.3.1.ini");
-#endif	
-		break;
-	case 560:
-#ifdef DEBUG	
-		http.Download("http://192.168.0.26/ini/RiceVideo5.6.0.ini","D:\\RiceVideo5.6.0.ini");
-#else
-		http.Download("http://freakdave.xbox-scene.com/ini/RiceVideo5.6.0.ini","D:\\RiceVideo5.6.0.ini");
-#endif	
-		break;
-}
-
-//At this point we're basically done
-//Clean up Winsock
-TerminateWinsock();
 //Clean up Network
-TerminateNetwork();
-return TRUE;
+void XNetwork::CleanupNetwork(void){
+	OutputDebugString("Cleaning up Network\n");
+	XNetCleanup();
 }
-
-
-
-
-

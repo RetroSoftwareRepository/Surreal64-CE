@@ -39,10 +39,28 @@ const CProfiler::ProfileInfo CProfiler::s_ItemInfo[ NUM_PROFILE_ITEMS ] =
 
 void CProfiler::Display()
 {
- 
+#ifndef _XBOX
+	char buf[3000];
+	char buf2[200];
+	buf[0]=0;
+
+	for( int i=0; i<NUM_PROFILE_ITEMS; i++ )
+	{
+		sprintf(buf2, "%s: %f (s)\n", s_ItemInfo[i].name, m_fTimes[1][i]);
+		strcat(buf, buf2);
+	}
+
+	MsgInfo(buf);
+#endif
 }
 
 void CProfiler::StopTiming( ProfileItem item )
 {
-	 
+#ifndef _XBOX
+	LARGE_INTEGER liEnd;
+	QueryPerformanceCounter( &liEnd );
+
+	//m_bStarted = false;
+	m_fTimes[ 1 ][ (DWORD)item ] += (float)(liEnd.QuadPart - m_liStartTimes[ (DWORD)item ].QuadPart) / m_liFrequency.QuadPart;
+#endif
 }

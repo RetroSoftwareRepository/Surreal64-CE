@@ -2,15 +2,217 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.10"
-	Name="PJ64-X 5.31"
-	ProjectGUID="{A6BD6CA7-B31E-4A0C-B621-E1AEA47F5AD9}"
-	RootNamespace="PJ64-X"
+	Name="PJ64x 5.31"
+	ProjectGUID="{20B03EDE-81D0-4751-AF9D-746CC615C1FA}"
+	RootNamespace="PJ64x.5-31"
 	Keyword="XboxProj">
 	<Platforms>
 		<Platform
 			Name="Xbox"/>
 	</Platforms>
 	<Configurations>
+		<Configuration
+			Name="Debug|Xbox"
+			OutputDirectory="$(SolutionDir)Debug"
+			IntermediateDirectory="obj\Debug"
+			ConfigurationType="1"
+			CharacterSet="2">
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="0"
+				OptimizeForProcessor="2"
+				AdditionalIncludeDirectories=""
+				PreprocessorDefinitions="DEBUG;_XBOX;EXTERNAL_RELEASE;WIN32;_WIN32;_WINDOWS;__WIN32__"
+				BasicRuntimeChecks="0"
+				RuntimeLibrary="0"
+				StructMemberAlignment="4"
+				BufferSecurityCheck="FALSE"
+				EnableFunctionLevelLinking="TRUE"
+				EnableEnhancedInstructionSet="1"
+				UsePrecompiledHeader="0"
+				PrecompiledHeaderFile="$(IntDir)\$(ProjectName).pch"
+				BrowseInformation="1"
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="FALSE"
+				DebugInformationFormat="4"
+				CallingConvention="1"
+				CompileAs="0"/>
+			<Tool
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xacteng.lib xboxkrnl.lib xbdm.lib AudioBasic.lib AudioJttl.lib AudioNone.lib AudioAzimer.lib Input.lib RSP.lib RSPHLE.lib RSPM64P.lib Video531.lib"
+				OutputFile="$(OutDir)/PJ64-531.exe"
+				LinkIncremental="1"
+				AdditionalLibraryDirectories="..\Plugins\lib"
+				IgnoreAllDefaultLibraries="FALSE"
+				IgnoreDefaultLibraryNames=""
+				GenerateDebugInformation="TRUE"
+				AssemblyDebug="1"
+				ProgramDatabaseFile="$(OutDir)/$(ProjectName).pdb"
+				MapLines="TRUE"
+				SubSystem="2"
+				OptimizeForWindows98="1"
+				TargetMachine="1"
+				FixedBaseAddress="0"/>
+			<Tool
+				Name="VCPostBuildEventTool"/>
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+			<Tool
+				Name="XboxDeploymentTool"
+				RemotePath="xe:\Surreal64 CE\PJ64-531.xbe"/>
+			<Tool
+				Name="XboxImageTool"
+				FileName="$(TargetDir)/PJ64-531.xbe"
+				StackSize="131072"
+				DontMountUD="FALSE"
+				IncludeDebugInfo="TRUE"
+				NoLibWarn="TRUE"
+				TitleID="0x64CE64CE"
+				TitleName="Surreal 64 CE - PJ64x ($(ConfigurationName))"/>
+		</Configuration>
+		<Configuration
+			Name="Profile|Xbox"
+			OutputDirectory="$(SolutionDir)Profile"
+			IntermediateDirectory="obj\Profile"
+			ConfigurationType="1"
+			CharacterSet="2"
+			WholeProgramOptimization="FALSE">
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="3"
+				GlobalOptimizations="TRUE"
+				InlineFunctionExpansion="2"
+				EnableIntrinsicFunctions="TRUE"
+				FavorSizeOrSpeed="1"
+				OmitFramePointers="TRUE"
+				EnableFiberSafeOptimizations="TRUE"
+				OptimizeForProcessor="2"
+				AdditionalIncludeDirectories=""
+				PreprocessorDefinitions="NDEBUG;_XBOX;EXTERNAL_RELEASE;WIN32;_WIN32;_WINDOWS;__WIN32__;PROFILE"
+				StringPooling="TRUE"
+				RuntimeLibrary="0"
+				StructMemberAlignment="4"
+				BufferSecurityCheck="FALSE"
+				EnableFunctionLevelLinking="TRUE"
+				EnableEnhancedInstructionSet="1"
+				UsePrecompiledHeader="0"
+				PrecompiledHeaderFile="$(IntDir)\$(ProjectName).pch"
+				BrowseInformation="1"
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="FALSE"
+				DebugInformationFormat="3"
+				CallingConvention="1"
+				CompileAs="1"/>
+			<Tool
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="xapilib.lib d3d8i.lib d3dx8.lib xgraphics.lib dsound.lib dmusici.lib xactengi.lib xboxkrnl.lib xbdm.lib AudioBasic.lib AudioJttl.lib AudioNone.lib AudioAzimer.lib Input.lib RSP.lib RSPHLE.lib RSPM64P.lib Video531.lib"
+				OutputFile="$(OutDir)/PJ64-531.exe"
+				LinkIncremental="1"
+				AdditionalLibraryDirectories="..\Plugins\lib"
+				GenerateDebugInformation="TRUE"
+				ProgramDatabaseFile="$(OutDir)/$(ProjectName).pdb"
+				SubSystem="2"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				OptimizeForWindows98="1"
+				SetChecksum="TRUE"
+				TargetMachine="1"/>
+			<Tool
+				Name="VCPostBuildEventTool"/>
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+			<Tool
+				Name="XboxDeploymentTool"
+				RemotePath="xe:\Surreal64 CE\PJ64-531.xbe"/>
+			<Tool
+				Name="XboxImageTool"
+				FileName="$(TargetDir)/PJ64-531.xbe"
+				StackSize="131072"
+				IncludeDebugInfo="TRUE"
+				DontMountUD="FALSE"
+				NoLibWarn="TRUE"
+				UDCluster="3"
+				TitleID="0x64CE64CE"
+				TitleName="Surreal 64 CE - PJ64x ($(ConfigurationName))"/>
+		</Configuration>
+		<Configuration
+			Name="Profile_FastCap|Xbox"
+			OutputDirectory="$(SolutionDir)Profile_FastCap"
+			IntermediateDirectory="obj\Profile_FastCap"
+			ConfigurationType="1"
+			CharacterSet="2"
+			WholeProgramOptimization="FALSE">
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="3"
+				GlobalOptimizations="TRUE"
+				InlineFunctionExpansion="2"
+				EnableIntrinsicFunctions="TRUE"
+				FavorSizeOrSpeed="1"
+				OmitFramePointers="TRUE"
+				EnableFiberSafeOptimizations="TRUE"
+				OptimizeForProcessor="2"
+				AdditionalIncludeDirectories=""
+				PreprocessorDefinitions="NDEBUG;_XBOX;EXTERNAL_RELEASE;WIN32;_WIN32;_WINDOWS;__WIN32__;PROFILE;FASTCAP"
+				StringPooling="TRUE"
+				RuntimeLibrary="0"
+				StructMemberAlignment="4"
+				BufferSecurityCheck="FALSE"
+				EnableFunctionLevelLinking="TRUE"
+				EnableEnhancedInstructionSet="1"
+				UsePrecompiledHeader="0"
+				PrecompiledHeaderFile="$(IntDir)\$(ProjectName).pch"
+				BrowseInformation="1"
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="FALSE"
+				DebugInformationFormat="3"
+				CallingConvention="1"
+				CompileAs="1"
+				FastCAP="TRUE"/>
+			<Tool
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="xapilib.lib d3d8i.lib d3dx8.lib xgraphics.lib dsound.lib dmusici.lib xactengi.lib xboxkrnl.lib xbdm.lib AudioBasic.lib AudioJttl.lib AudioNone.lib AudioAzimer.lib Input.lib RSP.lib RSPHLE.lib RSPM64P.lib Video531.lib"
+				OutputFile="$(OutDir)/PJ64-531.exe"
+				LinkIncremental="1"
+				AdditionalLibraryDirectories="..\Plugins\lib"
+				GenerateDebugInformation="TRUE"
+				ProgramDatabaseFile="$(OutDir)/$(ProjectName).pdb"
+				SubSystem="2"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				OptimizeForWindows98="1"
+				SetChecksum="TRUE"
+				TargetMachine="1"/>
+			<Tool
+				Name="VCPostBuildEventTool"/>
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+			<Tool
+				Name="XboxDeploymentTool"
+				RemotePath="xe:\Surreal64 CE\PJ64-531.xbe"/>
+			<Tool
+				Name="XboxImageTool"
+				FileName="$(TargetDir)/PJ64-531.xbe"
+				StackSize="131072"
+				IncludeDebugInfo="TRUE"
+				DontMountUD="FALSE"
+				NoLibWarn="TRUE"
+				UDCluster="3"
+				TitleID="0x64CE64CE"
+				TitleName="Surreal 64 CE - PJ64x ($(ConfigurationName))"/>
+		</Configuration>
 		<Configuration
 			Name="Release|Xbox"
 			OutputDirectory="$(SolutionDir)Release"
@@ -35,23 +237,25 @@
 				RuntimeLibrary="0"
 				StructMemberAlignment="4"
 				BufferSecurityCheck="FALSE"
-				EnableFunctionLevelLinking="FALSE"
+				EnableFunctionLevelLinking="TRUE"
 				EnableEnhancedInstructionSet="1"
 				UsePrecompiledHeader="0"
-				PrecompiledHeaderFile="obj\Release\$(ProjectName).pch"
+				PrecompiledHeaderFile="$(IntDir)\$(ProjectName).pch"
+				BrowseInformation="1"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
-				DebugInformationFormat="0"
-				CallingConvention="1"/>
+				DebugInformationFormat="3"
+				CallingConvention="1"
+				CompileAs="1"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xacteng.lib xboxkrnl.lib AudioBasic.lib AudioJttl.lib AudioNone.lib AudioAzimer.lib AudioMusyX.lib Input.lib RSP.lib Video531.lib"
-				OutputFile="$(OutDir)/Pj64-531.exe"
+				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xacteng.lib xboxkrnl.lib xbdm.lib AudioBasic.lib AudioJttl.lib AudioNone.lib AudioAzimer.lib Input.lib RSP.lib RSPHLE.lib RSPM64P.lib Video531.lib"
+				OutputFile="$(OutDir)/PJ64-531.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\Plugins\lib"
-				GenerateDebugInformation="FALSE"
+				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(OutDir)/$(ProjectName).pdb"
 				SubSystem="2"
 				OptimizeReferences="2"
@@ -67,7 +271,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="XboxDeploymentTool"
-				RemotePath="xe:\Surreal64 XXX CE\Pj64-531.xbe"/>
+				RemotePath="xe:\Surreal64 CE\PJ64-531.xbe"/>
 			<Tool
 				Name="XboxImageTool"
 				FileName="$(TargetDir)/PJ64-531.xbe"
@@ -75,53 +279,53 @@
 				DontMountUD="FALSE"
 				NoLibWarn="TRUE"
 				UDCluster="3"
-				TitleID="0xA64FEA57"
-				TitleName="Surreal 64 XXX CE - Pj64x"/>
+				TitleID="0x64CE64CE"
+				TitleName="Surreal 64 CE - PJ64x"/>
 		</Configuration>
 		<Configuration
-			Name="Debug|Xbox"
-			OutputDirectory="$(SolutionDir)Debug"
-			IntermediateDirectory="obj\Debug"
+			Name="Release_LTCG|Xbox"
+			OutputDirectory="$(SolutionDir)Release_LTCG"
+			IntermediateDirectory="obj\Release_LTCG"
 			ConfigurationType="1"
 			CharacterSet="2"
-			WholeProgramOptimization="FALSE">
+			WholeProgramOptimization="TRUE">
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="2"
+				Optimization="3"
 				GlobalOptimizations="TRUE"
 				InlineFunctionExpansion="2"
-				EnableIntrinsicFunctions="TRUE"
+				EnableIntrinsicFunctions="FALSE"
 				ImproveFloatingPointConsistency="FALSE"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="TRUE"
 				EnableFiberSafeOptimizations="TRUE"
 				OptimizeForProcessor="2"
 				AdditionalIncludeDirectories=""
-				PreprocessorDefinitions="DEBUG;_XBOX;EXTERNAL_RELEASE;WIN32;_WIN32;_WINDOWS;__WIN32__"
+				PreprocessorDefinitions="NDEBUG;_XBOX;EXTERNAL_RELEASE;WIN32;_WIN32;_WINDOWS;__WIN32__;LTCG"
 				StringPooling="TRUE"
 				RuntimeLibrary="0"
 				StructMemberAlignment="4"
 				BufferSecurityCheck="FALSE"
-				EnableFunctionLevelLinking="FALSE"
+				EnableFunctionLevelLinking="TRUE"
 				EnableEnhancedInstructionSet="1"
 				UsePrecompiledHeader="0"
-				PrecompiledHeaderFile="obj\Debug\$(ProjectName).pch"
+				PrecompiledHeaderFile="$(IntDir)\$(ProjectName).pch"
+				BrowseInformation="1"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
 				DebugInformationFormat="3"
-				CallingConvention="1"/>
+				CallingConvention="1"
+				CompileAs="1"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xacteng.lib xboxkrnl.lib AudioBasic.lib AudioJttl.lib AudioMusyX.lib AudioNone.lib Input.lib RSP.lib Video531.lib"
-				OutputFile="$(OutDir)/Pj64-531.exe"
+				AdditionalDependencies="xapilib.lib d3d8ltcg.lib d3dx8.lib xgraphicsltcg.lib dsound.lib dmusicltcg.lib xactengltcg.lib xboxkrnl.lib AudioBasic.lib AudioJttl.lib AudioNone.lib AudioAzimer.lib Input.lib RSP.lib RSPHLE.lib RSPM64P.lib Video531.lib"
+				OutputFile="$(OutDir)/PJ64-531.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\Plugins\lib"
 				GenerateDebugInformation="TRUE"
-				AssemblyDebug="1"
 				ProgramDatabaseFile="$(OutDir)/$(ProjectName).pdb"
-				MapLines="TRUE"
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
@@ -136,15 +340,16 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="XboxDeploymentTool"
-				RemotePath="xe:\Surreal64 XXX CE\Pj64-531.xbe"/>
+				RemotePath="xe:\Surreal64 CE\PJ64-531.xbe"/>
 			<Tool
 				Name="XboxImageTool"
 				FileName="$(TargetDir)/PJ64-531.xbe"
 				StackSize="131072"
 				DontMountUD="FALSE"
 				NoLibWarn="TRUE"
-				TitleID="0xA64FEA57"
-				TitleName="Surreal 64 XXX CE - Pj64x"/>
+				UDCluster="3"
+				TitleID="0x64CE64CE"
+				TitleName="Surreal 64 CE - PJ64x"/>
 		</Configuration>
 	</Configurations>
 	<References>
@@ -238,18 +443,6 @@
 				</File>
 				<File
 					RelativePath=".\Stubs.c">
-					<FileConfiguration
-						Name="Release|Xbox">
-						<Tool
-							Name="VCCLCompilerTool"
-							ObjectFile="$(IntDir)/$(InputName)1.obj"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Debug|Xbox">
-						<Tool
-							Name="VCCLCompilerTool"
-							ObjectFile="$(IntDir)/$(InputName)1.obj"/>
-					</FileConfiguration>
 				</File>
 			</Filter>
 			<Filter
@@ -267,6 +460,36 @@
 				Filter="">
 				<File
 					RelativePath="Plugin.c">
+					<FileConfiguration
+						Name="Debug|Xbox">
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)/$(InputName)_$(ProjectName).obj"/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Profile|Xbox">
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)/$(InputName)_$(ProjectName).obj"/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Profile_FastCap|Xbox">
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)/$(InputName)_$(ProjectName).obj"/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Xbox">
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)/$(InputName)_$(ProjectName).obj"/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release_LTCG|Xbox">
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)/$(InputName)_$(ProjectName).obj"/>
+					</FileConfiguration>
 				</File>
 			</Filter>
 			<Filter
@@ -377,9 +600,6 @@
 				RelativePath=".\RomBrowser.h">
 			</File>
 			<File
-				RelativePath=".\rompaging.h">
-			</File>
-			<File
 				RelativePath=".\Settings Api.h">
 			</File>
 			<File
@@ -408,9 +628,6 @@
 			</File>
 			<File
 				RelativePath=".\Unzip.h">
-			</File>
-			<File
-				RelativePath=".\VirtualMemoryManager.h">
 			</File>
 			<File
 				RelativePath=".\Win32Timer.h">

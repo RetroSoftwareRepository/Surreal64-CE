@@ -67,7 +67,7 @@ ConfigAppLoad2();//OK
 BOOL g_bControllerPresent[4];
 BOOL g_bMemPackPresent[4];
 
-
+extern char g_szPathSaves[256];
 
 static void Cont_Eeprom(byte * pbPIRAM);
 static void Cont_LoadEeprom();
@@ -95,6 +95,9 @@ static byte g_MemPack[4][(0x400+1) * 32];
 static BOOL s_bEepromUsed = FALSE;
 static BOOL s_bMempackUsed = FALSE;
 
+//#define DEBUG_PAKS 1 // to print out console info
+// there doesn't seem to be any attempt to read/write the mempaks
+
 HRESULT Controller_Initialise()
 {
 	s_bEepromUsed = FALSE;
@@ -114,16 +117,24 @@ HRESULT Controller_Initialise()
 	g_bControllerPresent[2] = EnableController3;
 	g_bControllerPresent[3] = EnableController4;
 
-	if(DefaultPak == 1){
+	if(DefaultPak == PLUGIN_MEMPAK){
 	g_bMemPackPresent[0] = TRUE;//0 = NoPak, 1 = MemPak, 2 = RumblePak : Default = 2
 	g_bMemPackPresent[1] = TRUE;
 	g_bMemPackPresent[2] = TRUE;
 	g_bMemPackPresent[3] = TRUE;
+	
+	//s_bMempackUsed = TRUE; // force a mempak to be written with null data
+#ifdef DEBUG_PAKS
+	OutputDebugString("MemPaks: Enabled\n");
+#endif
 	}else{
 	g_bMemPackPresent[0] = FALSE;
 	g_bMemPackPresent[1] = FALSE;
 	g_bMemPackPresent[2] = FALSE;
 	g_bMemPackPresent[3] = FALSE;
+#ifdef DEBUG_PAKS
+	OutputDebugString("MemPaks: Disabled\n");
+#endif
 	}
 
 	Cont_InitMemPack();
@@ -140,7 +151,10 @@ void Controller_Finalise()
 	}
 	if (s_bMempackUsed)
 	{
-		// Write Eeprom to rom directory
+#ifdef DEBUG_PAKS
+		OutputDebugString("Controller_Finalise:Cont_SaveMempack\n");
+#endif
+		// Write Mempak to rom directory
 		Cont_SaveMempack();
 	}
 
@@ -169,7 +183,7 @@ void Cont_LoadEeprom()
 
 	//Dump_GetSaveDirectory(szEepromFileName, g_ROM.szFileName, TEXT(".sav"));
 
-	sprintf(szEepromFileName, "T:\\%08X-%08X-%02X.eep", cart.crc1, cart.crc2, cart.country);
+	sprintf(szEepromFileName, "%s%08X\\%08X-%08X-%02X.eep", g_szPathSaves, cart.crc1, cart.crc1, cart.crc2, cart.country);
 
 	//MessageBox(NULL, szEepromFileName, "Loading EEPROM from", MB_OK);
 
@@ -206,7 +220,7 @@ void Cont_SaveEeprom()
 	FILE * fh;
 	byte b[2048];
 
-	sprintf(szEepromFileName, "T:\\%08X-%08X-%02X.eep", cart.crc1, cart.crc2, cart.country);
+	sprintf(szEepromFileName, "%s%08X\\%08X-%08X-%02X.eep", g_szPathSaves, cart.crc1, cart.crc1, cart.crc2, cart.country);
 
 	//MessageBox(NULL, szEepromFileName, "Saving EEPROM to", MB_OK);
 
@@ -245,15 +259,28 @@ void Cont_SaveMempack()
 
 	//DBGConsole_Msg(0, "Saving mempack to [C%s]", szMempackFileName);
 
-	sprintf(szMempackFileName, "T:\\%08X-%08X-%02X.mpk", cart.crc1, cart.crc2, cart.country);
+	sprintf(szMempackFileName, "%s%08X\\%08X-%08X-%02X.mpk", g_szPathSaves, cart.crc1, cart.crc1, cart.crc2, cart.country);
 
 	fp = fopen(szMempackFileName, "wb");
 	if (fp != NULL)
 	{
+#ifdef DEBUG_PAKS
+		OutputDebugString("Cont_SaveMempack: ");
+		OutputDebugString(szMempackFileName);
+		OutputDebugString("\n");
+#endif
 		// Don't do last 32 bytes (like nemu)
 		fwrite(&g_MemPack[0][0], (0x400) * 32, 1, fp);
 		fclose(fp);
 	}
+#ifdef DEBUG_PAKS
+	else
+	{
+		OutputDebugString("Cont_SaveMempack: Failed to save: ");
+		OutputDebugString(szMempackFileName);
+		OutputDebugString("\n");
+	}
+#endif
 }
 
 void Cont_LoadMempack()
@@ -265,15 +292,28 @@ void Cont_LoadMempack()
 
 	//DBGConsole_Msg(0, "Loading mempack from [C%s]", szMempackFileName);
 
-	sprintf(szMempackFileName, "T:\\%08X-%08X-%02X.mpk", cart.crc1, cart.crc2, cart.country);
+	sprintf(szMempackFileName, "%s%08X\\%08X-%08X-%02X.mpk", g_szPathSaves, cart.crc1, cart.crc1, cart.crc2, cart.country);
 
 	fp = fopen(szMempackFileName, "rb");
 	if (fp != NULL)
 	{
+#ifdef DEBUG_PAKS
+		OutputDebugString("Cont_LoadMempack: ");
+		OutputDebugString(szMempackFileName);
+		OutputDebugString("\n");
+#endif
 		// Don't do last 32 bytes (like nemu)
 		fread(&g_MemPack[0][0], (0x400) * 32, 1, fp);
 		fclose(fp);
 	}
+#ifdef DEBUG_PAKS
+	else
+	{
+		OutputDebugString("Cont_LoadMempack: Failed to load: ");
+		OutputDebugString(szMempackFileName);
+		OutputDebugString("\n");
+	}
+#endif
 }
 
 void Controller_Check(void)
@@ -347,6 +387,8 @@ void Controller_Check(void)
 				
 				//DPF(DEBUG_MEMORY_PIF, "Controller: Code 0x%02x, Write 0x%02x, Read 0x%02x", ucCode, ucWrite, ucRead);
 				
+				// when this is working right, ucCmd should be 2 or 3 when reading or writing to mempaks
+				// perhaps that data isn't in pbPIRAM? or it's not being retrieved correctly?
 				i = Cont_Command(pbPIRAM, i, iError, ucCmd, iChannel, ucWrite, ucRead);
 			}
 			break;
@@ -362,6 +404,11 @@ void Controller_Check(void)
 	}
 	if (s_bMempackUsed)
 	{
+#ifdef DEBUG_PAKS
+		// if Cont_Command was reading/writing to mempaks, this would be true, but the command is never triggered
+		// if you set s_bMempackUsed to true on init (force write), this will trigger and write out all nulls
+		OutputDebugString("Controller_Check:Cont_SaveMempack\n");
+#endif
 		// Write Eeprom to rom directory
 		Cont_SaveMempack();
 		s_bMempackUsed = FALSE;
@@ -401,10 +448,19 @@ dword Cont_Command(byte * pbPIRAM, dword i, dword iError, byte ucCmd, dword iCha
 	dwController = i/8;
 
 	// i Currently points to data to write to
+	
+#ifdef DEBUG_PAKS
+	if (ucCmd != 1) { // too much console spam, 1=normal op
+	// 0, 1 and 4 are ok - but where's 2 (read mempak) and 3 (write mempak)?
+	char dbgcmd[256];
+	sprintf(dbgcmd, "Cont_Command: i=%X, iError=%X, ucCmd=%X, iChannel=%X, ucWrite=%X, ucRead=%X\n", i, iError, ucCmd, iChannel, ucWrite, ucRead);
+	OutputDebugString(dbgcmd);
+	}
+#endif
 
 	switch (ucCmd)
 	{
-	case CONT_GET_STATUS:		// Status
+	case CONT_GET_STATUS: //0x00		// Status
 		if (iChannel == 0)
 		{
 			//DPF(DEBUG_MEMORY_PIF, "Controller: Executing GET_STATUS");
@@ -454,7 +510,7 @@ dword Cont_Command(byte * pbPIRAM, dword i, dword iError, byte ucCmd, dword iCha
 		break;
 
 
-	case CONT_READ_CONTROLLER:		// Controller
+	case CONT_READ_CONTROLLER: //0x01		// Controller
 		{
 			//DPF(DEBUG_MEMORY_PIF, "Controller: Executing READ_CONTROLLER");
 			// This is controller status
@@ -481,16 +537,28 @@ dword Cont_Command(byte * pbPIRAM, dword i, dword iError, byte ucCmd, dword iCha
 		i += ucWrite + ucRead;		
 
 		break;
-	case CONT_READ_MEMPACK:
+	case CONT_READ_MEMPACK: //0x02 - this isn't getting triggered
 		{
+#ifdef DEBUG_PAKS
+			OutputDebugString("CONT_READ_MEMPACK\n");
+#endif
 			//DPF(DEBUG_MEMORY_PIF, "Controller: Command is READ_MEMPACK");
 			if (g_bControllerPresent[iChannel])
 			{
+#ifdef DEBUG_PAKS
+				char dbg[256];
+				sprintf(dbg, "Cont_Command:CONT_READ_MEMPACK: (%i)\n", iChannel);
+				OutputDebugString(dbg);
+#endif
 				dwRetVal = Cont_ReadMemPack(pbPIRAM, i, iError, iChannel, ucWrite, ucRead);
 				if (dwRetVal == ~0)
 					i = 63;
 				else
 					i = dwRetVal;
+#ifdef DEBUG_PAKS
+				sprintf(dbg, "Returned: (%i)\n", i);
+				OutputDebugString(dbg);
+#endif
 			}
 			else
 			{
@@ -499,16 +567,28 @@ dword Cont_Command(byte * pbPIRAM, dword i, dword iError, byte ucCmd, dword iCha
 			}
 		}
 		break;
-	case CONT_WRITE_MEMPACK:
+	case CONT_WRITE_MEMPACK: //0x03 - this isn't getting triggered
 		{
+#ifdef DEBUG_PAKS
+			OutputDebugString("CONT_WRITE_MEMPACK\n");
+#endif
 			//DPF(DEBUG_MEMORY_PIF, "Controller: Command is WRITE_MEMPACK");
 			if (g_bControllerPresent[iChannel])
 			{
+#ifdef DEBUG_PAKS
+				char dbg[256];
+				sprintf(dbg, "Cont_Command:CONT_WRITE_MEMPACK: (%i)\n", iChannel);
+				OutputDebugString(dbg);
+#endif
 				dwRetVal = Cont_WriteMemPack(pbPIRAM, i, iError, iChannel, ucWrite, ucRead);
 				if (dwRetVal == ~0)
 					i = 63;
 				else
 					i = dwRetVal;
+#ifdef DEBUG_PAKS
+				sprintf(dbg, "Returned: (%i)\n", i);
+				OutputDebugString(dbg);
+#endif
 			}
 			else
 			{
@@ -519,14 +599,14 @@ dword Cont_Command(byte * pbPIRAM, dword i, dword iError, byte ucCmd, dword iCha
 		break;
 		
 
-	case CONT_READ_EEPROM:
+	case CONT_READ_EEPROM: //0x04
 		dwRetVal = Cont_ReadEeprom(pbPIRAM, i, iError, ucWrite, ucRead);
 		if (dwRetVal == ~0)
 			i = 63;
 		else
 			i = dwRetVal;
 		break;
-	case CONT_WRITE_EEPROM:
+	case CONT_WRITE_EEPROM: //0x05
 		dwRetVal = Cont_WriteEeprom(pbPIRAM, i, iError, ucWrite, ucRead);
 		if (dwRetVal == ~0)
 			i = 63;
@@ -534,7 +614,7 @@ dword Cont_Command(byte * pbPIRAM, dword i, dword iError, byte ucCmd, dword iCha
 			i = dwRetVal;
 		break;
 
-	case CONT_RESET:
+	case CONT_RESET: //0xff
 
 		//DPF(DEBUG_MEMORY_PIF, "Controller: Command is RESET");
 		i += ucWrite + ucRead;
@@ -723,8 +803,17 @@ dword Cont_ReadMemPack(byte * pbPIRAM, dword i, dword iError, dword iChannel, dw
 	byte ucDataCRC;
 	byte * pBuf;
 
+#ifdef DEBUG_PAKS
+	char dbg[256];
+	sprintf(dbg, "Cont_ReadMemPack: (%i)\n", iChannel);
+	OutputDebugString(dbg);
+#endif
+	
 	if (!s_bMempackUsed)
 	{
+#ifdef DEBUG_PAKS
+		OutputDebugString("Loading...\n");
+#endif
 		Cont_LoadMempack();
 		s_bMempackUsed = TRUE;
 	}
@@ -805,9 +894,18 @@ dword Cont_WriteMemPack(byte * pbPIRAM, dword i, dword iError,  dword iChannel, 
 	dword dwCRC;
 	byte ucDataCRC;
 	byte * pBuf;
+	
+#ifdef DEBUG_PAKS
+	char dbg[256];
+	sprintf(dbg, "Cont_WriteMemPack: (%i)\n", iChannel);
+	OutputDebugString(dbg);
+#endif
 
 	if (!s_bMempackUsed)
 	{
+#ifdef DEBUG_PAKS
+		OutputDebugString("Loading...\n");
+#endif
 		Cont_LoadMempack();
 		s_bMempackUsed = TRUE;
 	}

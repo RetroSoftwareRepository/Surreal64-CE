@@ -17,7 +17,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include "stdafx.h"
+#ifdef _XBOX
 #include <xgraphics.h>
+#endif
 
 extern DWORD constFactorMap[2];
 
@@ -331,7 +333,7 @@ int CDirectXPixelShaderCombiner::GeneratePixelShaderFromMux(void)
 
 	// Step 2: Compile the shade text to generate a new pixel shader binary
 
-	/*FILE *fps = fopen("T:\\pshader.psh", "wt");
+	/*FILE *fps = fopen("T:\\Misc\\pshader.psh", "wt");
 	fwrite(&m_textBuf, 1, strlen(m_textBuf), fps);
 	fclose(fps);*/
 
@@ -470,11 +472,40 @@ void CDirectXSemiPixelShaderCombiner::InitCombinerCycle12(void)
 #ifdef _DEBUG
 void CDirectXPixelShaderCombiner::DisplaySimpleMuxString(void)
 {
-	 
+#ifndef _XBOX
+	CColorCombiner::DisplaySimpleMuxString();
+	TRACE0("\n");
+
+	int idx = FindCompiledShader();
+	if( idx < 0 )	idx = GeneratePixelShaderFromMux();
+
+	if( m_pixelShaderList[idx].pShaderText != NULL )
+		TRACE0(m_pixelShaderList[idx].pShaderText);
+
+	TRACE0("\n\n");
+#endif
 }
 void CDirectXSemiPixelShaderCombiner::DisplaySimpleMuxString(void)
 {
-	 
+#ifndef _XBOX
+	m_lastIndex = CGeneralCombiner::FindCompiledMux();
+	if( m_lastIndex < 0 )		// Can not found
+	{
+		m_lastIndex = CGeneralCombiner::ParseDecodedMux();
+	}
+
+	GeneralCombinerInfo &res = m_vCompiledCombinerStages[m_lastIndex];
+
+	if( res.bResultIsGoodWithinStages )
+	{
+		CDirectXColorCombiner::DisplaySimpleMuxString();
+	}
+	else
+	{
+		CDirectXPixelShaderCombiner::DisplaySimpleMuxString();
+		CDirectXColorCombiner::DisplaySimpleMuxString();
+	}
+#endif
 }
 
 #endif

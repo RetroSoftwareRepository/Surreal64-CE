@@ -3,84 +3,151 @@
 #include <xbresource.h>
 
 #ifdef DEBUG
-bool showdebug = true;
+	bool showdebug = true;
 #else
-bool showdebug = false;
+	bool showdebug = false;
 #endif
 
+#ifdef LAUNCHER
+	bool bLauncherHD = true;  // Force HD in Launcher if available
+#else
+	bool bLauncherHD = false;
+#endif
+
+bool bEnableHDTV = false; // Set to false (640x480 default)
+bool bFullScreen = false;//true;	// When Using HDTV render to whole screen
+									// This setting is unused at the moment, we are talking
+									// about aspect ratio here. UHLE defaults to 4:3 even in HD
+									
 extern "C" void loadinis();
-void LoadSkinFile();
 extern "C" int loaddwPJ64PagingMem();
 extern "C" int loaddwPJ64DynaMem();
 extern "C" int loaddw1964PagingMem();
 extern "C" int loaddw1964DynaMem();
-void WriteSkinFile();
+extern "C" int loaddwMaxVideoMem(); //reinstate max video mem
 
-// Ez0n3 - use iAudioPlugin instead to determine which audio plugin is used
+//extern "C" int loadbUseLLERSP(); // not used anymore, use iAudioPlugin instead to determine which audio plugin is used
+extern "C" int loadbUseRspAudio(); // control a listing
+extern "C" int loadiRspPlugin();
 extern "C" int loadiAudioPlugin();
 
-// Ez0n3 - reinstate max video mem
-extern "C" int loaddwMaxVideoMem();
+// ultrahle mem settings
+extern "C" int loaddwUltraCodeMem();
+extern "C" int loaddwUltraGroupMem();
 
-//freakdave
-int dw1964DynaMem=8;
+extern "C" int loadiPagingMethod();
+
+extern "C" int loadbAudioBoost();
+extern "C" void GetPathSaves(char *pszPathSaves);
+
+void LoadSkinFile();
+void WriteSkinFile();
+
+enum Pak
+{
+	NoPak = 1,
+	MemPak = 2,
+	RumblePak = 3
+};
+
+enum D3D_PresentationIntervals
+{
+	INTERVAL_IMMEDIATE,	//screen tearing possible
+	INTERVAL_ONE,	//VSync
+	//INTERVAL_TWO,	//VSync
+	//INTERVAL_THREE,	//VSync
+	//INTERVAL_FOUR,	//not supported on XBOX
+	//INTERVAL_DEFAULT,	//VSync
+	INTERVAL_ONE_OR_IMMEDIATE //see SDK docs
+	//INTERVAL_TWO_OR_IMMEDIATE, //see SDK docs
+	//INTERVAL_THREE_OR_IMMEDIATE, //see SDK docs*/
+};
+
+
+int dw1964DynaMem=4;//8
 int dw1964PagingMem=4;
-int dwPJ64DynaMem=16;
+int dwPJ64DynaMem=10;//16
 int dwPJ64PagingMem=4;
+int dwMaxVideoMem=4; // reinstate max free - in launcher config, this was 4 //5
 
-// Ez0n3 - use iAudioPlugin instead to determine which audio plugin is used
-bool bUseLLERSP=false; // leave this in case it's set in ini
-int iAudioPlugin = _AudioPluginJttl; // 2=JttL
+// ultrahle mem settings
+int dwUltraCodeMem=5;
+int dwUltraGroupMem=10;
 
-// Ez0n3 - reinstate max free
-int dwMaxVideoMem=5;
+int videoplugin = _VideoPluginRice560; // 2=rice560
+int iAudioPlugin = _AudioPluginJttl; // 2=JttL // use iAudioPlugin instead to determine which audio plugin is used
+int iRspPlugin = _RSPPluginHLE;
+bool bUseRspAudio=false; // control a listing
+
+// leave this in case it's set in ini
+bool bUseLLERSP=false;
+bool bUseBasicAudio=false;
+
+
 bool has128ram; // determine if the current phys ram is greater than 100MB: 128MB = true, 64MB = false
 
 // Ez0n3 - launch screens enable / disable
 bool HideLaunchScreens=0;
+bool EnableVideoAudio=0;
+bool EnableXMVPreview=0;
+bool EnableInfoPanel=1;
+//bool usePageOriginal=0; //fd - XXX default // moving to main ini
+int iPagingMethod=_PagingXXX; //XXX
+bool EnableBGMusic=1;
+bool RandomBGMusic=false;
+bool bAudioBoost=false;
 
-int videoplugin = _VideoPluginRice560; // Ez0n3 - 2=rice560
+//DWORD dwLastRomCRC;
 char romCRC[32];
 int romcounter = 0;
 bool onhd;
 int FlickerFilter = 1;
 bool SoftDisplayFilter = 0;
 int TextureMode = 3;
-int VertexMode = 1;
+int AntiAliasMode = 0;
+int VertexMode = 2; // default hardware
 bool FrameSkip = FALSE;
+int VSync = INTERVAL_IMMEDIATE; //see D3D_PresentParameters (PresentationIntervals)
+//int RefreshRateInHz = 60;
 float XBOX_CONTROLLER_DEAD_ZONE = 8600; // also change in SurrealMenu.cpp
 float Deadzone = 26;
-unsigned int Sensitivity = 10;
-char skinname[32] = "default";
+int Sensitivity = 10;
+char skinname[32] = "Default";
 
 char romname[256];
 
+char szPathRoms[MAX_FILE_PATH] = "D:\\Roms\\";
+char szPathMedia[MAX_FILE_PATH] = "D:\\Media\\";
+char szPathSkins[MAX_FILE_PATH] = "D:\\Skins\\";
+char szPathSaves[MAX_FILE_PATH] = "D:\\Saves\\";
+char szPathScreenshots[MAX_FILE_PATH] = "D:\\Screenshots\\";
 
-int ControllerConfig[72] 
+#define CONTROLLER_CONFIG_MAX 76 // change it here and it will auto-update the ini's
+int ControllerConfig[CONTROLLER_CONFIG_MAX] 
 		= {0x00,0x01,0x02,0x03,0x08,0x09,0x0A,0x0B,
 		   0x04,0x05,0x06,0x07,0x0C,0x10,0x12,0x16,
-		   0x0D,0x17,0x00,0x01,0x02,0x03,0x08,0x09,
-		   0x0A,0x0B,0x04,0x05,0x06,0x07,0x0C,0x10,
-		   0x12,0x16,0x0D,0x17,0x00,0x01,0x02,0x03,
-		   0x08,0x09,0x0A,0x0B,0x04,0x05,0x06,0x07,
-		   0x0C,0x10,0x12,0x16,0x0D,0x17,0x00,0x01,
-		   0x02,0x03,0x08,0x09,0x0A,0x0B,0x04,0x05,
-		   0x06,0x07,0x0C,0x10,0x12,0x16,0x0D,0x17};
+		   0x0D,0x17,0x0F,
+		   0x00,0x01,0x02,0x03,0x08,0x09,0x0A,0x0B,
+		   0x04,0x05,0x06,0x07,0x0C,0x10,0x12,0x16,
+		   0x0D,0x17,0x0F,
+		   0x00,0x01,0x02,0x03,0x08,0x09,0x0A,0x0B,
+		   0x04,0x05,0x06,0x07,0x0C,0x10,0x12,0x16,
+		   0x0D,0x17,0x0F,
+		   0x00,0x01,0x02,0x03,0x08,0x09,0x0A,0x0B,
+		   0x04,0x05,0x06,0x07,0x0C,0x10,0x12,0x16,
+		   0x0D,0x17,0x0F};
 
-int ControllerReset[18]  = 
+int ControllerReset[19]  = 
           {0x00,0x01,0x02,0x03,0x08,0x09,0x0A,0x0B,
 		   0x04,0x05,0x06,0x07,0x0C,0x10,0x12,0x16,
-		   0x0D,0x17};
+		   0x0D,0x17,0x0F};
 
-enum Pak
-{
-NoPak,
-MemPak,
-RumblePak,
-};
 //Skin.ini Defaults
+char BoxartName[32] = "Cbagys3DArt";
+
 //Font Colors
 DWORD dwTitleColor = 0xFF53B77F;
+DWORD dwIGMTitleColor = 0x55777777;
 DWORD dwMenuItemColor = 0xCCEEEEEE;
 DWORD dwMenuTitleColor = 0xFF8080FF;
 DWORD dwRomListColor = 0xAAEEEEEE;
@@ -88,144 +155,295 @@ DWORD dwSelectedRomColor = 0xFFFF8000;
 DWORD dwNullItemColor = 0xEE53B77F;
 
 //Launcher XLMenu Coords
-int iLaunchMenuPosX = 210;
-int iLaunchMenuPosY = 160;
-int iMainMenuPosX = 60;
-int iMainMenuPosY = 80;
+int iLaunchMenuTxtPosX = 200;
+int iLaunchMenuTxtPosY = 130;
+int iLaunchMenuTxtAlign = 0;
+int iLaunchMenuBgPosX = 190;
+int iLaunchMenuBgPosY = 120;
+int iLaunchHilightPosX = 190;
+int iMainMenuTxtPosX = 60;
+int iMainMenuTxtPosY = 65;
+int iMainMenuPosX = 45;
+int iMainMenuPosY = 60;
+int iMainMenuTxtAlign = 0;
+int iMainHilightPosX = 45;
+int iControlConfigPosX = 64;
+int iControlConfigPosY = 5;
+int iControlConfigWidth = 505;
+int iControlConfigTxtPosX = 320;
+int iControlConfigTxtPosY = 25;
+int iControlConfigTxtPadLX = 5;
 
-
-//IGM XLMenu Coords
-int iIGMMenuPosX = 60;
-int iIGMMenuPosY = 80;
+//Synopsis
+int iSynopsisPosX = 30;
+int iSynopsisPosY = 15;	// initial y position, should be a skin param???
+int iSynopsisWrap = 66; // sd=66 (69 max - 3 roughly matches PosX 30 left margin), hd=??? (roughly 138 for 1280? - 3 for margin)
+int iSynopsisLines = 20;
+int iSynopsisAlign = 0;
 
 //Launcher Coords
 int iInfoPosX = 50;
 int iInfoPosY = 310;
-int iBoxPosX = 430;
-int iBoxPosY = 30;
+int iInfoTxtPosX = 60;
+int iInfoTxtPosY = 316;
+int iInfoTxtAlign = 0;
+int iInfoTxtControlPosX = 320;
+int iInfoTxtControlPosY = 430;
+int iInfoTxtControlAlign = 2; // 0=left, 1=right, 2=centerX,
+bool bShowRLControls = 1;
+float InfoPanelTrunc = 430.0f; //float or int? float.
+int iBoxPosX = 437;
+int iBoxPosY = 37;
+int iBoxWidth = 178;
+int iBoxHeight = 178;
+int iBoxPanelPosX = 430;
+int iBoxPanelPosY = 30;
 int iTitleX = 305;
 int iTitleY = 20;
+int iControlsSpacing = -3;
+
+int iTempMessagePosX = 10;
+int iTempMessagePosY = 10;
+int iTempMessageAlign = 0;
+
+// Load Window
+int iLoadBoxPosX = 85;
+int iLoadBoxPosY = 120;
+int iLoadPanelPosX = 92;
+int iLoadPanelPosY = 30;
+int iLoadPanelTxtPosX = 100;
+int iLoadPanelTxtPosY = 35;
+int iLoadPanelTxtAlign = 0;
+int iLoadPanelBarPosX = 95;
+int iLoadPanelBarPosY = 67;
+int iLoadPanelTrunc = 450;
+
+int iBoxWidthAuto = 178;
+int iBoxHeightAuto = 178;
 
 //IGM Coords
-int iIGMTitleX = 305;
-int iIGMTitleY = 20;
-int iPanelX = 305;
-int iPanelY = 65;
-int iPanelNW = 267;
-int iPanelNH = 200;
+int iIGMTitleX = 510;//305
+int iIGMTitleY = 430;//20
+int iIGMMenuPosX = 45;
+int iIGMMenuPosY = 70;
+int iIGMHilightPosX = 45;
+int iPanelX = 0;//305
+int iPanelY = 0;//65
+int iPanelNW = 640;//267
+int iPanelNH = 480;//200
+int iIGMControlConfigBGPosX = 64;
+int iIGMControlConfigBGPosY = 5;
+int iControlsSpacingIGM = -3;
+int iIGMControlConfigCenterX = 320;
+int iIGMControlConfigWidth = 505;
+int iIGMControlConfigTop = 25;
+int iIGMControlConfigTxtPadLX = 5;
+int iIGMConControlsPosX = 270;
+int iIGMConControlsPosY = 350;
+int iIGMConControlsTxtPosX = 272;
+int iIGMConControlsTxtPosY = 355;
+int iIGMConControlsTxtAlign = 0;
+
+//IGM XLMenu Coords
+int iIGMMenuTxtPosX = 60;
+int iIGMMenuTxtPosY = 80;
+int iIGMMenuTxtAlign = 0;
+int iIGMStateScreenX = 60;
+int iIGMStateScreenY = 270;
+int iIGMStateScreenW = 256;
+int iIGMStateScreenH = 191;
+
+//IGM HD Coords
+int iIGMTitleX_HD = 1100;
+int iIGMTitleY_HD = 690;
+int iIGMMenuPosX_HD = 45;
+int iIGMMenuPosY_HD = 70;
+int iIGMHilightPosX_HD = 45;
+int iPanelX_HD = 0;
+int iPanelY_HD = 0;
+int iPanelNW_HD = 1280;
+int iPanelNH_HD = 720;
+int iIGMControlConfigBGPosX_HD = 64;
+int iIGMControlConfigBGPosY_HD = 5;
+int iControlsSpacingIGM_HD = -3;
+int iIGMControlConfigCenterX_HD = 320;
+int iIGMControlConfigWidth_HD = 505;
+int iIGMControlConfigTop_HD = 25;
+int iIGMControlConfigTxtPadLX_HD = 5;
+int iIGMConControlsPosX_HD = 270;
+int iIGMConControlsPosY_HD = 350;
+int iIGMConControlsTxtPosX_HD = 272;
+int iIGMConControlsTxtPosY_HD = 360;
+int iIGMConControlsTxtAlign_HD = 0;
+
+//IGM HD XLMenu Coords
+int iIGMMenuTxtPosX_HD = 60;
+int iIGMMenuTxtPosY_HD = 80;
+int iIGMMenuTxtAlign_HD = 0;
+int iIGMStateScreenX_HD = 60;
+int iIGMStateScreenY_HD = 270;
+int iIGMStateScreenW_HD = 256;
+int iIGMStateScreenH_HD = 143;
 
 //RomList Coords
-int iRomListPosX = 45;
-int iRomListPosY = 45;
-int GAMESEL_MaxWindowList = 12;
+int iRomListPosX = 48;
+int iRomListPosY = 48;
+int GAMESEL_MaxWindowList = 11;//12
+int iRomListAlign = 0;
 int RomListTrunc = 43;
-int MenuTrunc = 256;
-int iControlsPosX = 430;
-int iControlsPosY = 35;
+int MenuTrunc = 28;
+int iControlsPosX = 436;
+int iControlsPosY = 180;
+int iControlsTxtPosX = 448; //430;
+int iControlsTxtPosY = 180; //180;
+int iControlsTxtAlign = 0;
 int iRLBorderPosX = 33;
 int iRLBorderPosY = 20;
+
+//Control Panel Coords
+int iConControlsPosX = 235;
+int iConControlsPosY = 340;
+int iConControlsTxtPosX = 272;
+int iConControlsTxtPosY = 351;
+int iConControlsTxtAlign = 0;
+int iSynControlsPosX = 450;
+int iSynControlsPosY = 20;
+int iSynControlsTxtPosX = 465;
+int iSynControlsTxtPosY = 21;
+int iSynControlsTxtAlign = 0;
+int iCredControlsPosX = 450;
+int iCredControlsPosY = 380;
+int iCredControlsTxtPosX = 465;
+int iCredControlsTxtPosY = 393;
+int iCredControlsTxtAlign = 0;
+
+//Logo Coords (HD)
+int iLogoPosX = 770;
+int iLogoPosY = 300;
+
+//XMVPlayer
+int iMovieTop = 185;
+int iMovieBottom = 290;
+int iMovieLeft = 435;
+int iMovieRight = 600;
+int iLineSpacing = -5;
 
 int DefaultPak = RumblePak;
 
 //freakdave - now all controllers are enabled by default, users don't seem to know how to change it in Surreal's Menu
 bool EnableController1 = true;
 bool EnableController2 = true;
-bool EnableController3 = true;
-bool EnableController4 = true;
+bool EnableController3 = true; // this was false in launcher config
+bool EnableController4 = true; // this was false in launcher config
 
 extern int actualrom;
 int preferedemu=0;
 
 void ResetDefaults()
 {
-preferedemu=0;
-dw1964DynaMem=8;
-dw1964PagingMem=4;
-dwPJ64DynaMem=16;
-dwPJ64PagingMem=4;
+	preferedemu=0;
+	dw1964DynaMem=4;//8
+	dw1964PagingMem=4;
+	dwPJ64DynaMem=10;//16
+	dwPJ64PagingMem=4;
+	dwMaxVideoMem=4; //reinstate max free mem //5
+	bUseRspAudio=false; // control a listing
 
-// Ez0n3 - use iAudioPlugin instead to determine if basic audio is used
-bUseLLERSP=false; // leave this in case it's set in ini
+	// ultrahle mem settings
+	dwUltraCodeMem=5;
+	dwUltraGroupMem=10;
+	
+	// not used anymore - leave for ini
+	bUseLLERSP=false;
+	bUseBasicAudio=false;
 
-// Ez0n3 - reinstate max free mem
-dwMaxVideoMem=5;
+	DefaultPak = RumblePak;
+	FlickerFilter = 1;
+	TextureMode = 3;
+	VertexMode = 2;
+	VSync = INTERVAL_IMMEDIATE;
+	AntiAliasMode = 0;
+	SoftDisplayFilter = 0;
+	FrameSkip = FALSE;
+	bEnableHDTV = false;
+	bFullScreen = false;
+	EnableController1 = true;
+	EnableController2 = true;
+	EnableController3 = true; // this was false in launcher config
+	EnableController4 = true; // this was false in launcher config
+	XBOX_CONTROLLER_DEAD_ZONE = 8600;
+	Deadzone = 26;
+	Sensitivity = 10;
+	videoplugin = _VideoPluginRice560; //2=rice560
 
-DefaultPak = RumblePak;
-EnableController1 = true;
-EnableController2 = true;
-EnableController3 = true;
-EnableController4 = true;
-XBOX_CONTROLLER_DEAD_ZONE = 8600;
-Deadzone = 26;
-Sensitivity = 10;
-videoplugin = _VideoPluginRice560; // Ez0n3 - 2=rice560
+	//plugins
+	iAudioPlugin = _AudioPluginJttl; //2=jttl
+	iRspPlugin = _RSPPluginHLE;
+	
+	int iPagingMethod=_PagingXXX;
 
-//Ez0n3 - plugins
-iAudioPlugin = _AudioPluginJttl; //2=jttl
+	for (int i=0;i<4;i++) {
+	for (int j=0;j<19;j++){
+	ControllerConfig[(i*19)+j]=ControllerReset[j];}}
+}
 
-for (int i=0;i<4;i++) {
-for (int j=0;j<18;j++){
-ControllerConfig[(i*18)+j]=ControllerReset[j];}}
-
+void ResetAppDefaults()
+{
+	//onhd
+	//skinname
+	HideLaunchScreens = false;
+	EnableXMVPreview = false;
+	EnableVideoAudio = false;
+	EnableInfoPanel = true;
+	EnableBGMusic = true;
+	RandomBGMusic = false;
+	bAudioBoost = false;
+	
+	sprintf(szPathRoms,			"D:\\Roms\\");
+	sprintf(szPathMedia,		"D:\\Media\\");
+	sprintf(szPathSkins,		"D:\\Skins\\");
+	sprintf(szPathSaves,		"D:\\Saves\\");
+	sprintf(szPathScreenshots,	"D:\\Screenshots\\");
 }
 
 // Read in the config file for the whole application
 int ConfigAppLoad()
 {
-	char szLine[256];
-	FILE *h;
+	CSimpleIniA ini;
+	SI_Error rc;
+	ini.SetUnicode(true);
+	ini.SetMultiKey(true);
+	ini.SetMultiLine(false);
+	ini.SetSpaces(false); // spaces before and after =
 
-	if (onhd){
-	if ((h = fopen("D:\\ini\\surreal-xxx.ini", "rt")) == NULL) {
-		return 1;
-	}}
-	else {
-	if ((h = fopen("T:\\ini\\surreal-xxx.ini", "rt")) == NULL) {
-		return 1;
-	}}
-
-	// Go through each line of the config file
-	while (1) {
-		int nLen;
-		if (fgets(szLine, sizeof(szLine), h) == NULL) {	// End of config file
-			break;
-		}
-
-		nLen = strlen(szLine);
-		
-		// Get rid of the linefeed at the end
-		if (szLine[nLen - 1] == 10) {
-			szLine[nLen - 1] = 0;
-			nLen--;
-		}
-
-#define BOL(x) { char *szValue = LabelCheck(szLine,#x);		\
-	if (szValue) x = strtol(szValue, NULL, 0) != 0; }
-#define VAR(x) { char *szValue = LabelCheck(szLine,#x);		\
-	if (szValue) x = strtol(szValue, NULL, 0); }
-#define FLT(x) { char *szValue = LabelCheck(szLine,#x);		\
-	if (szValue) x = atof(szValue); }
-#define STR(x) { char *szValue = LabelCheck(szLine,#x " ");	\
-	if (szValue) strcpy(x,szValue); }
-
-        VAR(VertexMode);
-		VAR(FlickerFilter);
-		BOL(SoftDisplayFilter);
-		VAR(TextureMode);
-		VAR(romcounter);
-		BOL(onhd);
-		STR(skinname);
-
-		// Ez0n3 - show launch screens
-		BOL(HideLaunchScreens);
-
-#undef STR
-#undef FLT
-#undef VAR
-#undef BOL
-
+	char szIniFilename[64];
+	sprintf(szIniFilename, "T:\\surreal-ce.ini");
+	OutputDebugString(szIniFilename);
+	rc = ini.LoadFile(szIniFilename);
+	if (rc < 0) 
+	{
+		OutputDebugStringA(" Failed to Load!\n");
+		return 1; // write out default?
 	}
-	fclose(h);
+	OutputDebugStringA(" Successfully Loaded!\n");
+
+	//romcounter = ini.GetLongValue("Settings", "romcounter", 0 );
+	sprintf(skinname, "%s", ini.GetValue("Settings", "skinname", "Default" ));
+	onhd = ini.GetBoolValue("Settings", "onhd", true );
+	HideLaunchScreens = ini.GetBoolValue("Settings", "HideLaunchScreens", false );
+	EnableXMVPreview = ini.GetBoolValue("Settings", "EnableXMVPreview", false );
+	EnableVideoAudio = ini.GetBoolValue("Settings", "EnableVideoAudio", false );
+	EnableInfoPanel = ini.GetBoolValue("Settings", "EnableInfoPanel", true );
+	EnableBGMusic = ini.GetBoolValue("Settings", "EnableBGMusic", true);
+	RandomBGMusic = ini.GetBoolValue("Settings", "RandomBGMusic", false);
+	bAudioBoost = ini.GetBoolValue("Settings", "AudioBoost", false);
+	
+	sprintf(szPathRoms, "%s", ini.GetValue("Settings", "PathRoms", szPathRoms ));
+	sprintf(szPathMedia, "%s", ini.GetValue("Settings", "PathMedia", szPathMedia ));
+	sprintf(szPathSkins, "%s", ini.GetValue("Settings", "PathSkins", szPathSkins ));
+	sprintf(szPathSaves, "%s", ini.GetValue("Settings", "PathSaves", szPathSaves ));
+	sprintf(szPathScreenshots, "%s", ini.GetValue("Settings", "PathScreenshots", szPathScreenshots ));
+
 	return 0;
 }
 
@@ -233,796 +451,803 @@ int ConfigAppLoad()
 
 int ConfigAppSave()
 {
-	FILE *h;
-
-	if(onhd){
-		if ((h = fopen("D:\\ini\\surreal-xxx.ini", "wt")) == NULL) return 1;}
-	else{
-		if ((h = fopen("T:\\ini\\surreal-xxx.ini", "wt")) == NULL) return 1;}
-
-	// Write title
-	fprintf(h,"// Surreal64 XXX Config File\n\n");
-	fprintf(h,"// Don't edit this file manually unless you know what you're doing\n");
-	fprintf(h,"// Surreal will restore default settings when this file is deleted\n");
-
-#define BOL(x) fprintf(h, #x " %d\n", (int)(x != 0))
-#define VAR(x) fprintf(h, #x " %d\n", x)
-#define FLT(x) fprintf(h, #x " %f\n", x)
-#define STR(x) fprintf(h, #x " %s\n", x)
+	CSimpleIniA ini;
+	SI_Error rc;
+	ini.SetUnicode(true);
+    ini.SetMultiKey(true);
+    ini.SetMultiLine(false);
+	ini.SetSpaces(false); // spaces before and after =
 	
-	fprintf(h,"\n\n\n");
-    
-	VAR(VertexMode);
-	VAR(FlickerFilter);
-	BOL(SoftDisplayFilter);
-	VAR(TextureMode);
-	VAR(romcounter);
-	BOL(onhd);
-	STR(skinname);
+	//ini.SetLongValue("Settings", "romcounter", romcounter);
+	ini.SetValue("Settings", "skinname", skinname);
+	ini.SetBoolValue("Settings", "onhd", onhd);
+	ini.SetBoolValue("Settings", "HideLaunchScreens", HideLaunchScreens);
+	ini.SetBoolValue("Settings", "EnableXMVPreview", EnableXMVPreview);
+	ini.SetBoolValue("Settings", "EnableVideoAudio", EnableVideoAudio);
+	ini.SetBoolValue("Settings", "EnableInfoPanel", EnableInfoPanel);
+	ini.SetBoolValue("Settings", "EnableBGMusic", EnableBGMusic);
+	ini.SetBoolValue("Settings", "RandomBGMusic", RandomBGMusic);
+	ini.SetBoolValue("Settings", "AudioBoost", bAudioBoost);
+	
+	ini.SetValue("Settings", "PathRoms", szPathRoms);
+	ini.SetValue("Settings", "PathMedia", szPathMedia);
+	ini.SetValue("Settings", "PathSkins", szPathSkins);
+	ini.SetValue("Settings", "PathSaves", szPathSaves);
+	ini.SetValue("Settings", "PathScreenshots", szPathScreenshots);
+	
+	char szIniFilename[64];
+	sprintf(szIniFilename, "T:\\surreal-ce.ini");
+	OutputDebugString(szIniFilename);
+	rc = ini.SaveFile(szIniFilename);
+    if (rc < 0) 
+	{
+		OutputDebugStringA(" Failed to Save!\n");
+		return 1; //return false;
+	}
+	OutputDebugStringA(" Saved Successfully!\n");
 
-	// Ez0n3 - show launch screens
-	BOL(HideLaunchScreens);
-
-#undef STR
-#undef FLT
-#undef VAR
-#undef BOL
-
-	fclose(h);
 	return 0;
 }
 
 
 int ConfigAppSave2()
 {
-	FILE *h;
-	char szConfig[260];
-
-	if(onhd)
-	sprintf(szConfig, "D:\\ini\\games\\%s.ini", romCRC);
-	else
-	sprintf(szConfig, "T:\\ini\\games\\%s.ini", romCRC);
-
-	if ((h = fopen(szConfig, "wt")) == NULL) return 1;
-
-#define BOL(x) fprintf(h, #x " %d\n", (int)(x != 0))
-#define VAR(x) fprintf(h, #x " %d\n", x)
-#define FLT(x) fprintf(h, #x " %f\n", x)
-#define STR(x) fprintf(h, #x " %s\n", x)
+	CSimpleIniA ini;
+	SI_Error rc;
+	ini.SetUnicode(true);
+    ini.SetMultiKey(true);
+    ini.SetMultiLine(false);
+	ini.SetSpaces(false); // spaces before and after =
 	
-	fprintf(h,"\n\n\n");
-
-	VAR(preferedemu);
-
-	FLT(XBOX_CONTROLLER_DEAD_ZONE);
-	FLT(Deadzone);
-	VAR(Sensitivity);
-	VAR(DefaultPak);
-	BOL(EnableController1);
-	BOL(EnableController2);
-	BOL(EnableController3);
-	BOL(EnableController4);
-
-	VAR(dw1964DynaMem);
-	VAR(dw1964PagingMem);
-	VAR(dwPJ64DynaMem);
-	VAR(dwPJ64PagingMem);
-	BOL(bUseLLERSP); // Ez0n3 - use iAudioPlugin instead
-	BOL(FrameSkip);
+	ini.SetLongValue("Settings", "preferedemu", preferedemu);
+	ini.SetLongValue("Settings", "videoplugin", videoplugin);
+	ini.SetLongValue("Settings", "iAudioPlugin", iAudioPlugin);
+	ini.SetLongValue("Settings", "iRspPlugin", iRspPlugin);
 	
-	// Ez0n3 - reinstate max video mem
-	VAR(dwMaxVideoMem);
-	VAR(videoplugin);
-	VAR(iAudioPlugin);
+	ini.SetLongValue("Settings", "dw1964DynaMem", dw1964DynaMem);
+	ini.SetLongValue("Settings", "dw1964PagingMem", dw1964PagingMem);
+	ini.SetLongValue("Settings", "dwPJ64DynaMem", dwPJ64DynaMem);
+	ini.SetLongValue("Settings", "dwPJ64PagingMem", dwPJ64PagingMem);
+	ini.SetLongValue("Settings", "dwMaxVideoMem", dwMaxVideoMem); // reinstate max video mem
+	ini.SetBoolValue("Settings", "bUseRspAudio", bUseRspAudio); // control a listing
 	
+	// ultrahle mem settings
+	ini.SetLongValue("Settings", "dwUltraCodeMem", dwUltraCodeMem);
+	ini.SetLongValue("Settings", "dwUltraGroupMem", dwUltraGroupMem);
+	
+	ini.SetBoolValue("Settings", "bUseLLERSP", bUseLLERSP); // leave for ini?
+	
+	//weinerschnitzel - Rompaging
+	//ini.SetBoolValue("Settings", "usePageOriginal", usePageOriginal); // moving to main ini
+	ini.SetLongValue("Settings", "iPagingMethod", iPagingMethod);
+	
+	ini.SetLongValue("Settings", "Sensitivity", Sensitivity);
+	ini.SetLongValue("Settings", "DefaultPak", DefaultPak);
+	ini.SetLongValue("Settings", "FlickerFilter", FlickerFilter);
+	ini.SetLongValue("Settings", "TextureMode", TextureMode);
+	ini.SetLongValue("Settings", "VertexMode", VertexMode);
+	ini.SetLongValue("Settings", "VSync", VSync);
+	ini.SetLongValue("Settings", "AntiAliasMode", AntiAliasMode);
+	ini.SetBoolValue("Settings", "SoftDisplayFilter", SoftDisplayFilter);
+	ini.SetBoolValue("Settings", "FrameSkip", FrameSkip);
+	ini.SetBoolValue("Settings", "EnableController1", EnableController1);
+	ini.SetBoolValue("Settings", "EnableController2", EnableController2);
+	ini.SetBoolValue("Settings", "EnableController3", EnableController3);
+	ini.SetBoolValue("Settings", "EnableController4", EnableController4);
+	
+	
+	char szFloatBuf[64];
+	
+	sprintf(szFloatBuf, "%.6f", XBOX_CONTROLLER_DEAD_ZONE);
+	ini.SetValue("Settings", "XBOX_CONTROLLER_DEAD_ZONE", szFloatBuf);
+	
+	sprintf(szFloatBuf, "%.6f", Deadzone);
+	ini.SetValue("Settings", "Deadzone", szFloatBuf);
+	
+	// controller config
+	{
+		for (int i = 0; i < CONTROLLER_CONFIG_MAX; i++)
+		{
+			char var[22];
+			sprintf(var, "ControllerConfig[%i]", i);
+			ini.SetLongValue("Settings", var, ControllerConfig[i]);
+		}
+	}
+		
+	ini.SetBoolValue("Settings", "EnableHDTV", bEnableHDTV);
+	ini.SetBoolValue("Settings", "FullScreen", bFullScreen);
 
-	VAR(ControllerConfig[0]);
-	VAR(ControllerConfig[1]);
-	VAR(ControllerConfig[2]);
-	VAR(ControllerConfig[3]);
-	VAR(ControllerConfig[4]);
-	VAR(ControllerConfig[5]);
-	VAR(ControllerConfig[6]);
-	VAR(ControllerConfig[7]);
-	VAR(ControllerConfig[8]);
-	VAR(ControllerConfig[9]);
-	VAR(ControllerConfig[10]);
-	VAR(ControllerConfig[11]);
-	VAR(ControllerConfig[12]);
-	VAR(ControllerConfig[13]);
-	VAR(ControllerConfig[14]);
-	VAR(ControllerConfig[15]);
-	VAR(ControllerConfig[16]);
-	VAR(ControllerConfig[17]);
-	VAR(ControllerConfig[18]);
-	VAR(ControllerConfig[19]);
-	VAR(ControllerConfig[20]);
-	VAR(ControllerConfig[21]);
-	VAR(ControllerConfig[22]);
-	VAR(ControllerConfig[23]);
-	VAR(ControllerConfig[24]);
-	VAR(ControllerConfig[25]);
-	VAR(ControllerConfig[26]);
-	VAR(ControllerConfig[27]);
-	VAR(ControllerConfig[28]);
-	VAR(ControllerConfig[29]);
-	VAR(ControllerConfig[30]);
-	VAR(ControllerConfig[31]);
-	VAR(ControllerConfig[32]);
-	VAR(ControllerConfig[33]);
-	VAR(ControllerConfig[34]);
-	VAR(ControllerConfig[35]);
-	VAR(ControllerConfig[36]);
-	VAR(ControllerConfig[37]);
-	VAR(ControllerConfig[38]);
-	VAR(ControllerConfig[39]);
-	VAR(ControllerConfig[40]);
-	VAR(ControllerConfig[41]);
-	VAR(ControllerConfig[42]);
-	VAR(ControllerConfig[43]);
-	VAR(ControllerConfig[44]);
-	VAR(ControllerConfig[45]);
-	VAR(ControllerConfig[46]);
-	VAR(ControllerConfig[47]);
-	VAR(ControllerConfig[48]);
-	VAR(ControllerConfig[49]);
-	VAR(ControllerConfig[50]);
-	VAR(ControllerConfig[51]);
-	VAR(ControllerConfig[52]);
-	VAR(ControllerConfig[53]);
-	VAR(ControllerConfig[54]);
-	VAR(ControllerConfig[55]);
-	VAR(ControllerConfig[56]);
-	VAR(ControllerConfig[57]);
-	VAR(ControllerConfig[58]);
-	VAR(ControllerConfig[59]);
-	VAR(ControllerConfig[60]);
-	VAR(ControllerConfig[61]);
-	VAR(ControllerConfig[62]);
-	VAR(ControllerConfig[63]);
-	VAR(ControllerConfig[64]);
-	VAR(ControllerConfig[65]);
-	VAR(ControllerConfig[66]);
-	VAR(ControllerConfig[67]);
-	VAR(ControllerConfig[68]);
-	VAR(ControllerConfig[69]);
-	VAR(ControllerConfig[70]);
-	VAR(ControllerConfig[71]);
+	{
+		char romsavedir[64];
+		sprintf(romsavedir, "%s%s", szPathSaves, romCRC);
+		if(!PathFileExists(romsavedir)) {
+			if(!CreateDirectory(romsavedir, NULL)) {
+				OutputDebugString("Error creating directory: ");
+				OutputDebugString(romsavedir);
+				OutputDebugString("\n");
+				return 1;
+			}
+		}
+	}
+	
+	char szIniFilename[64];
+	sprintf(szIniFilename, "%s%s\\%s.ini", szPathSaves, romCRC, romCRC);
+	OutputDebugString(szIniFilename);
+	rc = ini.SaveFile(szIniFilename);
+    if (rc < 0) 
+	{
+		OutputDebugStringA(" Failed to Save!\n");
+		return 1; //return false;
+	}
+	OutputDebugStringA(" Saved Successfully!\n");
 
-#undef STR
-#undef FLT
-#undef VAR
-#undef BOL
-	fclose(h);
 	return 0;
 }
 
 
 int ConfigAppLoad2()
 {
-	FILE *h;
-	char szConfig[260];
-	char szLine[256];
+	// rom specific settings (xxxxxxxx.ini)
+	// if you want it backward compatible, check for old ini here 1st
+	// get the vars from old file and set them in code instead of parsing it with simpleini
+	// let the new save write out a new ini with those updated values the next time it's called from menu
+	// just need old vars set in code and then return
 
-	if (onhd)
-	sprintf(szConfig, "D:\\ini\\games\\%s.ini", romCRC);
-	else
-	sprintf(szConfig, "T:\\ini\\games\\%s.ini", romCRC);
+	CSimpleIniA ini;
+	SI_Error rc;
+	ini.SetUnicode(true);
+	ini.SetMultiKey(true);
+	ini.SetMultiLine(false);
+	ini.SetSpaces(false); // spaces before and after =
 
-	if ((h = fopen(szConfig, "rt")) == NULL) {
-        ResetDefaults();	
-		return 1;}
-
-	// Go through each line of the config file
-	while (1) {
-		int nLen;
-		if (fgets(szLine, sizeof(szLine), h) == NULL) {	// End of config file
-			break;
-		}
-
-		nLen = strlen(szLine);
-		
-		// Get rid of the linefeed at the end
-		if (szLine[nLen - 1] == 10) {
-			szLine[nLen - 1] = 0;
-			nLen--;
-		}
-
-#define BOL(x) { char *szValue = LabelCheck(szLine,#x);		\
-	if (szValue) x = strtol(szValue, NULL, 0) != 0; }
-#define VAR(x) { char *szValue = LabelCheck(szLine,#x);		\
-	if (szValue) x = strtol(szValue, NULL, 0); }
-#define FLT(x) { char *szValue = LabelCheck(szLine,#x);		\
-	if (szValue) x = atof(szValue); }
-#define STR(x) { char *szValue = LabelCheck(szLine,#x " ");	\
-	if (szValue) strcpy(x,szValue); }
-
-	
-		VAR(preferedemu);
-		FLT(XBOX_CONTROLLER_DEAD_ZONE);
-		FLT(Deadzone);
-		VAR(Sensitivity);
-		VAR(DefaultPak);
-		BOL(EnableController1);
-		BOL(EnableController2);
-		BOL(EnableController3);
-		BOL(EnableController4);
-
-		VAR(dw1964DynaMem);
-		VAR(dw1964PagingMem);
-		VAR(dwPJ64DynaMem);
-		VAR(dwPJ64PagingMem);
-		BOL(bUseLLERSP); // Ez0n3 - use iAudioPlugin instead, but leave this in in case it's set in ini
-		BOL(FrameSkip);
-
-		// Ez0n3 - reinstate max video mem
-		VAR(dwMaxVideoMem);
-		VAR(videoplugin);
-		VAR(iAudioPlugin);
-
-        VAR(ControllerConfig[0]);
-        VAR(ControllerConfig[1]);
-        VAR(ControllerConfig[2]);
-        VAR(ControllerConfig[3]);
-        VAR(ControllerConfig[4]);
-        VAR(ControllerConfig[5]);
-        VAR(ControllerConfig[6]);
-        VAR(ControllerConfig[7]);
-        VAR(ControllerConfig[8]);
-        VAR(ControllerConfig[9]);
-        VAR(ControllerConfig[10]);
-        VAR(ControllerConfig[11]);
-        VAR(ControllerConfig[12]);
-        VAR(ControllerConfig[13]);
-        VAR(ControllerConfig[14]);
-        VAR(ControllerConfig[15]);
-        VAR(ControllerConfig[16]);
-        VAR(ControllerConfig[17]);
-        VAR(ControllerConfig[18]);
-        VAR(ControllerConfig[19]);
-        VAR(ControllerConfig[20]);
-        VAR(ControllerConfig[21]);
-        VAR(ControllerConfig[22]);
-        VAR(ControllerConfig[23]);
-        VAR(ControllerConfig[24]);
-        VAR(ControllerConfig[25]);
-        VAR(ControllerConfig[26]);
-        VAR(ControllerConfig[27]);
-        VAR(ControllerConfig[28]);
-        VAR(ControllerConfig[29]);
-        VAR(ControllerConfig[30]);
-        VAR(ControllerConfig[31]);
-        VAR(ControllerConfig[32]);
-        VAR(ControllerConfig[33]);
-        VAR(ControllerConfig[34]);
-        VAR(ControllerConfig[35]);
-        VAR(ControllerConfig[36]);
-        VAR(ControllerConfig[37]);
-        VAR(ControllerConfig[38]);
-        VAR(ControllerConfig[39]);
-        VAR(ControllerConfig[40]);
-        VAR(ControllerConfig[41]);
-        VAR(ControllerConfig[42]);
-        VAR(ControllerConfig[43]);
-        VAR(ControllerConfig[44]);
-        VAR(ControllerConfig[45]);
-        VAR(ControllerConfig[46]);
-        VAR(ControllerConfig[47]);
-        VAR(ControllerConfig[48]);
-        VAR(ControllerConfig[49]);
-        VAR(ControllerConfig[50]);
-        VAR(ControllerConfig[51]);
-        VAR(ControllerConfig[52]);
-        VAR(ControllerConfig[53]);
-        VAR(ControllerConfig[54]);
-        VAR(ControllerConfig[55]);
-        VAR(ControllerConfig[56]);
-        VAR(ControllerConfig[57]);
-        VAR(ControllerConfig[58]);
-        VAR(ControllerConfig[59]);
-        VAR(ControllerConfig[60]);
-        VAR(ControllerConfig[61]);
-        VAR(ControllerConfig[62]);
-        VAR(ControllerConfig[63]);
-        VAR(ControllerConfig[64]);
-        VAR(ControllerConfig[65]);
-        VAR(ControllerConfig[66]);
-        VAR(ControllerConfig[67]);
-        VAR(ControllerConfig[68]);
-        VAR(ControllerConfig[69]);
-        VAR(ControllerConfig[70]);
-        VAR(ControllerConfig[71]);
-	
-#undef STR
-#undef FLT
-#undef VAR
-#undef BOL
+	char szIniFilename[64];
+	sprintf(szIniFilename, "%s%s\\%s.ini", szPathSaves, romCRC, romCRC);
+	OutputDebugString(szIniFilename);
+	rc = ini.LoadFile(szIniFilename);
+	if (rc < 0) 
+	{
+		OutputDebugStringA(" Failed to Load!\n");
+		return 1;
 	}
-	fclose(h);
+	OutputDebugStringA(" Successfully Loaded!\n");
+
+	// need to double check the defaults
+	// just setting them to whatever they were for now if it's not found
+	preferedemu = ini.GetLongValue("Settings", "preferedemu", preferedemu );
+	videoplugin = ini.GetLongValue("Settings", "videoplugin", videoplugin );
+	iAudioPlugin = ini.GetLongValue("Settings", "iAudioPlugin", iAudioPlugin );
+	iRspPlugin = ini.GetLongValue("Settings", "iRspPlugin", iRspPlugin );
+	
+	dw1964DynaMem = ini.GetLongValue("Settings", "dw1964DynaMem", dw1964DynaMem );
+	dw1964PagingMem = ini.GetLongValue("Settings", "dw1964PagingMem", dw1964PagingMem );
+	dwPJ64DynaMem = ini.GetLongValue("Settings", "dwPJ64DynaMem", dwPJ64DynaMem );
+	dwPJ64PagingMem = ini.GetLongValue("Settings", "dwPJ64PagingMem", dwPJ64PagingMem );
+	dwMaxVideoMem = ini.GetLongValue("Settings", "dwMaxVideoMem", dwMaxVideoMem ); // reinstate max video mem
+	
+	bUseRspAudio = ini.GetBoolValue("Settings", "bUseRspAudio", bUseRspAudio ); // control a listing
+	
+	// ultrahle mem settings
+	dwUltraCodeMem = ini.GetLongValue("Settings", "dwUltraCodeMem", dwUltraCodeMem );
+	dwUltraGroupMem = ini.GetLongValue("Settings", "dwUltraGroupMem", dwUltraGroupMem );
+
+	bUseLLERSP = ini.GetBoolValue("Settings", "bUseLLERSP", bUseLLERSP ); // leave for ini?
+	
+	//weinerschnitzel - Rompaging
+	//usePageOriginal = ini.GetBoolValue("Settings", "usePageOriginal", usePageOriginal ); // moving to main ini
+	iPagingMethod = ini.GetLongValue("Settings", "iPagingMethod", iPagingMethod );
+	
+	Sensitivity = ini.GetLongValue("Settings", "Sensitivity", Sensitivity );
+	DefaultPak = ini.GetLongValue("Settings", "DefaultPak", DefaultPak );
+	FlickerFilter = ini.GetLongValue("Settings", "FlickerFilter", FlickerFilter );
+	TextureMode = ini.GetLongValue("Settings", "TextureMode", TextureMode );
+	VertexMode = ini.GetLongValue("Settings", "VertexMode", VertexMode );
+	VSync = ini.GetLongValue("Settings", "VSync", VSync );
+	AntiAliasMode = ini.GetLongValue("Settings", "AntiAliasMode", AntiAliasMode );
+	SoftDisplayFilter = ini.GetBoolValue("Settings", "SoftDisplayFilter", SoftDisplayFilter );
+	FrameSkip = ini.GetBoolValue("Settings", "FrameSkip", FrameSkip );
+	EnableController1 = ini.GetBoolValue("Settings", "EnableController1", EnableController1 );
+	EnableController2 = ini.GetBoolValue("Settings", "EnableController2", EnableController2 );
+	EnableController3 = ini.GetBoolValue("Settings", "EnableController3", EnableController3 );
+	EnableController4 = ini.GetBoolValue("Settings", "EnableController4", EnableController4 );
+	
+	char szFloatBuf[64];
+	
+	sprintf(szFloatBuf, "%s", ini.GetValue("Settings", "XBOX_CONTROLLER_DEAD_ZONE", "" ));
+	if (szFloatBuf != "")
+		XBOX_CONTROLLER_DEAD_ZONE = (float) atof(szFloatBuf);
+	
+	sprintf(szFloatBuf, "%s", ini.GetValue("Settings", "Deadzone", "" ));
+	if (szFloatBuf != "")
+		Deadzone = (float) atof(szFloatBuf);
+
+	// controller config
+	{
+		for (int i = 0; i < CONTROLLER_CONFIG_MAX; i++)
+		{
+			char var[22];
+			sprintf(var, "ControllerConfig[%i]", i);
+			ControllerConfig[i] = static_cast<byte>( ini.GetLongValue("Settings", var, 00 ) ); // should be byte or int? it's byte in hash
+		}
+	}
+
+	//HD Emu Settings
+	bEnableHDTV = ini.GetBoolValue("Settings", "EnableHDTV", bEnableHDTV);
+	bFullScreen = ini.GetBoolValue("Settings", "FullScreen", bFullScreen);
+
 	return 0;
 }
 
 
 int ConfigAppSaveTemp()
 {
-	FILE *h;
-
-	if(onhd){
-		if ((h = fopen("D:\\Temp.ini", "wt")) == NULL) return 1;}
-	else {
-		if ((h = fopen("T:\\Temp.ini", "wt")) == NULL) return 1;}
-
-#define BOL(x) fprintf(h, #x " %d\n", (int)(x != 0))
-#define VAR(x) fprintf(h, #x " %d\n", x)
-#define FLT(x) fprintf(h, #x " %f\n", x)
-#define STR(x) fprintf(h, #x " %s\n", x)
+	CSimpleIniA ini;
+	SI_Error rc;
+	ini.SetUnicode(true);
+    ini.SetMultiKey(true);
+    ini.SetMultiLine(false);
+	ini.SetSpaces(false); // spaces before and after =
 	
-	fprintf(h,"\n\n\n");
-    
-    STR(romname);
-	STR(romCRC);
+	ini.SetValue("History", "romname", romname);
+	ini.SetValue("History", "romCRC", romCRC);
+	
+	char szIniFilename[64];
+	sprintf(szIniFilename, "T:\\Tmp.ini");
+	OutputDebugString(szIniFilename);
+	rc = ini.SaveFile(szIniFilename);
+    if (rc < 0) 
+	{
+		OutputDebugStringA(" Failed to Save!\n");
+		return 1; //return false;
+	}
+	OutputDebugStringA(" Saved Successfully!\n");
 
-#undef STR
-#undef FLT
-#undef VAR
-#undef BOL
-	fclose(h);
 	return 0;
 }
 
 
 int ConfigAppLoadTemp()
 {
-	FILE *h;
-	char szLine[256];
+	CSimpleIniA ini;
+	SI_Error rc;
+	ini.SetUnicode(true);
+	ini.SetMultiKey(true);
+	ini.SetMultiLine(false);
+	ini.SetSpaces(false); // spaces before and after =
 
-	if(onhd){
-		if ((h = fopen("D:\\Temp.ini", "rt")) == NULL) return 1;}
-	else {
-		if ((h = fopen("T:\\Temp.ini", "rt")) == NULL) return 1;}
-
-	// Go through each line of the config file
-	while (1) {
-		int nLen;
-		if (fgets(szLine, sizeof(szLine), h) == NULL) {	// End of config file
-			break;
-		}
-
-		nLen = strlen(szLine);
-		
-		// Get rid of the linefeed at the end
-		if (szLine[nLen - 1] == 10) {
-			szLine[nLen - 1] = 0;
-			nLen--;
-		}
-
-#define BOL(x) { char *szValue = LabelCheck(szLine,#x);		\
-	if (szValue) x = strtol(szValue, NULL, 0) != 0; }
-#define VAR(x) { char *szValue = LabelCheck(szLine,#x);		\
-	if (szValue) x = strtol(szValue, NULL, 0); }
-#define FLT(x) { char *szValue = LabelCheck(szLine,#x);		\
-	if (szValue) x = atof(szValue); }
-#define STR(x) { char *szValue = LabelCheck(szLine,#x " ");	\
-	if (szValue) strcpy(x,szValue); }
-
-	STR(romname);
-    STR(romCRC);
-
-#undef STR
-#undef FLT
-#undef VAR
-#undef BOL
+	char szIniFilename[64];
+	sprintf(szIniFilename, "T:\\Tmp.ini");
+	OutputDebugString(szIniFilename);
+	rc = ini.LoadFile(szIniFilename);
+	if (rc < 0) 
+	{
+		OutputDebugStringA(" Failed to Load!\n");
+		return 1;
 	}
+	OutputDebugStringA(" Successfully Loaded\n");
 
-	fclose(h);
+	sprintf(romname, "%s", ini.GetValue("History", "romname", "" ));
+	sprintf(romCRC, "%s", ini.GetValue("History", "romCRC", "" ));
+
 	return 0;
 }
 
-//Load Skin File 
+//Load Skin File
 void LoadSkinFile(){
-	FILE* f;
-	std::string PATH = "D:\\skins\\";
-	PATH += skinname;
-	PATH += "\\Skin.ini";
-	f = fopen(PATH.c_str() , "r");
 
+	CSimpleIniA ini;
+	SI_Error rc;
+	ini.SetUnicode(true);
+	ini.SetMultiKey(true);
+	ini.SetMultiLine(false);
+	ini.SetSpaces(true); // spaces before and after =
 
-	//Build ini if nonexistant
-	if(!f) {
-		FILE* f;
-		std::string PATH = "D:\\skins\\";
-		PATH += skinname;
-		PATH += "\\Skin.ini";
-		f = fopen(PATH.c_str(), "w");
-		fclose(f);
+	char szIniFilename[64];
+	
+	sprintf(szIniFilename, "%s%s\\Skin.ini", szPathSkins, skinname); // try the custom dir
+	if(!PathFileExists(szIniFilename)) {
+		sprintf(szIniFilename, "T:\\Skins\\%s\\Skin.ini", skinname); // then try T
+		if(!PathFileExists(szIniFilename)) {
+			sprintf(szIniFilename, "D:\\Skins\\%s\\Skin.ini", skinname); // then try D
+		}
+	}
 
+	OutputDebugString(szIniFilename);
+	rc = ini.LoadFile(szIniFilename);
+	if (rc < 0) 
+	{
+		OutputDebugStringA(" Failed to Load!\n");
 		WriteSkinFile();
 		return;
 	}
-	if(f){
-		char line[100];
-		char szTitleColor[10];
-		char tmpbuf[11];
-		
+	//OutputDebugStringA(" Successfully Loaded!\n");
 
-		fgets(line,100, f);
-		for(int i = 0; i < 100; i++) {
-			if(line[i] == '=') {
-				for(int j = 0; j < 10; j++){
+	char szDwordBuf[16];
+	char szDwordDefBuf[16];
 
-					szTitleColor[j] = line[i+1+j]; 
-				}
-				memcpy(tmpbuf, szTitleColor, 10);
-				tmpbuf[10] = '\0';
-				dwTitleColor = strtoul(tmpbuf, NULL, 16);
-				break;
-			}
-		}
-		char line2[100];
-		char szMenuTitleColor[10];
+	sprintf(szDwordDefBuf, "%08X", dwTitleColor);
+	sprintf(szDwordBuf, "%s", ini.GetValue("Font Colors", "TitleColor", szDwordDefBuf ));
+	dwTitleColor = strtoul(szDwordBuf, NULL, 16);
+	
+	sprintf(szDwordDefBuf, "%08X", dwMenuTitleColor);
+	sprintf(szDwordBuf, "%s", ini.GetValue("Font Colors", "MenuTitleColor", szDwordDefBuf ));
+	dwMenuTitleColor = strtoul(szDwordBuf, NULL, 16);
+	
+	sprintf(szDwordDefBuf, "%08X", dwIGMTitleColor);
+	sprintf(szDwordBuf, "%s", ini.GetValue("Font Colors", "IGMTitleColor", szDwordDefBuf ));
+	dwIGMTitleColor = strtoul(szDwordBuf, NULL, 16);
+	
+	sprintf(szDwordDefBuf, "%08X", dwRomListColor);
+	sprintf(szDwordBuf, "%s", ini.GetValue("Font Colors", "RomListColor", szDwordDefBuf ));
+	dwRomListColor = strtoul(szDwordBuf, NULL, 16);
+	
+	sprintf(szDwordDefBuf, "%08X", dwSelectedRomColor);
+	sprintf(szDwordBuf, "%s", ini.GetValue("Font Colors", "SelectedRomColor", szDwordDefBuf ));
+	dwSelectedRomColor = strtoul(szDwordBuf, NULL, 16);
+	
+	sprintf(szDwordDefBuf, "%08X", dwMenuItemColor);
+	sprintf(szDwordBuf, "%s", ini.GetValue("Font Colors", "MenuItemColor", szDwordDefBuf ));
+	dwMenuItemColor = strtoul(szDwordBuf, NULL, 16);
+	
+	sprintf(szDwordDefBuf, "%08X", dwNullItemColor);
+	sprintf(szDwordBuf, "%s", ini.GetValue("Font Colors", "NullItemColor", szDwordDefBuf ));
+	dwNullItemColor = strtoul(szDwordBuf, NULL, 16);
 
-		fgets(line2,100, f);
-		for(int i = 0; i < 100; i++) {
-			if(line2[i] == '=') {
-				for(int j = 0; j < 10; j++){
+	
+	iTitleX = ini.GetLongValue("General", "TitleX", iTitleX);
+	iTitleY = ini.GetLongValue("General", "TitleY", iTitleY);
+	iLineSpacing = ini.GetLongValue("General", "LineSpacing", iLineSpacing);
+	// should go here?
+	iTempMessagePosX = ini.GetLongValue("General", "TempMessagePosX", iTempMessagePosX);
+	iTempMessagePosY = ini.GetLongValue("General", "TempMessagePosY", iTempMessagePosY);
+	iTempMessageAlign = ini.GetLongValue("General", "TempMessageAlign", iTempMessageAlign);
 
-					szMenuTitleColor[j] = line2[i+1+j]; 
-				}
-				memcpy(tmpbuf, szMenuTitleColor, 10);
-				tmpbuf[10] = '\0';
-				dwMenuTitleColor = strtoul(tmpbuf, NULL, 16);
-				break;
-			}
-		}
-		char line3[100];
-		char szRomListColor[10];
+	iMainMenuPosX = ini.GetLongValue("Main Menu", "MainMenuPosX", iMainMenuPosX);
+	iMainMenuPosY = ini.GetLongValue("Main Menu", "MainMenuPosY", iMainMenuPosY);
+	iMainMenuTxtPosX = ini.GetLongValue("Main Menu", "MainMenuTxtPosX", iMainMenuTxtPosX);
+	iMainMenuTxtPosY = ini.GetLongValue("Main Menu", "MainMenuTxtPosY", iMainMenuTxtPosY);
+	iMainMenuTxtAlign = ini.GetLongValue("Main Menu", "MainMenuTxtAlign", iMainMenuTxtAlign);
+	MenuTrunc = ini.GetLongValue("Main Menu", "MenuCharacterLimit", MenuTrunc);
+	iMainHilightPosX = ini.GetLongValue("Main Menu", "HilightPosX", iMainHilightPosX);
 
-		fgets(line3,100, f);
-		for(int i = 0; i < 100; i++) {
-			if(line3[i] == '=') {
-				for(int j = 0; j < 10; j++){
+	iLaunchMenuBgPosX = ini.GetLongValue("Launch Menu", "LaunchMenuPosX", iLaunchMenuBgPosX);
+	iLaunchMenuBgPosY = ini.GetLongValue("Launch Menu", "LaunchMenuPosY", iLaunchMenuBgPosY);
+	iLaunchMenuTxtPosX = ini.GetLongValue("Launch Menu", "LaunchMenuTxtPosX", iLaunchMenuTxtPosX);
+	iLaunchMenuTxtPosY = ini.GetLongValue("Launch Menu", "LaunchMenuTxtPosY", iLaunchMenuTxtPosY);
+	iLaunchMenuTxtAlign = ini.GetLongValue("Launch Menu", "LaunchMenuTxtAlign", iLaunchMenuTxtAlign);
+	iLaunchHilightPosX = ini.GetLongValue("Launch Menu", "LaunchHilightPosX", iLaunchHilightPosX);
 
-					szRomListColor[j] = line3[i+1+j]; 
-				}
-				memcpy(tmpbuf, szRomListColor, 10);
-				tmpbuf[10] = '\0';
-				dwRomListColor = strtoul(tmpbuf, NULL, 16);
-				break;
-			}
-		}
-		char line4[100];
-		char szSelectedRomColor[10];
+	iInfoPosX = ini.GetLongValue("Info Panel", "InfoPosX", iInfoPosX);
+	iInfoPosY = ini.GetLongValue("Info Panel", "InfoPosY", iInfoPosY);
+	iInfoTxtPosX = ini.GetLongValue("Info Panel", "InfoTxtPosX", iInfoTxtPosX);
+	iInfoTxtPosY = ini.GetLongValue("Info Panel", "InfoTxtPosY", iInfoTxtPosY);
+	iInfoTxtAlign = ini.GetLongValue("Info Panel", "InfoTxtAlign", iInfoTxtAlign);
 
-		fgets(line4,100, f);
-		for(int i = 0; i < 100; i++) {
-			if(line4[i] == '=') {
-				for(int j = 0; j < 10; j++){
-					
-					szSelectedRomColor[j] = line4[i+1+j]; 
-				}
-				memcpy(tmpbuf, szSelectedRomColor, 10);
-				tmpbuf[10] = '\0';
-				dwSelectedRomColor = strtoul(tmpbuf, NULL, 16);
-				break;
-			}
-		}
-		char line5[100];
-		char szMenuItemColor[10];
+	iInfoTxtControlPosX = ini.GetLongValue("Rom List Controls", "InfoTxtControlPosX", iInfoTxtControlPosX);
+	iInfoTxtControlPosY = ini.GetLongValue("Rom List Controls", "InfoTxtControlPosY", iInfoTxtControlPosY);
+	iInfoTxtControlAlign = ini.GetLongValue("Rom List Controls", "InfoTxtControlAlign", iInfoTxtControlAlign);
+	bShowRLControls = ini.GetBoolValue("Rom List Controls", "ShowControls", bShowRLControls);
+	
+	char szFloatBuf[64];
+	sprintf(szFloatBuf, "%s", ini.GetValue("Info Panel", "InfoPanelTrunc", "" ));
+	if (szFloatBuf != "")
+		InfoPanelTrunc = (float) atof(szFloatBuf);
 
-		fgets(line5,100, f);
-		for(int i = 0; i < 100; i++) {
-			if(line5[i] == '=') {
-				for(int j = 0; j < 10; j++){
+	sprintf(BoxartName, "%s", ini.GetValue("Box Art", "BoxartName", BoxartName ));
+	
+	iBoxPanelPosX = ini.GetLongValue("Box Art", "BoxArtPanelPosX", iBoxPanelPosX);
+	iBoxPanelPosY = ini.GetLongValue("Box Art", "BoxArtPanelPosY", iBoxPanelPosY);
+	iBoxPosX = ini.GetLongValue("Box Art", "BoxPosX", iBoxPosX);
+	iBoxPosY = ini.GetLongValue("Box Art", "BoxPosY", iBoxPosY);
+	iBoxWidth = ini.GetLongValue("Box Art", "BoxWidth", iBoxWidth);
+	iBoxHeight = ini.GetLongValue("Box Art", "BoxHeight", iBoxHeight);
 
-					szMenuItemColor[j] = line5[i+1+j]; 
-				}
+	iMovieLeft = ini.GetLongValue("Video Preview", "MovieLeft", iMovieLeft);
+	iMovieTop = ini.GetLongValue("Video Preview", "MovieTop", iMovieTop);
+	iMovieRight = ini.GetLongValue("Video Preview", "MovieRight", iMovieRight);
+	iMovieBottom = ini.GetLongValue("Video Preview", "MovieBottom", iMovieBottom);
+	
+	iControlConfigPosX = ini.GetLongValue("Control Config", "ControlConfigPosX", iControlConfigPosX);
+	iControlConfigPosY = ini.GetLongValue("Control Config", "ControlConfigPosY", iControlConfigPosY);
+	iControlConfigWidth = ini.GetLongValue("Control Config", "ControlConfigWidth", iControlConfigWidth);
+	iControlsSpacing= ini.GetLongValue("Control Config", "ControlConfigSpacing", iControlsSpacing);
+	iControlConfigTxtPosX = ini.GetLongValue("Control Config", "ControlConfigTxtPosX", iControlConfigTxtPosX);
+	iControlConfigTxtPosY = ini.GetLongValue("Control Config", "ControlConfigTxtPosY", iControlConfigTxtPosY);
+	iControlConfigTxtPadLX = ini.GetLongValue("Control Config", "ControlConfigTxtPadLX", iControlConfigTxtPadLX);
+	iConControlsPosX = ini.GetLongValue("Control Config", "ControlsPosX", iConControlsPosX);
+	iConControlsPosY = ini.GetLongValue("Control Config", "ControlsPosY", iConControlsPosY);
+	iConControlsTxtPosX = ini.GetLongValue("Control Config", "ControlsTxtPosX", iConControlsTxtPosX);
+	iConControlsTxtPosY = ini.GetLongValue("Control Config", "ControlsTxtPosY", iConControlsTxtPosY);
+	iConControlsTxtAlign = ini.GetLongValue("Control Config", "ControlsTxtAlign", iConControlsTxtAlign);
 
-				memcpy(tmpbuf, szMenuItemColor, 10);
-				tmpbuf[10] = '\0';
-				dwMenuItemColor = strtoul(tmpbuf, NULL, 16);
-				break;
-			}
-		}
-		char line6[100];
-		char szNullItemColor[10];
+	iCredControlsPosX = ini.GetLongValue("Credits", "ControlsPosX", iCredControlsPosX);
+	iCredControlsPosY = ini.GetLongValue("Credits", "ControlsPosY", iCredControlsPosY);
+	iCredControlsTxtPosX = ini.GetLongValue("Credits", "ControlsTxtPosX", iCredControlsTxtPosX);
+	iCredControlsTxtPosY = ini.GetLongValue("Credits", "ControlsTxtPosY", iCredControlsTxtPosY);
+	iCredControlsTxtAlign = ini.GetLongValue("Credits", "ControlsTxtAlign", iCredControlsTxtAlign);
 
-		fgets(line6,100, f);
-		for(int i = 0; i < 100; i++) {
-			if(line6[i] == '=') {
-				for(int j = 0; j < 10; j++){
+	iRLBorderPosX = ini.GetLongValue("Rom List", "RomListBorderPosX", iRLBorderPosX);
+	iRLBorderPosY = ini.GetLongValue("Rom List", "RomListBorderPosY", iRLBorderPosY);
+	iRomListPosX = ini.GetLongValue("Rom List", "RomListPosX", iRomListPosX);
+	iRomListPosY = ini.GetLongValue("Rom List", "RomListPosY", iRomListPosY);
+	GAMESEL_MaxWindowList = ini.GetLongValue("Rom List", "RomListSize", GAMESEL_MaxWindowList);
+	iRomListAlign = ini.GetLongValue("Rom List", "RomListAlign", iRomListAlign);
+	RomListTrunc = ini.GetLongValue("Rom List", "RomListCharacterLimit", RomListTrunc );
 
-					szNullItemColor[j] = line6[i+1+j]; 
-				}
-				memcpy(tmpbuf, szNullItemColor, 10);
-				tmpbuf[10] = '\0';
-				dwNullItemColor = strtoul(tmpbuf, NULL, 16);
-				break;
-			}
-		}
-		//Load Coords
-		char line7[100];
-		fgets(line7,100, f);
-		for(int i = 0; i < 100; i++) {
-			if(line7[i] == '=') {
-				iLaunchMenuPosX = (float) atof(&line7[i+1]); 
-				break;
-			}
-		}
-		char line8[100];
-		fgets(line8,100, f);
-		for(int i = 0; i < 100; i++) {
-			if(line8[i] == '=') {
-				iLaunchMenuPosY = (float) atof(&line8[i+1]); 
-				break;
-			}
-		}
-		char line9[100];
-		fgets(line9,100, f);
-		for(int i = 0; i < 100; i++) {
-			if(line9[i] == '=') {
-				iMainMenuPosX = (float) atof(&line9[i+1]); 
-				break;
-			}
-		}
-		char line10[100];
-		fgets(line10,100, f);
-		for(int i = 0; i < 100; i++) {
-			if(line10[i] == '=') {
-				iMainMenuPosY = (float) atof(&line10[i+1]); 
-				break;
-			}
-		}
-		
-		char line11[100];
-		fgets(line11,100, f);
-		for(int i = 0; i < 100; i++) {
-			if(line11[i] == '=') {
-				iIGMMenuPosX = (float) atof(&line11[i+1]); 
-				break;
-			}
-		}
-		char line12[100];
-		fgets(line12,100, f);
-		for(int i = 0; i < 100; i++) {
-			if(line12[i] == '=') {
-				iIGMMenuPosY = (float) atof(&line12[i+1]); 
-				break;
-			}
-		}
-		char line13[100];
-		fgets(line13,100, f);
-		for(int i = 0; i < 100; i++) {
-			if(line13[i] == '=') {
-				iInfoPosX  = (float) atof(&line13[i+1]); 
-				break;
-			}
-		}
-		char line14[100];
-		fgets(line14,100, f);
-		for(int i = 0; i < 100; i++) {
-			if(line14[i] == '=') {
-				iInfoPosY  = (float) atof(&line14[i+1]); 
-				break;
-			}
-		}
-		char line15[100];
-		fgets(line15,100, f);
-		for(int i = 0; i < 100; i++) {
-			if(line15[i] == '=') {
-				iBoxPosX  = (float) atof(&line15[i+1]); 
-				break;
-			}
-		}
-		char line16[100];
-		fgets(line16,100, f);
-		for(int i = 0; i < 100; i++) {
-			if(line16[i] == '=') {
-				iBoxPosY  = (float) atof(&line16[i+1]); 
-				break;
-			}
-		}
-		char line17[100];
-		fgets(line17,100, f);
-		for(int i = 0; i < 100; i++) {
-			if(line17[i] == '=') {
-				iTitleX  = (float) atof(&line17[i+1]); 
-				break;
-			}
-		}
-		char line18[100];
-		fgets(line18,100, f);
-		for(int i = 0; i < 100; i++) {
-			if(line18[i] == '=') {
-				iTitleY  = (float) atof(&line18[i+1]); 
-				break;
-			}
-		}
-		char line19[100];
-		fgets(line19,100, f);
-		for(int i = 0; i < 100; i++) {
-			if(line19[i] == '=') {
-				iIGMTitleX  = (float) atof(&line19[i+1]); 
-				break;
-			}
-		}
-		char line20[100];
-		fgets(line20,100, f);
-		for(int i = 0; i < 100; i++) {
-			if(line20[i] == '=') {
-				iIGMTitleY  = (float) atof(&line20[i+1]); 
-				break;
-			}
-		}
-		char line21[100];
-		fgets(line21,100, f);
-		for(int i = 0; i < 100; i++) {
-			if(line21[i] == '=') {
-				iPanelX  = (float) atof(&line21[i+1]); 
-				break;
-			}
-		}
-		char line22[100];
-		fgets(line22,100, f);
-		for(int i = 0; i < 100; i++) {
-			if(line22[i] == '=') {
-				iPanelY  = (float) atof(&line22[i+1]); 
-				break;
-			}
-		}
-		char line23[100];
-		fgets(line23,100, f);
-		for(int i = 0; i < 100; i++) {
-			if(line23[i] == '=') {
-				iPanelNW  = (float) atof(&line23[i+1]); 
-				break;
-			}
-		}
-		char line24[100];
-		fgets(line24,100, f);
-		for(int i = 0; i < 100; i++) {
-			if(line24[i] == '=') {
-				iPanelNH  = (float) atof(&line24[i+1]); 
-				break;
-			}
-		}
-		char line25[100];
-		fgets(line25,100, f);
-		for(int i = 0; i < 100; i++) {
-			if(line25[i] == '=') {
-				iRomListPosX  = (float) atof(&line25[i+1]); 
-				break;
-			}
-		}
-		char line26[100];
-		fgets(line26,100, f);
-		for(int i = 0; i < 100; i++) {
-			if(line26[i] == '=') {
-				iRomListPosY  = (float) atof(&line26[i+1]); 
-				break;
-			}
-		}
-		char line27[100];
-		fgets(line27,100, f);
-		for(int i = 0; i < 100; i++) {
-			if(line27[i] == '=') {
-				GAMESEL_MaxWindowList  = (float) atof(&line27[i+1]); 
-				break;
-			}
-		}
-		char line28[100];
-		fgets(line28,100, f);
-		for(int i = 0; i < 100; i++) {
-			if(line28[i] == '=') {
-				RomListTrunc  = (float) atof(&line28[i+1]); 
-				break;
-			}
-		}
-		char line29[100];
-		fgets(line29,100, f);
-		for(int i = 0; i < 100; i++) {
-			if(line29[i] == '=') {
-				MenuTrunc  = (float) atof(&line29[i+1]); 
-				break;
-			}
-		}
-		char line30[100];
-		fgets(line30,100, f);
-		for(int i = 0; i < 100; i++) {
-			if(line30[i] == '=') {
-				iControlsPosX  = (float) atof(&line30[i+1]); 
-				break;
-			}
-		}
-		char line31[100];
-		fgets(line31,100, f);
-		for(int i = 0; i < 100; i++) {
-			if(line31[i] == '=') {
-				iControlsPosY  = (float) atof(&line31[i+1]); 
-				break;
-			}
-		}
-		char line32[100];
-		fgets(line32,100, f);
-		for(int i = 0; i < 100; i++) {
-			if(line32[i] == '=') {
-				iRLBorderPosX  = (float) atof(&line32[i+1]); 
-				break;
-			}
-		}
-		char line33[100];
-		fgets(line33,100, f);
-		for(int i = 0; i < 100; i++) {
-			if(line33[i] == '=') {
-				iRLBorderPosY  = (float) atof(&line33[i+1]); 
-				break;
-			}
-		}
+	iControlsPosX = ini.GetLongValue("Controls Panel", "ControlsPanelPosX", iControlsPosX);
+	iControlsPosY = ini.GetLongValue("Controls Panel", "ControlsPanelPosY", iControlsPosY);
+	iControlsTxtPosX = ini.GetLongValue("Controls Panel", "ControlsTxtPosX", iControlsTxtPosX);
+	iControlsTxtPosY = ini.GetLongValue("Controls Panel", "ControlsTxtPosY", iControlsTxtPosY);
+	iControlsTxtAlign = ini.GetLongValue("Controls Panel", "ControlsTxtAlign", iControlsTxtAlign);
+	
+	iLogoPosX = ini.GetLongValue("Logo", "LogoPosX", iLogoPosX);
+	iLogoPosY = ini.GetLongValue("Logo", "LogoPosY", iLogoPosY);
+
+	iSynopsisPosX = ini.GetLongValue("Synopsis", "SynopsisPosX", iSynopsisPosX);
+	iSynopsisPosY = ini.GetLongValue("Synopsis", "SynopsisPosY", iSynopsisPosY);
+	iSynopsisLines = ini.GetLongValue("Synopsis", "SynopsisLines", iSynopsisLines);
+	iSynopsisWrap = ini.GetLongValue("Synopsis", "SynopsisWrap", iSynopsisWrap);
+	iSynopsisAlign = ini.GetLongValue("Synopsis", "SynopsisAlign", iSynopsisAlign);
+	iSynControlsPosX = ini.GetLongValue("Synopsis", "ControlsPosX", iSynControlsPosX);
+	iSynControlsPosY = ini.GetLongValue("Synopsis", "ControlsPosY", iSynControlsPosY);
+	iSynControlsTxtPosX = ini.GetLongValue("Synopsis", "ControlsTxtPosX", iSynControlsTxtPosX);
+	iSynControlsTxtPosY = ini.GetLongValue("Synopsis", "ControlsTxtPosY", iSynControlsTxtPosY);
+	iSynControlsTxtAlign = ini.GetLongValue("Synopsis", "ControlsTxtAlign", iSynControlsTxtAlign);
+
+	//Loading Panel
+	iLoadBoxPosX = ini.GetLongValue("Loading Screen", "BoxArtPosX", iLoadBoxPosX);
+	iLoadBoxPosY = ini.GetLongValue("Loading Screen", "BoxArtPosY", iLoadBoxPosY);
+	iLoadPanelPosX = ini.GetLongValue("Loading Screen", "LoadPanelPosX", iLoadPanelPosX);
+	iLoadPanelPosY = ini.GetLongValue("Loading Screen", "LoadPanelPosY", iLoadPanelPosY);
+	iLoadPanelTxtPosX = ini.GetLongValue("Loading Screen", "LoadingTxtPosX", iLoadPanelTxtPosX);
+	iLoadPanelTxtPosY = ini.GetLongValue("Loading Screen", "LoadingTxtPosY", iLoadPanelTxtPosY);
+	iLoadPanelTxtAlign = ini.GetLongValue("Loading Screen", "LoadingTxtAlign", iLoadPanelTxtAlign);
+	iLoadPanelBarPosX = ini.GetLongValue("Loading Screen", "LoadingBarPosX", iLoadPanelBarPosX);
+	iLoadPanelBarPosY = ini.GetLongValue("Loading Screen", "LoadingBarPosY", iLoadPanelBarPosY);
+	iLoadPanelTrunc = ini.GetLongValue("Loading Screen", "LoadPanelTrunc", iLoadPanelTrunc);
+
+	// In Game Menu
+
+	iIGMTitleX = ini.GetLongValue("IGM Title", "IGMTitleX", iIGMTitleX);
+	iIGMTitleY = ini.GetLongValue("IGM Title", "IGMTitleY", iIGMTitleY);
+
+	iIGMMenuPosX = ini.GetLongValue("IGM Menu", "IGMMenuPosX", iIGMMenuPosX);
+	iIGMMenuPosY = ini.GetLongValue("IGM Menu", "IGMMenuPosY", iIGMMenuPosY);
+	iIGMHilightPosX = ini.GetLongValue("IGM Menu", "IGMHilightPosX", iIGMHilightPosX);
+	iIGMMenuTxtPosX = ini.GetLongValue("IGM Menu", "IGMMenuTxtPosX", iIGMMenuTxtPosX);
+	iIGMMenuTxtPosY = ini.GetLongValue("IGM Menu", "IGMMenuTxtPosY", iIGMMenuTxtPosY);
+	iIGMMenuTxtAlign = ini.GetLongValue("IGM Menu", "IGMMenuTxtAlign", iIGMMenuTxtAlign);
+	iIGMStateScreenX = ini.GetLongValue("IGM Menu", "IGMStateScreenX", iIGMStateScreenX);
+	iIGMStateScreenY = ini.GetLongValue("IGM Menu", "IGMStateScreenY", iIGMStateScreenY);
+	iIGMStateScreenW = ini.GetLongValue("IGM Menu", "IGMStateScreenW", iIGMStateScreenW);
+	iIGMStateScreenH = ini.GetLongValue("IGM Menu", "IGMStateScreenH", iIGMStateScreenH);
+
+	iControlsSpacingIGM = ini.GetLongValue("IGM Control Config", "ControlConfigSpacing", iControlsSpacingIGM);
+	iIGMControlConfigCenterX = ini.GetLongValue("IGM Control Config", "ControlConfigCenterX", iIGMControlConfigCenterX);
+	iIGMControlConfigWidth = ini.GetLongValue("IGM Control Config", "ControlConfigWidth", iIGMControlConfigWidth);
+	iIGMControlConfigTop = ini.GetLongValue("IGM Control Config", "ControlConfigTop", iIGMControlConfigTop);
+	iIGMControlConfigBGPosX = ini.GetLongValue("IGM Control Config", "ControlConfigBGPosX", iIGMControlConfigBGPosX);
+	iIGMControlConfigBGPosY = ini.GetLongValue("IGM Control Config", "ControlConfigBGPosY", iIGMControlConfigBGPosY);
+//	iIGMControlConfigTxtPosX = ini.GetLongValue("IGM Control Config", "ControlConfigTxtPosX", iIGMControlConfigTxtPosX);
+//	iIGMControlConfigTxtPosY = ini.GetLongValue("IGM Control Config", "ControlConfigTxtPosY", iIGMControlConfigTxtPosY);
+	iIGMControlConfigTxtPadLX = ini.GetLongValue("IGM Control Config", "ControlConfigTxtPadLX", iIGMControlConfigTxtPadLX);	
+	iIGMConControlsPosX = ini.GetLongValue("IGM Control Config", "ControlsPosX", iIGMConControlsPosX);
+	iIGMConControlsPosY = ini.GetLongValue("IGM Control Config", "ControlsPosY", iIGMConControlsPosY);
+	iIGMConControlsTxtPosX = ini.GetLongValue("IGM Control Config", "ControlsTxtPosX", iIGMConControlsTxtPosX);
+	iIGMConControlsTxtPosY = ini.GetLongValue("IGM Control Config", "ControlsTxtPosY", iIGMConControlsTxtPosY);
+	iIGMConControlsTxtAlign = ini.GetLongValue("IGM Control Config", "ControlsTxtAlign", iIGMConControlsTxtAlign);
+
+	iPanelX = ini.GetLongValue("IGM Screenshot", "PanelX", iPanelX);
+	iPanelY = ini.GetLongValue("IGM Screenshot", "PanelY", iPanelY);
+	iPanelNW = ini.GetLongValue("IGM Screenshot", "PanelNW", iPanelNW);
+	iPanelNH = ini.GetLongValue("IGM Screenshot", "PanelNH", iPanelNH);
+	
+	// In Game Menu HD
+
+	iIGMTitleX_HD = ini.GetLongValue("IGM HD Title", "IGMTitleX_HD", iIGMTitleX_HD);
+	iIGMTitleY_HD = ini.GetLongValue("IGM HD Title", "IGMTitleY_HD", iIGMTitleY_HD);
+
+	iIGMMenuPosX_HD = ini.GetLongValue("IGM HD Menu", "IGMMenuPosX_HD", iIGMMenuPosX_HD);
+	iIGMMenuPosY_HD = ini.GetLongValue("IGM HD Menu", "IGMMenuPosY_HD", iIGMMenuPosY_HD);
+	iIGMHilightPosX_HD = ini.GetLongValue("IGM HD Menu", "IGMHilightPosX_HD", iIGMHilightPosX_HD);
+	iIGMMenuTxtPosX_HD = ini.GetLongValue("IGM HD Menu", "IGMMenuTxtPosX_HD", iIGMMenuTxtPosX_HD);
+	iIGMMenuTxtPosY_HD = ini.GetLongValue("IGM HD Menu", "IGMMenuTxtPosY_HD", iIGMMenuTxtPosY_HD);
+	iIGMMenuTxtAlign_HD = ini.GetLongValue("IGM HD Menu", "IGMMenuTxtAlign_HD", iIGMMenuTxtAlign_HD);
+	iIGMStateScreenX_HD = ini.GetLongValue("IGM HD Menu", "IGMStateScreenX_HD", iIGMStateScreenX_HD);
+	iIGMStateScreenY_HD = ini.GetLongValue("IGM HD Menu", "IGMStateScreenY_HD", iIGMStateScreenY_HD);
+	iIGMStateScreenW_HD = ini.GetLongValue("IGM HD Menu", "IGMStateScreenW_HD", iIGMStateScreenW_HD);
+	iIGMStateScreenH_HD = ini.GetLongValue("IGM HD Menu", "IGMStateScreenH_HD", iIGMStateScreenH_HD);	
+
+	iControlsSpacingIGM_HD = ini.GetLongValue("IGM HD Control Config", "ControlConfigSpacing_HD", iControlsSpacingIGM_HD);
+	iIGMControlConfigCenterX_HD = ini.GetLongValue("IGM HD Control Config", "ControlConfigCenterX_HD", iIGMControlConfigCenterX_HD);
+	iIGMControlConfigWidth_HD = ini.GetLongValue("IGM HD Control Config", "ControlConfigWidth_HD", iIGMControlConfigWidth_HD);
+	iIGMControlConfigTop_HD = ini.GetLongValue("IGM HD Control Config", "ControlConfigTop_HD", iIGMControlConfigTop_HD);
+	iIGMControlConfigBGPosX_HD = ini.GetLongValue("IGM HD Control Config", "ControlConfigBGPosX_HD", iIGMControlConfigBGPosX_HD);
+	iIGMControlConfigBGPosY_HD = ini.GetLongValue("IGM HD Control Config", "ControlConfigBGPosY_HD", iIGMControlConfigBGPosY_HD);
+//	iIGMControlConfigTxtPosX_HD = ini.GetLongValue("IGM HD Control Config", "ControlConfigTxtPosX_HD", iIGMControlConfigTxtPosX_HD);
+//	iIGMControlConfigTxtPosY_HD = ini.GetLongValue("IGM HD Control Config", "ControlConfigTxtPosY_HD", iIGMControlConfigTxtPosY_HD);
+	iIGMControlConfigTxtPadLX_HD = ini.GetLongValue("IGM HD Control Config", "ControlConfigTxtPadLX_HD", iIGMControlConfigTxtPadLX_HD);	
+	iIGMConControlsPosX_HD = ini.GetLongValue("IGM HD Control Config", "ControlsPosX_HD", iIGMConControlsPosX_HD);
+	iIGMConControlsPosY_HD = ini.GetLongValue("IGM HD Control Config", "ControlsPosY_HD", iIGMConControlsPosY_HD);
+	iIGMConControlsTxtPosX_HD = ini.GetLongValue("IGM HD Control Config", "ControlsTxtPosX_HD", iIGMConControlsTxtPosX_HD);
+	iIGMConControlsTxtPosY_HD = ini.GetLongValue("IGM HD Control Config", "ControlsTxtPosY_HD", iIGMConControlsTxtPosY_HD);
+	iIGMConControlsTxtAlign_HD = ini.GetLongValue("IGM HD Control Config", "ControlsTxtAlign_HD", iIGMConControlsTxtAlign_HD);
+
+	iPanelX_HD = ini.GetLongValue("IGM HD Screenshot", "PanelX_HD", iPanelX_HD);
+	iPanelY_HD = ini.GetLongValue("IGM HD Screenshot", "PanelY_HD", iPanelY_HD);
+	iPanelNW_HD = ini.GetLongValue("IGM HD Screenshot", "PanelNW_HD", iPanelNW_HD);
+	iPanelNH_HD = ini.GetLongValue("IGM HD Screenshot", "PanelNH_HD", iPanelNH_HD);
+	
+	
+	// fixed-ratio - force proper ratio
+	if (iBoxWidth > iBoxHeight) { // && (iBoxHeight < (iBoxWidth * 0.75f)) // to keep it from overflowing if it's almost square
+		iBoxWidthAuto = iBoxWidth;
+		iBoxHeightAuto = iBoxWidth;
+	} else {
+		iBoxWidthAuto = iBoxHeight;
+		iBoxHeightAuto = iBoxHeight;
 	}
-	fclose(f);
+	
+	// auto-ratio - allow improper ratio
+	/*float fRatio = (640.0f / 480.0f);
+	if (iBoxWidth > iBoxHeight) {
+		iBoxWidthAuto = iBoxWidth;
+		iBoxHeightAuto = (iBoxHeight * fRatio);
+	} else {
+		iBoxWidthAuto = (iBoxWidth * fRatio);
+		iBoxHeightAuto = iBoxHeight;
+	}*/
+	
+	OutputDebugStringA(" Successfully Loaded!\n");
+	
 	return;
-
-
 }
 
 void WriteSkinFile(){
+
+	CSimpleIniA ini;
+	SI_Error rc;
+	ini.SetUnicode(true);
+    ini.SetMultiKey(true);
+    ini.SetMultiLine(false);
+	ini.SetSpaces(true); // spaces before and after =
 	
+
+	char szDwordBuf[16];
 	
+	sprintf(szDwordBuf, "%08X", dwTitleColor);
+	ini.SetValue("Font Colors", "TitleColor", szDwordBuf); //0xFF53B77F
+
+	sprintf(szDwordBuf, "%08X", dwIGMTitleColor);
+	ini.SetValue("Font Colors", "IGMTitleColor", szDwordBuf); //0x33777777
 	
-	FILE* f;
-		std::string PATH = "D:\\skins\\";
-		PATH += skinname;
-		PATH += "\\Skin.ini";
-		f = fopen(PATH.c_str() , "w");
-		if(f) {
-			fprintf(f, "TitleColor=0xFF53B77F\n");
-			fprintf(f, "MenuTitleColor=0xFF8080FF\n");
-			fprintf(f, "RomListColor=0xAAEEEEEE\n");
-			fprintf(f, "SelectedRomColor=0xFFFF8000\n");
-			fprintf(f, "MenuItemColor=0xCCEEEEEE\n");
-			fprintf(f, "NullItemColor=0xEE53B77F\n");
-
-			fprintf(f, "LaunchMenuPosX=%d\n",iLaunchMenuPosX);
-			fprintf(f, "LaunchMenuPosY=%d\n",iLaunchMenuPosY);
-			fprintf(f, "MainMenuPosX=%d\n",iMainMenuPosX);
-			fprintf(f, "MainMenuPosY=%d\n",iMainMenuPosY);
-
-			fprintf(f, "IGMMenuPosX=%d\n",iIGMMenuPosX);
-			fprintf(f, "IGMMenuPosY=%d\n",iIGMMenuPosY);
-
-			fprintf(f, "InfoPosX=%d\n",iInfoPosX);
-			fprintf(f, "InfoPosY=%d\n",iInfoPosY);
-			fprintf(f, "BoxPosX=%d\n",iBoxPosX);
-			fprintf(f, "BoxPosY=%d\n",iBoxPosY);
-			fprintf(f, "TitleX=%d\n",iTitleX);
-			fprintf(f, "TitleY=%d\n",iTitleY);
-
-			fprintf(f, "IGMTitleX=%d\n",iIGMTitleX);
-			fprintf(f, "IGMTitleY=%d\n",iIGMTitleY);
-			fprintf(f, "PanelX=%d\n",iPanelX);
-			fprintf(f, "PanelY=%d\n",iPanelY);
-			fprintf(f, "PanelNW=%d\n",iPanelNW);
-			fprintf(f, "PanelNH=%d\n",iPanelNH);
-
-			fprintf(f, "RomListPosX=%d\n",iRomListPosX);
-			fprintf(f, "RomListPosY=%d\n",iRomListPosY);
-			fprintf(f, "RomListSize=%d\n",GAMESEL_MaxWindowList);
-			fprintf(f, "RomListCharacterLimit=%d\n",RomListTrunc);
-			fprintf(f, "MenuCharacterLimit=%d\n",MenuTrunc);
-			fprintf(f, "ControlsPanelPosX=%d\n",iControlsPosX);
-			fprintf(f, "ControlsPanelPosY=%d\n",iControlsPosY);
-			fprintf(f, "RomListBorderPosX=%d\n",iRLBorderPosX);
-			fprintf(f, "RomListBorderPosY=%d\n",iRLBorderPosY);
-
-
-
-		}
-	fclose(f);
+	sprintf(szDwordBuf, "%08X", dwMenuTitleColor);
+	ini.SetValue("Font Colors", "MenuTitleColor", szDwordBuf); //0xFF8080FF
 	
+	sprintf(szDwordBuf, "%08X", dwRomListColor);
+	ini.SetValue("Font Colors", "RomListColor", szDwordBuf); //0xAAEEEEEE
 	
+	sprintf(szDwordBuf, "%08X", dwSelectedRomColor);
+	ini.SetValue("Font Colors", "SelectedRomColor", szDwordBuf); //0xFFFF8000
+	
+	sprintf(szDwordBuf, "%08X", dwMenuItemColor);
+	ini.SetValue("Font Colors", "MenuItemColor", szDwordBuf); //0xCCEEEEEE
+	
+	sprintf(szDwordBuf, "%08X", dwNullItemColor);
+	ini.SetValue("Font Colors", "NullItemColor", szDwordBuf); //0xEE53B77F
+
+	ini.SetLongValue("General", "TitleX", iTitleX);
+	ini.SetLongValue("General", "TitleY", iTitleY);
+	ini.SetLongValue("General", "LineSpacing", iLineSpacing);
+	// should go here?
+	ini.SetLongValue("General", "TempMessagePosX", iTempMessagePosX);
+	ini.SetLongValue("General", "TempMessagePosY", iTempMessagePosY);
+	ini.SetLongValue("General", "TempMessageAlign", iTempMessageAlign);
+
+	ini.SetLongValue("Main Menu", "MainMenuPosX", iMainMenuPosX);
+	ini.SetLongValue("Main Menu", "MainMenuPosY", iMainMenuPosY);
+	ini.SetLongValue("Main Menu", "MainMenuTxtPosX", iMainMenuTxtPosX);
+	ini.SetLongValue("Main Menu", "MainMenuTxtPosY", iMainMenuTxtPosY);
+	ini.SetLongValue("Main Menu", "MainMenuTxtAlign", iMainMenuTxtAlign);
+	ini.SetLongValue("Main Menu", "MenuCharacterLimit", MenuTrunc);
+	ini.SetLongValue("Main Menu", "HilightPosX", iMainHilightPosX);
+
+	ini.SetLongValue("Launch Menu", "LaunchMenuPosX", iLaunchMenuBgPosX);
+	ini.SetLongValue("Launch Menu", "LaunchMenuPosY", iLaunchMenuBgPosY);
+	ini.SetLongValue("Launch Menu", "LaunchMenuTxtPosX", iLaunchMenuTxtPosX);
+	ini.SetLongValue("Launch Menu", "LaunchMenuTxtPosY", iLaunchMenuTxtPosY);
+	ini.SetLongValue("Launch Menu", "LaunchMenuTxtAlign", iLaunchMenuTxtAlign);	
+	ini.SetLongValue("Launch Menu", "LaunchHilightPosX", iLaunchHilightPosX);
+	
+	ini.SetLongValue("Info Panel", "InfoPosX", iInfoPosX);
+	ini.SetLongValue("Info Panel", "InfoPosY", iInfoPosY);
+	ini.SetLongValue("Info Panel", "InfoTxtPosX", iInfoTxtPosX);
+	ini.SetLongValue("Info Panel", "InfoTxtPosY", iInfoTxtPosY);
+	ini.SetLongValue("Info Panel", "InfoTxtAlign", iInfoTxtAlign);
+
+	ini.SetLongValue("Rom List Controls", "InfoTxtControlPosX", iInfoTxtControlPosX);
+	ini.SetLongValue("Rom List Controls", "InfoTxtControlPosY", iInfoTxtControlPosY);
+	ini.SetLongValue("Rom List Controls", "InfoTxtControlAlign", iInfoTxtControlAlign);
+	ini.SetBoolValue("Rom List Controls", "ShowControls", bShowRLControls);
+	
+	char szFloatBuf[64];
+	sprintf(szFloatBuf, "%.0f", InfoPanelTrunc);
+	ini.SetValue("Info Panel", "InfoPanelTrunc", szFloatBuf);
+
+	ini.SetValue("Box Art", "BoxartName", BoxartName);
+	ini.SetLongValue("Box Art", "BoxArtPanelPosX", iBoxPanelPosX);
+	ini.SetLongValue("Box Art", "BoxArtPanelPosY", iBoxPanelPosY);
+	ini.SetLongValue("Box Art", "BoxPosX", iBoxPosX);
+	ini.SetLongValue("Box Art", "BoxPosY", iBoxPosY);
+	ini.SetLongValue("Box Art", "BoxWidth", iBoxWidth);
+	ini.SetLongValue("Box Art", "BoxHeight", iBoxHeight);
+
+	ini.SetLongValue("Video Preview", "MovieLeft", iMovieLeft);
+	ini.SetLongValue("Video Preview", "MovieTop", iMovieTop);
+	ini.SetLongValue("Video Preview", "MovieRight", iMovieRight);
+	ini.SetLongValue("Video Preview", "MovieBottom", iMovieBottom);
+	
+	ini.SetLongValue("Control Config", "ControlConfigPosX", iControlConfigPosX);
+	ini.SetLongValue("Control Config", "ControlConfigPosY", iControlConfigPosY);
+	ini.SetLongValue("Control Config", "ControlConfigWidth", iControlConfigWidth);
+	ini.SetLongValue("Control Config", "ControlConfigSpacing", iControlsSpacing);
+	ini.SetLongValue("Control Config", "ControlConfigTxtPosX", iControlConfigTxtPosX);
+	ini.SetLongValue("Control Config", "ControlConfigTxtPosY", iControlConfigTxtPosY);
+	ini.SetLongValue("Control Config", "ControlConfigTxtPadLX", iControlConfigTxtPadLX);
+	ini.SetLongValue("Control Config", "ControlsPosX", iConControlsPosX);
+	ini.SetLongValue("Control Config", "ControlsPosY", iConControlsPosY);
+	ini.SetLongValue("Control Config", "ControlsTxtPosX", iConControlsTxtPosX);
+	ini.SetLongValue("Control Config", "ControlsTxtPosY", iConControlsTxtPosY);
+	ini.SetLongValue("Control Config", "ControlsTxtAlign", iConControlsTxtAlign);
+	
+	ini.SetLongValue("Credits", "ControlsPosX", iCredControlsPosX);
+	ini.SetLongValue("Credits", "ControlsPosY", iCredControlsPosY);
+	ini.SetLongValue("Credits", "ControlsTxtPosX", iCredControlsTxtPosX);
+	ini.SetLongValue("Credits", "ControlsTxtPosY", iCredControlsTxtPosY);
+	ini.SetLongValue("Credits", "ControlsTxtAlign", iCredControlsTxtAlign);
+
+	ini.SetLongValue("Rom List", "RomListBorderPosX", iRLBorderPosX);
+	ini.SetLongValue("Rom List", "RomListBorderPosY", iRLBorderPosY);
+	ini.SetLongValue("Rom List", "RomListPosX", iRomListPosX);
+	ini.SetLongValue("Rom List", "RomListPosY", iRomListPosY);
+	ini.SetLongValue("Rom List", "RomListSize", GAMESEL_MaxWindowList);
+	ini.SetLongValue("Rom List", "RomListAlign", iRomListAlign);
+	ini.SetLongValue("Rom List", "RomListCharacterLimit", RomListTrunc);
+
+	ini.SetLongValue("Controls Panel", "ControlsPanelPosX", iControlsPosX);
+	ini.SetLongValue("Controls Panel", "ControlsPanelPosY", iControlsPosY);
+	ini.SetLongValue("Controls Panel", "ControlsTxtPosX", iControlsTxtPosX);
+	ini.SetLongValue("Controls Panel", "ControlsTxtPosY", iControlsTxtPosY);
+	ini.SetLongValue("Controls Panel", "ControlsTxtAlign", iControlsTxtAlign);
+	
+	ini.SetLongValue("Logo", "LogoPosX", iLogoPosX);
+	ini.SetLongValue("Logo", "LogoPosY", iLogoPosY);
+
+	ini.SetLongValue("Synopsis", "SynopsisPosX", iSynopsisPosX);
+	ini.SetLongValue("Synopsis", "SynopsisPosY", iSynopsisPosY);
+	ini.SetLongValue("Synopsis", "SynopsisLines", iSynopsisLines);
+	ini.SetLongValue("Synopsis", "SynopsisWrap", iSynopsisWrap);
+	ini.SetLongValue("Synopsis", "SynopsisAlign", iSynopsisAlign);
+	ini.SetLongValue("Synopsis", "ControlsPosX", iSynControlsPosX);
+	ini.SetLongValue("Synopsis", "ControlsPosY", iSynControlsPosY);
+	ini.SetLongValue("Synopsis", "ControlsTxtPosX", iSynControlsTxtPosX);
+	ini.SetLongValue("Synopsis", "ControlsTxtPosY", iSynControlsTxtPosY);
+	ini.SetLongValue("Synopsis", "ControlsTxtAlign", iSynControlsTxtAlign);
+
+
+	ini.SetLongValue("IGM Title", "IGMTitleX", iIGMTitleX);
+	ini.SetLongValue("IGM Title", "IGMTitleY", iIGMTitleY);
+
+	ini.SetLongValue("IGM Menu", "IGMMenuPosX", iIGMMenuPosX);
+	ini.SetLongValue("IGM Menu", "IGMMenuPosY", iIGMMenuPosY);
+	ini.SetLongValue("IGM Menu", "IGMHilightPosX", iIGMHilightPosX);
+	ini.SetLongValue("IGM Menu", "IGMMenuTxtPosX", iIGMMenuTxtPosX);
+	ini.SetLongValue("IGM Menu", "IGMMenuTxtPosY", iIGMMenuTxtPosY);
+	ini.SetLongValue("IGM Menu", "IGMMenuTxtAlign", iIGMMenuTxtAlign);
+	ini.SetLongValue("IGM Menu", "IGMStateScreenX", iIGMStateScreenX);
+	ini.SetLongValue("IGM Menu", "IGMStateScreenY", iIGMStateScreenY);
+	ini.SetLongValue("IGM Menu", "IGMStateScreenW", iIGMStateScreenW);
+	ini.SetLongValue("IGM Menu", "IGMStateScreenH", iIGMStateScreenH);
+
+	ini.SetLongValue("IGM Control Config", "ControlConfigSpacing", iControlsSpacingIGM);
+	ini.SetLongValue("IGM Control Config", "ControlConfigCenterX", iIGMControlConfigCenterX);
+	ini.SetLongValue("IGM Control Config", "ControlConfigWidth", iIGMControlConfigWidth);
+	ini.SetLongValue("IGM Control Config", "ControlConfigTop", iIGMControlConfigTop);
+	ini.SetLongValue("IGM Control Config", "ControlConfigBGPosX", iIGMControlConfigBGPosX);
+	ini.SetLongValue("IGM Control Config", "ControlConfigBGPosY", iIGMControlConfigBGPosY);
+//	ini.SetLongValue("IGM Control Config", "ControlConfigTxtPosX", iIGMControlConfigTxtPosX);
+//	ini.SetLongValue("IGM Control Config", "ControlConfigTxtPosY", iIGMControlConfigTxtPosY);
+	ini.SetLongValue("IGM Control Config", "ControlConfigTxtPadLX", iIGMControlConfigTxtPadLX);
+	ini.SetLongValue("IGM Control Config", "ControlsPosX", iIGMConControlsPosX);
+	ini.SetLongValue("IGM Control Config", "ControlsPosY", iIGMConControlsPosY);
+	ini.SetLongValue("IGM Control Config", "ControlsTxtPosX", iIGMConControlsTxtPosX);
+	ini.SetLongValue("IGM Control Config", "ControlsTxtPosY", iIGMConControlsTxtPosY);
+	ini.SetLongValue("IGM Control Config", "ControlsTxtAlign", iIGMConControlsTxtAlign);
+
+	ini.SetLongValue("IGM Screenshot", "PanelX", iPanelX);
+	ini.SetLongValue("IGM Screenshot", "PanelY", iPanelY);
+	ini.SetLongValue("IGM Screenshot", "PanelNW", iPanelNW);
+	ini.SetLongValue("IGM Screenshot", "PanelNH", iPanelNH);
+
+	//Loading Panel
+	ini.SetLongValue("Loading Screen", "BoxArtPosX", iLoadBoxPosX);
+	ini.SetLongValue("Loading Screen", "BoxArtPosY", iLoadBoxPosY);
+	ini.SetLongValue("Loading Screen", "LoadPanelPosX", iLoadPanelPosX);
+	ini.SetLongValue("Loading Screen", "LoadPanelPosY", iLoadPanelPosY);
+	ini.SetLongValue("Loading Screen", "LoadingTxtPosX", iLoadPanelTxtPosX);
+	ini.SetLongValue("Loading Screen", "LoadingTxtPosY", iLoadPanelTxtPosY);
+	ini.SetLongValue("Loading Screen", "LoadingTxtAlign", iLoadPanelTxtAlign);	
+	ini.SetLongValue("Loading Screen", "LoadingBarPosX", iLoadPanelBarPosX);
+	ini.SetLongValue("Loading Screen", "LoadingBarPosY", iLoadPanelBarPosY);
+	ini.SetLongValue("Loading Screen", "LoadPanelTrunc", iLoadPanelTrunc);
+	
+
+	// In Game Menu HD
+
+	ini.SetLongValue("IGM HD Title", "IGMTitleX_HD", iIGMTitleX_HD);
+	ini.SetLongValue("IGM HD Title", "IGMTitleY_HD", iIGMTitleY_HD);
+
+	ini.SetLongValue("IGM HD Menu", "IGMMenuPosX_HD", iIGMMenuPosX_HD);
+	ini.SetLongValue("IGM HD Menu", "IGMMenuPosY_HD", iIGMMenuPosY_HD);
+	ini.SetLongValue("IGM HD Menu", "IGMHilightPosX_HD", iIGMHilightPosX_HD);
+	ini.SetLongValue("IGM HD Menu", "IGMMenuTxtPosX_HD", iIGMMenuTxtPosX_HD);
+	ini.SetLongValue("IGM HD Menu", "IGMMenuTxtPosY_HD", iIGMMenuTxtPosY_HD);
+	ini.SetLongValue("IGM HD Menu", "IGMMenuTxtAlign_HD", iIGMMenuTxtAlign_HD);
+	ini.SetLongValue("IGM HD Menu", "IGMStateScreenX_HD", iIGMStateScreenX_HD);
+	ini.SetLongValue("IGM HD Menu", "IGMStateScreenY_HD", iIGMStateScreenY_HD);
+	ini.SetLongValue("IGM HD Menu", "IGMStateScreenW_HD", iIGMStateScreenW_HD);
+	ini.SetLongValue("IGM HD Menu", "IGMStateScreenH_HD", iIGMStateScreenH_HD);
+
+	ini.SetLongValue("IGM HD Control Config", "ControlConfigSpacing_HD", iControlsSpacingIGM_HD);
+	ini.SetLongValue("IGM HD Control Config", "ControlConfigCenterX_HD", iIGMControlConfigCenterX_HD);
+	ini.SetLongValue("IGM HD Control Config", "ControlConfigWidth_HD", iIGMControlConfigWidth_HD);
+	ini.SetLongValue("IGM HD Control Config", "ControlConfigTop_HD", iIGMControlConfigTop_HD);
+	ini.SetLongValue("IGM HD Control Config", "ControlConfigBGPosX_HD", iIGMControlConfigBGPosX_HD);
+	ini.SetLongValue("IGM HD Control Config", "ControlConfigBGPosY_HD", iIGMControlConfigBGPosY_HD);
+//	ini.SetLongValue("IGM HD Control Config", "ControlConfigTxtPosX_HD", iIGMControlConfigTxtPosX_HD);
+//	ini.SetLongValue("IGM HD Control Config", "ControlConfigTxtPosY_HD", iIGMControlConfigTxtPosY_HD);
+	ini.SetLongValue("IGM HD Control Config", "ControlConfigTxtPadLX_HD", iIGMControlConfigTxtPadLX_HD);
+	ini.SetLongValue("IGM HD Control Config", "ControlsPosX_HD", iIGMConControlsPosX_HD);
+	ini.SetLongValue("IGM HD Control Config", "ControlsPosY_HD", iIGMConControlsPosY_HD);
+	ini.SetLongValue("IGM HD Control Config", "ControlsTxtPosX_HD", iIGMConControlsTxtPosX_HD);
+	ini.SetLongValue("IGM HD Control Config", "ControlsTxtPosY_HD", iIGMConControlsTxtPosY_HD);
+	ini.SetLongValue("IGM HD Control Config", "ControlsTxtAlign_HD", iIGMConControlsTxtAlign_HD);
+
+	ini.SetLongValue("IGM HD Screenshot", "PanelX_HD", iPanelX_HD);
+	ini.SetLongValue("IGM HD Screenshot", "PanelY_HD", iPanelY_HD);
+	ini.SetLongValue("IGM HD Screenshot", "PanelNW_HD", iPanelNW_HD);
+	ini.SetLongValue("IGM HD Screenshot", "PanelNH_HD", iPanelNH_HD);
+
+
+	char szIniFilename[64];
+	if(onhd || strcmp(szPathSkins,"D:\\Skins\\") != 0) {
+		// if it's on the hd or a custom path is specified, we'll save it there
+		sprintf(szIniFilename, "%s%s\\Skin.ini", szPathSkins, skinname);
+	} else {
+		// otherwise, we'll save it to T
+		sprintf(szIniFilename, "T:\\Skins\\%s\\Skin.ini", skinname);
+
+		if (!PathFileExists("T:\\Skins"))
+			CreateDirectory("T:\\Skins", NULL);
+		
+		char pathskinini[MAX_FILE_PATH];
+		sprintf(pathskinini, "T:\\Skins\\%s", skinname);
+		if (!PathFileExists(pathskinini))
+			CreateDirectory(pathskinini, NULL);
+	}
+
+
+	OutputDebugString(szIniFilename);
+	rc = ini.SaveFile(szIniFilename);
+    if (rc < 0) 
+	{
+		OutputDebugStringA(" Failed to Save!\n");
+		return; //return false;
+	}
+	OutputDebugStringA(" Saved Successfully!\n");
 
 	return;
-
 }
+
 void loadinis() {
 	//Check for CD/DVD
 	if(XGetDiskSectorSize("D:\\") == 2048){
@@ -1040,14 +1265,22 @@ int loaddwPJ64PagingMem(){ return dwPJ64PagingMem;}
 int loaddwPJ64DynaMem(){ return dwPJ64DynaMem;}
 int loaddw1964PagingMem(){ return dw1964PagingMem;}
 int loaddw1964DynaMem(){ return dw1964DynaMem;}
+int loaddwMaxVideoMem(){ return dwMaxVideoMem;} //reinstate max video mem
 
-// Ez0n3 - use iAudioPlugin instead to determine if basic audio is used
+//int loadbUseLLERSP(){ return bUseLLERsp;}
+//int loadbUseLLERSP() { if (bUseLLERSP) return 1; return 0;} // not used anymore, use iAudioPlugin instead to determine if basic audio is used
+int loadbUseRspAudio() { if (bUseRspAudio) return 1; return 0;} // control a listing
+int loadiRspPlugin(){ return iRspPlugin;}
 int loadiAudioPlugin(){ return iAudioPlugin;}
 
-// Ez0n3 - reinstate max video mem
-int loaddwMaxVideoMem(){ return dwMaxVideoMem;}
+// ultrahle mem settings
+int loaddwUltraCodeMem(){ return dwUltraCodeMem;}
+int loaddwUltraGroupMem(){ return dwUltraGroupMem;}
 
+int loadiPagingMethod(){ return iPagingMethod;}
+int loadbAudioBoost() { if (bAudioBoost) return 1; return 0; };
 
+/* // not used?
 char* LabelCheck(char *s,char *szLabel)
 {
 	int nLen;
@@ -1147,4 +1380,15 @@ int QuoteRead(char** pszQuote, char** pszEnd, char* szSrc)		// Read a quoted str
 	}
 	
 	return 0;
+}
+*/
+
+bool PathFileExists(const char *pszPath)
+{   
+    return GetFileAttributes(pszPath) != INVALID_FILE_ATTRIBUTES;   
+}
+
+void GetPathSaves(char *pszPathSaves)
+{
+	sprintf(pszPathSaves, "%s", szPathSaves);
 }

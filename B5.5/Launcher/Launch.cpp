@@ -4,8 +4,11 @@
 #include "zlib/unzip.h"
 #include "musicmanager.h"
 
+#ifndef DEBUG
+#define USE_OBF
+#endif
 extern CMusicManager music;
-extern int romcounter;
+//extern int romcounter; // use romlist func instead
 extern int actualrom;
 #define BUFFER_SIZE 0x400000 // -> (4096 / 4KB pagesize) = 1MB
 extern byte GetByteSwapType(byte *header);
@@ -14,19 +17,29 @@ extern int dw1964DynaMem;
 extern int dw1964PagingMem;
 extern int dwPJ64DynaMem;
 extern int dwPJ64PagingMem;
-extern bool bUseLLERSP; // Ez0n3 - use iAudioPlugin instead, but leave this in case it's set in ini
-extern int m_emulator;
+extern bool bUseLLERSP; // use iAudioPlugin instead, but leave this in case it's set in ini
+
+// ultrahle mem settings
+extern int dwUltraCodeMem;
+extern int dwUltraGroupMem;
+
+//extern int m_emulator; // Ez0n3 - why was this used at all?
+extern int preferedemu;
+
 extern void CreateProgress();
 extern void RenderProgress(int progress);
 extern int ConfigAppSaveTemp();
 extern int videoplugin;
-extern bool onhd;
+//extern bool onhd;
 
 // Ez0n3 - use iAudioPlugin instead to determine which audio plugin is used
 extern int iAudioPlugin;
-
+//extern bool usePageOriginal;
+extern int iPagingMethod;
 // Ez0n3 - reinstate max video mem
 extern int dwMaxVideoMem;
+extern int iRspPlugin;
+extern bool bUseRspAudio; // control a listing
 
 
 DWORD WINAPI PrepareRomThread(Rom *rom)
@@ -38,6 +51,15 @@ DWORD WINAPI PrepareRomThread(Rom *rom)
 	
 	ifstream romTmpFile;
 	romTmpFile.open("Z:\\TemporaryRom.dat", ios_base::in | ios_base::binary);
+	//romTmpFile.open("T:\\Data\\TemporaryRom.dat", ios_base::in | ios_base::binary);
+	
+	#ifdef USE_OBF
+	// create a temporary file just in case something goes wrong
+	HANDLE hFile = CreateFile( "T:\\Temp\\codetemp.dat", GENERIC_WRITE, FILE_SHARE_READ, NULL, 
+                               OPEN_ALWAYS, 0, NULL );
+	CloseHandle(hFile);
+	#endif
+
 	if (romTmpFile.is_open()) {
 		byte header[0x40];
 		romTmpFile.read(reinterpret_cast<char *>(header), 0x40);
@@ -46,17 +68,22 @@ DWORD WINAPI PrepareRomThread(Rom *rom)
 		byte byByteSwapType = GetByteSwapType(header);
 		if (byByteSwapType != -1) {
 			char tmprom[256];
-			dword tmp_dwCrc1;
-			dword tmp_dwCrc2;
-			byte tmp_byCountry;
+			dword dwCrc1;
+			dword dwCrc2;
+			byte byCountry;
 		
 			ByteSwap(0x40, header, byByteSwapType);
-			tmp_dwCrc1	= *(reinterpret_cast<dword *>(header + 0x10));
-			tmp_dwCrc2	= *(reinterpret_cast<dword *>(header + 0x14));
-			tmp_byCountry	= *(reinterpret_cast<byte *>(header + 0x3D));
-			sprintf(tmprom, "%08X-%08X-C:%02X", tmp_dwCrc1, tmp_dwCrc2, tmp_byCountry);
+			dwCrc1 = *(reinterpret_cast<dword *>(header + 0x10));
+			dwCrc2 = *(reinterpret_cast<dword *>(header + 0x14));
+			byCountry = *(reinterpret_cast<byte *>(header + 0x3D));
+			sprintf(tmprom, "%08X-%08X-C:%02X", dwCrc1, dwCrc2, byCountry);
 			
 			if (strcmp(currom, tmprom) == 0) {
+			
+				// show the boxart with 100% progress for persist display
+				CreateProgress();
+				RenderProgress(100);
+
 				return 0;
 			}
 		}
@@ -73,16 +100,10 @@ DWORD WINAPI PrepareRomThread(Rom *rom)
 	byte *pBuffer = static_cast<byte *>(VirtualAlloc(NULL, BUFFER_SIZE, MEM_COMMIT, PAGE_READWRITE));
 	
 
-	//freakdave - CD/DVD check
-	if (!onhd)
-	{
-		g_iniFile.Save("T:\\Surreal.ini");
-	}
-	else g_iniFile.Save("D:\\Surreal.ini");
-
 	// open the destination rom
 	ofstream destRom;
 	destRom.open("Z:\\TemporaryRom.dat", ios_base::out | ios_base::binary);
+	//destRom.open("T:\\Data\\TemporaryRom.dat", ios_base::out | ios_base::binary);
 
 	if (!destRom.is_open())
 	{
@@ -258,44 +279,62 @@ _END:
 
 void Launch()
 {
-			Rom *m_pRom = g_romList.GetRomAt(actualrom);
-			music.Stop();
-			PrepareRomThread(m_pRom);
+	Rom *m_pRom = g_romList.GetRomAt(actualrom);
+	music.Stop();
+	PrepareRomThread(m_pRom);
 
-			ConfigAppSaveTemp();
+	ConfigAppSaveTemp();
 
+	char szLaunchXBE[128];
+	
+	if (preferedemu == _UltraHLE)
+	{
+		sprintf(szLaunchXBE, "D:\\UltraHLE.xbe");
+	}
+	else
+	{
+		char szEmulator[16];
+		char szAudioPlugin[16];
+		char szVideoPlugin[16];
+		//char szPagingMethod[16];
+		
+		switch (preferedemu) {
+			case _1964: 		sprintf(szEmulator, "1964"); break;
+			case _Project64: 	sprintf(szEmulator, "PJ64"); break;
+			//case _UltraHLE: 	sprintf(szEmulator, "UltraHLE"); break;
+			default:
+				sprintf(szEmulator, "1964"); break;
+		}
+		
+		switch (videoplugin) {
+			case _VideoPluginRice510: 	sprintf(szVideoPlugin, "-510"); break;
+			case _VideoPluginRice531: 	sprintf(szVideoPlugin, "-531"); break;
+			case _VideoPluginRice560: 	sprintf(szVideoPlugin, "-560"); break;
+			case _VideoPluginRice611: 	sprintf(szVideoPlugin, "-611"); break;
+			case _VideoPluginRice612: 	sprintf(szVideoPlugin, "-612"); break;
+			default:
+				sprintf(szVideoPlugin, "-560"); break;
+		}
+		
+		switch (iAudioPlugin) {
+			//case _AudioPluginNone: 	sprintf(szAudioPlugin, ""); break;
+			//case _AudioPluginBasic: 	sprintf(szAudioPlugin, ""); break;
+			//case _AudioPluginJttl: 	sprintf(szAudioPlugin, ""); break;
+			//case _AudioPluginAzimer: 	sprintf(szAudioPlugin, ""); break;
+			case _AudioPluginMusyX: 	sprintf(szAudioPlugin, "M"); break;
+			default:
+				sprintf(szAudioPlugin, ""); break;
+		}
 
-			switch (m_emulator)
-			{
-				case _1964:
-				{
-					switch (videoplugin) {
-				case 0 : XLaunchNewImage("D:\\1964-510.xbe", NULL);
-					     break;
-				case 1 : XLaunchNewImage("D:\\1964-531.xbe", NULL);
-					     break;
-				case 2 : XLaunchNewImage("D:\\1964-560.xbe", NULL);
-					break;
-				case 3 : XLaunchNewImage("D:\\1964-612.xbe", NULL);
-					break;}
-					break;
-				}
-				case _Project64:
-				{
-					switch (videoplugin) {
-				case 0 : XLaunchNewImage("D:\\Pj64-510.xbe", NULL);
-					     break;
-				case 1 : XLaunchNewImage("D:\\Pj64-531.xbe", NULL);
-					     break;
-				case 2 : XLaunchNewImage("D:\\Pj64-560.xbe", NULL);
-					break;
-				case 3 : XLaunchNewImage("D:\\Pj64-612.xbe", NULL);
-					break;}
-					break;
-				}
-				case _UltraHLE:
-				{
-					XLaunchNewImage("D:\\UltraHLE.xbe", NULL);
-				}
-			}
+		sprintf(szLaunchXBE, "D:\\%s%s%s.xbe", szEmulator, szVideoPlugin, szAudioPlugin);
+	}
+
+	OutputDebugString("Launching: ");
+	OutputDebugString(szLaunchXBE);
+	OutputDebugString("\n");
+	//Sleep(100); // to see debug string
+
+	D3DDevice::PersistDisplay();
+	
+	XLaunchNewImage(szLaunchXBE, NULL);
 }

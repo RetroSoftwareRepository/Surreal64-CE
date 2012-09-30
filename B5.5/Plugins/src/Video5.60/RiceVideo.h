@@ -136,9 +136,4 @@ extern char generalText[];
 
 void SetVIScales();
 
-
-// Ez0n3 - reinstate max video mem until freakdave finishes this
-//void	_VIDEO_SetMaxTextureMem(DWORD mem);
-
-
 #endif

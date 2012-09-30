@@ -17,13 +17,18 @@ public:
 	~BoxArtTable(void);
 
 	void Build();
+	void Destroy();
+	void Refresh();
 	string GetBoxArtFilename(dword crc1);
+	//string GetVideoFilename(dword crc1);
 
 private:
 	BoxArtEntry *CreateBoxArtEntry(dword crc1, const string &pathName);
-
-private:
 	BoxArtEntry **m_entryTable;
+	
+	bool m_bBoxartLoaded;
+	
 };
 
 extern BoxArtTable g_boxArtTable;
+

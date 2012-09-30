@@ -23,6 +23,8 @@
 string Trim(const string &szStr);
 string FixPath(const string &path);
 word *StringToWChar(const string &str);
+bool StringRLTL(const string& szElem1, const string& szElem2);
+string Truncate(const string &szString, int iLength, bool bEllipses);
 
 /**
  * N64 rom specific stuff

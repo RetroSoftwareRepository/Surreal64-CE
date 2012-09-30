@@ -42,6 +42,7 @@ CPanel::CPanel()
 	m_nWidth		= 0;
 	m_nHeight		= 0;
 	m_bManaged		= FALSE;
+	holdwidth		= 0;
 }
 
 
@@ -74,6 +75,7 @@ HRESULT CPanel::Create( LPDIRECT3DDEVICE8 pd3dDevice, LPDIRECT3DTEXTURE8 pd3dTex
 
 	m_nWidth = (float) desc.Width;
 	m_nHeight = (float) desc.Height;
+	holdwidth = m_nWidth;
 
     // Create a vertex buffer for rendering the image
     m_pd3dDevice->CreateVertexBuffer( 4*6*sizeof(FLOAT), D3DUSAGE_WRITEONLY, 
@@ -214,6 +216,71 @@ HRESULT CPanel::Render(float x, float y)
     m_pd3dDevice->SetTextureStageState( 1, D3DTSS_ALPHAOP,   D3DTOP_DISABLE );
     m_pd3dDevice->SetTextureStageState( 0, D3DTSS_ADDRESSU,  D3DTADDRESS_CLAMP );
     m_pd3dDevice->SetTextureStageState( 0, D3DTSS_ADDRESSV,  D3DTADDRESS_CLAMP );
+    m_pd3dDevice->SetRenderState( D3DRS_ZENABLE,      FALSE );
+    m_pd3dDevice->SetRenderState( D3DRS_FOGENABLE,    FALSE );
+    m_pd3dDevice->SetRenderState( D3DRS_FOGTABLEMODE, D3DFOG_NONE );
+    m_pd3dDevice->SetRenderState( D3DRS_FILLMODE,     D3DFILL_SOLID );
+    m_pd3dDevice->SetRenderState( D3DRS_CULLMODE,     D3DCULL_CCW );
+    m_pd3dDevice->SetRenderState( D3DRS_ALPHABLENDENABLE, TRUE );
+    m_pd3dDevice->SetRenderState( D3DRS_SRCBLEND,  D3DBLEND_SRCALPHA );
+    m_pd3dDevice->SetRenderState( D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA );
+    m_pd3dDevice->SetVertexShader( D3DFVF_XYZRHW|D3DFVF_TEX1 );
+
+    // Render the image
+    m_pd3dDevice->SetStreamSource( 0, m_pVB, 6*sizeof(FLOAT) );
+    m_pd3dDevice->DrawPrimitive( D3DPT_QUADLIST, 0, 1 );
+
+    return S_OK;
+}
+
+//-----------------------------------------------------------------------------
+// Name: Render(float x, float y, float w, float h)
+// Desc: Renders the image at a given position and size.
+//-----------------------------------------------------------------------------
+
+HRESULT CPanel::Render(float x, float y, float w, float h)
+{
+    // Set state to render the image
+	CPanel::VERTEX* vertex;
+    m_pVB->Lock( 0, 0, (BYTE**)&vertex, 0L );
+    
+	vertex[0].p = D3DXVECTOR4( x - 0.5f,			y - 0.5f,			0, 0 );
+	vertex[0].tu = 0;
+	vertex[0].tv = 0;
+
+    vertex[1].p = D3DXVECTOR4( x+w - 0.5f,			y - 0.5f,			0, 0 );
+	vertex[1].tu = m_nWidth;
+	vertex[1].tv = 0;
+
+    vertex[2].p = D3DXVECTOR4( x+w - 0.5f,			y+h - 0.5f,			0, 0 );
+	vertex[2].tu = m_nWidth;
+	vertex[2].tv = m_nHeight;
+
+    vertex[3].p = D3DXVECTOR4( x - 0.5f,			y+h - 0.5f,			0, 0 );
+	vertex[3].tu = 0;
+	vertex[3].tv = m_nHeight;
+
+    m_pVB->Unlock();
+
+    // Set state to render the image
+    m_pd3dDevice->SetTexture( 0, m_pTexture );
+
+    m_pd3dDevice->SetTextureStageState( 0, D3DTSS_COLOROP,   D3DTOP_MODULATE );
+    m_pd3dDevice->SetTextureStageState( 0, D3DTSS_COLORARG1, D3DTA_TEXTURE );
+    m_pd3dDevice->SetTextureStageState( 0, D3DTSS_COLORARG2, D3DTA_DIFFUSE );
+    m_pd3dDevice->SetTextureStageState( 0, D3DTSS_ALPHAOP,   D3DTOP_MODULATE );
+    m_pd3dDevice->SetTextureStageState( 0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE );
+    m_pd3dDevice->SetTextureStageState( 0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE );
+    m_pd3dDevice->SetTextureStageState( 1, D3DTSS_COLOROP,   D3DTOP_DISABLE );
+    m_pd3dDevice->SetTextureStageState( 1, D3DTSS_ALPHAOP,   D3DTOP_DISABLE );
+    m_pd3dDevice->SetTextureStageState( 0, D3DTSS_ADDRESSU,  D3DTADDRESS_CLAMP );
+    m_pd3dDevice->SetTextureStageState( 0, D3DTSS_ADDRESSV,  D3DTADDRESS_CLAMP );
+	
+	//Linear filter to smooth the resize
+	m_pd3dDevice->SetTextureStageState(0, D3DTSS_MAGFILTER,D3DTEXF_LINEAR);
+	m_pd3dDevice->SetTextureStageState(0, D3DTSS_MINFILTER,D3DTEXF_LINEAR);
+	m_pd3dDevice->SetTextureStageState(0, D3DTSS_MIPFILTER,D3DTEXF_NONE);
+
     m_pd3dDevice->SetRenderState( D3DRS_ZENABLE,      FALSE );
     m_pd3dDevice->SetRenderState( D3DRS_FOGENABLE,    FALSE );
     m_pd3dDevice->SetRenderState( D3DRS_FOGTABLEMODE, D3DFOG_NONE );
@@ -374,6 +441,7 @@ HRESULT CPanel::Render(float x, float y, float nw, float nh, int nFilter, int bR
 		vertex[3].tu = 0;
 		vertex[3].tv = m_nHeight;  
 	}
+
  
 
     m_pVB->Unlock();

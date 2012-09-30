@@ -130,6 +130,22 @@ bool D3DRender::RestoreDeviceObjects()
 	g_pD3DDev->SetRenderState( D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
 	SetD3DRSZWriteEnable( TRUE);
 	
+	// weinersch - do xbox antialiasing here
+	// Rice 5.31 PC does not have FSAA
+#ifdef _XBOX
+
+	if(AntiAliasMode>1){
+		g_pD3DDev->SetRenderState( D3DRS_MULTISAMPLEANTIALIAS , TRUE);
+	}else if(AntiAliasMode==1){
+		g_pD3DDev->SetRenderState( D3DRS_MULTISAMPLEANTIALIAS , FALSE);
+		g_pD3DDev->SetRenderState( D3DRS_ALPHABLENDENABLE , TRUE);
+		g_pD3DDev->SetRenderState( D3DRS_EDGEANTIALIAS , TRUE);
+	}else{
+		g_pD3DDev->SetRenderState( D3DRS_MULTISAMPLEANTIALIAS , FALSE);
+	}
+
+#endif
+
 	// Initialize all the renderstate to our defaults.
 	SetShadeMode( gRSP.shadeMode );
 	g_pD3DDev->SetRenderState( D3DRS_TEXTUREFACTOR, m_dwTextureFactor );

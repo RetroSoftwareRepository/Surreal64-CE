@@ -84,7 +84,7 @@ void LoadEeprom (void) {
 	char File[255], Directory[255];
 	DWORD dwRead;
 
-	sprintf(File, "T:\\%08X-%08X-%02X.eep", *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x14)), *((BYTE *)(RomHeader + 0x3D)));
+	sprintf(File, "%s%08X\\%08X-%08X-%02X.eep", g_szPathSaves, *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x14)), *((BYTE *)(RomHeader + 0x3D)));
 	
 	hEepromFile = CreateFile(File,GENERIC_WRITE | GENERIC_READ, FILE_SHARE_READ,NULL,OPEN_ALWAYS,
 		FILE_ATTRIBUTE_NORMAL | FILE_FLAG_RANDOM_ACCESS, NULL);

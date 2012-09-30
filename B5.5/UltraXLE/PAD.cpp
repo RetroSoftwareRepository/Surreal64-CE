@@ -171,7 +171,7 @@ void pad_buttons(void)
 
 void pad_init(void)
 {
-/*	FILE *file = fopen("T:\\Settings.dat", "rb");
+/*	FILE *file = fopen("T:\\Data\\Settings.dat", "rb");
 
 	if (file)				
 	{

@@ -267,6 +267,9 @@ typedef struct
   output:   none
 *******************************************************************/ 
  void  _VIDEO_FBRead(DWORD addr);
+ 
+// not in 510? code from 531
+//void _VIDEO_FBGetFrameBufferInfo(void *pinfo);
 
  void	_VIDEO_SetMaxTextureMem(DWORD mem);
 

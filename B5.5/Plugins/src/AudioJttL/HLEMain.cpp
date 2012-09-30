@@ -99,7 +99,7 @@ u32 UCData, UDataLen;
 //#define ENABLELOG
 #ifdef ENABLELOG
 #pragma message ("Logging of Timing info is enabled!!!")
-FILE *dfile = fopen ("d:\\HLEInfo.txt", "wt");
+FILE *dfile = fopen ("T:\\Misc\\HLEInfo.txt", "wt");
 #endif
 
 extern u32 loopval;

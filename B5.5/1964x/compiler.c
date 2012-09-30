@@ -309,6 +309,7 @@ step2:
 	__except(NULL, EXCEPTION_EXECUTE_HANDLER)
 	{
 		DisplayError("%08X: Dyna PC out of range", pc);
+		TRACE1("%08X: Dyna PC out of range", pc);
 	}
 
 	return code;

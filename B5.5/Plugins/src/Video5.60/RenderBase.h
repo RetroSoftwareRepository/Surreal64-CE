@@ -83,6 +83,8 @@ extern Matrix	gRSPmodelViewTop;
 extern Matrix	gRSPmodelViewTopTranspose;
 extern float	gRSPfFogMin;
 extern float	gRSPfFogMax;
+extern float	gRSPfFogDivider;
+
 
 /************************************************************************/
 /*      Don't move                                                      */
@@ -126,6 +128,10 @@ typedef struct
 
 	DWORD	ambientLightColor;
 	DWORD	ambientLightIndex;
+
+	//weinersch - 5.10 fog
+	float	fFogMul;
+	float	fFogOffset;
 
 	DWORD	projectionMtxTop;
 	DWORD	modelViewMtxTop;

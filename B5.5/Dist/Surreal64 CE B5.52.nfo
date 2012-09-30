@@ -1,0 +1,77 @@
+Surreal64 CE B5.52
+by: Ez0n3, freakdave, & weinerschnitzel
+surreal64ce.wikidot.com
+
+Surreal64 CE is a continuation of the Surreal64 project where Team XXX left off. Originally developed by oDD and Lantus, Surreal64 included ports of three Win32 based Nintendo64 emulators including 1964, Project64 and UltraHLE. Our goal is to improve Nintendo64 emulation on the XBOX 
+with the addition of:
+
+- New or updated N64 emulators 
+- New or updated video, audio and RSP plugins
+- Improved controls
+- a user friendly and skinnable GUI
+
+Changes since B5.4:
+
+Added:
+* Native 720p output for all video plugins and the launcher
+* Full Screen Anti Aliasing modes up to 4x
+* VSYNC setting to eliminate tearing
+* Save state previews
+* Paths for Saves and Screenshots
+* Mupen64plus updated JttL audio plugin (still testing)
+* M64p HLE RSP plugin (Hacktarux & Azimer)
+* HLE RSP plugin (Hacktarux, Surreal CVS)
+* New setting UseRspAudio
+* Rom history which auto-selects the last rom at launch
+* Option to toggle background music for the launcher
+* Launch current rom using Y from the emulator settings menu
+* Temporary messages (as known from Surreal 1.0) for launcher and all video plugins
+* UltraHLE mem settings to ini - Ultra Code Mem/Ultra Group Mem
+* Favorites for rom list from Surreal 1.0 (BLACK = list all/favs, WHITE = add/rem fav)
+* Skin.ini for many new skinning features
+* XMV Video support
+* Real Time Clock support for 1964 (thanks to Shapyi and zoinkity)
+* EmuXtras Synopsis by MegaMan(?)
+
+
+Changed:
+* Music Manager so that it plays more than one wma file (LEFT THUMBSTICK = next track)
+* Deadzone now calculated as a percentage of total range
+* Load/Save State text to reflect date created
+* Paging methods now user defined setting in Launcher
+* Max Video Mem so that 0 is auto (keep to 2MB free)
+* Set VertexMode default to 2 (hardware)
+* Stripped non audio SDLx code from JttL
+* Toggling menu items in Launcher/IGM does now also work with DPAD/LEFT THUMBSTICK
+* Expanded ingame debug info output
+* Control Config Panel reorganized to better fit an image panel
+
+
+Fixed:
+* Mempak issue (still needs work - UltraHLE is still missing)
+* Rice Video 5.60 fog reverted to that of Rice Daedalus 5.10
+* Screenshot name problems
+* Switching paks in menu issue
+* Countless ini fixes for all Rice plugins, PJ64, 1964 (BIG thx scorp316)
+* GoldenEye crashes if 4 players were facing each other in multiplayer (UltraHLE)
+* Minor core (1964) and dynarec (1964/PJ64) optimizations
+* Increased volume for launcher and all sound plugins except Basic Audio (missing source code)
+* Several missing boxarts
+* Squished boxarts
+
+
+Other:
+* Consistent PAL and NTSC definitions
+* Added libSDLx source from HuntsVegas
+* Moved all OSD code into a single file
+* Added Build.bat
+* Added Profile, Profile_FastCap, and Release_LTCG configs
+* Changed all projects to have unique GUID's
+* Switched launcher ini parser to simpleini
+* Mem Decommit from 1964/PJ64 to UltraHLE for IGM
+* Added Doom 64 1.1 to boxarts (rename of existing)
+* Added GoldenEye:X to Surreal.ini
+
+B5.52 Additions:
+* Trigonometric analog sensitivity
+* Software Vertex Clipper for Rice 6.11 & Rice 6.12

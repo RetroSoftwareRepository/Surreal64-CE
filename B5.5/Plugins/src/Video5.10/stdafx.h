@@ -17,12 +17,21 @@
 #include <stdio.h>
 #include <xtl.h>
 #include <math.h>			// For sqrt()
-#include <xfont.h>
- 
-#include <d3dx8.h>
- 
-#include <vector>
 #include <iostream>
+
+#if _MSC_VER > 1200
+#include "xmmintrin.h"
+#endif
+
+
+#include <process.h>
+
+#include <d3d8.h>
+#include <d3dx8.h>
+#include <d3d8types.h>
+#include <D3dx8math.h>
+
+#include <vector>
 
 // TODO: reference additional headers your program requires here
 #ifndef _DEBUG
@@ -144,8 +153,6 @@ extern GFX_INFO g_GraphicsInfo;
 #define StartProfiler(item)
 #define StopProfiler(item)
 #endif
-
-extern XFONT *g_defaultTrueTypeFont;
 
 //#include "ResourceString.h"		// Useful everywhere
 //{{AFX_INSERT_LOCATION}}

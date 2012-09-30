@@ -35,29 +35,38 @@ AUDIO_INFO	Audio_Info;
 
 BOOL	CoreDoingAIUpdate = TRUE;
 
-// Ez0n3 - use iAudioPlugin instead to determine if basic audio is used
-//BOOL	g_bUseBasicAudio = FALSE;
+//BOOL	g_bUseBasicAudio = FALSE; //use iAudioPlugin instead to determine if basic audio is used
+
+#if defined(USE_MUSYX)
+int g_iAudioPlugin = _AudioPluginMusyX; // set default to musyx
+#elif defined(USE_M64PAUDIO)
+int g_iAudioPlugin = _AudioPluginM64p; // set default to m64p
+#else
 int g_iAudioPlugin = _AudioPluginJttl; // set default to jttl
+#endif
 
-// SET DEFAULT AUDIO PLUGIN - JttL
-void (*_AUDIO_LINK_AiDacrateChanged)(int SystemType) = _AUDIO_AiDacrateChanged;
-void (*_AUDIO_LINK_AiLenChanged)(void) = _AUDIO_AiLenChanged;
-DWORD (*_AUDIO_LINK_AiReadLength)(void) = _AUDIO_AiReadLength;
-void (*_AUDIO_LINK_AiUpdate)(BOOL Wait) = _AUDIO_AiUpdate;
-void (*_AUDIO_LINK_CloseDLL)(void) = _AUDIO_CloseDLL;
-void (*_AUDIO_LINK_DllAbout)(HWND hParent) = _AUDIO_DllAbout;
-void (*_AUDIO_LINK_DllConfig)(HWND hParent) = _AUDIO_DllConfig;
-void (*_AUDIO_LINK_DllTest)(HWND hParent) = _AUDIO_DllTest;
-void (*_AUDIO_LINK_GetDllInfo)(PLUGIN_INFO *PluginInfo) = _AUDIO_GetDllInfo;
-BOOL (*_AUDIO_LINK_InitiateAudio)(AUDIO_INFO Audio_Info) = _AUDIO_InitiateAudio;
-void (*_AUDIO_LINK_ProcessAList)(void) = _AUDIO_ProcessAList;
-void (*_AUDIO_LINK_RomClosed)(void) = _AUDIO_RomClosed;
-//DWORD (*_AUDIO_LINK_ProcessAListCountCycles)(void) = NULL;
-
+BOOL g_bAudioBoost = FALSE;
 
 /* Used when selecting plugins */
 //void (__cdecl *_AUDIO_Under_Selecting_About) (HWND) = NULL;
 //void (__cdecl *_AUDIO_Under_Selecting_Test) (HWND) = NULL;
+
+
+void (*_AUDIO_LINK_AiDacrateChanged)(int SystemType) = NULL;
+void (*_AUDIO_LINK_AiLenChanged)(void) = NULL;
+DWORD (*_AUDIO_LINK_AiReadLength)(void) = NULL;
+void (*_AUDIO_LINK_AiUpdate)(BOOL Wait) = NULL;
+void (*_AUDIO_LINK_CloseDLL)(void) = NULL;
+void (*_AUDIO_LINK_DllAbout)(HWND hParent) = NULL;
+void (*_AUDIO_LINK_DllConfig)(HWND hParent) = NULL;
+void (*_AUDIO_LINK_DllTest)(HWND hParent) = NULL;
+void (*_AUDIO_LINK_GetDllInfo)(PLUGIN_INFO *PluginInfo) = NULL;
+BOOL (*_AUDIO_LINK_InitiateAudio)(AUDIO_INFO Audio_Info) = NULL;
+void (*_AUDIO_LINK_ProcessAList)(void) = NULL;
+void (*_AUDIO_LINK_RomClosed)(void) = NULL;
+//DWORD (*_AUDIO_LINK_ProcessAListCountCycles)(void) = NULL;
+
+void (*_AUDIO_LINK_AudioBoost)(BOOL Boost) = NULL;
 
 /*
  =======================================================================================================================
@@ -65,7 +74,49 @@ void (*_AUDIO_LINK_RomClosed)(void) = _AUDIO_RomClosed;
  */
 BOOL LoadAudioPlugin()
 { 
-	// Ez0n3 - plugin selection to replace bools: g_bUseBasicAudio = g_bUseLLERspPlugin;
+	// plugin selection to replace bools: g_bUseBasicAudio, g_bUseLLERspPlugin;
+#if defined(USE_MUSYX)
+	//if (g_iAudioPlugin == _AudioPluginMusyX)
+	{
+		// freakdave - new MusyX Audio plugin
+		_AUDIO_LINK_AiDacrateChanged 	= _AUDIO_MUSYX_AiDacrateChanged;
+		_AUDIO_LINK_AiLenChanged	 	= _AUDIO_MUSYX_AiLenChanged;
+		_AUDIO_LINK_AiReadLength	 	= _AUDIO_MUSYX_AiReadLength;
+		_AUDIO_LINK_AiUpdate		 	= _AUDIO_MUSYX_AiUpdate;
+		_AUDIO_LINK_CloseDLL		 	= _AUDIO_MUSYX_CloseDLL;
+		_AUDIO_LINK_DllAbout		 	= _AUDIO_MUSYX_DllAbout;
+		_AUDIO_LINK_DllConfig		 	= _AUDIO_MUSYX_DllConfig;
+		_AUDIO_LINK_DllTest			 	= _AUDIO_MUSYX_DllTest;
+		_AUDIO_LINK_GetDllInfo		 	= _AUDIO_MUSYX_GetDllInfo;
+		_AUDIO_LINK_InitiateAudio	 	= _AUDIO_MUSYX_InitiateAudio;
+		_AUDIO_LINK_ProcessAList	 	= _AUDIO_MUSYX_ProcessAList;
+		_AUDIO_LINK_RomClosed		 	= _AUDIO_MUSYX_RomClosed;
+		//_AUDIO_LINK_ProcessAListCountCycles = _AUDIO_MUSYX_ProcessAListCountCycles;
+		
+		_AUDIO_LINK_AudioBoost		 	= _AUDIO_MUSYX_AudioBoost;
+	}
+#elif defined(USE_M64PAUDIO)
+	//if (g_iAudioPlugin == _AudioPluginM64p) // so it doesn't break for now
+	{
+		// Mupen 1.5 Audio plugin
+		_AUDIO_LINK_AiDacrateChanged 	= _AUDIO_M64P_AiDacrateChanged;
+		_AUDIO_LINK_AiLenChanged	 	= _AUDIO_M64P_AiLenChanged;
+		_AUDIO_LINK_AiReadLength	 	= _AUDIO_M64P_AiReadLength;
+		_AUDIO_LINK_AiUpdate		 	= _AUDIO_M64P_AiUpdate;
+		_AUDIO_LINK_CloseDLL		 	= _AUDIO_M64P_CloseDLL;
+		_AUDIO_LINK_DllAbout		 	= _AUDIO_M64P_DllAbout;
+		_AUDIO_LINK_DllConfig		 	= _AUDIO_M64P_DllConfig;
+		_AUDIO_LINK_DllTest			 	= _AUDIO_M64P_DllTest;
+		_AUDIO_LINK_GetDllInfo		 	= _AUDIO_M64P_GetDllInfo;
+		_AUDIO_LINK_InitiateAudio	 	= _AUDIO_M64P_InitiateAudio;
+		_AUDIO_LINK_ProcessAList	 	= _AUDIO_M64P_ProcessAList;
+		_AUDIO_LINK_RomClosed		 	= _AUDIO_M64P_RomClosed;
+		//_AUDIO_LINK_ProcessAListCountCycles = _AUDIO_MUSYX_ProcessAListCountCycles;
+		
+		_AUDIO_LINK_AudioBoost		 	= _AUDIO_M64P_AudioBoost;
+	}
+#else
+
 	if (g_iAudioPlugin == _AudioPluginNone)
 	{
 		// Ez0n3 - No Audio (declared in plugin.h include)
@@ -82,10 +133,10 @@ BOOL LoadAudioPlugin()
 		_AUDIO_LINK_ProcessAList	 	= _AUDIO_NONE_ProcessAList;
 		_AUDIO_LINK_RomClosed		 	= _AUDIO_NONE_RomClosed;
 	}
-	else if (g_iAudioPlugin == _AudioPluginLleRsp)
+	/*else if (g_iAudioPlugin == _AudioPluginLleRsp)
 	{
-		//
-	}
+		// deprecated
+	}*/
 	else if (g_iAudioPlugin == _AudioPluginBasic)
 	{
 		_AUDIO_LINK_AiDacrateChanged 	= _AUDIO_BASIC_AiDacrateChanged;
@@ -104,23 +155,24 @@ BOOL LoadAudioPlugin()
 	else if (g_iAudioPlugin == _AudioPluginJttl)
 	{
 		//freakdave - JttL 1.2
-		_AUDIO_LINK_AiDacrateChanged 	= _AUDIO_AiDacrateChanged;
-		_AUDIO_LINK_AiLenChanged	 	= _AUDIO_AiLenChanged;
-		_AUDIO_LINK_AiReadLength	 	= _AUDIO_AiReadLength;
-		_AUDIO_LINK_AiUpdate		 	= _AUDIO_AiUpdate;
-		_AUDIO_LINK_CloseDLL		 	= _AUDIO_CloseDLL;
-		_AUDIO_LINK_DllAbout		 	= _AUDIO_DllAbout;
-		_AUDIO_LINK_DllConfig		 	= _AUDIO_DllConfig;
-		_AUDIO_LINK_DllTest			 	= _AUDIO_DllTest;
-		_AUDIO_LINK_GetDllInfo		 	= _AUDIO_GetDllInfo;
-		_AUDIO_LINK_InitiateAudio	 	= _AUDIO_InitiateAudio;
-		_AUDIO_LINK_ProcessAList	 	= _AUDIO_ProcessAList;
-		_AUDIO_LINK_RomClosed		 	= _AUDIO_RomClosed;
+		_AUDIO_LINK_AiDacrateChanged 	= _AUDIO_JTTL_AiDacrateChanged;
+		_AUDIO_LINK_AiLenChanged	 	= _AUDIO_JTTL_AiLenChanged;
+		_AUDIO_LINK_AiReadLength	 	= _AUDIO_JTTL_AiReadLength;
+		_AUDIO_LINK_AiUpdate		 	= _AUDIO_JTTL_AiUpdate;
+		_AUDIO_LINK_CloseDLL		 	= _AUDIO_JTTL_CloseDLL;
+		_AUDIO_LINK_DllAbout		 	= _AUDIO_JTTL_DllAbout;
+		_AUDIO_LINK_DllConfig		 	= _AUDIO_JTTL_DllConfig;
+		_AUDIO_LINK_DllTest			 	= _AUDIO_JTTL_DllTest;
+		_AUDIO_LINK_GetDllInfo		 	= _AUDIO_JTTL_GetDllInfo;
+		_AUDIO_LINK_InitiateAudio	 	= _AUDIO_JTTL_InitiateAudio;
+		_AUDIO_LINK_ProcessAList	 	= _AUDIO_JTTL_ProcessAList;
+		_AUDIO_LINK_RomClosed		 	= _AUDIO_JTTL_RomClosed;
+		
+		_AUDIO_LINK_AudioBoost		 	= _AUDIO_JTTL_AudioBoost;
 	}
 	else if (g_iAudioPlugin == _AudioPluginAzimer)
 	{
-		// Ez0n3 - old Azimer plugin from Surreal 1.0 and FDB
-		//freakdave - readded Azimer
+		//freakdave - readded Azimer plugin from Surreal 1.0 and FDB
 		_AUDIO_LINK_AiDacrateChanged 	= _AUDIO_AZIMER_AiDacrateChanged;
 		_AUDIO_LINK_AiLenChanged	 	= _AUDIO_AZIMER_AiLenChanged;
 		_AUDIO_LINK_AiReadLength	 	= _AUDIO_AZIMER_AiReadLength;
@@ -133,26 +185,19 @@ BOOL LoadAudioPlugin()
 		_AUDIO_LINK_InitiateAudio	 	= _AUDIO_AZIMER_InitiateAudio;
 		_AUDIO_LINK_ProcessAList	 	= _AUDIO_AZIMER_ProcessAList;
 		_AUDIO_LINK_RomClosed		 	= _AUDIO_AZIMER_RomClosed;
+		
+		_AUDIO_LINK_AudioBoost		 	= _AUDIO_AZIMER_AudioBoost;
 	}
-	
-	else if (g_iAudioPlugin == _AudioPluginMusyX)
+#endif
+
+	__try
 	{
-		// freakdave - new MusyX Audio plugin
-		_AUDIO_LINK_AiDacrateChanged 	= _AUDIO_MUSYX_AiDacrateChanged;
-		_AUDIO_LINK_AiLenChanged	 	= _AUDIO_MUSYX_AiLenChanged;
-		_AUDIO_LINK_AiReadLength	 	= _AUDIO_MUSYX_AiReadLength;
-		_AUDIO_LINK_AiUpdate		 	= _AUDIO_MUSYX_AiUpdate;
-		_AUDIO_LINK_CloseDLL		 	= _AUDIO_MUSYX_CloseDLL;
-		_AUDIO_LINK_DllAbout		 	= _AUDIO_MUSYX_DllAbout;
-		_AUDIO_LINK_DllConfig		 	= _AUDIO_MUSYX_DllConfig;
-		_AUDIO_LINK_DllTest			 	= _AUDIO_MUSYX_DllTest;
-		_AUDIO_LINK_GetDllInfo		 	= _AUDIO_MUSYX_GetDllInfo;
-		_AUDIO_LINK_InitiateAudio	 	= _AUDIO_MUSYX_InitiateAudio;
-		_AUDIO_LINK_ProcessAList	 	= _AUDIO_MUSYX_ProcessAList;
-		_AUDIO_LINK_RomClosed		 	= _AUDIO_MUSYX_RomClosed;
-		//_AUDIO_LINK_ProcessAListCountCycles = _AUDIO_MUSYX_ProcessAListCountCycles;
+		_AUDIO_LINK_AudioBoost(g_bAudioBoost);
+		_AUDIO_LINK_AudioBoost = NULL;
 	}
-	
+	__except(NULL, EXCEPTION_EXECUTE_HANDLER)
+	{
+	}
 
 	return TRUE;
 }

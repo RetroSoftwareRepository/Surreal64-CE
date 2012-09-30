@@ -45,7 +45,8 @@ IniFile::~IniFile()
 {
 	if (bChanged)
 	{
-		WriteIniFile(m_szFileName);
+		//WriteIniFile(m_szFileName);
+		WriteIniFile();
 	}
 }
 
@@ -81,6 +82,7 @@ char * tidy(char * s)
 }
 
 extern void GetPluginDir( char * Directory );
+extern bool PathFileExists(const char *pszPath);
 
 BOOL IniFile::ReadIniFile()
 {
@@ -92,7 +94,24 @@ BOOL IniFile::ReadIniFile()
 	
 	char filename[256];
 	 
-	strcpy(filename,m_szFileName);
+	GetPluginDir(filename);
+	strcat(filename,m_szFileName);
+	//strcpy(filename,m_szFileName);
+	
+	// try D if it's not on T
+	if (!PathFileExists(filename)) {
+		sprintf(filename, "D:\\%s", m_szFileName);
+		if (!PathFileExists(filename)) {
+			ErrorMsg("%s Failed to Load!", filename);
+			return FALSE;
+		} else {
+			MsgInfo("%s Loaded Successfully!", filename);
+		}
+	} else {
+		MsgInfo("%s Loaded Successfully!", filename);
+	}
+	
+	
 	inifile.open(filename);
 	
 	if (inifile.fail())
@@ -259,8 +278,12 @@ std::ifstream & getline(std::ifstream & is, char *str)
     return is;
 }
 
-void IniFile::WriteIniFile(LPCTSTR szFileName)
+//void IniFile::WriteIniFile(LPCTSTR szFileName)
+void IniFile::WriteIniFile()
 {
+	// noting to write atm - needs work
+	return;
+	
 	TCHAR szFileNameOut[MAX_PATH+1];
 	TCHAR szFileNameDelete[MAX_PATH+1];
 	TCHAR filename[MAX_PATH+1];
@@ -272,9 +295,9 @@ void IniFile::WriteIniFile(LPCTSTR szFileName)
 
 	GetPluginDir(szFileNameOut);
 	GetPluginDir(szFileNameDelete);
-	wsprintf(filename, "%s.tmp", szFileName);
+	wsprintf(filename, "%s.tmp", m_szFileName); //szFileName
 	strcat(szFileNameOut, filename);
-	wsprintf(filename, "%s.del", szFileName);
+	wsprintf(filename, "%s.del", m_szFileName); //szFileName
 	strcat(szFileNameDelete, filename);
 
 	GetPluginDir(filename);

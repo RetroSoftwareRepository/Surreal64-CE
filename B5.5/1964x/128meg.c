@@ -3,17 +3,11 @@
 #include "128meg.h"
 #include <stdio.h>
 
-//weinerschnitzel - rename these to use both
-// Ez0n3 - old method of rom paging
-extern unsigned short g_dwNumFrames;
-#define RP_PAGE_SIZE_O 0x10000
-
-
 // freakdave - new method of rom paging
-extern unsigned short nombreframes;
-#define RP_PAGE_SIZE_N 0x40000
 
-
+extern DWORD g_dwNumFrames;
+extern DWORD g_dwPageSize;
+extern char g_temporaryRomPath[260];
 
 // MTRR register addresses
 #define IA32_MTRRCAP            0x00FE
@@ -77,13 +71,9 @@ void Enable128MegCaching( void )
   MEMORYSTATUS memStatus;
   GlobalMemoryStatus( &memStatus );
   if( memStatus.dwTotalPhys < (100 * 1024 * 1024) ){
-  
-    //Ez0n3 - wrong paging variable - should be 1964 not PJ64
-   	//nombreframes = (loaddwPJ64PagingMem() * 1024 * 1024) / RP_PAGE_SIZE_N;
-	nombreframes = (loaddw1964PagingMem() * 1024 * 1024) / RP_PAGE_SIZE_N; //need for 128mb users
-	g_dwNumFrames = (loaddw1964PagingMem() * 1024 * 1024) / RP_PAGE_SIZE_O; //old method 
-	
-	return;}
+    g_dwNumFrames = ((loaddw1964PagingMem() * 1024 * 1024) / g_dwPageSize); 
+	return;
+  }
 
     // Grab the existing default type
   READMSRREG( IA32_MTRR_DEF_TYPE, &regVal );
@@ -92,11 +82,11 @@ void Enable128MegCaching( void )
   regVal.LowPart = (regVal.LowPart & ~0xFF) | 0x06;
   WRITEMSRREG( IA32_MTRR_DEF_TYPE, regVal );
 
-  fp = fopen("Z:\\TemporaryRom.dat","r");
+  fp = fopen(g_temporaryRomPath,"r");
   rewind(fp);
   fseek(fp, 0, SEEK_END);
   filesize = ftell(fp);
   fclose(fp);
-  nombreframes = (filesize) / RP_PAGE_SIZE_N; //need this for 128mb users
-  g_dwNumFrames = (filesize) / RP_PAGE_SIZE_O; //old method
+
+  g_dwNumFrames = (DWORD)((filesize) / g_dwPageSize);
 }

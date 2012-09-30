@@ -28,6 +28,9 @@ class CDaedalusRender : public CExtendedRender
 protected:
 	CDaedalusRender();
 
+	TextureUVFlag TileUFlags[8];
+	TextureUVFlag TileVFlags[8];
+
 public:
 
 	float m_fScreenViewportMultX;

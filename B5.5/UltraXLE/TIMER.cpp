@@ -1,6 +1,6 @@
 
-#include "ultra.h"
 #include "stdsdk.h"
+#include "ultra.h"
 
 static LARGE_INTEGER  perf_freq;
 static int            initdone;

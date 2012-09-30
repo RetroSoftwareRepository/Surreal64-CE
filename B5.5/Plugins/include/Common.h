@@ -23,8 +23,9 @@ typedef struct
 	                          bswap on a dword (32 bits) boundry */
 } PLUGIN_INFO;
 
-#define SYSTEM_NTSC					1
-#define SYSTEM_PAL					0
+// sometimes NTSC is 0 and PAL is 1, other times it's reverse - not a problem? (multiple files)
+#define SYSTEM_NTSC					0 //1
+#define SYSTEM_PAL					1 //0
 #define SYSTEM_MPAL					2
 /***** Structures *****/
 typedef struct 

@@ -60,11 +60,13 @@ public:
     HRESULT Render();
 	HRESULT RenderAlpha();
 	HRESULT Render(float x, float y);
+	HRESULT Render(float x, float y, float w, float h);
 	HRESULT Render(float x, float y, float w, float h, float x2, float y2, int bRotate=0);
 	HRESULT Render(float x, float y, float nw, float nh, int nFilter,int bRotate=0);
 
 	FLOAT GetWidth()	{ return m_nWidth; };
 	FLOAT GetHeight()	{ return m_nHeight; };
+	FLOAT holdwidth;
 };
 
 #endif

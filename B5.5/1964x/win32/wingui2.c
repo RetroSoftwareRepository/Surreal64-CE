@@ -54,75 +54,75 @@ void CountryCodeToCountryName_and_TVSystem(int countrycode, char *countryname, i
 	{
 	/* Demo */
 	case 0:
-		*tvsystem = SYSTEM_NTSC;
+		*tvsystem = TV_SYSTEM_NTSC;
 		strcpy(countryname, "Demo");
 		break;
 
 	case '7':
-		*tvsystem = SYSTEM_NTSC;
+		*tvsystem = TV_SYSTEM_NTSC;
 		strcpy(countryname, "Beta");
 		break;
 
 	case 0x41:
-		*tvsystem = SYSTEM_NTSC;
+		*tvsystem = TV_SYSTEM_NTSC;
 		strcpy(countryname, "USA/Japan");
 		break;
 
 	/* Germany */
 	case 0x44:
-		*tvsystem = SYSTEM_PAL;
+		*tvsystem = TV_SYSTEM_PAL;
 		strcpy(countryname, "German");
 		break;
 
 	/* USA */
 	case 0x45:
-		*tvsystem = SYSTEM_NTSC;
+		*tvsystem = TV_SYSTEM_NTSC;
 		strcpy(countryname, "USA");
 		break;
 
 	/* France */
 	case 0x46:
-		*tvsystem = SYSTEM_PAL;
+		*tvsystem = TV_SYSTEM_PAL;
 		strcpy(countryname, "France");
 		break;
 
 	/* Italy */
 	case 'I':
-		*tvsystem = SYSTEM_PAL;
+		*tvsystem = TV_SYSTEM_PAL;
 		strcpy(countryname, "Italy");
 		break;
 
 	/* Japan */
 	case 0x4A:
-		*tvsystem = SYSTEM_NTSC;
+		*tvsystem = TV_SYSTEM_NTSC;
 		strcpy(countryname, "Japan");
 		break;
 
 	/* Europe - PAL */
 	case 0x50:
-		*tvsystem = SYSTEM_PAL;
+		*tvsystem = TV_SYSTEM_PAL;
 		strcpy(countryname, "Europe");
 		break;
 
 	case 'S':	/* Spain */
-		*tvsystem = SYSTEM_PAL;
+		*tvsystem = TV_SYSTEM_PAL;
 		strcpy(countryname, "Spain");
 		break;
 
 	/* Australia */
 	case 0x55:
-		*tvsystem = SYSTEM_PAL;
+		*tvsystem = TV_SYSTEM_PAL;
 		strcpy(countryname, "Australia");
 		break;
 
 	case 0x58:
-		*tvsystem = SYSTEM_PAL;
+		*tvsystem = TV_SYSTEM_PAL;
 		strcpy(countryname, "Europe");
 		break;
 
 	/* Australia */
 	case 0x59:
-		*tvsystem = SYSTEM_PAL;
+		*tvsystem = TV_SYSTEM_PAL;
 		strcpy(countryname, "Australia");
 		break;
 
@@ -130,13 +130,13 @@ void CountryCodeToCountryName_and_TVSystem(int countrycode, char *countryname, i
 	case 0x21:
 	case 0x38:
 	case 0x70:
-		*tvsystem = SYSTEM_PAL;
+		*tvsystem = TV_SYSTEM_PAL;
 		sprintf(countryname, "Europe", countrycode);
 		break;
 
 	/* ??? */
 	default:
-		*tvsystem = SYSTEM_PAL;
+		*tvsystem = TV_SYSTEM_PAL;
 		sprintf(countryname, "PAL", countrycode);
 		break;
 	}
@@ -213,7 +213,8 @@ void InitPluginData(void)
  */
 void Set_1964_Directory(void)
 {
-	strcpy(directories.main_directory, "D:\\");
+	//strcpy(directories.main_directory, "D:\\");
+	strcpy(directories.main_directory, "T:\\");
 }
 
 char	critical_msg_buffer[32 * 1024]; /* 32KB */
@@ -224,7 +225,19 @@ char	critical_msg_buffer[32 * 1024]; /* 32KB */
  */
 void __cdecl DisplayCriticalMessage(char *Message, ...)
 {
+//#ifdef DEBUG
+	char	Msg[400];
+	va_list ap;
+	
+	va_start(ap, Message);
+	vsprintf(Msg, Message, ap);
+	va_end(ap);
+
+	OutputDebugString(Msg);
+/*#else
 	OutputDebugString(Message);
+#endif*/
+	OutputDebugString("\n");
 }
 
 /*
@@ -233,7 +246,19 @@ void __cdecl DisplayCriticalMessage(char *Message, ...)
  */
 void __cdecl DisplayError(char *Message, ...)
 {
+//#ifdef DEBUG
+	char	Msg[400];
+	va_list ap;
+	
+	va_start(ap, Message);
+	vsprintf(Msg, Message, ap);
+	va_end(ap);
+
+	OutputDebugString(Msg);
+/*#else
 	OutputDebugString(Message);
+#endif*/
+	OutputDebugString("\n");
 }
 
 /*
@@ -242,7 +267,20 @@ void __cdecl DisplayError(char *Message, ...)
  */
 BOOL __cdecl DisplayError_AskIfContinue(char *Message, ...)
 {
+//#ifdef DEBUG
+	char	Msg[400];
+	va_list ap;
+	
+	va_start(ap, Message);
+	vsprintf(Msg, Message, ap);
+	va_end(ap);
+
+	OutputDebugString(Msg);
+/*#else
 	OutputDebugString(Message);
+#endif*/
+	OutputDebugString("\n");
+
 	return TRUE;
 }
 
@@ -355,8 +393,8 @@ void LoadPlugins()
 {
 	SetDefaultOptions();
 
-	// Ez0n3 - use iAudioPlugin instead to determine if basic audio is used
-	if (g_iAudioPlugin == _AudioPluginLleRsp) //g_bUseLLERspPlugin 	//_AudioPluginBasic
+	// control RSP with multi plugin options
+	if (g_iRspPlugin > _RSPPluginNone && g_iRspPlugin < _RSPPluginMissing)
 	{
 		rsp_plugin_is_loaded = TRUE;
 		emuoptions.UsingRspPlugin = TRUE;

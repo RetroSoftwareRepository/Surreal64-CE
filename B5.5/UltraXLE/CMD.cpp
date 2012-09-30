@@ -10,6 +10,8 @@ static byte *snap;
 #define IFIS(x,str) if(!stricmp(x,str))
 #define IS(x,str) !stricmp(x,str)
 
+extern char g_szPathSaves[256];
+
 char *param(char **tp)
 {
     static char buf[256];
@@ -343,10 +345,19 @@ int command_main(char *p,char *tp)
         p=param_w_spaces(&tp);
         if(!p || *p<=32)
         {
-			remove("T:\\ultrabak.sav");
+			/*remove("T:\\ultrabak.sav");
 			rename("T:\\ultra.sav","T:\\ultrabak.sav");
 			remove("T:\\ultra.sav");
-			p="T:\\ultra.sav";
+			p="T:\\ultra.sav";*/
+			
+			char ultrasav[128];
+			char ultrasavbak[128];
+			sprintf(ultrasav, "%sultra.sav", g_szPathSaves);
+			sprintf(ultrasavbak, "%sultrabak.sav", g_szPathSaves);
+			remove(ultrasavbak);
+			rename(ultrasav,ultrasavbak);
+			remove(ultrasav);
+			p=ultrasav;
         }
         strcpy(buf,p); 
 		if(!strstr(p,".")) strcat(buf,".sav");
@@ -365,7 +376,12 @@ int command_main(char *p,char *tp)
     {
         char buf[64];
         p=param_w_spaces(&tp);
-		if(!p || *p<=32) p="T:\\ultra.sav";
+		if(!p || *p<=32) {
+			//p="T:\\ultra.sav";
+			char ultrasav[128];
+			sprintf(ultrasav, "%sultra.sav", g_szPathSaves);
+			p=ultrasav;
+		}
         strcpy(buf,p); if(!strstr(p,".")) strcat(buf,".sav");
         p=buf;
         loadstate(p);

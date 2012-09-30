@@ -193,7 +193,6 @@ protected:
 	D3DFORMAT			m_desktopFormat;
 
 public:
-
 	LPDIRECT3DSURFACE8	pBackBufferSave;
 };
 

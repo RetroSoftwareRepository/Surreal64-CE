@@ -221,17 +221,20 @@ void ReInitVirtualDynaMemory(boolean charge)
 	if (!charge) {
 		if(dyna_RecompCode != NULL){
 			fp=fopen("Z:\\codetemp.dat","wb");
-			fwrite(dyna_RecompCode,g_dwRecompCodeSize ,sizeof(char),fp);
+			//fp=fopen("T:\\Data\\codetemp.dat","wb");
+			fwrite(dyna_RecompCode,g_dwRecompCodeSize ,sizeof(uint8),fp);
 			VirtualFree(dyna_RecompCode, g_dwRecompCodeSize, MEM_DECOMMIT);
 		    fclose(fp);}
 	}
 	else {
 		fp=fopen("Z:\\codetemp.dat","rb");
+		//fp=fopen("T:\\Data\\codetemp.dat","rb");
 		VirtualFree(dyna_RecompCode, g_dwRecompCodeSize, MEM_DECOMMIT);
 		(double *) dyna_RecompCode = (double *) VirtualAlloc(dyna_RecompCode, g_dwRecompCodeSize, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
-        fread(dyna_RecompCode,sizeof(char),g_dwRecompCodeSize,fp);
+        fread(dyna_RecompCode,sizeof(uint8),g_dwRecompCodeSize,fp);
 		fclose(fp);
 		DeleteFile("Z:\\codetemp.dat");
+		//DeleteFile("T:\\Data\\codetemp.dat");
 	}
 }
 

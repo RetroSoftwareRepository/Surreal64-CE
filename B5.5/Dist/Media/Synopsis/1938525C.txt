@@ -1,0 +1,23 @@
+Ms. Pac-Man Maze Madness
+Platform: Nintendo 64
+Media: Cartridge
+Genre: Maze
+Release Year: 2000
+Developer: Mass Media Inc.
+Publisher: Namco
+Players: Single-player, multiplayer
+_________________________
+
+Plot
+
+Professor Pac learns that the witch, Mesmerelda, has seized control of the Enchanted Castle using black magic and from there is planning on stealing all four Gems of Virtue (Generosity; Truth; Wisdom; Courage) to control the "four wonders" (areas of Pac-Land). He creates a device called a Pactrometer which allows Ms. Pac-Man to go to these areas to recover the gems before Mesmerelda can get them first.
+
+Multiplayer
+
+The multiplayer mode is somewhat similar in format to Bomberman and allows up to 4 people to play simultaneously (although just one player can verse three computer-controlled characters).
+
+There are three different multiplayer modes:
+
+Dot Mania: Pac-Dots randomly spurt out of fountains and form lines around the paths on the maze. The first to eat 80 dots wins. If you are hit by a ghost you lose 10 of your held pac-dots and are returned to your starting corner.
+Ghost Tag: All players play as ghosts. A Ms. Pac-Man icon will appear that allows you to turn into Ms. Pac-Man when you get it. Once you are Ms. Pac-Man eat Pac-Dots as fast as you can avoiding the other three ghosts. If you get touched by one of the three ghosts you are returned to your starting corner (though without losing any Pac-Dots) and the player who touched you becomes Ms. Pac-Man. As the ghost again go touch Ms. Pac-Man to change back. First to hold 50 Pac-Dots wins.
+Da Bomb: A randomly-chosen player will hold the bomb, which counts-down from 30 seconds. Touch another player to give it to them. The person holding it when the timer expires dies and becomes a ghost, then being able to block the paths for other surviving players. The last one alive (as a Pac character, not as a ghost) wins.

@@ -19,6 +19,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "stdafx.h"
 #include "_BldNum.h"
 
+#ifdef _XBOX
+BOOL g_bTempMessage = FALSE;
+DWORD g_dwTempMessageStart = 0;
+char g_szTempMessage[100];
+#endif
+
 PluginStatus status;
 char generalText[256];
 
@@ -55,7 +61,7 @@ bool frameWriteByCPURectFlag[20][20];
 std::vector<uint32> frameWriteRecord;
 
 #ifdef _XBOX
-XFONT *g_defaultTrueTypeFont = NULL;
+//XFONT *g_defaultTrueTypeFont = NULL;
 extern bool g_bUseSetTextureMem;
 extern DWORD g_maxTextureMemUsage;
 #endif
@@ -92,7 +98,8 @@ BOOL APIENTRY DllMain(HINSTANCE hinstDLL,  // DLL module handle
 void GetPluginDir( char * Directory ) 
 {
 #ifdef _XBOX
-	strcpy(Directory,"D:\\");
+	//strcpy(Directory,"D:\\");
+	strcpy(Directory,"T:\\");
 #else
 	char path_buffer[_MAX_PATH], drive[_MAX_DRIVE] ,dir[_MAX_DIR];
 	char fname[_MAX_FNAME],ext[_MAX_EXT];
@@ -859,6 +866,22 @@ void __cdecl MsgInfo (char * Message, ...)
 
 	sprintf(generalText, "%s %s",project_name, FILE_VERSION);
 	MessageBox(NULL,Msg,generalText,MB_OK|MB_ICONINFORMATION);
+#else
+
+	OutputDebugString("Rice MSG: ");
+//#ifdef DEBUG
+	char Msg[400];
+	
+	va_list ap;
+	va_start( ap, Message );
+	vsprintf( Msg, Message, ap );
+	va_end( ap );
+	
+	OutputDebugString(Msg);
+/*#else
+	OutputDebugString(Message);
+#endif*/
+	OutputDebugString("\n");
 #endif
 }
 
@@ -877,6 +900,22 @@ void __cdecl ErrorMsg (char * Message, ...)
 		SetWindowText(g_GraphicsInfo.hStatusBar,Msg);
 	else
 		MessageBox(NULL,Msg,generalText,MB_OK|MB_ICONERROR);
+#else
+
+	OutputDebugString("Rice ERR: ");
+//#ifdef DEBUG
+	char Msg[400];
+	
+	va_list ap;
+	va_start( ap, Message );
+	vsprintf( Msg, Message, ap );
+	va_end( ap );
+	
+	OutputDebugString(Msg);
+/*#else
+	OutputDebugString(Message);
+#endif*/
+	OutputDebugString("\n");
 #endif
 }
 
@@ -1080,18 +1119,18 @@ void _VIDEO_DisplayTemporaryMessage(const char *Message)
 #ifdef _XBOX
 void _VIDEO_SetMaxTextureMem(DWORD mem)
 {
-	if (mem == 0)
+	if (mem == 0) // auto mem
 	{
 		g_bUseSetTextureMem = false;
 	}
-	else
+	else // set mem
 	{
 		g_bUseSetTextureMem = true;
 		g_maxTextureMemUsage = mem * 1024 * 1024;
 	}
 }
 
-void _VIDEO_DisplayTemporaryMessage2(const char *Message, ...)
+/*void _VIDEO_DisplayTemporaryMessage2(const char *Message, ...)
 {
 	g_bTempMessage = TRUE;
 	//strncpy(g_szTempMessage, Message, 99);
@@ -1106,11 +1145,11 @@ void _VIDEO_DisplayTemporaryMessage2(const char *Message, ...)
 	va_end( ap );
 	
 	strncpy(g_szTempMessage, Msg, 99);
-}
+}*/
 
 //void XBOX_Debugger_Log(const char *Message, ...)
 //{
-//	FILE *fp = fopen("D:\\ricelog.log","wt");
+//	FILE *fp = fopen("T:\\Misc\\ricelog.log","wt");
 //	if( !fp )
 //	{
 //		g_bTempMessage = TRUE;
@@ -1156,7 +1195,8 @@ typedef struct
 	uint32	width;
 	uint32	height;
 } FrameBufferInfo;
-__declspec(dllexport) void CALL FBGetFrameBufferInfo(void *p)
+//__declspec(dllexport) void CALL FBGetFrameBufferInfo(void *p)
+FUNC_TYPE(void) NAME_DEFINE(FBGetFrameBufferInfo)(void *p)
 {
 	FrameBufferInfo * pinfo = (FrameBufferInfo *)p;
 	memset(pinfo,0,sizeof(FrameBufferInfo)*6);

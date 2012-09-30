@@ -14,10 +14,6 @@
 #include <stdio.h>
 #include <xtl.h>
 #include <math.h>			// For sqrt()
- 
-#include <d3dx8.h>
- 
-#include <vector>
 #include <iostream>
 
 #if _MSC_VER > 1200
@@ -121,16 +117,6 @@ extern unsigned char *g_pRDRAMu8;
 
 extern GFX_INFO g_GraphicsInfo;
 
-
-
-//extern BOOL g_bMenuWaiting;
-extern BOOL g_bTempMessage;
-extern DWORD g_dwTempMessageStart;
-extern char g_szTempMessage[100];
-//extern XFONT *g_defaultTrueTypeFont;
-
-void XboxCheckMenuAndDebugInfo();
-void XboxDrawTemporaryMessage();
 
 //#define ENABLE_PROFILER
 

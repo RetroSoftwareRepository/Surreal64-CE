@@ -96,7 +96,7 @@ public:
 	void DrawSimpleRect(LONG nX0, LONG nY0, LONG nX1, LONG nY1, DWORD dwColor, float depth, float rhw);
 	void DrawText(const char* str, RECT *rect);
 
-	void SetFogMinMax(float fMin, float fMax);
+	void SetFogMinMax(float fMin, float fMax, float fMul, float fOffset);
 	void SetFogEnable(BOOL bEnable);
 	void TurnFogOnOff(BOOL flag);
 	void SetFogColor(DWORD r, DWORD g, DWORD b, DWORD a);
@@ -263,8 +263,7 @@ protected:
 			m_dwrsZWriteEnable = dwrsZWriteEnable;
 			g_pD3DDev->SetRenderState( D3DRS_ZWRITEENABLE, dwrsZWriteEnable );	
 		}
-	}
-	
+	}	
 	inline void SetD3DRSSrcBlend(DWORD dwrsSrcBlend)
 	{
 		if (m_dwrsSrcBlend != dwrsSrcBlend)

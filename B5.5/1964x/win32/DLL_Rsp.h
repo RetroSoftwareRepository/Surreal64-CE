@@ -28,14 +28,15 @@ DWORD DoRspCycles( DWORD );
 void InitiateRSP_1_1( RSP_INFO Rsp_Info, DWORD * Cycles);
 
 //void CloseRSPPlugin (void);
-/*BOOL LoadRSPPlugin(char * libname);*/
+BOOL LoadRSPPlugin();
 void InitializeRSP (void);
 
 extern BOOL rsp_plugin_is_loaded;
 
 // Ez0n3 - use iAudioPlugin instead to determine if basic audio is used
-//extern BOOL	g_bUseLLERspPlugin;
-extern int g_iAudioPlugin;
+//extern BOOL	g_bUseLLERspPlugin; // reinstate lle rsp
+//extern int g_iAudioPlugin;
+extern BOOL g_bUseRspAudio;
+extern int g_iRspPlugin;
 
 #endif
-

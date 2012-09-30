@@ -2,7 +2,7 @@
 #include "stdsdk.h"
 
 void printtxt(char *txt)
-{
+{/*
     static FILE *logfile;
     char *p;
     static int printedstuff=0;
@@ -10,7 +10,7 @@ void printtxt(char *txt)
 
     if(init.showconsole)
     {
-		if(!logfile) logfile=fopen("T:\\ultra.log","wt");
+		if(!logfile) logfile=fopen("T:\\Misc\\ultra.log","wt");
         if(!txt)
         {
             if(flushcnt)
@@ -49,7 +49,7 @@ void printtxt(char *txt)
         fputs(p,logfile);
     }
 
-    outputhook(p,txt); // for new ui
+    outputhook(p,txt); // for new ui*/
 }
 
 void printMemStatus()
@@ -89,7 +89,7 @@ void print(char *txt,...) // generic
     va_start(argp,txt);
 
 	if(!logfile)
-		logfile = CreateFile("T:\\print.log", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+		logfile = CreateFile("T:\\Misc\\print.log", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 	
     //if(!logfile) logfile=fopen("print.log","wt");
     if(!txt)
@@ -177,7 +177,7 @@ void logx(char *txt,...) // [a]udio
 
     va_start(argp,txt);
 
-	if(!logfile) logfile=fopen("T:\\xx.log","wt");
+	if(!logfile) logfile=fopen("T:\\Misc\\xx.log","wt");
     if(!txt)
     {
         fflush(logfile);
@@ -270,17 +270,17 @@ void logi(char *txt,...)
 }*/
 
 void flushlog(void)
-{
+{/*
     loga(NULL);
     logd(NULL);
-    printtxt(NULL);
+    printtxt(NULL);*/
 }
 
 // errors/warnings
 
 void xception(char *txt,...)
 {
-    static char buf[256];
+    /*static char buf[256];
     va_list argp;
 
     st2.xception=1;
@@ -292,11 +292,11 @@ void xception(char *txt,...)
     {
         print(buf);
         cpu_break();
-    }
+    }*/
 }
 
 void error(char *txt,...)
-{
+{/*
     static char buf[256];
     va_list argp;
     va_start(argp,txt);
@@ -311,11 +311,18 @@ void error(char *txt,...)
     else
     {
         print(buf);
-    }
+    }*/
+	    static char buf[256];
+    va_list argp;
+    va_start(argp,txt);
+    sprintf(buf,YEL"error(%08X): ",st.pc);
+    vsprintf(buf+strlen(buf),txt,argp);
+    strcat(buf,"\n");
+	OutputDebugString(buf);
 }
 
 void warning(char *txt,...)
-{
+{/*
     static char buf[256];
     va_list argp;
     va_start(argp,txt);
@@ -330,6 +337,13 @@ void warning(char *txt,...)
     else
     {
         print(buf);
-    }
+    }*/
+    static char buf[256];
+    va_list argp;
+    va_start(argp,txt);
+    sprintf(buf,YEL"warning(%08X): ",st.pc);
+    vsprintf(buf+strlen(buf),txt,argp);
+    strcat(buf,"\n");
+	OutputDebugString(buf);
 }
 

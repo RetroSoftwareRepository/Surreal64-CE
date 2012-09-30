@@ -1,3 +1,6 @@
+
+// NOT USED!!!
+
 /*
  * 1964 Copyright (C) 1999-2002 Joel Middendorf, <schibo@emulation64.com> This
  * program is free software; you can redistribute it and/or modify it under the

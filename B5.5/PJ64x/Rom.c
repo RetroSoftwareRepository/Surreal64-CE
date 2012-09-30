@@ -37,10 +37,12 @@
 #include "Plugin.h"
 #include "IOSupport.h"
 
+#include "../Plugins.h"
+
 int InitalizeApplication ( HINSTANCE hInstance );
 //weinerschnitzel - determine memory size for rompaging method
-extern int RAM_IS_128;
-extern BOOL PhysRam128(); //May need this here for clean paging
+//extern int RAM_IS_128;
+//extern BOOL PhysRam128(); //May need this here for clean paging
 // Ez0n3 - reinstate max video mem until freakdave finishes this
 extern void _VIDEO_SetMaxTextureMem(DWORD mem);
 
@@ -673,10 +675,29 @@ void SetRomDirectory ( char * Directory, BOOL IgnoreDefaultDir ) {
 	 
 }
 
+//extern BOOL PathFileExists(const char *pszPath);
+BOOL PathFileExists(const char *pszPath)
+{   
+    return GetFileAttributes(pszPath) != INVALID_FILE_ATTRIBUTES;   
+}
 
 char * GetIniFileName(void) {
-	 
-	return "D:\\Project64.rdb";
+	//return "D:\\Project64.rdb";
+	
+	if(PathFileExists("T:\\Project64.rdb")) {
+		OutputDebugString("T:\\Project64.rdb Loading!\n");
+		return "T:\\Project64.rdb";
+	}
+	else {
+		OutputDebugString("T:\\Project64.rdb Failed to Load!\n");
+		
+		if(PathFileExists("D:\\Project64.rdb"))
+			OutputDebugString("D:\\Project64.rdb Loading!\n");
+		else
+			OutputDebugString("D:\\Project64.rdb Failed to Load!\n");
+			
+		return "D:\\Project64.rdb";
+	}
 }
 
 
@@ -757,52 +778,90 @@ extern int loaddwPJ64PagingMem();
 extern int loaddwPJ64DynaMem();
 
 // Ez0n3 - use iAudioPlugin instead to determine if basic audio is used
-//extern int loadbUseLLERSP();
+//extern int loadbUseLLERSP(); // not used anymore
+extern int loadbUseRspAudio(); // control a listing
+extern int loadiRspPlugin();
 extern int loadiAudioPlugin();
 
 // Ez0n3 - reinstate max video mem
 extern int loaddwMaxVideoMem();
 
+extern int loadiPagingMethod();
+extern int loadbAudioBoost();
+
+char g_szPathSaves[256] = "D:\\Saves\\";
+extern void GetPathSaves(char *pszPathSaves);
+
 
 char emuname[256];
+
 VOID __cdecl main()
 {
-
 	// mount the common drives
 	Mount("A:","cdrom0");
 	Mount("E:","Harddisk0\\Partition1");
-	Mount("Z:","Harddisk0\\Partition2");
+	//Mount("C:","Harddisk0\\Partition2");
+	//Mount("X:","Harddisk0\\Partition3");
+	//Mount("Y:","Harddisk0\\Partition4");
+	//Mount("Z:","Harddisk0\\Partition5");
 	Mount("F:","Harddisk0\\Partition6");
 	Mount("G:","Harddisk0\\Partition7");
-
+	
+	// utility shoud be mounted automatically
+	if(XGetDiskSectorSize("Z:\\") == 0)
+		Mount("Z:","Harddisk0\\Partition5");
+	
+	// make sure there's a temp rom
+	if (PathFileExists("Z:\\TemporaryRom.dat")) {
+		OutputDebugString("Z:\\TemporaryRom.dat File Found!\n");
+		strcpy(g_temporaryRomPath, "Z:\\TemporaryRom.dat");
+	}
+	else {
+		OutputDebugString("Z:\\TemporaryRom.dat File Not Found!\n");
+		
+		// if debugging, a temp rom can be placed in T to skip the launcher
+		if (PathFileExists("T:\\Data\\TemporaryRom.dat")) {
+			OutputDebugString("T:\\Data\\TemporaryRom.dat File Found!\n");
+			strcpy(g_temporaryRomPath, "T:\\Data\\TemporaryRom.dat");
+		}
+		else {
+			OutputDebugString("T:\\Data\\TemporaryRom.dat File Not Found!\n");
+			Sleep(100);
+			XLaunchNewImage("D:\\default.xbe", NULL);
+		}
+	}
+	
 	loadinis();
 
 	//freakdave - check for 128mb
-	PhysRam128();
+	//PhysRam128();
 
-	if(RAM_IS_128 == 1){
-	Enable128MegCaching(); // weinerschnitzel - put this in 128mb mode
-	}
     sprintf(emuname,"Project64x");
+	
+	GetPathSaves(g_szPathSaves);
 
 	g_dwNormalCompileBufferSize = loaddwPJ64DynaMem() * 1024 * 1024;
 	
-	//weinerschnitzel enable in 64mb condition
-	if(RAM_IS_128 == 0){
-	// Ez0n3 - old method of rom paging - but still using 128MB var
-	//g_dwNumFrames = 64; //default 64 set in stubs.h and assigned below (bottom)
-	Enable128MegCaching();
-	g_frameTable = (Frame *)VirtualAlloc(NULL, g_dwNumFrames * sizeof(Frame *), MEM_COMMIT, PAGE_EXECUTE_READWRITE);
-	g_memory = (uint8 *)VirtualAlloc(NULL, RP_PAGE_SIZE_O * g_dwNumFrames, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+	
+	g_iPagingMethod = loadiPagingMethod();
+	if (g_iPagingMethod == _PagingXXX) {
+		g_dwPageSize = 0x40000;
 	}
+	else if (g_iPagingMethod == _PagingS10) {
+		g_dwPageSize = 0x10000;
+	}
+	Enable128MegCaching();
+
 	
-	// Ez0n3 - reinstate max video mem
-	//_VIDEO_SetMaxTextureMem(pLd->dwMaxVideoMem);
-	_VIDEO_SetMaxTextureMem(loaddwMaxVideoMem());	
+	// max texture mem, 0 = auto
+	_VIDEO_SetMaxTextureMem(loaddwMaxVideoMem());
 	
+	g_bAudioBoost = (loadbAudioBoost() == 1 ? TRUE : FALSE); // set before audio init
 	
 	// Ez0n3 - use iAudioPlugin instead to determine if basic audio is used
-	//g_bUseLLERspPlugin = loadbUseLLERSP();
+	//g_bUseLLERspPlugin = loadbUseLLERSP(); // not used anymore
+	g_bUseRspAudio = loadbUseRspAudio(); // control a listing
+	g_iRspPlugin = loadiRspPlugin();
 	g_iAudioPlugin = loadiAudioPlugin();
 
 	
@@ -811,7 +870,18 @@ VOID __cdecl main()
 //	strcpy(CurrentFileName, pLd->szFilename);
 
 	OpenChosenFile();
-
+	
+	{ // create the save directory if it doesn't exist
+		char szPathSaves[_MAX_PATH];
+		sprintf(szPathSaves, "%s%08x", g_szPathSaves, *(DWORD *)(tmpBuf + 0x10));
+		if (!PathFileExists(szPathSaves)) {
+			if (!CreateDirectory(szPathSaves, NULL)) {
+				OutputDebugString(szPathSaves);
+				OutputDebugStringA(" Could Not Be Created!\n");
+			}
+		}
+	}
+	
 	switch (CPU_Type) {
 	case CPU_Interpreter:  
 		StartInterpreterCPU();
@@ -922,14 +992,9 @@ void Enable128MegCaching( void )
   MEMORYSTATUS memStatus;
   GlobalMemoryStatus( &memStatus );
   if( memStatus.dwTotalPhys < (100 * 1024 * 1024) ) {
-	if(RAM_IS_128 == 1){
-  	g_dwNumFrames = (loaddwPJ64PagingMem() * 1024 * 1024) / RP_PAGE_SIZE_N;
-	}
-	//weinerschnitzel - Yeah I know it will only use the original method but we can use RAM_IS_128 for users to select paging method
-	if(RAM_IS_128 == 0){
-  	g_dwNumFrames = (loaddwPJ64PagingMem() * 1024 * 1024) / RP_PAGE_SIZE_O;
-	}
-	return;}
+  	g_dwNumFrames = ((loaddwPJ64PagingMem() * 1024 * 1024) / g_dwPageSize);
+	return;
+  }
 
     // Grab the existing default type
   READMSRREG( IA32_MTRR_DEF_TYPE, &regVal );
@@ -938,21 +1003,29 @@ void Enable128MegCaching( void )
   regVal.LowPart = (regVal.LowPart & ~0xFF) | 0x06;
   WRITEMSRREG( IA32_MTRR_DEF_TYPE, regVal );
 
-  fp = fopen("Z:\\TemporaryRom.dat","r");
+  fp = fopen(g_temporaryRomPath,"r");
+  //fp = fopen("T:\\Data\\TemporaryRom.dat","r");
   rewind(fp);
   fseek(fp, 0, SEEK_END);
   filesize = ftell(fp);
   fclose(fp);
-if(RAM_IS_128 == 1){ //new method for 128
-  g_dwNumFrames = (filesize) / RP_PAGE_SIZE_N;
-}
-if(RAM_IS_128 == 0){ //old method for 64
-  g_dwNumFrames = (filesize) / RP_PAGE_SIZE_O;
-}
+
+  g_dwNumFrames = (DWORD)((filesize) / g_dwPageSize);
 }
 
-void DisplayError (char * Message, ...) {
+void DisplayError (char * Message, ...)
+{
+//#ifdef DEBUG
+	char Msg[400];
+	va_list ap;
 
-	 OutputDebugString(Message);
-
+	va_start( ap, Message );
+	vsprintf( Msg, Message, ap );
+	va_end( ap );
+	
+	OutputDebugString(Msg);
+/*#else
+	OutputDebugString(Message);
+#endif*/
+	OutputDebugString("\n");
 }

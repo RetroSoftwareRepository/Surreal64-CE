@@ -1,0 +1,26 @@
+Castlevania - Legacy of Darkness
+Platform: Nintendo 64
+Media: Cartridge
+Genre: Action > Adventure > Platformer
+Release Year: 1999
+Developer: KCE Kobe
+Publisher: Konami
+Players: Single Player
+Alternate Title: CASTLEVANIA 2
+_________________________
+
+Plot
+
+Set in the year 1844, the game stars the man-beast Cornell in his quest to prevent his adoptive sister, Ada, from being used as a sacrifice to resurrect Dracula. The game opens as Cornell arrives at his village, which has been burned to the ground by Dracula's minions. He finds Ada's pendant in a doorway and follows her scent to Dracula's castle.
+
+During the course of the game, Cornell comes upon a grand estate owned by the Oldrey family: J.A. Oldrey, the master of the Villa, Mary, his wife, and Henry, their son. Gilles de Rais and Actrise have turned Oldrey Senior into a vampire. At Mary's request, Cornell guides Henry to safety. Later in life, Henry returns to Castlevania to save kidnapped children.
+
+Throughout the game, Cornell encounters his rival and fellow man-beast, Ortega. Ortega has allied himself with Dracula to finally beat Cornell in combat, turning into a chimera like creature. They eventually battle near the end of the game, just before Cornell defeats Dracula and saves his sister. He only accomplishes the latter by sacrificing his man-wolf powers. Unbeknownst to the hero, acquiring this power was the true aim of the dark forces, as it was the perfect sacrifice (not Ada, as Cornell had assumed) to resurrect Dracula at his full power.
+
+Development
+
+Legacy of Darkness was a continuation of Konami's first attempt (Castlevania, also published in 1999) to create a 3D Castlevania. It is officially referred to as a "Special Edition" of the original game[citation needed], and more fully realizes the game designers' vision. For example, Cornell was present in early development media and press information for Castlevania, but was ultimately removed before the game's release.
+
+Legacy's primary focus is on a new story (a prequel to Carrie and Reinhardt's adventures) in which Cornell explores new levels, as well as redesigned levels from Castlevania 64. Levels from Castlevania 64 that have not been drastically changed (such as the Villa) are often navigated in a new or novel manner and feature different puzzles. Carrie and Reinhardt's quests are a secondary focus (bonus features), that can only be unlocked after completing both Cornell and Henry's quests. Carrie and Reinhardt's quests lack voice acting, some cutscenes and the original level designs present in Castlevania 64, instead adopting the new designs (from Cornell and Henry's quests). Very minor details have been removed as well; a demonic sound effect used when Death summons giant barracuda through pentagram portals and animation of a female vampire boss in the Villa stage slowly backing away after receiving damage. Their quests also feature new bosses from Henry's quest, such as Medusa and the Queen of the Spider.
+
+In Legacy control of the game's characters, camera, and frame-rate were streamlined. The game also supports the Nintendo 64's Expansion Pak add-on, which allows for an option in which textures are displayed in a higher resolution. However, this mode is plagued by frame rate problems. Legacy of Darkness also features several minor additions, such as an alternate costume for Cornell and new alternate costumes for Carrie and Reinhardt (their original costumes from Castlevania 64).

@@ -1,0 +1,22 @@
+Namco Museum 64
+Platform: Nintendo 64
+Media: Cartridge
+Genre: Arcade
+Release Year: 1999
+Developer: Mass Media
+Publisher: Namco
+Players: Single-player
+_________________________
+
+Features
+
+The game is compiled of several classic arcade games released by Namco, including:
+
+Pac-Man
+Ms. Pac-Man
+Pole Position
+Galaga
+Galaxian
+Dig-Dug
+
+The game also features the ability to save high scores, with the use of a Nintendo 64 Controller Pak. The N64 Rumble pack can also be used in with this game.

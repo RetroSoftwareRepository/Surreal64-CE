@@ -29,6 +29,7 @@
 #include "wingui.h"
 #include "../emulator.h"
 
+
 void	InitAll1964Options(void);
 
 /*
@@ -48,7 +49,9 @@ void ReadConfiguration(void)
  */
 void InitAll1964Options(void)
 {
-	strcat(default_save_directory, "T:\\");
+	//strcat(default_save_directory, "T:\\");
+	strcpy(default_save_directory, g_szPathSaves);
+	
 	strcpy(user_set_save_directory, default_save_directory);
 	strcpy(state_save_directory, default_save_directory);
 	strcpy(directories.save_directory_to_use, default_save_directory);
@@ -77,8 +80,19 @@ void InitAll1964Options(void)
 	defaultoptions.Counter_Factor = COUTERFACTOR_2;
 	defaultoptions.Use_Register_Caching = USEREGC_YES;
 
+	// Default 480
 	guistatus.clientwidth = 640;
 	guistatus.clientheight = 480;
+
+	//Change window size for HD
+	/*if(XGetAVPack() == XC_AV_PACK_HDTV)
+	  {		
+		  if((XGetVideoFlags() & XC_VIDEO_FLAGS_HDTV_720p)){
+			guistatus.clientwidth = 1280;
+			guistatus.clientheight = 720;
+		  }
+	  }
+	  */
 	guistatus.window_position.top = 100;
 	guistatus.window_position.left = 100;
 	guistatus.WindowIsMaximized = FALSE;

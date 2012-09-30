@@ -69,6 +69,8 @@ CDaedalusRender::CDaedalusRender() :
 		g_textures[i].m_dwTileHeight = 64;
 		g_textures[i].m_fTexWidth = 64.0f;		// Value doesn't really matter, as tex not set
 		g_textures[i].m_fTexHeight = 64.0f;
+		
+		TileUFlags[i] = TileVFlags[i] = TEXTURE_UV_FLAG_CLAMP;
 	}
 
 
@@ -750,7 +752,18 @@ bool CDaedalusRender::TexRect(LONG nX0, LONG nY0, LONG nX1, LONG nY1, float fS0,
 
 
 	bool res;
-	if( fScaleS >= 1 && fScaleT >= 1)
+	if( TileUFlags[gRSP.curTile]==TEXTURE_UV_FLAG_CLAMP && TileVFlags[gRSP.curTile]==TEXTURE_UV_FLAG_CLAMP )
+	{
+		DaedalusTextureFilter dwFilter = m_dwMagFilter;
+		m_dwMagFilter = m_dwMinFilter = FILTER_LINEAR;
+		ApplyTextureFilter();
+		ApplyRDPScissor();
+		res = RenderTexRect();
+		ApplyScissorWithClipRatio();
+		m_dwMagFilter = m_dwMinFilter = dwFilter;
+		ApplyTextureFilter();
+	}
+	else if( fScaleS >= 1 && fScaleT >= 1)
 	{
 		DaedalusTextureFilter dwFilter = m_dwMagFilter;
 		m_dwMagFilter = m_dwMinFilter = FILTER_POINT;
@@ -1410,6 +1423,9 @@ void CDaedalusRender::SetTextureFilter(DWORD dwFilter)
 			break;
 		case FORCE_GAUSSIANCUBIC_FILTER:
 			m_dwMinFilter = m_dwMagFilter = FILTER_GAUSSIANCUBIC;
+			break;
+		default:
+			m_dwMinFilter = m_dwMagFilter = FILTER_ANISOTROPIC;
 			break;
 		}
 	//}

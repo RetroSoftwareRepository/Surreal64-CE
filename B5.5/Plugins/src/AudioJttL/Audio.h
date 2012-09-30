@@ -50,7 +50,7 @@ typedef struct
   output:   none
 *******************************************************************/ 
 
- void  _AUDIO_AiDacrateChanged (int  SystemType);
+ void  _AUDIO_JTTL_AiDacrateChanged (int  SystemType);
 /******************************************************************
   Function: _AUDIO_AiLenChanged
   Purpose:  This function is called to notify the dll that the
@@ -58,7 +58,7 @@ typedef struct
   input:    none
   output:   none
 *******************************************************************/ 
- void  _AUDIO_AiLenChanged (void);
+ void  _AUDIO_JTTL_AiLenChanged (void);
 /******************************************************************
   Function: _AUDIO_AiReadLength
   Purpose:  This function is called to allow the dll to return the
@@ -66,7 +66,7 @@ typedef struct
   input:    none
   output:   The amount of bytes still left to play.
 *******************************************************************/ 
- DWORD  _AUDIO_AiReadLength (void);
+ DWORD  _AUDIO_JTTL_AiReadLength (void);
 
 /******************************************************************
   Function: _AUDIO_AiUpdate
@@ -80,7 +80,7 @@ typedef struct
             till there is a messgae in the its message queue.
   output:   none
 *******************************************************************/ 
- void  _AUDIO_AiUpdate (BOOL Wait);
+ void  _AUDIO_JTTL_AiUpdate (BOOL Wait);
 
 /******************************************************************
   Function: _AUDIO_CloseDLL
@@ -89,7 +89,7 @@ typedef struct
   input:    none
   output:   none
 *******************************************************************/ 
- void  _AUDIO_CloseDLL (void);
+ void  _AUDIO_JTTL_CloseDLL (void);
 /******************************************************************
   Function: _AUDIO_DllAbout
   Purpose:  This function is optional function that is provided
@@ -97,7 +97,7 @@ typedef struct
   input:    a handle to the window that calls this function
   output:   none
 *******************************************************************/ 
- void  _AUDIO_DllAbout ( HWND hParent );
+ void  _AUDIO_JTTL_DllAbout ( HWND hParent );
 
 /******************************************************************
   Function: _AUDIO_DllConfig
@@ -106,7 +106,7 @@ typedef struct
   input:    a handle to the window that calls this function
   output:   none
 *******************************************************************/ 
- void  _AUDIO_DllConfig ( HWND hParent );
+ void  _AUDIO_JTTL_DllConfig ( HWND hParent );
 /******************************************************************
   Function: _AUDIO_DllTest
   Purpose:  This function is optional function that is provided
@@ -114,7 +114,7 @@ typedef struct
   input:    a handle to the window that calls this function
   output:   none
 *******************************************************************/ 
- void  _AUDIO_DllTest ( HWND hParent );
+ void  _AUDIO_JTTL_DllTest ( HWND hParent );
 
 /******************************************************************
   Function: _AUDIO_GetDllInfo
@@ -124,7 +124,7 @@ typedef struct
             filled by the function. (see def above)
   output:   none
 *******************************************************************/ 
- void  _AUDIO_GetDllInfo ( PLUGIN_INFO * PluginInfo );
+ void  _AUDIO_JTTL_GetDllInfo ( PLUGIN_INFO * PluginInfo );
 
 /******************************************************************
   Function: InitiateSound
@@ -141,7 +141,7 @@ typedef struct
   and then call the function CheckInterrupts to tell the emulator
   that there is a waiting interrupt.
 *******************************************************************/ 
- BOOL  _AUDIO_InitiateAudio (AUDIO_INFO Audio_Info);
+ BOOL  _AUDIO_JTTL_InitiateAudio (AUDIO_INFO Audio_Info);
 /******************************************************************
   Function: _AUDIO_ProcessAList
   Purpose:  This function is called when there is a Alist to be
@@ -150,7 +150,7 @@ typedef struct
   input:    none
   output:   none
 *******************************************************************/ 
- void  _AUDIO_ProcessAList(void);
+ void  _AUDIO_JTTL_ProcessAList(void);
 
 /******************************************************************
   Function: _AUDIO_RomClosed
@@ -158,7 +158,7 @@ typedef struct
   input:    none
   output:   none
 *******************************************************************/ 
- void  _AUDIO_RomClosed (void);
+ void  _AUDIO_JTTL_RomClosed (void); void _AUDIO_JTTL_AudioBoost (BOOL Boost);
 #if defined(__cplusplus)
 }
 #endif

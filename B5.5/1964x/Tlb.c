@@ -554,7 +554,7 @@ void __cdecl error(char *Message, ...)
 	vsprintf(Msg, Message, ap);
 	va_end(ap);
 
-	OutputDebugString(Msg);
+	DisplayError(Msg);
 }
 
 /*

@@ -36,7 +36,9 @@ bool g_bUseSetTextureMem = true;
 DWORD g_maxTextureMemUsage = (5*1024*1024);
 DWORD g_amountToFree = (512*1024);
 
-
+#ifndef OLDTXTCACHE
+static const DWORD MEM_KEEP_FREE = (2*1024*1024); // keep 2MB free
+#endif
 
 // Returns the first prime greater than or equal to nFirst
 inline LONG GetNextPrime(LONG nFirst)
@@ -95,7 +97,7 @@ CTextureManager::CTextureManager() :
 {
 	m_numOfCachedTxtrList = GetNextPrime(800);
 
-	m_currentTextureMemUsage	= 0; // Ez0n3 - already old way
+	m_currentTextureMemUsage	= 0;
 	m_pYoungestTexture			= NULL;
 	m_pOldestTexture			= NULL;
 
@@ -129,16 +131,18 @@ bool CTextureManager::CleanUp()
 {
 	RecycleAllTextures();
 
+#ifndef OLDTXTCACHE
 	if (!g_bUseSetTextureMem)
 	{
-	while (m_pHead)
-	{
-		TxtrCacheEntry * pVictim = m_pHead;
-		m_pHead = pVictim->pNext;
+		while (m_pHead)
+		{
+			TxtrCacheEntry * pVictim = m_pHead;
+			m_pHead = pVictim->pNext;
 
-		delete pVictim;
+			delete pVictim;
+		}
 	}
-	}
+#endif
 
 	if( m_blackTextureEntry.pTexture )		delete m_blackTextureEntry.pTexture;	
 	if( m_PrimColorTextureEntry.pTexture )	delete m_PrimColorTextureEntry.pTexture;
@@ -157,6 +161,7 @@ bool CTextureManager::CleanUp()
 // Purge any textures whos last usage was over 5 seconds ago
 void CTextureManager::PurgeOldTextures()
 {
+#ifdef OLDTXTCACHE
 	if (m_pCacheTxtrList == NULL)
 		return;
 	
@@ -213,6 +218,9 @@ void CTextureManager::PurgeOldTextures()
 			pCurr = pNext;
 		}
 	}
+#else
+	return;
+#endif
 }
 
 void CTextureManager::RecycleAllTextures()
@@ -235,10 +243,15 @@ void CTextureManager::RecycleAllTextures()
 			
 			dwTotalUses += pTVictim->dwUses;
 			dwCount++;
+
+#ifdef OLDTXTCACHE
 			if (g_bUseSetTextureMem)
 				delete pTVictim;
 			else
-			RecycleTexture(pTVictim);
+				RecycleTexture(pTVictim);
+#else
+				delete pTVictim;
+#endif
 		}
 	}
 }
@@ -264,6 +277,7 @@ void CTextureManager::RecheckHiresForAllTextures()
 // Add to the recycle list
 void CTextureManager::RecycleTexture(TxtrCacheEntry *pEntry)
 {
+#ifdef OLDTXTCACHE
 	if (g_bUseSetTextureMem)
 		return;
 
@@ -287,11 +301,15 @@ void CTextureManager::RecycleTexture(TxtrCacheEntry *pEntry)
 		SAFE_DELETE(pEntry->pEnhancedTexture);
 		m_pHead = pEntry;
 	}
+#else
+	return;
+#endif
 }
 
 // Search for a texture of the specified dimensions to recycle
 TxtrCacheEntry * CTextureManager::ReviveTexture( uint32 width, uint32 height )
 {
+#ifdef OLDTXTCACHE
 	if (g_bUseSetTextureMem)
 		return NULL;
 
@@ -316,7 +334,8 @@ TxtrCacheEntry * CTextureManager::ReviveTexture( uint32 width, uint32 height )
 		pPrev = pCurr;
 		pCurr = pCurr->pNext;
 	}
-	
+#endif
+
 	return NULL;
 }
 
@@ -330,8 +349,10 @@ uint32 CTextureManager::Hash(uint32 dwValue)
 
 void CTextureManager::MakeTextureYoungest(TxtrCacheEntry *pEntry)
 {
+#ifdef OLDTXTCACHE
 	if (!g_bUseSetTextureMem)
 		return;
+#endif
 
 	if (pEntry == m_pYoungestTexture)
 		return;
@@ -441,8 +462,10 @@ void CTextureManager::RemoveTexture(TxtrCacheEntry * pEntry)
 			   m_pCacheTxtrList[dwKey] = pCurr->pNext;
 
 			// Ez0n3 - already old way
+#ifdef OLDTXTCACHE
 			if (g_bUseSetTextureMem)
 			{
+#endif
 				// remove the texture from the age list
 				if (pEntry->pNextYoungest != NULL)
 				{
@@ -457,11 +480,13 @@ void CTextureManager::RemoveTexture(TxtrCacheEntry * pEntry)
 				m_currentTextureMemUsage -= (pEntry->pTexture->m_dwWidth * pEntry->pTexture->m_dwHeight * 4);
 			
 				delete pEntry;
+#ifdef OLDTXTCACHE
 			}
 			else
 			{
 				RecycleTexture(pEntry);
 			}
+#endif
 
 			break;
 		}
@@ -471,7 +496,37 @@ void CTextureManager::RemoveTexture(TxtrCacheEntry * pEntry)
 	}
 	
 }
+
+#ifndef OLDTXTCACHE
+bool bFreeingTextures = false;
+void CTextureManager::FreeTextures()
+{
+	if(bFreeingTextures)
+		return;
+		
+	MEMORYSTATUS ms;
+	GlobalMemoryStatus(&ms);
+
+	// keep freeing textures till enough memory is free
+	while (ms.dwAvailPhys < MEM_KEEP_FREE && m_pOldestTexture != NULL)
+	{
+		if (!bFreeingTextures) bFreeingTextures = true;
 	
+		TxtrCacheEntry *nextYoungest = m_pOldestTexture->pNextYoungest;
+
+		RemoveTexture(m_pOldestTexture);
+
+		m_pOldestTexture = nextYoungest;
+		
+		//OutputDebugString("Freeing Texture\n");
+
+		GlobalMemoryStatus(&ms);
+	}
+	
+	bFreeingTextures = false;
+}
+#endif
+
 TxtrCacheEntry * CTextureManager::CreateNewCacheEntry(uint32 dwAddr, uint32 dwWidth, uint32 dwHeight)
 {
 	TxtrCacheEntry * pEntry = NULL;
@@ -497,32 +552,39 @@ TxtrCacheEntry * CTextureManager::CreateNewCacheEntry(uint32 dwAddr, uint32 dwWi
 
 			m_pOldestTexture = nextYoungest;
 
-			OutputDebugString("Freeing Texture\n");
+			//OutputDebugString("Freeing Texture\n");
 		}
 
-		m_currentTextureMemUsage += widthToCreate * heightToCreate * 4;
+		//m_currentTextureMemUsage += widthToCreate * heightToCreate * 4;
 	}
 	else
 	{
+#ifdef OLDTXTCACHE
 		// Find a used texture
 		pEntry = ReviveTexture(dwWidth, dwHeight);
+#else
+		FreeTextures();
+#endif
     }
+	m_currentTextureMemUsage += (dwWidth * dwHeight * 4);
 	
 
+#ifdef OLDTXTCACHE
 	if (pEntry == NULL || g_bUseSetTextureMem)
 	{
+#endif
 		// Couldn't find on - recreate!
 		pEntry = new TxtrCacheEntry;
 		if (pEntry == NULL)
 		{
-			_VIDEO_DisplayTemporaryMessage("Error to create an texture entry");
+			//_VIDEO_DisplayTemporaryMessage("Error to create an texture entry");
 			return NULL;
 		}
 
 		pEntry->pTexture = CDeviceBuilder::GetBuilder()->CreateTexture(dwWidth, dwHeight);
 		if (pEntry->pTexture == NULL || pEntry->pTexture->GetTexture() == NULL)
 		{
-			_VIDEO_DisplayTemporaryMessage("Error to create an texture");
+			//_VIDEO_DisplayTemporaryMessage("Error to create an texture");
 			TRACE2("Warning, unable to create %d x %d texture!", dwWidth, dwHeight);
 		}
 		else
@@ -530,7 +592,9 @@ TxtrCacheEntry * CTextureManager::CreateNewCacheEntry(uint32 dwAddr, uint32 dwWi
 			pEntry->pTexture->m_bScaledS = false;
 			pEntry->pTexture->m_bScaledT = false;
 		}
+#ifdef OLDTXTCACHE
 	}
+#endif
 	
 	// Initialize
 	pEntry->ti.Address = dwAddr;
@@ -716,7 +780,7 @@ TxtrCacheEntry * CTextureManager::GetTexture(TxtrInfo * pgti, bool fromTMEM, boo
 		if (pEntry == NULL)
 		{
 			g_lastTextureEntry = pEntry;
-			_VIDEO_DisplayTemporaryMessage("Fail to create new texture entry");
+			//_VIDEO_DisplayTemporaryMessage("Fail to create new texture entry");
 			return NULL;
 		}
 	}

@@ -18,11 +18,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "stdafx.h"
 #include "../../../config.h"
+//#include "../../../ingamemenu/panel.h"
 
 #include <xbapp.h>
 #include <xbresource.h>
-#include <xbfont.h>
-#include "../../../ingamemenu/panel.h"
+
+extern void XboxDrawOSD();
+extern int AntiAliasMode;
+char emuvidname[128];
 
 MYLPDIRECT3DDEVICE g_pD3DDev = NULL;
 CD3DDevWrapper    gD3DDevWrapper;
@@ -35,25 +38,12 @@ LPDIRECT3DVERTEXSHADER9 gVertexShader = NULL;
 
 
 #ifdef _XBOX
-/*extern int flickerlevel;
-extern float XBINPUT_DEADZONE;
-extern float XBINPUT_SUMMAND;
-extern bool softlevel;
-extern int vertex;
-extern int texfilter;*/
 extern "C" void _INPUT_LoadButtonMap(int *cfgData); 
-extern int ControllerConfig[72];
-extern bool showdebug;
-extern bool onhd;
-extern DWORD dwTitleColor;
-CXBFont		m_Font;					// Font	for	text display
-CXBFont		m_MSFont;					// Font	for	buttons
-extern "C" char emuname[256];
+extern int ControllerConfig[76];
 
 //LPDIRECT3DDEVICE8 g_pD3DDev = NULL;
 //D3DCAPS8 g_D3DDeviceCaps;
-D3DPRESENT_PARAMETERS d3dpp;
-extern char skinname[32];
+//D3DPRESENT_PARAMETERS d3dpp;
 extern void 	CreateRenderTarget();
 extern void     SetAsRenderTarget();
 extern void     RestoreRenderTarget();
@@ -62,8 +52,8 @@ extern void     RestoreRenderTarget();
 int FormatToSize(D3DFORMAT fmt)
 {
 	switch(fmt)
-	{
-		/*
+	{/*
+	default: // default to 32 always?
 #ifdef _XBOX
 	case D3DFMT_A8R8G8B8:
 	case D3DFMT_X8R8G8B8:
@@ -82,11 +72,11 @@ int FormatToSize(D3DFORMAT fmt)
 	case D3DFMT_D24X4S4:
 	case TEXTURE_FMT_A8R8G8B8:
 #endif
-		return 32;
-	default:*/
-		/*
+		return 32;*/
+	default:
+		
 		case D3DFMT_R5G6B5:
-		case D3DFMT_X1R5G5B5:
+		/*case D3DFMT_X1R5G5B5:
 		case D3DFMT_A1R5G5B5:
 		case D3DFMT_A4R4G4B4:
 		case D3DFMT_A8:
@@ -100,13 +90,10 @@ int FormatToSize(D3DFORMAT fmt)
 		case D3DFMT_A4L4:
 		case D3DFMT_INDEX16:
 		case D3DFMT_D16_LOCKABLE:
-		case D3DFMT_D15S1:
+		case D3DFMT_D15S1:*/
 		case D3DFMT_D16:
-		*/
-	default:
-	case D3DFMT_LIN_R5G6B5:
-	case D3DFMT_D16:
-		return 16;
+		
+		return 16; // don't default to 16?
 	}
 }
 
@@ -138,8 +125,7 @@ CDXGraphicsContext::CDXGraphicsContext() :
 	m_dwCreateFlags(0),
 	m_dwMinDepthBits(16),
 	m_dwMinStencilBits(0),
-	//m_desktopFormat(D3DFMT_A8R8G8B8),
-	m_desktopFormat(D3DFMT_LIN_R5G6B5),
+	m_desktopFormat(D3DFMT_A8R8G8B8),
 	m_FSAAIsEnabled(false)
 {
 	m_strDeviceStats[0] = '\0';
@@ -174,10 +160,32 @@ void CDXGraphicsContext::Clear(ClearFlag dwFlags, uint32 color, float depth)
 //
 //*****************************************************************************
 extern RECT frameWriteByCPURect;
+extern bool bloadstate[MAX_SAVE_STATES];
+extern bool bsavestate[MAX_SAVE_STATES];
+extern "C" void __EMU_SaveState(int index);
+extern "C" void __EMU_LoadState(int index);
+extern bool bSatesUpdated;
 
-void CDXGraphicsContext::UpdateFrame(bool swaponly)
+__forceinline void CDXGraphicsContext::UpdateFrame(bool swaponly)
 {
-	HRESULT hr;
+	//HRESULT hr; //unreferenced
+
+	if (bSatesUpdated) {
+		bSatesUpdated = false;
+		
+		for (int i=0; i<MAX_SAVE_STATES; i++) {
+			if (bloadstate[i]) {
+				__EMU_LoadState(i+1);
+				bloadstate[i]=false;
+				break;
+			}
+			else if (bsavestate[i]) {
+				__EMU_SaveState(i+1);
+				bsavestate[i]=false;
+				break;
+			}
+		}
+	}
 
 	status.gFrameCount++;
 
@@ -217,44 +225,13 @@ void CDXGraphicsContext::UpdateFrame(bool swaponly)
 		CRender::g_pRender->EndRendering();
 	}
 	
-		
-		static DWORD lastTick = GetTickCount() / 1000;
-		static int lastTickFPS = 0;
-		static int frameCount = 0;
+#ifndef OLDTXTCACHE
+	if (!g_bUseSetTextureMem)
+		gTextureManager.FreeTextures();
+#endif
 
-		if (lastTick != GetTickCount() / 1000)
-		{
-			lastTickFPS = frameCount;
-			frameCount = 0;
-			lastTick = GetTickCount() / 1000;
-		}
-frameCount++;
-WCHAR str[10];
-swprintf(str,L"%i fps", lastTickFPS);
-MEMORYSTATUS memStat;
-WCHAR szMemStatus[128];
-
-GlobalMemoryStatus(&memStat);
-//Check Memory, Warn User, Return to Launcher
-if (memStat.dwAvailPhys / 1024 / 1024 < 1)
-	{
-		swprintf(szMemStatus,L"Out of Memory! Returning to Launcher...");
-		m_Font.Begin();
-		m_Font.DrawText(320, 240, dwTitleColor, szMemStatus, XBFONT_CENTER_X);
-		m_Font.End();
-		XLaunchNewImage("D:\\default.xbe", NULL);
-	}
-if (showdebug) {
-	swprintf(szMemStatus,L"%d Mb Free",(memStat.dwAvailPhys /1024 /1024));
-	WCHAR debugemu[256];
-	swprintf(debugemu,L"%S",emuname);
-
-	m_Font.Begin();
-	m_Font.DrawText(60, 35, dwTitleColor, szMemStatus, XBFONT_LEFT);
-	m_Font.DrawText(60, 50, dwTitleColor, str, XBFONT_LEFT);
-	m_Font.DrawText(60, 65, dwTitleColor, debugemu, XBFONT_LEFT);
-	m_Font.End();
-}
+	XboxDrawOSD();
+/*
 	Lock();
 	if (m_pd3dDevice == NULL)
 	{
@@ -262,7 +239,7 @@ if (showdebug) {
 	}
 	else
 	{
-/*#ifndef _XBOX
+#ifndef _XBOX
 		// Test the cooperative level to see if it's okay to render
 		if( FAILED( hr = m_pd3dDevice->TestCooperativeLevel() ) )
 		{
@@ -321,7 +298,7 @@ if (showdebug) {
 			hr = m_pd3dDevice->Present( &srcrect, &dstrect, NULL, NULL );
 		}
 		else
-#endif*/
+#endif
 		{
 			hr = m_pd3dDevice->Present( NULL, NULL, NULL, NULL );
 		}
@@ -333,15 +310,55 @@ if (showdebug) {
 		}
 #endif
 
-	}
+	}*/
 /*#ifndef _XBOX
 exit:
-#endif*/
+#endif
 	
-	Unlock();
-
+	Unlock();*/
+	m_pd3dDevice->Present( NULL, NULL, NULL, NULL );
 	status.bScreenIsDrawn = false;
 	if( g_curRomInfo.bForceScreenClear )	needCleanScene = true;
+}
+
+
+//-----------------------------------------------------------------------------
+// Name: SetAntiAliasMode()
+// Desc: Surreal64 function to set the antialiasing mode determined by the
+//       Launcher. Edge AntiAliasing may work better on the xbox compared to
+//	     the FSAA modes. 4x Gaussian is the reccomended then to 2x Quincunx if 
+//	     the framerate plunges. Linear modes are also available if those
+//	     methods are prefered.
+//-----------------------------------------------------------------------------
+DWORD SetAntiAliasMode(int AAMode){
+	DWORD useAAMode;
+	switch (AAMode)
+	{
+		case 0:
+			useAAMode = D3DMULTISAMPLE_NONE;
+		break;
+
+		case 1:
+			useAAMode = D3DMULTISAMPLE_NONE;
+		break;
+
+		case 2:
+			useAAMode = D3DMULTISAMPLE_2_SAMPLES_MULTISAMPLE_LINEAR;
+		break;
+
+		case 3:
+			useAAMode = D3DMULTISAMPLE_2_SAMPLES_MULTISAMPLE_QUINCUNX;
+		break;
+
+		case 4:
+			useAAMode = D3DMULTISAMPLE_4_SAMPLES_MULTISAMPLE_LINEAR;
+		break;
+
+		case 5:
+			useAAMode = D3DMULTISAMPLE_4_SAMPLES_MULTISAMPLE_GAUSSIAN;
+		break;
+	}
+	return useAAMode;
 }
 
 //-----------------------------------------------------------------------------
@@ -353,10 +370,10 @@ BOOL CDXGraphicsContext::FindDepthStencilFormat( UINT iAdapter, D3DDEVTYPE Devic
 											  D3DFORMAT TargetFormat,
 											  D3DFORMAT* pDepthStencilFormat )
 {
-#ifdef _XBOX
+//#ifdef _XBOX
 	*pDepthStencilFormat = D3DFMT_D16;
 	return TRUE;
-#else
+/*#else
 	if( m_dwMinDepthBits <= 16 && m_dwMinStencilBits == 0 )
 	{
 		if( SUCCEEDED( m_pD3D->CheckDeviceFormat( iAdapter, DeviceType,
@@ -446,7 +463,7 @@ BOOL CDXGraphicsContext::FindDepthStencilFormat( UINT iAdapter, D3DDEVTYPE Devic
 	}
 	
 	return FALSE;
-#endif
+#endif*/
 }
 
 //*****************************************************************************
@@ -511,16 +528,11 @@ bool CDXGraphicsContext::Initialize(HWND hWnd, HWND hWndStatus,
 	
 	// GogoAckman
 	g_pd3dDevice = g_pD3DDev;
-	char fontname[256];
-	sprintf(fontname,"D:\\Skins\\%s\\Font.xpr",skinname);
-	m_Font.Create(fontname);
-	sprintf(fontname,"D:\\Skins\\%s\\MsFont.xpr",skinname);
-	m_MSFont.Create(fontname); 
-    d3dpp = m_d3dpp;
+	sprintf(emuvidname,"Video 6.11");
+    //d3dpp = m_d3dpp;
 
 	//CreateRenderTarget();
 	_INPUT_LoadButtonMap(ControllerConfig);
-    strcat(emuname," Video 6.12");
 
 	return hr==S_OK;
 }
@@ -595,7 +607,7 @@ void CDXGraphicsContext::InitDeviceParameters()
 		pD3D->GetDeviceCaps( iAdapter, DeviceTypes[iDevice], &pDevice->d3dCaps );
 
 		pDevice->dwNumModes     = 0;
-		pDevice->MultiSampleType = D3DMULTISAMPLE_NONE;
+		pDevice->MultiSampleType = SetAntiAliasMode(AntiAliasMode);
 	}
 
 	// Check FSAA maximum
@@ -712,20 +724,41 @@ HRESULT CDXGraphicsContext::InitializeD3D()
     ZeroMemory( &m_d3dpp, sizeof(m_d3dpp) );
 
 #ifdef _XBOX
-	m_d3dpp.Windowed               = FALSE;
-	m_d3dpp.BackBufferCount        = 1;
-	//m_d3dpp.MultiSampleType        = D3DMULTISAMPLE_2_SAMPLES_MULTISAMPLE_QUINCUNX;
+	m_d3dpp.Windowed				= FALSE;
+	m_d3dpp.BackBufferCount			= 1;
+	m_d3dpp.MultiSampleType        = SetAntiAliasMode(AntiAliasMode);
 	//m_d3dpp.SwapEffect             = bufferSettings[curBufferSetting].swapEffect;
-	m_d3dpp.SwapEffect             =  D3DSWAPEFFECT_COPY;
-	m_d3dpp.EnableAutoDepthStencil = TRUE; /*m_bUseDepthBuffer;*/
+	m_d3dpp.SwapEffect				=  D3DSWAPEFFECT_COPY;
+	m_d3dpp.EnableAutoDepthStencil	= TRUE; /*m_bUseDepthBuffer;*/
 	//m_d3dpp.AutoDepthStencilFormat = pModeInfo->DepthStencilFormat;
-	m_d3dpp.AutoDepthStencilFormat = D3DFMT_D16;
-	m_d3dpp.hDeviceWindow          = m_hWnd;
-	m_d3dpp.FullScreen_PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
-	m_d3dpp.FullScreen_RefreshRateInHz = D3DPRESENT_RATE_DEFAULT;
-	m_d3dpp.BackBufferWidth = 640;
-	m_d3dpp.BackBufferHeight = 480;
-	m_d3dpp.BackBufferFormat = D3DFMT_LIN_R5G6B5; //D3DFMT_A8R8G8B8;
+	m_d3dpp.AutoDepthStencilFormat	= D3DFMT_D16;
+	m_d3dpp.hDeviceWindow			= m_hWnd;
+	m_d3dpp.BackBufferWidth			= 640;
+	m_d3dpp.BackBufferHeight		= 480;
+	m_d3dpp.BackBufferFormat		= D3DFMT_A8R8G8B8;
+
+	switch (VSync){
+		case 0 : 	m_d3dpp.FullScreen_PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
+			break;
+		case 1 : 	m_d3dpp.FullScreen_PresentationInterval = D3DPRESENT_INTERVAL_ONE;
+			break;
+		case 2 : 	m_d3dpp.FullScreen_PresentationInterval = D3DPRESENT_INTERVAL_ONE_OR_IMMEDIATE;
+			break;
+/*		case 2 : 	m_d3dpp.FullScreen_PresentationInterval = D3DPRESENT_INTERVAL_TWO;
+			break;
+		case 3 : 	m_d3dpp.FullScreen_PresentationInterval = D3DPRESENT_INTERVAL_THREE;
+			break;
+		case 4 : 	m_d3dpp.FullScreen_PresentationInterval = D3DPRESENT_INTERVAL_DEFAULT;
+			break;
+		case 5 : 	m_d3dpp.FullScreen_PresentationInterval = D3DPRESENT_INTERVAL_ONE_OR_IMMEDIATE;
+			break;
+		case 6 : 	m_d3dpp.FullScreen_PresentationInterval = D3DPRESENT_INTERVAL_TWO_OR_IMMEDIATE;
+			break;
+		case 7 : 	m_d3dpp.FullScreen_PresentationInterval = D3DPRESENT_INTERVAL_THREE_OR_IMMEDIATE;
+			break;*/
+	}
+	m_d3dpp.FullScreen_RefreshRateInHz = 60;
+	
 
 	DWORD videoFlags = XGetVideoFlags();
 	if(XGetVideoStandard() == XC_VIDEO_STANDARD_PAL_I)
@@ -736,25 +769,27 @@ HRESULT CDXGraphicsContext::InitializeD3D()
 			m_d3dpp.FullScreen_RefreshRateInHz = 50;
 	}
 
-	//Widescreen
-	if((videoFlags & XC_VIDEO_FLAGS_WIDESCREEN) !=0)
-	 {
-		m_d3dpp.Flags = D3DPRESENTFLAG_WIDESCREEN;
-	 }
-
+	
+	if(XGetAVPack() == XC_AV_PACK_HDTV){
+		//720p
+		if( videoFlags & XC_VIDEO_FLAGS_HDTV_720p && bEnableHDTV){
+			m_d3dpp.BackBufferWidth = 1280;
+			m_d3dpp.BackBufferHeight = 720;
+			m_d3dpp.Flags = D3DPRESENTFLAG_PROGRESSIVE | D3DPRESENTFLAG_WIDESCREEN;
+			m_d3dpp.BackBufferFormat = D3DFMT_A8R8G8B8;
+		}
 		//480p
-	 if(XGetAVPack() == XC_AV_PACK_HDTV){
-		if( videoFlags & XC_VIDEO_FLAGS_HDTV_480p){
+		else if( videoFlags & XC_VIDEO_FLAGS_HDTV_480p){
 			m_d3dpp.Flags = D3DPRESENTFLAG_PROGRESSIVE;
-			m_d3dpp.BackBufferFormat = D3DFMT_A8R8G8B8; 
+			m_d3dpp.BackBufferFormat = D3DFMT_A8R8G8B8;
 		}
 	 }
 
 	windowSetting.uDisplayWidth = m_d3dpp.BackBufferWidth;
 	windowSetting.uDisplayHeight = m_d3dpp.BackBufferHeight;
 
-	m_desktopFormat = D3DFMT_LIN_R5G6B5;
-	//m_desktopFormat = D3DFMT_A8R8G8B8;
+	//m_desktopFormat = D3DFMT_X1R5G5B5;
+	m_desktopFormat = D3DFMT_A8R8G8B8;
 
 	//freakdave
 	if(VertexMode == 0){
@@ -762,11 +797,9 @@ HRESULT CDXGraphicsContext::InitializeD3D()
 		hr = m_pD3D->CreateDevice( D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL,
 			NULL, D3DCREATE_PUREDEVICE, &m_d3dpp,
 			&m_pd3dDevice );
-
 	}
 
-
-	if(VertexMode == 1){
+	else if(VertexMode == 1){
 		// Create the device
 		hr = m_pD3D->CreateDevice( D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL,
 			NULL, D3DCREATE_SOFTWARE_VERTEXPROCESSING, &m_d3dpp,
@@ -774,7 +807,7 @@ HRESULT CDXGraphicsContext::InitializeD3D()
 
 	}
 
-	if(VertexMode == 2){
+	else if(VertexMode == 2){
 		// Create the device
 		hr = m_pD3D->CreateDevice( D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL,
 			NULL, D3DCREATE_HARDWARE_VERTEXPROCESSING, &m_d3dpp,
@@ -782,7 +815,7 @@ HRESULT CDXGraphicsContext::InitializeD3D()
 
 	}
 
-	if(VertexMode == 3){
+	else if(VertexMode == 3){
 		// Create the device
 		hr = m_pD3D->CreateDevice( D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL,
 			NULL, D3DCREATE_MIXED_VERTEXPROCESSING, &m_d3dpp,
@@ -907,15 +940,15 @@ HRESULT CDXGraphicsContext::InitializeD3D()
 			m_dwCreateFlags = D3DCREATE_PUREDEVICE;
 		}
 
-		if(VertexMode == 1){
+		else if(VertexMode == 1){
 			m_dwCreateFlags = D3DCREATE_SOFTWARE_VERTEXPROCESSING;
 		}
 
-		if(VertexMode == 2){
+		else if(VertexMode == 2){
 			m_dwCreateFlags = D3DCREATE_HARDWARE_VERTEXPROCESSING;
 		}
 
-		if(VertexMode == 3){
+		else if(VertexMode == 3){
 			m_dwCreateFlags = D3DCREATE_MIXED_VERTEXPROCESSING;
 		}
 #else
@@ -1391,10 +1424,15 @@ HRESULT CDXGraphicsContext::BuildDeviceList()
 			else if( options.DirectXAntiAliasingValue > 16 )
 				options.DirectXAntiAliasingValue = 16;
 
+//weinersch set AA mode here, DX8 and XBOX have different multisampling modes	
+#ifdef _XBOX
+			pDevice->MultiSampleType = SetAntiAliasMode(AntiAliasMode);
+#else
 			if( m_maxFSAA > 0 )
 				pDevice->MultiSampleType = (D3DMULTISAMPLE_TYPE)(D3DMULTISAMPLE_NONE+min(m_maxFSAA,(int)options.DirectXAntiAliasingValue));
 			else
 				pDevice->MultiSampleType = D3DMULTISAMPLE_NONE;
+#endif
 			
             // Examine each format supported by the adapter to see if it will
             // work with this device and meets the needs of the application.
@@ -1629,7 +1667,11 @@ int	CDXGraphicsContext::FindCurrentDisplayModeIndex()
 	TRACE0("Cannot find a matching mode");
 	for( m=0; m<device.dwNumModes; m++ )
 	{
-		if( device.modes[m].Width==640 && device.modes[m].Height==480 )
+		if( device.modes[m].Width==1280 && device.modes[m].Height==720 )
+		{
+			return m;
+		}
+		else if( device.modes[m].Width==640 && device.modes[m].Height==480 )
 		{
 			return m;
 		}

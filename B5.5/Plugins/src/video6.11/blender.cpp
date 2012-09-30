@@ -277,9 +277,9 @@ Possible Blending Factors:
 				uint32 dwM2B_2 = (gRDP.otherMode.blender   ) & 0x3;
 
 				TRACE0("Unknown Blender Mode: 2 cycle");
-				/*DebuggerAppendMsg( "\tblender:\t\t%04x - Cycle1:\t%s * %s + %s * %s\n\t\t%04x - Cycle2:\t%s * %s + %s * %s", blendmode_1,
+				DebuggerAppendMsg( "\tblender:\t\t%04x - Cycle1:\t%s * %s + %s * %s\n\t\t%04x - Cycle2:\t%s * %s + %s * %s", blendmode_1,
 					sc_szBlClr[dwM1A_1], sc_szBlA1[dwM1B_1], sc_szBlClr[dwM2A_1], sc_szBlA2[dwM2B_1], blendmode_2,
-					sc_szBlClr[dwM1A_2], sc_szBlA1[dwM1B_2], sc_szBlClr[dwM2A_2], sc_szBlA2[dwM2B_2]);*/
+					sc_szBlClr[dwM1A_2], sc_szBlA1[dwM1B_2], sc_szBlClr[dwM2A_2], sc_szBlA2[dwM2B_2]);
 
 			}
 #endif
@@ -376,7 +376,7 @@ Possible Blending Factors:
 			Enable();
 			break;
 		default:
-/*#ifdef _DEBUG
+#ifdef _DEBUG
 			if( pauseAtNext )
 			{
 				uint32 dwM1A_1 = (gRDP.otherMode.blender>>14) & 0x3;
@@ -394,7 +394,7 @@ Possible Blending Factors:
 					sc_szBlClr[dwM1A_1], sc_szBlA1[dwM1B_1], sc_szBlClr[dwM2A_1], sc_szBlA2[dwM2B_1],
 					sc_szBlClr[dwM1A_2], sc_szBlA1[dwM1B_2], sc_szBlClr[dwM2A_2], sc_szBlA2[dwM2B_2]);
 			}
-#endif*/
+#endif
 			BlendFunc(D3DBLEND_SRCALPHA, D3DBLEND_INVSRCALPHA);
 			Enable();
 			render->SetAlphaTestEnable(TRUE);

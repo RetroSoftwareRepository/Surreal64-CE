@@ -1205,7 +1205,7 @@ void saveaudiomem(void)
     if(!done)
     {
         FILE *f1;
-		f1=fopen("T:\\audiomem.dat","wb");
+		f1=fopen("T:\\Data\\audiomem.dat","wb");
         fwrite(sst.mem,1,4096+1024,f1);
         fclose(f1);
         done=1;

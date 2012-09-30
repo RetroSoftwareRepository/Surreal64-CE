@@ -134,7 +134,11 @@ void RunEmulator(uint32 core)
 		m_Font.DrawText(320, 240, dwTitleColor, szErrorMSG, XBFONT_CENTER_X);
 		m_Font.End();
 */
+#ifndef DEBUG
 		XLaunchNewImage("D:\\default.xbe", NULL);
+#else
+		TRACE0("Crash in RunEmulator");
+#endif
 	}
 #endif
 
@@ -260,7 +264,7 @@ void EmulatorSetCore(int core)
 		{
 			if(PauseEmulator())
 			{
-				TRACE2("Switch CPU Core to %s, PC=%08X", emulator_type_names[core], gHWS_pc);
+				//TRACE2("Switch CPU Core to %s, PC=%08X", emulator_type_names[core], gHWS_pc); //names missing
 				emustatus.cpucore = core;
 				ResumeEmulator(REFRESH_DYNA_AFTER_PAUSE);
 			}
@@ -313,7 +317,7 @@ void CloseEmulator(void)
     £
  =======================================================================================================================
  */
-void RefreshDynaDuringGamePlay(void)
+__forceinline void RefreshDynaDuringGamePlay(void)
 {
 	Init_Dynarec();
 	Set_Translate_PC();
@@ -1090,7 +1094,11 @@ Dyna_Check_Codes();
 		m_Font.DrawText(320, 240, dwTitleColor, szErrorMSG, XBFONT_CENTER_X);
 		m_Font.End();
 */
+#ifndef DEBUG
 		XLaunchNewImage("D:\\default.xbe", NULL);
+#else
+		TRACE0("Crash in RunDynaBlock");
+#endif
 	}
 #endif
 }

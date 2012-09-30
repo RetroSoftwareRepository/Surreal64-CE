@@ -69,6 +69,31 @@ word *StringToWChar(const string &str)
 	return retVal;
 }
 
+// right less than left
+bool StringRLTL(const string& szElem1, const string& szElem2)
+{
+	string szLeft = szElem1;
+	string szRight = szElem2;
+	transform(szLeft.begin(), szLeft.end(), szLeft.begin(), ::tolower);
+	transform(szRight.begin(), szRight.end(), szRight.begin(), ::tolower);
+	
+	return (szLeft < szRight);
+}
+
+string Truncate(const string &szString, int iLength, bool bEllipses)
+{
+	string szTruncated = szString;
+	if ((int)szTruncated.length() > iLength) {
+		string szTrunc (szTruncated, 0, (bEllipses ? (iLength-3) : iLength));
+		if (bEllipses) {
+			szTrunc = Trim(szTrunc);
+			szTrunc.append("...");
+		}
+		szTruncated = szTrunc;
+	}
+	return Trim(szTruncated);
+}
+
 byte GetByteSwapType(byte *header)
 {
 	if(header[0] == 0x80 && header[1] == 0x37)

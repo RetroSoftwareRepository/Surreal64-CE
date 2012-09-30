@@ -11,3 +11,4 @@ int  sound_add(short *data,int bytes);
 void sound_resync(int target);
 
 void sound_addwavfile(char *file,short *data,int cnt,int stereo);
+extern bool g_bAudioBoost;
