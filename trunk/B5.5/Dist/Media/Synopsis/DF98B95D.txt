@@ -1,0 +1,32 @@
+Bakuretsu Muteki Bangaioh
+Platform: Nintendo 64
+Region: Japan
+Genre: Shoot 'em Up
+Release Year: 1999
+Developer: Treasure
+Publisher: ESP
+Players: Single Player
+Alternate Title: Bangai-O
+_________________________
+
+Plot
+
+The game has a simple storyline (though slightly differing scripts among the Japanese, European, and North American releases) conveyed through intermission screens and dialogue interruptions, with character portraits and captions, triggered by approaching objects in normal play. Two young mecha pilots, Riki and his sister Mami share command of the powerful humanoid-shaped Bangai-O and battle villains from the "Cosmo Gang", guilty of fruit contraband, and lots of gun turrets, bombs and robots through 44 levels.
+
+Gameplay
+
+Bangai-O, the player's mecha, is maneuvered via eight-way directional controls and fires in eight directions, controlled by the controller's four face buttons. There is a life bar and the levels can be retried from the beginning after dying. As opposed to most shoot 'em up games in which players effortlessly shoot through waves of enemies, the player is overwhelmed with enemy firepower, requiring strategy to figure out the best course of action to clear the level without dying.
+
+Two firing modes are represented as switching between the two pilots (the current one is displayed at all times in a portrait): Riki fires red homing missiles and Mami fires blue lasers that bounce off walls.
+
+There is a special attack that consists of a 360 degree burst of the current shot type. The number of shots fired by the special attack, 40 to 400, depends on how many enemy bullets are on the screen and how close the player is to them while firing. The missile special attack splits between multiple targets; the laser special attack points towards a target after bouncing.
+
+At the beginning of a level two special shots are available; destroying enemies and scenery gives additional uses, up to five available shots, and this recharging effect is shown as a meter.
+
+The number of explosions taking place at any given time is shown at the top of the screen and determines how much the special attack meter recharges and what type of fruit is left behind by destroyed enemies. Higher numbers of explosions yield more special energy and more valuable types of fruit. Therefore, the tactic of inviting substantial enemy fire in order to counter with the special attack is key to success at the game.
+
+The original version of the game, released only in Japan and limited to 10,000 cartridges, has significant differences to the Dreamcast version.
+
+Utilizes a combo system instead of the explosion meter. After destroying at least 100 enemies in quick succession with a special attack or otherwise, the player gets a combo meter that tracks the number of enemies destroyed. When the combo stops, a portal opens that when touched opens a menu which allows the player to choose to upgrade their firepower, refill their life, take a large point bonus, or gain temporary invincibility. The level of the upgrades, life refill, and point bonus are determined by the size of the combo, invincibility is only given as an option from very large combos.
+The special attack is generally less effective. It must be charged (by holding down the button) in order to reach its full potential.
+Riki's shots do more damage than Mami's shots. Mami's shots are semi-homing in that they target enemies after bouncing off a wall.

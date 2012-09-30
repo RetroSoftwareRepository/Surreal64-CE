@@ -107,4 +107,11 @@ extern int					game_country_tvsystem;
 
 void LoadPlugins();
 
+extern void __EMU_GetStateFilename(int index, char *filename, int mode);
+
+#define INVALID_FILE_ATTRIBUTES ((DWORD)-1)
+extern BOOL PathFileExists(const char *pszPath);
+
+extern char g_szPathSaves[256];
+
 #endif

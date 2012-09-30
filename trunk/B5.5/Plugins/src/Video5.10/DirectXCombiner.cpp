@@ -146,14 +146,12 @@ CDirectXColorCombiner::CDirectXColorCombiner(CDaedalusRender *pRender)
 	m_bCapsTxtOpBlendFacAlpha = (g_D3DDeviceCaps.TextureOpCaps & D3DTEXOPCAPS_BLENDFACTORALPHA )!=0;
 	m_bCapsTxtOpBlendTxtAlpha = (g_D3DDeviceCaps.TextureOpCaps & D3DTEXOPCAPS_BLENDTEXTUREALPHA )!=0;
 	m_bCapsTxtOpBlendTxtAlphaPm = (g_D3DDeviceCaps.TextureOpCaps & D3DTEXOPCAPS_BLENDTEXTUREALPHAPM )!=0;
-	m_bCapsTxtOpLerp = (g_D3DDeviceCaps.TextureOpCaps & D3DTEXOPCAPS_LERP )!=0;
+	m_bCapsTxtOpLerp = true;//(g_D3DDeviceCaps.TextureOpCaps & D3DTEXOPCAPS_LERP )!=0;
 	m_bCapsTxtOpModAlphaAddColor = (g_D3DDeviceCaps.TextureOpCaps & D3DTEXOPCAPS_MODULATEALPHA_ADDCOLOR )!=0;
 	m_bCapsTxtOpModColorAddAlpha = (g_D3DDeviceCaps.TextureOpCaps & D3DTEXOPCAPS_MODULATECOLOR_ADDALPHA )!=0;
 	m_bCapsTxtOpModInvAlphaAddColor = (g_D3DDeviceCaps.TextureOpCaps & D3DTEXOPCAPS_MODULATEINVALPHA_ADDCOLOR )!=0;
 	m_bCapsTxtOpModInvColorAddAlpha = (g_D3DDeviceCaps.TextureOpCaps & D3DTEXOPCAPS_MODULATEINVCOLOR_ADDALPHA )!=0;
-	//m_bCapsTxtOpMulAdd = (g_D3DDeviceCaps.TextureOpCaps & D3DTEXOPCAPS_MULTIPLYADD )!=0;
-	m_bCapsTxtOpMulAdd = true;
-	m_bCapsTxtOpLerp = true;
+	m_bCapsTxtOpMulAdd = true;//(g_D3DDeviceCaps.TextureOpCaps & D3DTEXOPCAPS_MULTIPLYADD )!=0;
 	m_bCapsTxtOpPreMod = (g_D3DDeviceCaps.TextureOpCaps & D3DTEXOPCAPS_PREMODULATE )!=0;
 	m_bCapsTxtOpSub = (g_D3DDeviceCaps.TextureOpCaps & D3DTEXOPCAPS_SUBTRACT )!=0;
 	

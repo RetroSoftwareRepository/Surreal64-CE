@@ -183,9 +183,9 @@ extern unsigned char *g_pRDRAMu8;
 
 extern GFX_INFO g_GraphicsInfo;
 
-#ifdef _XBOX
+/*#ifdef _XBOX
 extern XFONT *g_defaultTrueTypeFont;
-#endif
+#endif*/
 
 
 extern char *project_name;

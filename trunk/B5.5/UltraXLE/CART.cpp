@@ -253,17 +253,19 @@ void cart_open(char *fname,int memmap)
 	cart.crc2 = *((dword *)(cart.data + 0x14));
 	cart.country = *((byte *)(cart.data + 0x3D));
 
+#ifdef DEFAULT_MAX
 	// reduce the codecache for zelda so that it fits in memory
-	if (cart.size > 29360128)
+	if (cart.size > 29360128) // 28MB
 	{
-		COMPILER_CODEMAX = 0x100000;
-		COMPILER_GROUPMAX  = 0x3333;
+		COMPILER_CODEMAX = 0x100000; // 1MB
+		COMPILER_GROUPMAX  = 0x3333; // 1/3MB?
 	}
 	else
 	{
-		COMPILER_CODEMAX = 0x500000;
-		COMPILER_GROUPMAX = 0x10000;
+		COMPILER_CODEMAX = 0x500000; // 5MB
+		COMPILER_GROUPMAX = 0x10000; // 1MB?
 	}
+#endif
 
 	Controller_Initialise();
 

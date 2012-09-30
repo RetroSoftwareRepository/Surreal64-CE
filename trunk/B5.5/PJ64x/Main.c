@@ -318,8 +318,10 @@ void __cdecl DisplayError (char * Message, ...) {
 	va_start( ap, Message );
 	vsprintf( Msg, Message, ap );
 	va_end( ap );
-	MessageBox(NULL,Msg,"Error",MB_OK|MB_ICONERROR|MB_SETFOREGROUND);
-	SetActiveWindow(hMainWindow);
+	//MessageBox(NULL,Msg,"Error",MB_OK|MB_ICONERROR|MB_SETFOREGROUND);
+	//SetActiveWindow(hMainWindow);
+	OutputDebugString(Msg);
+	OutputDebugString("\n");
 }
 
 void DisplayFPS (void) {

@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="7.10"
 	Name="zlibvc"
-	ProjectGUID="{07503C8D-9620-4346-8E8B-DBFB49FF8674}"
+	ProjectGUID="{D29A108F-AAFA-49bf-B804-51ED29A00334}"
 	SccProjectName=""
 	SccLocalPath="">
 	<Platforms>
@@ -308,7 +308,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				PreprocessorDefinitions="_DEBUG;_XBOX;BUILD_ZLIBDLL;ZLIB_DLL"
-				RuntimeLibrary="1"
+				RuntimeLibrary="0"
 				PrecompiledHeaderFile=".\Debug/zlibvc.pch"
 				AssemblerListingLocation=".\Debug/"
 				ObjectFile=".\Debug/"

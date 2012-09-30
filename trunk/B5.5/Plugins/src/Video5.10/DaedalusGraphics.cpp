@@ -19,7 +19,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "stdafx.h"
 #include "_BldNum.h"
 #include "TextureCache.h"
-#include "./Menu/MenuMain.h"
+//#include "./Menu/MenuMain.h"
+
+BOOL g_bTempMessage = FALSE;
+DWORD g_dwTempMessageStart = 0;
+char g_szTempMessage[100];
 
 PluginStatus status;
 
@@ -70,7 +74,11 @@ extern DWORD g_maxTextureMemUsage;
 
 void GetPluginDir( char * Directory ) 
 {
-	 
+#ifdef _XBOX
+	//strcpy(Directory,"D:\\");
+	strcpy(Directory,"T:\\");
+#else
+#endif
 }
 
 //-------------------------------------------------------------------------------------
@@ -125,12 +133,8 @@ void ChangeWindowStep2()
 
 void _VIDEO_ChangeWindow ()
 {
-#ifdef USING_THREAD
-	SetEvent( threadMsg[RSPMSG_CHANGEWINDOW] );
-	WaitForSingleObject( threadFinished, INFINITE );
-#else
 	ChangeWindowStep2();
-#endif
+
 }
 
 void ChangeWinSize( void ) 
@@ -321,7 +325,21 @@ void _VIDEO_RomClosed (void)
 
 void _VIDEO_RomOpen (void)
 {
-	InitGammaValues();
+	//InitGammaValues();
+
+__try{
+		uint32 dummy;
+		dummy = g_GraphicsInfo.RDRAM[0x400000];
+		dummy = g_GraphicsInfo.RDRAM[0x500000];
+		dummy = g_GraphicsInfo.RDRAM[0x600000];
+		dummy = g_GraphicsInfo.RDRAM[0x700000];
+		dummy = g_GraphicsInfo.RDRAM[0x7FFFFC];
+		g_dwRamSize = 0x800000;
+	}
+	__except(NULL, EXCEPTION_EXECUTE_HANDLER)
+	{
+		g_dwRamSize = 0x400000;
+	}
 
 #ifdef _DEBUG
 	if( debuggerPause )
@@ -484,7 +502,7 @@ void UpdateScreenStep2 (void)
 		// CPU frame buffer update
 		u32 width = *g_GraphicsInfo.VI_WIDTH_RG;
 		if( (*g_GraphicsInfo.VI_ORIGIN_RG & (g_dwRamSize-1) ) > width*2 &&
-			*g_GraphicsInfo.VI_H_START_RG != 0 )
+			*g_GraphicsInfo.VI_H_START_RG != 0 && width != 0 )
 		{
 			SetVIScales();
 			CDaedalusRender::GetRender()->DrawFrameBuffer(true);
@@ -611,12 +629,46 @@ BOOL _VIDEO_InitiateGFX(GFX_INFO Gfx_Info)
 
 void __cdecl MsgInfo (char * Message, ...)
 {
-	 
+#ifndef _XBOX
+#else
+
+	OutputDebugString("Rice MSG: ");
+//#ifdef DEBUG
+	char Msg[400];
+	
+	va_list ap;
+	va_start( ap, Message );
+	vsprintf( Msg, Message, ap );
+	va_end( ap );
+	
+	OutputDebugString(Msg);
+/*#else
+	OutputDebugString(Message);
+#endif*/
+	OutputDebugString("\n");
+#endif
 }
 
 void __cdecl ErrorMsg (char * Message, ...)
 {
-	 
+#ifndef _XBOX
+#else
+
+	OutputDebugString("Rice ERR: ");
+//#ifdef DEBUG
+	char Msg[400];
+	
+	va_list ap;
+	va_start( ap, Message );
+	vsprintf( Msg, Message, ap );
+	va_end( ap );
+	
+	OutputDebugString(Msg);
+/*#else
+	OutputDebugString(Message);
+#endif*/
+	OutputDebugString("\n");
+#endif
 }
 
 //---------------------------------------------------------------------------------------
@@ -743,7 +795,7 @@ void TriggerDPInterrupt(void)
 			size = size of the plist, max = 1024
   output:   none
 *******************************************************************/ 
- void _VIDEO_FBWList(FrameBufferModifyEntry *plist, DWORD size)
+void _VIDEO_FBWList(FrameBufferModifyEntry *plist, DWORD size)
 {
 }
 
@@ -789,28 +841,68 @@ void _VIDEO_FBWrite(DWORD addr, DWORD size)
 	FrameBufferWriteByCPU(addr, size);
 }
 
+// not in 510? code from 531
+/*typedef struct
+{
+	uint32	addr;
+	uint32	size;
+	uint32	width;
+	uint32	height;
+} FrameBufferInfo;
+extern SetImgInfo g_DI;
+extern RecentCIInfo g_RecentCIInfo[];
+void _VIDEO_FBGetFrameBufferInfo(void *p)
+{
+	FrameBufferInfo * pinfo = (FrameBufferInfo *)p;
+	if( g_DI.dwAddr == 0 )
+	{
+		memset(pinfo,0,sizeof(FrameBufferInfo)*6);
+	}
+	else
+	{
+		int idx=0;
+		for (int i=0; i<5; i++ )
+		{
+			if( status.gRDPFrame-g_RecentCIInfo[i].lastUsedFrame > 30 || g_RecentCIInfo[i].lastUsedFrame == 0 )
+			{
+				memset(&pinfo[i],0,sizeof(FrameBufferInfo));
+			}
+			else
+			{
+				pinfo[i].addr = g_RecentCIInfo[i].dwAddr;
+				pinfo[i].size = 2;
+				pinfo[i].width = g_RecentCIInfo[i].dwWidth;
+				pinfo[i].height = g_RecentCIInfo[i].dwHeight;
+				pinfo[5].width = g_RecentCIInfo[i].dwWidth;
+				pinfo[5].height = g_RecentCIInfo[i].dwHeight;
+			}
+		}
+
+		pinfo[5].addr = g_DI.dwAddr;
+		//pinfo->size = g_RecentCIInfo[5].dwSize;
+		pinfo[5].size = 2;
+	}
+}*/
+
 void _VIDEO_SetMaxTextureMem(DWORD mem)
 {
-	// Ez0n3 - reinstate max video mem until freakdave finishes this
-	if (mem == 0)
+	if (mem == 0) // auto mem
 	{
 		g_bUseSetTextureMem = false;
 	}
-	else
+	else // set mem
 	{
 		g_bUseSetTextureMem = true;
 		g_maxTextureMemUsage = mem * 1024 * 1024;
 	}
 }
 
-/*
 void _VIDEO_DisplayTemporaryMessage(const char *msg)
 {
 	g_bTempMessage = TRUE;
 	strncpy(g_szTempMessage, msg, 99);
 	g_dwTempMessageStart = GetTickCount();
 }
-*/
 
 void InitGammaValues()
 {

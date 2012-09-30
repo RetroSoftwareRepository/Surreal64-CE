@@ -222,7 +222,7 @@ void ENVMIXER3 () {
 void ENVMIXER3o () {
 	u8 flags = (u8)((k0 >> 16) & 0xff);
 	u32 addy = (t9 & 0xFFFFFF);// + SEGMENTS[(t9>>24)&0xf];
-	//static FILE *dfile = fopen ("d:\\envmix.txt", "wt");
+	//static FILE *dfile = fopen ("T:\\Misc\\envmix.txt", "wt");
 // ********* Make sure these conditions are met... ***********
 	if ((AudioInBuffer | AudioOutBuffer | AudioAuxA | AudioAuxC | AudioAuxE | AudioCount) & 0x3) {
 		//MessageBox (NULL, "Unaligned EnvMixer... please report this to Azimer with the following information: RomTitle, Place in the rom it occurred, and any save state just before the error", "AudioHLE Error", MB_OK);
@@ -540,7 +540,7 @@ void ADPCM3 () { // Verified to be 100% Accurate...
 	BYTE Flags=(u8)(t9>>0x1c)&0xff;
 	//WORD Gain=(u16)(k0&0xffff);
 	DWORD Address=(k0 & 0xffffff);// + SEGMENTS[(t9>>24)&0xf];
-	WORD inPtr=(t9>>12)&0xf;
+	WORD inPtr=(WORD)((t9>>12)&0xf);
 	//short *out=(s16 *)(testbuff+(AudioOutBuffer>>2));
 	short *out=(short *)(BufferSpace+(t9&0xfff)+0x4f0);
 	BYTE *in=(BYTE *)(BufferSpace+((t9>>12)&0xf)+0x4f0);
@@ -882,7 +882,7 @@ void RESAMPLE3 () {
 		if (accum > 32767) accum = 32767;
 		if (accum < -32768) accum = -32768;
 
-		dst[dstPtr^1] = (accum);
+		dst[dstPtr^1] = (short)(accum);
 		dstPtr++;
 		Accum += Pitch;
 		srcPtr += (Accum>>16);
@@ -890,7 +890,7 @@ void RESAMPLE3 () {
 	}
 	for (int x=0; x < 4; x++)
 		((u16 *)rdram)[((addy/2)+x)^1] = src[(srcPtr+x)^1];
-	*(u16 *)(rdram+addy+10) = Accum;
+	*(u16 *)(rdram+addy+10) = (unsigned short)Accum;
 }
 
 void INTERLEAVE3 () { // Needs accuracy verification...
@@ -955,7 +955,7 @@ FILE *mp3dat;
 void WHATISTHIS () {
 }
 
-//static FILE *fp = fopen ("d:\\mp3info.txt", "wt");
+//static FILE *fp = fopen ("T:\\Misc\\mp3info.txt", "wt");
 u32 setaddr;
 void MP3ADDY () {
 	setaddr = (t9 & 0xffffff);

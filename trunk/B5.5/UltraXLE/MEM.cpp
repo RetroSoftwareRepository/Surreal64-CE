@@ -1,3 +1,4 @@
+#include <xtl.h>
 #include "ultra.h"
 
 Mem mem; // mem.c
@@ -140,6 +141,66 @@ void mem_init(int ramsize)
     // init default values to hardware regs
     hw_init();
 }
+
+
+// GogoAckman's free mem for IGM function from 1964/pj64
+void ReInitVirtualDynaMemory(bool charge)
+{
+	//debug - uncomment return if there's problems
+	//return;
+
+#ifdef DEBUG
+	CHAR temp[256];	
+	MEMORYSTATUS stat;
+	GlobalMemoryStatus(&stat);
+	OutputDebugString("-T-----------------------\n");
+	sprintf(temp, "IGM: VMM Total=%.2fMB | VMM Free=%.2fMB | VMM Used=%.2fMB \n", (float)(stat.dwTotalVirtual / (1024.0f*1024.0f)), (float)(stat.dwAvailVirtual / (1024.0f*1024.0f)), (float)((stat.dwTotalVirtual - stat.dwAvailVirtual) / (1024.0f*1024.0f)) );
+	OutputDebugString(temp);
+	sprintf(temp, "IGM: PHY Total=%.2fMB | PHY Free=%.2fMB | PHY Used=%.2fMB \n", (float)(stat.dwTotalPhys / (1024.0f*1024.0f)), (float)(stat.dwAvailPhys / (1024.0f*1024.0f)), (float)((stat.dwTotalPhys - stat.dwAvailPhys) / (1024.0f*1024.0f)) );
+	OutputDebugString(temp);
+	
+	char tmpgrp[128];
+	sprintf(tmpgrp, "%x", mem.groupmax);
+	sprintf(temp, "IGM: CodeMax = %iMB | GroupMax = %i (%x) \n", (mem.codemax / (1024*1024)), (atoi(tmpgrp) / 1000), mem.groupmax);
+	OutputDebugString(temp);
+	
+	OutputDebugString("-T-----------------------\n");
+#endif
+
+	FILE *fp;
+	
+	if (!charge) {
+		if(mem.code != NULL) {
+			fp=fopen("Z:\\codetemp.dat","wb");
+			//fp=fopen("T:\\Data\\codetemp.dat","wb");
+			fwrite(mem.code, mem.codemax, sizeof(char), fp); //codeused
+		    fclose(fp);
+			VirtualFree((LPVOID)mem.code, (dword)mem.codemax, MEM_DECOMMIT);
+		}
+	}
+	else {
+		VirtualFree((LPVOID)mem.code, (dword)mem.codemax, MEM_DECOMMIT);
+		*(double *)(mem.code) = *(double *) VirtualAlloc((LPVOID)mem.code, (dword)mem.codemax, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+		fp=fopen("Z:\\codetemp.dat","rb");
+		//fp=fopen("T:\\Data\\codetemp.dat","rb");
+		fread(mem.code, sizeof(char), mem.codemax, fp); //codeused
+		fclose(fp);
+		DeleteFile("Z:\\codetemp.dat");
+		//DeleteFile("T:\\Data\\codetemp.dat");
+	}
+
+#ifdef DEBUG
+	GlobalMemoryStatus(&stat);
+	OutputDebugString("-B-----------------------\n");
+	sprintf(temp, "IGM: VMM Total=%.2fMB | VMM Free=%.2fMB | VMM Used=%.2fMB \n", (float)(stat.dwTotalVirtual / (1024.0f*1024.0f)), (float)(stat.dwAvailVirtual / (1024.0f*1024.0f)), (float)((stat.dwTotalVirtual - stat.dwAvailVirtual) / (1024.0f*1024.0f)) );
+	OutputDebugString(temp);
+	sprintf(temp, "IGM: PHY Total=%.2fMB | PHY Free=%.2fMB | PHY Used=%.2fMB \n", (float)(stat.dwTotalPhys / (1024.0f*1024.0f)), (float)(stat.dwAvailPhys / (1024.0f*1024.0f)), (float)((stat.dwTotalPhys - stat.dwAvailPhys) / (1024.0f*1024.0f)) );
+	OutputDebugString(temp);
+	OutputDebugString("-B-----------------------\n");
+#endif
+
+}
+
 
 // map page[dst] to external 4K array (external data NOT saved!)
 // also used by mapphysical internally

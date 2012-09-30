@@ -20,26 +20,19 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				GlobalOptimizations="FALSE"
-				InlineFunctionExpansion="0"
-				EnableIntrinsicFunctions="TRUE"
-				ImproveFloatingPointConsistency="TRUE"
-				FavorSizeOrSpeed="1"
-				OmitFramePointers="TRUE"
-				EnableFiberSafeOptimizations="TRUE"
 				OptimizeForProcessor="2"
-				AdditionalIncludeDirectories="$(SolutionDir)Include; ..\lib"
-				PreprocessorDefinitions="DEBUG;_XBOX"
-				StringPooling="TRUE"
+				AdditionalIncludeDirectories="..\Include;.\zlib"
+				PreprocessorDefinitions="DEBUG;_XBOX;LAUNCHER"
 				MinimalRebuild="FALSE"
-				BasicRuntimeChecks="0"
+				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
 				BufferSecurityCheck="TRUE"
 				EnableFunctionLevelLinking="TRUE"
 				EnableEnhancedInstructionSet="1"
 				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="0"
-				PrecompiledHeaderFile="$(OutDir)/$(ProjectName).pch"
+				PrecompiledHeaderFile="$(IntDir)\$(ProjectName).pch"
+				BrowseInformation="1"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
 				DebugInformationFormat="4"
@@ -48,14 +41,83 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="xapilibd.lib d3d8d.lib d3dx8d.lib xgraphicsd.lib dsoundd.lib dmusicd.lib xactengd.lib xsndtrkd.lib xvoiced.lib xonlined.lib xboxkrnl.lib xbdm.lib xzlib.lib"
-				OutputFile="$(OutDir)/$(ProjectName).exe"
+				AdditionalDependencies="xapilibd.lib d3d8d.lib d3dx8d.lib xgraphicsd.lib dsoundd.lib xmvd.lib dmusicd.lib xactengd.lib xsndtrkd.lib xvoiced.lib xonlined.lib xboxkrnl.lib xbdm.lib xzlib.lib"
+				OutputFile="$(OutDir)/default.exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="zlib\"
+				IgnoreAllDefaultLibraries="FALSE"
+				IgnoreDefaultLibraryNames="libc,libcmt"
 				GenerateDebugInformation="TRUE"
 				AssemblyDebug="1"
 				ProgramDatabaseFile="$(OutDir)/$(ProjectName).pdb"
-				MapLines="TRUE"
+				MapLines="FALSE"
+				SubSystem="2"
+				OptimizeForWindows98="1"
+				TargetMachine="1"
+				FixedBaseAddress="0"/>
+			<Tool
+				Name="VCPostBuildEventTool"/>
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+			<Tool
+				Name="XboxDeploymentTool"
+				RemotePath="xe:\Surreal64 CE\default.xbe"/>
+			<Tool
+				Name="XboxImageTool"
+				FileName="$(TargetDir)default.xbe"
+				StackSize="65536"
+				IncludeDebugInfo="TRUE"
+				NoLibWarn="TRUE"
+				TitleID="0x64CE64CE"
+				TitleName="Surreal64 CE ($(ConfigurationName))"
+				TitleImage="titleimage.xpr"/>
+		</Configuration>
+		<Configuration
+			Name="Profile|Xbox"
+			OutputDirectory="$(SolutionDir)Profile"
+			IntermediateDirectory="obj\Profile"
+			ConfigurationType="1"
+			CharacterSet="2"
+			WholeProgramOptimization="FALSE">
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="3"
+				GlobalOptimizations="TRUE"
+				InlineFunctionExpansion="2"
+				EnableIntrinsicFunctions="TRUE"
+				FavorSizeOrSpeed="1"
+				OmitFramePointers="TRUE"
+				EnableFiberSafeOptimizations="TRUE"
+				OptimizeForProcessor="2"
+				AdditionalIncludeDirectories="..\Include;.\zlib"
+				PreprocessorDefinitions="NDEBUG;_XBOX;LAUNCHER;PROFILE"
+				StringPooling="TRUE"
+				RuntimeLibrary="0"
+				BufferSecurityCheck="FALSE"
+				EnableFunctionLevelLinking="TRUE"
+				EnableEnhancedInstructionSet="1"
+				RuntimeTypeInfo="FALSE"
+				UsePrecompiledHeader="0"
+				PrecompiledHeaderFile="$(IntDir)\$(ProjectName).pch"
+				BrowseInformation="1"
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="FALSE"
+				DebugInformationFormat="3"
+				CallingConvention="1"/>
+			<Tool
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="xapilib.lib d3d8i.lib d3dx8.lib xgraphics.lib dsound.lib dmusici.lib xactengi.lib xsndtrk.lib xvoice.lib xonline.lib xboxkrnl.lib xbdm.lib xzlib.lib xmv.lib"
+				OutputFile="$(OutDir)/default.exe"
+				LinkIncremental="1"
+				AdditionalLibraryDirectories="zlib\"
+				IgnoreAllDefaultLibraries="FALSE"
+				IgnoreDefaultLibraryNames="libc"
+				GenerateDebugInformation="TRUE"
+				ProgramDatabaseFile="$(OutDir)/$(ProjectName).pdb"
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
@@ -70,23 +132,100 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="XboxDeploymentTool"
-				RemotePath="xe:\Surreal64 XXX CE\default.xbe"/>
+				RemotePath="xe:\Surreal64 CE\default.xbe"/>
 			<Tool
 				Name="XboxImageTool"
 				FileName="$(TargetDir)default.xbe"
 				StackSize="65536"
 				IncludeDebugInfo="TRUE"
 				NoLibWarn="TRUE"
-				TitleID="0xA64FEA57"
-				TitleName="Surreal64 XXX CE"
-				TitleImage="titleimage.xpr"/>
+				UDCluster="3"
+				TitleID="0x64CE64CE"
+				TitleName="Surreal64 CE ($(ConfigurationName))"
+				TitleImage="titleimage.xpr"
+				SaveGameImage=""
+				XBEVersion=""/>
+		</Configuration>
+		<Configuration
+			Name="Profile_FastCap|Xbox"
+			OutputDirectory="$(SolutionDir)Profile_FastCap"
+			IntermediateDirectory="obj\Profile_FastCap"
+			ConfigurationType="1"
+			CharacterSet="2"
+			WholeProgramOptimization="FALSE">
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="3"
+				GlobalOptimizations="TRUE"
+				InlineFunctionExpansion="2"
+				EnableIntrinsicFunctions="TRUE"
+				FavorSizeOrSpeed="1"
+				OmitFramePointers="TRUE"
+				EnableFiberSafeOptimizations="TRUE"
+				OptimizeForProcessor="2"
+				AdditionalIncludeDirectories="..\Include;.\zlib"
+				PreprocessorDefinitions="NDEBUG;_XBOX;LAUNCHER;PROFILE;FASTCAP"
+				StringPooling="TRUE"
+				RuntimeLibrary="0"
+				BufferSecurityCheck="FALSE"
+				EnableFunctionLevelLinking="TRUE"
+				EnableEnhancedInstructionSet="1"
+				RuntimeTypeInfo="FALSE"
+				UsePrecompiledHeader="0"
+				PrecompiledHeaderFile="$(IntDir)\$(ProjectName).pch"
+				BrowseInformation="1"
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="FALSE"
+				DebugInformationFormat="3"
+				CallingConvention="1"
+				FastCAP="TRUE"/>
+			<Tool
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="xapilib.lib d3d8i.lib d3dx8.lib xgraphics.lib dsound.lib dmusici.lib xactengi.lib xsndtrk.lib xvoice.lib xonline.lib xboxkrnl.lib xbdm.lib xzlib.lib xmv.lib"
+				OutputFile="$(OutDir)/default.exe"
+				LinkIncremental="1"
+				AdditionalLibraryDirectories="zlib\"
+				IgnoreAllDefaultLibraries="FALSE"
+				IgnoreDefaultLibraryNames="libc"
+				GenerateDebugInformation="TRUE"
+				ProgramDatabaseFile="$(OutDir)/$(ProjectName).pdb"
+				SubSystem="2"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				OptimizeForWindows98="1"
+				SetChecksum="TRUE"
+				TargetMachine="1"/>
+			<Tool
+				Name="VCPostBuildEventTool"/>
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+			<Tool
+				Name="XboxDeploymentTool"
+				RemotePath="xe:\Surreal64 CE\default.xbe"/>
+			<Tool
+				Name="XboxImageTool"
+				FileName="$(TargetDir)default.xbe"
+				StackSize="65536"
+				IncludeDebugInfo="TRUE"
+				NoLibWarn="TRUE"
+				UDCluster="3"
+				TitleID="0x64CE64CE"
+				TitleName="Surreal64 CE ($(ConfigurationName))"
+				TitleImage="titleimage.xpr"
+				SaveGameImage=""
+				XBEVersion=""/>
 		</Configuration>
 		<Configuration
 			Name="Release|Xbox"
 			OutputDirectory="$(SolutionDir)Release"
 			IntermediateDirectory="obj\Release"
 			ConfigurationType="1"
-			CharacterSet="2">
+			CharacterSet="2"
+			WholeProgramOptimization="FALSE">
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="2"
@@ -98,29 +237,32 @@
 				OmitFramePointers="TRUE"
 				EnableFiberSafeOptimizations="TRUE"
 				OptimizeForProcessor="2"
-				AdditionalIncludeDirectories="$(SolutionDir)Include; ..\lib"
-				PreprocessorDefinitions="NDEBUG;_XBOX"
+				AdditionalIncludeDirectories="..\Include;.\zlib"
+				PreprocessorDefinitions="NDEBUG;_XBOX;LAUNCHER"
 				StringPooling="TRUE"
 				RuntimeLibrary="0"
-				BufferSecurityCheck="TRUE"
+				BufferSecurityCheck="FALSE"
 				EnableFunctionLevelLinking="TRUE"
 				EnableEnhancedInstructionSet="1"
 				RuntimeTypeInfo="FALSE"
 				UsePrecompiledHeader="0"
-				PrecompiledHeaderFile="$(OutDir)/$(ProjectName).pch"
+				PrecompiledHeaderFile="$(IntDir)\$(ProjectName).pch"
+				BrowseInformation="1"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
-				DebugInformationFormat="0"
+				DebugInformationFormat="3"
 				CallingConvention="1"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xacteng.lib xsndtrk.lib xvoice.lib xonline.lib xboxkrnl.lib xzlib.lib"
+				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xacteng.lib xsndtrk.lib xvoice.lib xonline.lib xboxkrnl.lib xbdm.lib xzlib.lib xmv.lib"
 				OutputFile="$(OutDir)/default.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="zlib\"
-				GenerateDebugInformation="FALSE"
+				IgnoreAllDefaultLibraries="FALSE"
+				IgnoreDefaultLibraryNames="libc"
+				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(OutDir)/$(ProjectName).pdb"
 				SubSystem="2"
 				OptimizeReferences="2"
@@ -136,15 +278,90 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="XboxDeploymentTool"
-				RemotePath="xe:\Surreal64 XXX CE\default.xbe"/>
+				RemotePath="xe:\Surreal64 CE\default.xbe"/>
 			<Tool
 				Name="XboxImageTool"
 				FileName="$(TargetDir)default.xbe"
 				StackSize="65536"
+				NoLibWarn="TRUE"
 				UDCluster="3"
-				TitleID="0xA64FEA57"
-				TitleName="Surreal64 XXX CE"
-				TitleImage="titleimage.xpr"/>
+				TitleID="0x64CE64CE"
+				TitleName="Surreal64 CE"
+				TitleImage="titleimage.xpr"
+				SaveGameImage=""
+				XBEVersion=""/>
+		</Configuration>
+		<Configuration
+			Name="Release_LTCG|Xbox"
+			OutputDirectory="$(SolutionDir)Release_LTCG"
+			IntermediateDirectory="obj\Release_LTCG"
+			ConfigurationType="1"
+			CharacterSet="2"
+			WholeProgramOptimization="TRUE">
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="3"
+				GlobalOptimizations="TRUE"
+				InlineFunctionExpansion="2"
+				EnableIntrinsicFunctions="FALSE"
+				ImproveFloatingPointConsistency="TRUE"
+				FavorSizeOrSpeed="1"
+				OmitFramePointers="TRUE"
+				EnableFiberSafeOptimizations="TRUE"
+				OptimizeForProcessor="2"
+				AdditionalIncludeDirectories="..\Include;.\zlib"
+				PreprocessorDefinitions="NDEBUG;_XBOX;LAUNCHER;LTCG"
+				StringPooling="TRUE"
+				RuntimeLibrary="0"
+				BufferSecurityCheck="FALSE"
+				EnableFunctionLevelLinking="TRUE"
+				EnableEnhancedInstructionSet="1"
+				RuntimeTypeInfo="FALSE"
+				UsePrecompiledHeader="0"
+				PrecompiledHeaderFile="$(IntDir)\$(ProjectName).pch"
+				BrowseInformation="1"
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="FALSE"
+				DebugInformationFormat="3"
+				CallingConvention="1"/>
+			<Tool
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="xapilib.lib d3d8ltcg.lib d3dx8.lib xgraphicsltcg.lib dsound.lib dmusicltcg.lib xactengltcg.lib xsndtrk.lib xvoice.lib xonline.lib xboxkrnl.lib xzlib.lib xmv.lib"
+				OutputFile="$(OutDir)/default.exe"
+				LinkIncremental="1"
+				AdditionalLibraryDirectories="zlib\"
+				IgnoreAllDefaultLibraries="FALSE"
+				IgnoreDefaultLibraryNames="libc"
+				GenerateDebugInformation="TRUE"
+				ProgramDatabaseFile="$(OutDir)/$(ProjectName).pdb"
+				SubSystem="2"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				OptimizeForWindows98="1"
+				SetChecksum="TRUE"
+				TargetMachine="1"/>
+			<Tool
+				Name="VCPostBuildEventTool"/>
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+			<Tool
+				Name="XboxDeploymentTool"
+				RemotePath="xe:\Surreal64 CE\default.xbe"/>
+			<Tool
+				Name="XboxImageTool"
+				FileName="$(TargetDir)default.xbe"
+				StackSize="65536"
+				NoLibWarn="TRUE"
+				UDCluster="3"
+				TitleID="0x64CE64CE"
+				TitleName="Surreal64 CE"
+				TitleImage="titleimage.xpr"
+				SaveGameImage=""
+				XBEVersion=""/>
 		</Configuration>
 	</Configurations>
 	<References>
@@ -171,6 +388,15 @@
 			<File
 				RelativePath=".\Rom.h">
 			</File>
+			<File
+				RelativePath="..\simpleini.h">
+			</File>
+			<File
+				RelativePath=".\VideoTable.cpp">
+			</File>
+			<File
+				RelativePath=".\VideoTable.h">
+			</File>
 		</Filter>
 		<Filter
 			Name="Graphics"
@@ -190,6 +416,18 @@
 			</File>
 			<File
 				RelativePath=".\IoSupport.h">
+			</File>
+			<File
+				RelativePath="..\Log.cpp">
+			</File>
+			<File
+				RelativePath="..\Log.h">
+			</File>
+			<File
+				RelativePath=".\PathExplorer.cpp">
+			</File>
+			<File
+				RelativePath=".\PathExplorer.h">
 			</File>
 			<File
 				RelativePath=".\Util.cpp">
@@ -214,6 +452,9 @@
 				RelativePath="..\Include\xbfont.h">
 			</File>
 			<File
+				RelativePath="..\Include\xbhelp.h">
+			</File>
+			<File
 				RelativePath="..\Include\xbinput.cpp">
 			</File>
 			<File
@@ -221,6 +462,24 @@
 			</File>
 			<File
 				RelativePath="..\Include\xbprofiling.cpp">
+				<FileConfiguration
+					Name="Debug|Xbox"
+					ExcludedFromBuild="TRUE">
+					<Tool
+						Name="VCCLCompilerTool"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Xbox"
+					ExcludedFromBuild="TRUE">
+					<Tool
+						Name="VCCLCompilerTool"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release_LTCG|Xbox"
+					ExcludedFromBuild="TRUE">
+					<Tool
+						Name="VCCLCompilerTool"/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\Include\xbprofiling.h">
@@ -236,6 +495,15 @@
 			</File>
 			<File
 				RelativePath="..\Include\xbutil.h">
+			</File>
+			<File
+				RelativePath="..\Include\xmvhelper.cpp">
+			</File>
+			<File
+				RelativePath="..\Include\xmvhelper.h">
+			</File>
+			<File
+				RelativePath="..\Include\xmvplayer.cpp">
 			</File>
 		</Filter>
 		<File
@@ -257,10 +525,22 @@
 			RelativePath="..\config.cpp">
 		</File>
 		<File
+			RelativePath=".\config.h">
+		</File>
+		<File
 			RelativePath="..\config.h">
 		</File>
 		<File
-			RelativePath="..\controller.cpp">
+			RelativePath=".\controller.cpp">
+		</File>
+		<File
+			RelativePath=".\controller.h">
+		</File>
+		<File
+			RelativePath=".\ftplib.cpp">
+		</File>
+		<File
+			RelativePath=".\ftplib.h">
 		</File>
 		<File
 			RelativePath=".\Launch.cpp">
@@ -276,6 +556,12 @@
 		</File>
 		<File
 			RelativePath=".\musicmanager.h">
+		</File>
+		<File
+			RelativePath=".\Network.cpp">
+		</File>
+		<File
+			RelativePath=".\Network.h">
 		</File>
 		<File
 			RelativePath=".\Panel.cpp">
@@ -294,6 +580,9 @@
 		</File>
 		<File
 			RelativePath=".\SurrealMenu.cpp">
+		</File>
+		<File
+			RelativePath=".\Synopsis.cpp">
 		</File>
 		<File
 			RelativePath=".\ui_logo.cpp">

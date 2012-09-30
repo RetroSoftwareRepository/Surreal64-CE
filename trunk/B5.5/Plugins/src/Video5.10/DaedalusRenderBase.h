@@ -134,7 +134,7 @@ typedef __declspec(align(16)) struct
 
 	RenderShadeMode	shadeMode;
 	bool	bCullFront;
-	float	bCullBack;
+	bool	bCullBack;
 	bool	bLightingEnable;
 	bool	bTextureGen;
 	bool	bFogEnabled;

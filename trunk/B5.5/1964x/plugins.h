@@ -8,18 +8,33 @@
 
 #pragma once
 
+//#include <Common.h>
+// original 1964
+//controls tv sys only - similar to rice
+#define TV_SYSTEM_NTSC		1
+#define TV_SYSTEM_PAL		0
+#define TV_SYSTEM_MPAL		0
+
+// pj64 and all audio plugins
+#define SYSTEM_NTSC			0
+#define SYSTEM_PAL			1
+#define SYSTEM_MPAL			2
+
 #include <RSP.h>
+
+#if defined(USE_MUSYX)
+#include <AudioMusyX.h>
+#elif defined(USE_M64PAUDIO)
+#include <AudioM64Plus.h>
+#else
+
 #include <AudioJttL.h>
 #include <AudioBasic.h>
-
-
-// Ez0n3 - Audio None
 #include <AudioNone.h>
 #include <AudioAzimer.h>
-//freakdave - Audio MusyX
-#include <AudioMusyX.h>
-#include "../Plugins.h"
+#endif
 
+#include "../Plugins.h"
 
 #include <Input.h>
 #include <Video.h>

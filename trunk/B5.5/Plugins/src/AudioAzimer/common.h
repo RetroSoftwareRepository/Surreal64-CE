@@ -58,7 +58,7 @@ unsigned long GenerateCRC (unsigned char *data, int size);
 		ProfileTimes[profile] = ProfileTimes[profile] + (end - ProfileStartTimes[profile]);
 	}
 	inline void PrintProfiles () {
-		FILE *dfile = fopen ("d:\\profile.txt", "wt");
+		FILE *dfile = fopen ("T:\\Misc\\profile.txt", "wt");
 		u64 totalTimes = 0;
 		for (int x = 0; x < 30; x++) {
 			if (ProfileTimes[x] != 0) {

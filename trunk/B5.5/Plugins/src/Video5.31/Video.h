@@ -270,6 +270,28 @@ typedef struct
   output:   none
 *******************************************************************/ 
  void  _VIDEO_FBRead(DWORD addr);
+ 
+ /************************************************************************
+Function: FBGetFrameBufferInfo
+Purpose:  This function is called by the emulator core to retrieve depth
+buffer information from the video plugin in order to be able
+to notify the video plugin about CPU depth buffer read/write
+operations
+
+size:
+= 1		byte
+= 2		word (16 bit) <-- this is N64 default depth buffer format
+= 4		dword (32 bit)
+
+when depth buffer information is not available yet, set all values
+in the FrameBufferInfo structure to 0
+
+input:    FrameBufferInfo *pinfo
+pinfo is pointed to a FrameBufferInfo structure which to be
+filled in by this function
+output:   Values are return in the FrameBufferInfo structure
+/************************************************************************/
+void _VIDEO_FBGetFrameBufferInfo(void *pinfo);
 
 //void InitGraphicsPlugin(HINSTANCE hInstance);
 //void DestroyGraphicsPlugin();

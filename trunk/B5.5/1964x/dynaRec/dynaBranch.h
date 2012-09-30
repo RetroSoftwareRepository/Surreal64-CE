@@ -353,7 +353,7 @@ void dyna4300i_bne(OP_PARAMS)
 	/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 	CHECK_OPCODE_PASS 
-		if(gMultiPass.WhichPass == COMPILE_OPCODES_ONLY) OutputDebugString("Bad");
+		if(gMultiPass.WhichPass == COMPILE_OPCODES_ONLY) DisplayError("Bad");
 	SetRdRsRt64bit(PASS_PARAMS);
 
 	compilerstatus.cp0Counter += 1;
@@ -670,7 +670,7 @@ void dyna4300i_bnel(OP_PARAMS)
 	/*~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 	CHECK_OPCODE_PASS;
-	if(gMultiPass.WhichPass == COMPILE_OPCODES_ONLY) OutputDebugString("Bad");
+	if(gMultiPass.WhichPass == COMPILE_OPCODES_ONLY) DisplayError("Bad");
 
 	compilerstatus.cp0Counter += 1;
 	SetRdRsRt64bit(PASS_PARAMS);

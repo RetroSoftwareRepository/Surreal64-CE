@@ -153,7 +153,7 @@ isDoneNow:
 #endif
 }
 
-//FILE *dfile = fopen ("d:\\envmix.txt", "wt");
+//FILE *dfile = fopen ("T:\\Misc\\envmix.txt", "wt");
 
 void ENVMIXER () {
 	//static int envmixcnt = 0;
@@ -493,7 +493,7 @@ void RESAMPLE () {
 	u32 addy = (t9 & 0xffffff);// + SEGMENTS[(t9>>24)&0xf];
 	DWORD Accum=0;
 	DWORD location;
-	s16 *lut, *lut2;
+	s16 *lut;//, *lut2; // unrefrenced
 	short *dst;
 	s16 *src;
 	dst=(short *)(BufferSpace);
@@ -553,7 +553,7 @@ void RESAMPLE () {
 		if (accum > 32767) accum = 32767;
 		if (accum < -32768) accum = -32768;
 
-		dst[dstPtr^1] = (accum);
+		dst[dstPtr^1] = (short)(accum);
 		dstPtr++;
 		Accum += Pitch;
 		srcPtr += (Accum>>16);
@@ -562,7 +562,7 @@ void RESAMPLE () {
 	for (int x=0; x < 4; x++)
 		((u16 *)rdram)[((addy/2)+x)^1] = src[(srcPtr+x)^1];
 	//memcpy (RSWORK, src+srcPtr, 0x8);
-	*(u16 *)(rdram+addy+10) = Accum;
+	*(u16 *)(rdram+addy+10) = (unsigned short)Accum;
 }
 
 void SETVOL () {
@@ -876,7 +876,7 @@ void ADPCM () { // Work in progress! :)
 
 void LOADBUFF () { // memcpy causes static... endianess issue :(
 	u32 v0;
-	u32 cnt;
+	//u32 cnt; // unrefrenced
 	if (AudioCount == 0)
  		return;
 	v0 = (t9 & 0xfffffc);// + SEGMENTS[(t9>>24)&0xf];
@@ -885,7 +885,7 @@ void LOADBUFF () { // memcpy causes static... endianess issue :(
 
 void SAVEBUFF () { // memcpy causes static... endianess issue :(
 	u32 v0;
-	u32 cnt;
+	//u32 cnt; // unrefrenced
 	if (AudioCount == 0)
 		return;
 	v0 = (t9 & 0xfffffc);// + SEGMENTS[(t9>>24)&0xf];

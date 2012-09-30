@@ -251,7 +251,16 @@ void CNvTNTDirectXCombiner::InitCombinerCycle12(void)
 #ifdef _DEBUG
 void CNvTNTDirectXCombiner::DisplaySimpleMuxString(void)
 {
+#ifndef _XBOX
+	CColorCombiner::DisplaySimpleMuxString();
+	TRACE0("\n");
+	m_lastIndex = CNvTNTCombiner::FindCompiledMux();
+	CNvTNTCombiner::DisplaySimpleMuxString();
+	TRACE0("\n");
+	DisplayBlendingStageInfo();
 
+	TRACE0("\n\n");
+#endif
 }
 
 #endif

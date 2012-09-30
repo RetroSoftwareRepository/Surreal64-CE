@@ -2,8 +2,8 @@
 #include <xtl.h>
 #else
 #include <windows.h>
-#include <dsound.h>
 #endif
+#include <dsound.h>
 
 #include <stdio.h>
 #include "AudioCode.h"

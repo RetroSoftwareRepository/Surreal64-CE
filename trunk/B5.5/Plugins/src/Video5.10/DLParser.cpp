@@ -20,16 +20,16 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "stdafx.h"
 
 #include "ucode.h"
-#include "menu/menumain.h"
+//#include "menu/menumain.h"
+extern void RunIngameMenu();
 
 extern BOOL _INPUT_IsIngameMenuWaiting();
+extern BOOL _INPUT_UpdatePaks();
+extern BOOL _INPUT_UpdateControllerStates();
+extern void _INPUT_RumblePause(bool bPause);
 extern "C" void ReInitVirtualDynaMemory(boolean charge);
 extern int TextureMode;
 extern bool FrameSkip;
-
-//BOOL g_bTempMessage = FALSE;
-//DWORD g_dwTempMessageStart = 0;
-//char g_szTempMessage[100];
 
 #include <xgraphics.h>
 
@@ -1060,10 +1060,9 @@ void DLParser_Process(OSTask * pTask)
 			pFrontBuffer->Release();
 			pBackBuffer->Release();
 		}
-		*/
+*/
 
-		/*
-		if (g_bTempMessage)
+		/*if (g_bTempMessage)
 		{
 			if (g_defaultTrueTypeFont == NULL)
 			{
@@ -1082,18 +1081,28 @@ void DLParser_Process(OSTask * pTask)
 
 			memset(buf, 0, sizeof(WCHAR) * 200);
 
+			// to correct aa scaling for the time being
+			if(AntiAliasMode>3){
+			g_pD3DDev->SetRenderState( D3DRS_MULTISAMPLEMODE, D3DMULTISAMPLEMODE_1X );
+			g_pD3DDev->SetBackBufferScale( 0.5f, 0.5f );
+			}else if(AntiAliasMode>1){
+			g_pD3DDev->SetRenderState( D3DRS_MULTISAMPLEMODE, D3DMULTISAMPLEMODE_1X );
+			g_pD3DDev->SetBackBufferScale( 0.5f, 1.0f );
+			}
+			
 			g_pD3DDev->GetBackBuffer(-1, D3DBACKBUFFER_TYPE_MONO, &pFrontBuffer);
 			g_pD3DDev->GetBackBuffer(0, D3DBACKBUFFER_TYPE_MONO, &pBackBuffer);
 
 			mbstowcs(buf, g_szTempMessage, strlen(g_szTempMessage));
 
-			g_defaultTrueTypeFont->TextOut(pFrontBuffer, buf, (unsigned)-1, 40, 410);
-			g_defaultTrueTypeFont->TextOut(pBackBuffer, buf, (unsigned)-1, 40, 410);
+			g_defaultTrueTypeFont->TextOut(pFrontBuffer, buf, (unsigned)-1, 30, (windowSetting.uDisplayHeight - 50));
+			g_defaultTrueTypeFont->TextOut(pBackBuffer, buf, (unsigned)-1, 30, (windowSetting.uDisplayHeight - 50));
 
 			pFrontBuffer->Release();
 			pBackBuffer->Release();
-		}
-
+		}*/
+		
+/*
 		if (menuWaiting)
 		{
 			D3DSurface *pBackBuffer;
@@ -1111,6 +1120,7 @@ void DLParser_Process(OSTask * pTask)
 			pTextureSurface->Release();
 		}
 */
+
 		CDaedalusRender::g_pRender->EndRendering();
 	}
 
@@ -1120,10 +1130,16 @@ void DLParser_Process(OSTask * pTask)
 
 	if (_INPUT_IsIngameMenuWaiting())
 	{
+		_INPUT_RumblePause(true);
+	
 		ReInitVirtualDynaMemory(false);
 		RunIngameMenu();
 		options.forceTextureFilter = TextureMode;
+		_INPUT_UpdatePaks();//added by freakdave
+		_INPUT_UpdateControllerStates();//added by freakdave
 		ReInitVirtualDynaMemory(true);
+		
+		_INPUT_RumblePause(false);
 	}
 }
 

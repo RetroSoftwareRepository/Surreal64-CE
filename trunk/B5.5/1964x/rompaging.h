@@ -17,14 +17,12 @@
 
 #include "memory.h"
 
+//#define RP_PAGE_SIZE		0x10000		// 64k pages
+//#define RP_PAGE_SIZE		0x40000		// 64k pages
 
-// Ez0n3 - old method of rom paging
-#define RP_PAGE_SIZE_O		0x10000		// 64k pages
-// freakdave - new method of rom paging
-#define RP_PAGE_SIZE_N		0x40000		// 64k pages
-
-
+extern DWORD g_dwPageSize;
 extern DWORD g_dwNumFrames;
+extern int g_iPagingMethod;
 
 // Frames
 // the 8meg memory block is made up of 128 frames, each able to hold 64k
@@ -38,24 +36,24 @@ typedef struct
 	uint32			pageNum;
 } Frame;
 
-extern Frame *g_frameTable;
-extern uint8 *g_memory;
+//extern Frame *g_frameTable;
+//extern uint8 *g_memory;
 
-BOOL InitVirtualRomData(char *rompath);
-void LoadVirtualRomData();
-void CloseVirtualRomData();
+BOOL __fastcall InitVirtualRomData(char *rompath);
+void __fastcall LoadVirtualRomData();
+void __fastcall CloseVirtualRomData();
 
-void InitPageAndFrameTables();
+void __fastcall InitPageAndFrameTables();
 
-uint32 ReadUWORDFromROM(uint32 location);
-uint16 ReadUHALFFromROM(uint32 location);
-uint8  ReadUBYTEFromROM(uint32 location);
+uint32 __fastcall ReadUWORDFromROM(uint32 location);
+uint16 __fastcall ReadUHALFFromROM(uint32 location);
+uint8  __fastcall ReadUBYTEFromROM(uint32 location);
 
-__int32 ReadSWORDFromROM(uint32 location);
+__int32 __fastcall ReadSWORDFromROM(uint32 location);
 
-BOOL CheckIfInRom(uint32 location);
+BOOL __fastcall CheckIfInRom(uint32 location);
 
-__forceinline __int32 ReadSWORDFromROM_EAXOnly(uint32 location)
+static __forceinline __int32 ReadSWORDFromROM_EAXOnly(uint32 location)
 {
 	{
 		__int32 temp;

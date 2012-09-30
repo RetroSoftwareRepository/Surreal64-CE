@@ -255,7 +255,7 @@ void D3DRender::DrawObjBGCopy(uObjBg &info)
 #else
 		if( g_pLockableBackBuffer == NULL && status.bHandleN64TextureBuffer == false )
 		{
-			if( IsResultGood(g_pD3DDev->CreateDepthStencilSurface(windowSetting.uDisplayWidth, windowSetting.uDisplayHeight, D3DFMT_D16_LOCKABLE, D3DMULTISAMPLE_NONE, &g_pLockableBackBuffer)) && g_pLockableBackBuffer )
+			if( IsResultGood(g_pD3DDev->CreateDepthStencilSurface(windowSetting.uDisplayWidth, windowSetting.uDisplayHeight, D3DFMT_D16_LOCKABLE, SetAntiAliasMode(AntiAliasMode), &g_pLockableBackBuffer)) && g_pLockableBackBuffer )
 			{
 				g_pD3DDev->SetRenderTarget(NULL, g_pLockableBackBuffer);
 				TRACE0("Created and use lockable depth buffer");

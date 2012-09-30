@@ -229,6 +229,10 @@ public:
 	void DropTextures();
 	bool CleanUp();
 	
+#ifndef OLDTXTCACHE
+	void FreeTextures();
+#endif
+	
 #ifdef _DEBUG
 	TextureEntry * GetCachedTexture(DWORD tex);
 	DWORD GetNumOfCachedTexture();

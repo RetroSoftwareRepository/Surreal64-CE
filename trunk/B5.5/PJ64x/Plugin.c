@@ -34,7 +34,9 @@
 // Ez0n3 - plugins
 #include "../Plugins.h"
 
- 
+BOOL g_bAudioBoost = FALSE;
+
+
 extern void _VIDEO_CloseDLL (void);
 extern void _VIDEO_DllConfig ( HWND hParent );
 extern void _VIDEO_GetDllInfo( PLUGIN_INFO *PluginInfo);
@@ -49,23 +51,47 @@ extern void _VIDEO_UpdateScreen(void);
 extern void _VIDEO_ViStatusChanged(void);
 extern void _VIDEO_ViStatusChanged(void);
 extern void _VIDEO_ViWidthChanged(void);
-extern void _RSP_GetDllInfo ( PLUGIN_INFO * PluginInfo );
-extern void _RSP_RomClosed (void);
-extern void _RSP_CloseDLL (void);
-extern void _RSP_DllConfig (HWND hWnd);
+
+#if defined(USE_MUSYX)
+// freakdave - New MusyX audio plugin
+extern void _AUDIO_MUSYX_CloseDLL (void);
+extern void _AUDIO_MUSYX_RomClosed(void);
+extern void _AUDIO_MUSYX_DllConfig ( HWND hParent );
+extern void _AUDIO_MUSYX_GetDllInfo(PLUGIN_INFO *PluginInfo);
+extern void _AUDIO_MUSYX_AiDacrateChanged(int SystemType);
+extern void _AUDIO_MUSYX_AiLenChanged(void);
+extern void _AUDIO_MUSYX_AiReadLength(void);
+extern void _AUDIO_MUSYX_AiUpdate(BOOL Wait);
+extern BOOL _AUDIO_MUSYX_InitiateAudio (AUDIO_INFO Audio_Info);
+extern void _AUDIO_MUSYX_ProcessAList(void);
+extern void _AUDIO_MUSYX_AudioBoost (BOOL Boost);
+#elif defined(USE_M64PAUDIO)
+// mupen 1.5 audio
+extern void _AUDIO_M64P_CloseDLL (void);
+extern void _AUDIO_M64P_RomClosed(void);
+extern void _AUDIO_M64P_DllConfig ( HWND hParent );
+extern void _AUDIO_M64P_GetDllInfo(PLUGIN_INFO *PluginInfo);
+extern void _AUDIO_M64P_AiDacrateChanged(int SystemType);
+extern void _AUDIO_M64P_AiLenChanged(void);
+extern void _AUDIO_M64P_AiReadLength(void);
+extern void _AUDIO_M64P_AiUpdate(BOOL Wait);
+extern BOOL _AUDIO_M64P_InitiateAudio (AUDIO_INFO Audio_Info);
+extern void _AUDIO_M64P_ProcessAList(void);
+extern void _AUDIO_M64P_AudioBoost (BOOL Boost);
+#else
 
 //freakdave - JttL
-extern void _AUDIO_CloseDLL (void);
-extern void _AUDIO_RomClosed(void);
-extern void _AUDIO_DllConfig ( HWND hParent );
-extern void _AUDIO_GetDllInfo(PLUGIN_INFO *PluginInfo);
-extern void _AUDIO_AiDacrateChanged(int SystemType);
-extern void _AUDIO_AiLenChanged(void);
-extern void _AUDIO_AiReadLength(void);
-extern void _AUDIO_AiUpdate(BOOL Wait);
-extern BOOL _AUDIO_InitiateAudio (AUDIO_INFO Audio_Info);
-extern void _AUDIO_ProcessAList(void);
-
+extern void _AUDIO_JTTL_CloseDLL (void);
+extern void _AUDIO_JTTL_RomClosed(void);
+extern void _AUDIO_JTTL_DllConfig ( HWND hParent );
+extern void _AUDIO_JTTL_GetDllInfo(PLUGIN_INFO *PluginInfo);
+extern void _AUDIO_JTTL_AiDacrateChanged(int SystemType);
+extern void _AUDIO_JTTL_AiLenChanged(void);
+extern void _AUDIO_JTTL_AiReadLength(void);
+extern void _AUDIO_JTTL_AiUpdate(BOOL Wait);
+extern BOOL _AUDIO_JTTL_InitiateAudio (AUDIO_INFO Audio_Info);
+extern void _AUDIO_JTTL_ProcessAList(void);
+extern void _AUDIO_JTTL_AudioBoost (BOOL Boost);
 
 // Basic Audio
 extern void _AUDIO_BASIC_CloseDLL (void);
@@ -79,7 +105,6 @@ extern void _AUDIO_BASIC_AiUpdate(BOOL Wait);
 extern BOOL _AUDIO_BASIC_InitiateAudio (AUDIO_INFO Audio_Info);
 extern void _AUDIO_BASIC_ProcessAList(void);
 
-
 // Ez0n3 - No Audio
 extern void _AUDIO_NONE_CloseDLL (void);
 extern void _AUDIO_NONE_RomClosed(void);
@@ -92,22 +117,7 @@ extern void _AUDIO_NONE_AiUpdate(BOOL Wait);
 extern BOOL _AUDIO_NONE_InitiateAudio (AUDIO_INFO Audio_Info);
 extern void _AUDIO_NONE_ProcessAList(void);
 
-// freakdave - New MusyX audio plugin
-extern void _AUDIO_MUSYX_CloseDLL (void);
-extern void _AUDIO_MUSYX_RomClosed(void);
-extern void _AUDIO_MUSYX_DllConfig ( HWND hParent );
-extern void _AUDIO_MUSYX_GetDllInfo(PLUGIN_INFO *PluginInfo);
-extern void _AUDIO_MUSYX_AiDacrateChanged(int SystemType);
-extern void _AUDIO_MUSYX_AiLenChanged(void);
-extern void _AUDIO_MUSYX_AiReadLength(void);
-extern void _AUDIO_MUSYX_AiUpdate(BOOL Wait);
-extern BOOL _AUDIO_MUSYX_InitiateAudio (AUDIO_INFO Audio_Info);
-extern void _AUDIO_MUSYX_ProcessAList(void);
-
-
-// Ez0n3 - old Azimer
 // freakdave - readded Azimer
-
 extern void _AUDIO_AZIMER_CloseDLL (void);
 extern void _AUDIO_AZIMER_RomClosed(void);
 extern void _AUDIO_AZIMER_DllConfig ( HWND hParent );
@@ -118,14 +128,56 @@ extern void _AUDIO_AZIMER_AiReadLength(void);
 extern void _AUDIO_AZIMER_AiUpdate(BOOL Wait);
 extern BOOL _AUDIO_AZIMER_InitiateAudio (AUDIO_INFO Audio_Info);
 extern void _AUDIO_AZIMER_ProcessAList(void);
+extern void _AUDIO_AZIMER_AudioBoost (BOOL Boost);
 
+#endif
 
+void (*_AUDIO_LINK_AiDacrateChanged)(int SystemType) = NULL;
+void (*_AUDIO_LINK_AiLenChanged)(void) = NULL;
+//DWORD (*_AUDIO_LINK_AiReadLength)(void) = NULL;
+void (*_AUDIO_LINK_AiReadLength)(void) = NULL;
+void (*_AUDIO_LINK_AiUpdate)(BOOL Wait) = NULL;
+void (*_AUDIO_LINK_CloseDLL)(void) = NULL;
+//void (*_AUDIO_LINK_DllAbout)(HWND hParent) = NULL;
+void (*_AUDIO_LINK_DllConfig)(HWND hParent) = NULL;
+//void (*_AUDIO_LINK_DllTest)(HWND hParent) = NULL;
+void (*_AUDIO_LINK_GetDllInfo)(PLUGIN_INFO *PluginInfo) = NULL;
+BOOL (*_AUDIO_LINK_InitiateAudio)(AUDIO_INFO Audio_Info) = NULL;
+void (*_AUDIO_LINK_ProcessAList)(void) = NULL;
+void (*_AUDIO_LINK_RomClosed)(void) = NULL;
 
+void (*_AUDIO_LINK_AudioBoost)(BOOL Boost) = NULL;
 
+extern void _RSP_GetDllInfo ( PLUGIN_INFO * PluginInfo );
+extern void _RSP_RomClosed (void);
+extern void _RSP_CloseDLL (void);
+extern void _RSP_DllConfig (HWND hWnd);
 extern DWORD _RSP_DoRspCycles(DWORD Cycles);
 extern void _RSP_InitiateRSP ( RSP_INFO_1_1 Rsp_Info, DWORD * CycleCount);
-//extern DWORD _RSP_HLE_DoRspCycles(DWORD Cycles);
-//extern void _RSP_HLE_InitiateRSP ( RSP_INFO_1_1 Rsp_Info, DWORD * CycleCount);
+
+extern void _RSP_HLE_GetDllInfo ( PLUGIN_INFO * PluginInfo );
+extern void _RSP_HLE_RomClosed (void);
+extern void _RSP_HLE_CloseDLL (void);
+extern void _RSP_HLE_DllConfig (HWND hWnd);
+extern DWORD _RSP_HLE_DoRspCycles(DWORD Cycles);
+extern void _RSP_HLE_InitiateRSP ( RSP_INFO_1_1 Rsp_Info, DWORD * CycleCount);
+
+extern void _RSP_M64p_GetDllInfo ( PLUGIN_INFO * PluginInfo );
+extern void _RSP_M64p_RomClosed (void);
+extern void _RSP_M64p_CloseDLL (void);
+extern void _RSP_M64p_DllConfig (HWND hWnd);
+extern DWORD _RSP_M64p_DoRspCycles(DWORD Cycles);
+extern void _RSP_M64p_InitiateRSP ( RSP_INFO_1_1 Rsp_Info, DWORD * CycleCount);
+
+DWORD (*_RSP_LINK_DoRspCycles)(DWORD) = NULL;
+void (*_RSP_LINK_CloseDLL)(void) = NULL;
+void (*_RSP_LINK_RomClosed)(void) = NULL;
+void (*_RSP_LINK_DllConfig)(HWND hWnd) = NULL;
+//void (*_RSP_LINK_DllAbout)(HWND hWnd) = NULL;
+void (*_RSP_LINK_GetDllInfo)(PLUGIN_INFO *PluginInfo) = NULL;
+//void (*_RSP_LINK_InitiateRSP_1_0)(RSP_INFO_1_0 Rsp_Info, DWORD * CycleCount) = NULL; //Cycles
+void (*_RSP_LINK_InitiateRSP_1_1)(RSP_INFO_1_1 Rsp_Info, DWORD * CycleCount) = NULL; //Cycles
+
 extern void _INPUT_CloseDLL(void);
 extern void _INPUT_ControllerCommand(int Control, BYTE *Command);
 extern void _INPUT_DllConfig(HWND hParent);
@@ -145,219 +197,203 @@ HANDLE hAudioThread = NULL;
 CONTROL Controllers[4];
 
 // Ez0n3 - use iAudioPlugin instead to determine if basic audio is used
-//BOOL g_bUseLLERspPlugin = FALSE;
-//BOOL g_bUseBasicAudio = FALSE;
+//BOOL g_bUseLLERspPlugin = FALSE; // not used anymore
+//BOOL g_bUseBasicAudio = FALSE; // not used anymore
+BOOL g_bUseRspAudio = FALSE; // control a listing
+
+int g_iRspPlugin = _RSPPluginHLE; // default hle
+
+#if defined(USE_MUSYX)
+int g_iAudioPlugin = _AudioPluginMusyX; // set default to musyx
+#elif defined(USE_M64PAUDIO)
+int g_iAudioPlugin = _AudioPluginM64p; // set default to musyx
+#else
 int g_iAudioPlugin = _AudioPluginJttl; // set default to jttl
+#endif
 
 
 BOOL PluginsChanged ( HWND hDlg );
 BOOL ValidPluginVersion ( PLUGIN_INFO * PluginInfo );
  
-void GetCurrentDlls (void) {
-	 
- 
-}
+void GetCurrentDlls (void) {}
 
-void GetPluginDir( char * Directory ) 
-{
+void GetPluginDir( char * Directory ) {}
 
-}
+void GetSnapShotDir( char * Directory ) {}
 
-void GetSnapShotDir( char * Directory ) 
-{
-
-}
-
-BOOL LoadAudioBasicDll(void) {
+BOOL LoadAudioDll(void) {
 	PLUGIN_INFO PluginInfo;
 	 
 	hAudioDll = (HANDLE)100;
 	if (hAudioDll == NULL) {  return FALSE; }
-
-	GetDllInfo = (void *)_AUDIO_BASIC_GetDllInfo;
-	if (GetDllInfo == NULL) { return FALSE; }
-
-	GetDllInfo(&PluginInfo);
-	if (!ValidPluginVersion(&PluginInfo) || PluginInfo.MemoryBswaped == FALSE) { return FALSE; }
-
-	AiCloseDLL = (void *)_AUDIO_BASIC_CloseDLL;
-	if (AiCloseDLL == NULL) { return FALSE; }
-	AiDacrateChanged = (void *)(int)_AUDIO_BASIC_AiDacrateChanged;
-	if (AiDacrateChanged == NULL) { return FALSE; }
-	AiLenChanged = (void *)_AUDIO_BASIC_AiLenChanged;
-	if (AiLenChanged == NULL) { return FALSE; }
-	AiReadLength = (DWORD ( *)(void))_AUDIO_BASIC_AiReadLength;
-	if (AiReadLength == NULL) { return FALSE; }
-	InitiateAudio = (BOOL ( *)(AUDIO_INFO))_AUDIO_BASIC_InitiateAudio;
-	if (InitiateAudio == NULL) { return FALSE; }
-	AiRomClosed = (void ( *)(void))_AUDIO_BASIC_RomClosed;
-	if (AiRomClosed == NULL) { return FALSE; }
-	ProcessAList = (void ( *)(void))_AUDIO_BASIC_ProcessAList;	
-	if (ProcessAList == NULL) { return FALSE; }
-
-	AiDllConfig = (void ( *)(HWND))_AUDIO_BASIC_DllConfig;
-	AiUpdate = (void ( *)(BOOL))_AUDIO_BASIC_AiUpdate;
-	return TRUE;
-}
-
-BOOL LoadAudioJttLDll(void) {
-	PLUGIN_INFO PluginInfo;
-	 
-	hAudioDll = (HANDLE)100;
-	if (hAudioDll == NULL) {  return FALSE; }
-
-	//freakdave
-	//GetDllInfo = (void *)_AUDIO_JTTL_GetDllInfo;
-	GetDllInfo = (void *)_AUDIO_GetDllInfo;
-	if (GetDllInfo == NULL) { return FALSE; }
-
-	GetDllInfo(&PluginInfo);
-	if (!ValidPluginVersion(&PluginInfo) || PluginInfo.MemoryBswaped == FALSE) { return FALSE; }
-	//freakdave - Implementation of Jttl's audio plugin (replace Azimer)
-	/*
-	AiCloseDLL = (void *)_AUDIO_JTTL_CloseDLL;
-	if (AiCloseDLL == NULL) { return FALSE; }
-	AiDacrateChanged = (void *)(int)_AUDIO_JTTL_AiDacrateChanged;
-	if (AiDacrateChanged == NULL) { return FALSE; }
-	AiLenChanged = (void *)_AUDIO_JTTL_AiLenChanged;
-	if (AiLenChanged == NULL) { return FALSE; }
-	AiReadLength = (DWORD ( *)(void))_AUDIO_JTTL_AiReadLength;
-	if (AiReadLength == NULL) { return FALSE; }
-	InitiateAudio = (BOOL ( *)(AUDIO_INFO))_AUDIO_JTTL_InitiateAudio;
-	if (InitiateAudio == NULL) { return FALSE; }
-	AiRomClosed = (void ( *)(void))_AUDIO_JTTL_RomClosed;
-	if (AiRomClosed == NULL) { return FALSE; }
-	ProcessAList = (void ( *)(void))_AUDIO_JTTL_ProcessAList;	
-	if (ProcessAList == NULL) { return FALSE; }
-
-	AiDllConfig = (void ( *)(HWND))_AUDIO_JTTL_DllConfig;
-	AiUpdate = (void ( *)(BOOL))_AUDIO_JTTL_AiUpdate;
-	return TRUE;
-*/
-	//freakdave - Implementation of Jttl's audio plugin (replace Azimer)
-	AiCloseDLL = (void *)_AUDIO_CloseDLL;
-	if (AiCloseDLL == NULL) { return FALSE; }
-	AiDacrateChanged = (void *)(int)_AUDIO_AiDacrateChanged;
-	if (AiDacrateChanged == NULL) { return FALSE; }
-	AiLenChanged = (void *)_AUDIO_AiLenChanged;
-	if (AiLenChanged == NULL) { return FALSE; }
-	AiReadLength = (DWORD ( *)(void))_AUDIO_AiReadLength;
-	if (AiReadLength == NULL) { return FALSE; }
-	InitiateAudio = (BOOL ( *)(AUDIO_INFO))_AUDIO_InitiateAudio;
-	if (InitiateAudio == NULL) { return FALSE; }
-	AiRomClosed = (void ( *)(void))_AUDIO_RomClosed;
-	if (AiRomClosed == NULL) { return FALSE; }
-	ProcessAList = (void ( *)(void))_AUDIO_ProcessAList;	
-	if (ProcessAList == NULL) { return FALSE; }
-
-	AiDllConfig = (void ( *)(HWND))_AUDIO_DllConfig;
-	AiUpdate = (void ( *)(BOOL))_AUDIO_AiUpdate;
-	return TRUE;
-
-}
-
-//freakdave - readded Azimer
-BOOL LoadAudioAzimerDll(void) {
-	PLUGIN_INFO PluginInfo;
-	 
-	hAudioDll = (HANDLE)100;
-	if (hAudioDll == NULL) {  return FALSE; }
-
-	GetDllInfo = (void *)_AUDIO_AZIMER_GetDllInfo;
-	if (GetDllInfo == NULL) { return FALSE; }
-
-	GetDllInfo(&PluginInfo);
-	if (!ValidPluginVersion(&PluginInfo) || PluginInfo.MemoryBswaped == FALSE) { return FALSE; }	
 	
-	AiCloseDLL = (void *)_AUDIO_AZIMER_CloseDLL;
-	if (AiCloseDLL == NULL) { return FALSE; }
-	AiDacrateChanged = (void *)(int)_AUDIO_AZIMER_AiDacrateChanged;
-	if (AiDacrateChanged == NULL) { return FALSE; }
-	AiLenChanged = (void *)_AUDIO_AZIMER_AiLenChanged;
-	if (AiLenChanged == NULL) { return FALSE; }
-	AiReadLength = (DWORD ( *)(void))_AUDIO_AZIMER_AiReadLength;
-	if (AiReadLength == NULL) { return FALSE; }
-	InitiateAudio = (BOOL ( *)(AUDIO_INFO))_AUDIO_AZIMER_InitiateAudio;
-	if (InitiateAudio == NULL) { return FALSE; }
-	AiRomClosed = (void ( *)(void))_AUDIO_AZIMER_RomClosed;
-	if (AiRomClosed == NULL) { return FALSE; }
-	ProcessAList = (void ( *)(void))_AUDIO_AZIMER_ProcessAList;	
-	if (ProcessAList == NULL) { return FALSE; }
+	//plugin selection to replace bools: g_bUseBasicAudio = g_bUseLLERspPlugin;
+#if defined(USE_MUSYX)
+	// freakdave - MusyX Audio plugin
+	//if (g_iAudioPlugin == _AudioPluginMusyX)
+	{
+		_AUDIO_LINK_AiDacrateChanged 	= _AUDIO_MUSYX_AiDacrateChanged;
+		_AUDIO_LINK_AiLenChanged	 	= _AUDIO_MUSYX_AiLenChanged;
+		_AUDIO_LINK_AiReadLength	 	= _AUDIO_MUSYX_AiReadLength;
+		_AUDIO_LINK_AiUpdate		 	= _AUDIO_MUSYX_AiUpdate;
+		_AUDIO_LINK_CloseDLL		 	= _AUDIO_MUSYX_CloseDLL;
+		//_AUDIO_LINK_DllAbout		 	= _AUDIO_MUSYX_DllAbout;
+		_AUDIO_LINK_DllConfig		 	= _AUDIO_MUSYX_DllConfig;
+		//_AUDIO_LINK_DllTest			 	= _AUDIO_MUSYX_DllTest;
+		_AUDIO_LINK_GetDllInfo		 	= _AUDIO_MUSYX_GetDllInfo;
+		_AUDIO_LINK_InitiateAudio	 	= _AUDIO_MUSYX_InitiateAudio;
+		_AUDIO_LINK_ProcessAList	 	= _AUDIO_MUSYX_ProcessAList;
+		_AUDIO_LINK_RomClosed		 	= _AUDIO_MUSYX_RomClosed;
+		
+		_AUDIO_LINK_AudioBoost		 	= _AUDIO_MUSYX_AudioBoost;
+	}
+#elif defined(USE_M64PAUDIO)
+	//if (g_iAudioPlugin == _AudioPluginM64p) // so it doesn't break for now
+	{
+		// Mupen 1.5 Audio plugin
+		_AUDIO_LINK_AiDacrateChanged 	= _AUDIO_M64P_AiDacrateChanged;
+		_AUDIO_LINK_AiLenChanged	 	= _AUDIO_M64P_AiLenChanged;
+		_AUDIO_LINK_AiReadLength	 	= _AUDIO_M64P_AiReadLength;
+		_AUDIO_LINK_AiUpdate		 	= _AUDIO_M64P_AiUpdate;
+		_AUDIO_LINK_CloseDLL		 	= _AUDIO_M64P_CloseDLL;
+		//_AUDIO_LINK_DllAbout		 	= _AUDIO_M64P_DllAbout;
+		_AUDIO_LINK_DllConfig		 	= _AUDIO_M64P_DllConfig;
+		//_AUDIO_LINK_DllTest			 	= _AUDIO_M64P_DllTest;
+		_AUDIO_LINK_GetDllInfo		 	= _AUDIO_M64P_GetDllInfo;
+		_AUDIO_LINK_InitiateAudio	 	= _AUDIO_M64P_InitiateAudio;
+		_AUDIO_LINK_ProcessAList	 	= _AUDIO_M64P_ProcessAList;
+		_AUDIO_LINK_RomClosed		 	= _AUDIO_M64P_RomClosed;
+		//_AUDIO_LINK_ProcessAListCountCycles = _AUDIO_MUSYX_ProcessAListCountCycles;
+		
+		_AUDIO_LINK_AudioBoost		 	= _AUDIO_M64P_AudioBoost;
+	}
+#else
 
-	AiDllConfig = (void ( *)(HWND))_AUDIO_AZIMER_DllConfig;
-	AiUpdate = (void ( *)(BOOL))_AUDIO_AZIMER_AiUpdate;
-	return TRUE;
+	if (g_iAudioPlugin == _AudioPluginNone)
+	{
+		// Ez0n3 - No Audio (declared in plugin.h include)
+		_AUDIO_LINK_AiDacrateChanged 	= _AUDIO_NONE_AiDacrateChanged;
+		_AUDIO_LINK_AiLenChanged	 	= _AUDIO_NONE_AiLenChanged;
+		_AUDIO_LINK_AiReadLength	 	= _AUDIO_NONE_AiReadLength;
+		_AUDIO_LINK_AiUpdate		 	= _AUDIO_NONE_AiUpdate;
+		_AUDIO_LINK_CloseDLL		 	= _AUDIO_NONE_CloseDLL;
+		//_AUDIO_LINK_DllAbout		 	= _AUDIO_NONE_DllAbout;
+		_AUDIO_LINK_DllConfig		 	= _AUDIO_NONE_DllConfig;
+		//_AUDIO_LINK_DllTest			 	= _AUDIO_NONE_DllTest;
+		_AUDIO_LINK_GetDllInfo		 	= _AUDIO_NONE_GetDllInfo;
+		_AUDIO_LINK_InitiateAudio	 	= _AUDIO_NONE_InitiateAudio;
+		_AUDIO_LINK_ProcessAList	 	= _AUDIO_NONE_ProcessAList;
+		_AUDIO_LINK_RomClosed		 	= _AUDIO_NONE_RomClosed;
+	}
+	/*else if (g_iAudioPlugin == _AudioPluginLleRsp)
+	{
+		// deprecated
+	}*/
+	else if (g_iAudioPlugin == _AudioPluginBasic)
+	{
+		_AUDIO_LINK_AiDacrateChanged 	= _AUDIO_BASIC_AiDacrateChanged;
+		_AUDIO_LINK_AiLenChanged	 	= _AUDIO_BASIC_AiLenChanged;
+		_AUDIO_LINK_AiReadLength	 	= _AUDIO_BASIC_AiReadLength;
+		_AUDIO_LINK_AiUpdate		 	= _AUDIO_BASIC_AiUpdate;
+		_AUDIO_LINK_CloseDLL		 	= _AUDIO_BASIC_CloseDLL;
+		//_AUDIO_LINK_DllAbout		 	= _AUDIO_BASIC_DllAbout;
+		_AUDIO_LINK_DllConfig		 	= _AUDIO_BASIC_DllConfig;
+		//_AUDIO_LINK_DllTest			 	= _AUDIO_BASIC_DllTest;
+		_AUDIO_LINK_GetDllInfo		 	= _AUDIO_BASIC_GetDllInfo;
+		_AUDIO_LINK_InitiateAudio	 	= _AUDIO_BASIC_InitiateAudio;
+		_AUDIO_LINK_ProcessAList	 	= _AUDIO_BASIC_ProcessAList;
+		_AUDIO_LINK_RomClosed		 	= _AUDIO_BASIC_RomClosed;
+	}
+	else if (g_iAudioPlugin == _AudioPluginJttl)
+	{
+		//freakdave - JttL 1.2
+		_AUDIO_LINK_AiDacrateChanged 	= _AUDIO_JTTL_AiDacrateChanged;
+		_AUDIO_LINK_AiLenChanged	 	= _AUDIO_JTTL_AiLenChanged;
+		_AUDIO_LINK_AiReadLength	 	= _AUDIO_JTTL_AiReadLength;
+		_AUDIO_LINK_AiUpdate		 	= _AUDIO_JTTL_AiUpdate;
+		_AUDIO_LINK_CloseDLL		 	= _AUDIO_JTTL_CloseDLL;
+		//_AUDIO_LINK_DllAbout		 	= _AUDIO_JTTL_DllAbout;
+		_AUDIO_LINK_DllConfig		 	= _AUDIO_JTTL_DllConfig;
+		//_AUDIO_LINK_DllTest			 	= _AUDIO_JTTL_DllTest;
+		_AUDIO_LINK_GetDllInfo		 	= _AUDIO_JTTL_GetDllInfo;
+		_AUDIO_LINK_InitiateAudio	 	= _AUDIO_JTTL_InitiateAudio;
+		_AUDIO_LINK_ProcessAList	 	= _AUDIO_JTTL_ProcessAList;
+		_AUDIO_LINK_RomClosed		 	= _AUDIO_JTTL_RomClosed;
+		
+		_AUDIO_LINK_AudioBoost		 	= _AUDIO_JTTL_AudioBoost;
+	}
+	else if (g_iAudioPlugin == _AudioPluginAzimer)
+	{
+		//freakdave - readded Azimer plugin from Surreal 1.0 and FDB
+		_AUDIO_LINK_AiDacrateChanged 	= _AUDIO_AZIMER_AiDacrateChanged;
+		_AUDIO_LINK_AiLenChanged	 	= _AUDIO_AZIMER_AiLenChanged;
+		_AUDIO_LINK_AiReadLength	 	= _AUDIO_AZIMER_AiReadLength;
+		_AUDIO_LINK_AiUpdate		 	= _AUDIO_AZIMER_AiUpdate;
+		_AUDIO_LINK_CloseDLL		 	= _AUDIO_AZIMER_CloseDLL;
+		//_AUDIO_LINK_DllAbout		 	= _AUDIO_AZIMER_DllAbout;
+		_AUDIO_LINK_DllConfig		 	= _AUDIO_AZIMER_DllConfig;
+		//_AUDIO_LINK_DllTest			 	= _AUDIO_AZIMER_DllTest;
+		_AUDIO_LINK_GetDllInfo		 	= _AUDIO_AZIMER_GetDllInfo;
+		_AUDIO_LINK_InitiateAudio	 	= _AUDIO_AZIMER_InitiateAudio;
+		_AUDIO_LINK_ProcessAList	 	= _AUDIO_AZIMER_ProcessAList;
+		_AUDIO_LINK_RomClosed		 	= _AUDIO_AZIMER_RomClosed;
+		
+		_AUDIO_LINK_AudioBoost		 	= _AUDIO_AZIMER_AudioBoost;
+	}
 
-}
+#endif
 
+	__try
+	{
+		_AUDIO_LINK_AudioBoost(g_bAudioBoost);
+	}
+	__except(NULL, EXCEPTION_EXECUTE_HANDLER)
+	{
+	}
 
-
-// Ez0n3 - No Audio
-BOOL LoadAudioNoneDll(void) {
-	PLUGIN_INFO PluginInfo;
-	 
-	hAudioDll = (HANDLE)100;
-	if (hAudioDll == NULL) {  return FALSE; }
-
-	GetDllInfo = (void *)_AUDIO_NONE_GetDllInfo;
+	GetDllInfo = (void *)_AUDIO_LINK_GetDllInfo;
 	if (GetDllInfo == NULL) { return FALSE; }
 
 	GetDllInfo(&PluginInfo);
 	if (!ValidPluginVersion(&PluginInfo) || PluginInfo.MemoryBswaped == FALSE) { return FALSE; }
 
-	AiCloseDLL = (void *)_AUDIO_NONE_CloseDLL;
+	AiCloseDLL = (void *)_AUDIO_LINK_CloseDLL;
 	if (AiCloseDLL == NULL) { return FALSE; }
-	AiDacrateChanged = (void *)(int)_AUDIO_NONE_AiDacrateChanged;
+	AiDacrateChanged = (void *)(int)_AUDIO_LINK_AiDacrateChanged;
 	if (AiDacrateChanged == NULL) { return FALSE; }
-	AiLenChanged = (void *)_AUDIO_NONE_AiLenChanged;
+	AiLenChanged = (void *)_AUDIO_LINK_AiLenChanged;
 	if (AiLenChanged == NULL) { return FALSE; }
-	AiReadLength = (DWORD ( *)(void))_AUDIO_NONE_AiReadLength;
+	AiReadLength = (DWORD ( *)(void))_AUDIO_LINK_AiReadLength;
 	if (AiReadLength == NULL) { return FALSE; }
-	InitiateAudio = (BOOL ( *)(AUDIO_INFO))_AUDIO_NONE_InitiateAudio;
+	InitiateAudio = (BOOL ( *)(AUDIO_INFO))_AUDIO_LINK_InitiateAudio;
 	if (InitiateAudio == NULL) { return FALSE; }
-	AiRomClosed = (void ( *)(void))_AUDIO_NONE_RomClosed;
+	AiRomClosed = (void ( *)(void))_AUDIO_LINK_RomClosed;
 	if (AiRomClosed == NULL) { return FALSE; }
-	ProcessAList = (void ( *)(void))_AUDIO_NONE_ProcessAList;	
+	ProcessAList = (void ( *)(void))_AUDIO_LINK_ProcessAList;	
 	if (ProcessAList == NULL) { return FALSE; }
 
-	AiDllConfig = (void ( *)(HWND))_AUDIO_NONE_DllConfig;
-	AiUpdate = (void ( *)(BOOL))_AUDIO_NONE_AiUpdate;
+	AiDllConfig = (void ( *)(HWND))_AUDIO_LINK_DllConfig;
+	AiUpdate = (void ( *)(BOOL))_AUDIO_LINK_AiUpdate;
+	
+	{
+		_AUDIO_LINK_AiDacrateChanged 	= NULL;
+		_AUDIO_LINK_AiLenChanged	 	= NULL;
+		_AUDIO_LINK_AiReadLength	 	= NULL;
+		_AUDIO_LINK_AiUpdate		 	= NULL;
+		_AUDIO_LINK_CloseDLL		 	= NULL;
+		//_AUDIO_LINK_DllAbout		 	= NULL;
+		_AUDIO_LINK_DllConfig		 	= NULL;
+		//_AUDIO_LINK_DllTest			 	= NULL;
+		_AUDIO_LINK_GetDllInfo		 	= NULL;
+		_AUDIO_LINK_InitiateAudio	 	= NULL;
+		_AUDIO_LINK_ProcessAList	 	= NULL;
+		_AUDIO_LINK_RomClosed		 	= NULL;
+		
+		_AUDIO_LINK_AudioBoost		 	= NULL;
+	}
+	
 	return TRUE;
 }
-
-// freakdave - MusyX Audio plugin
-BOOL LoadAudioMusyXDll(void) {
-	PLUGIN_INFO PluginInfo;
-	 
-	hAudioDll = (HANDLE)100;
-	if (hAudioDll == NULL) {  return FALSE; }
-
-	GetDllInfo = (void *)_AUDIO_MUSYX_GetDllInfo;
-	if (GetDllInfo == NULL) { return FALSE; }
-
-	GetDllInfo(&PluginInfo);
-	if (!ValidPluginVersion(&PluginInfo) || PluginInfo.MemoryBswaped == FALSE) { return FALSE; }
-
-	AiCloseDLL = (void *)_AUDIO_MUSYX_CloseDLL;
-	if (AiCloseDLL == NULL) { return FALSE; }
-	AiDacrateChanged = (void *)(int)_AUDIO_MUSYX_AiDacrateChanged;
-	if (AiDacrateChanged == NULL) { return FALSE; }
-	AiLenChanged = (void *)_AUDIO_MUSYX_AiLenChanged;
-	if (AiLenChanged == NULL) { return FALSE; }
-	AiReadLength = (DWORD ( *)(void))_AUDIO_MUSYX_AiReadLength;
-	if (AiReadLength == NULL) { return FALSE; }
-	InitiateAudio = (BOOL ( *)(AUDIO_INFO))_AUDIO_MUSYX_InitiateAudio;
-	if (InitiateAudio == NULL) { return FALSE; }
-	AiRomClosed = (void ( *)(void))_AUDIO_MUSYX_RomClosed;
-	if (AiRomClosed == NULL) { return FALSE; }
-	ProcessAList = (void ( *)(void))_AUDIO_MUSYX_ProcessAList;	
-	if (ProcessAList == NULL) { return FALSE; }
-
-	AiDllConfig = (void ( *)(HWND))_AUDIO_MUSYX_DllConfig;
-	AiUpdate = (void ( *)(BOOL))_AUDIO_MUSYX_AiUpdate;
-	return TRUE;
-}
-
 
 BOOL LoadControllerDll(void) {
 	PLUGIN_INFO PluginInfo;
@@ -441,14 +477,49 @@ BOOL LoadGFXDll(char * RspDll) {
 	return TRUE;
 }
 
-/*BOOL LoadRSPDll(void) {
+BOOL LoadRSPDll(void) {
 	PLUGIN_INFO PluginInfo;
  
-
 	hRspDll = (HANDLE)1;
 	if (hRspDll == NULL) {  return FALSE; }
 
-	GetDllInfo = (void ( *)(PLUGIN_INFO *))_RSP_GetDllInfo;
+	
+	if(g_iRspPlugin == _RSPPluginLLE || g_iRspPlugin == _RSPPluginNone) // pj64 seems to break without rsp
+	{
+		_RSP_LINK_DoRspCycles 		= _RSP_DoRspCycles;
+		_RSP_LINK_CloseDLL	 		= _RSP_CloseDLL;
+		_RSP_LINK_RomClosed	 		= _RSP_RomClosed;
+		_RSP_LINK_DllConfig		 	= _RSP_DllConfig;
+		//_RSP_LINK_DllAbout		 	= NULL;
+		_RSP_LINK_GetDllInfo		= _RSP_GetDllInfo;
+		//_RSP_LINK_InitiateRSP_1_0	= _RSP_InitiateRSP;
+		_RSP_LINK_InitiateRSP_1_1	= _RSP_InitiateRSP;
+	}
+	else if(g_iRspPlugin == _RSPPluginHLE)
+	{
+		_RSP_LINK_DoRspCycles 		= _RSP_HLE_DoRspCycles;
+		_RSP_LINK_CloseDLL	 		= _RSP_HLE_CloseDLL;
+		_RSP_LINK_RomClosed	 		= _RSP_HLE_RomClosed;
+		_RSP_LINK_DllConfig		 	= _RSP_HLE_DllConfig;
+		//_RSP_LINK_DllAbout		 	= NULL;
+		_RSP_LINK_GetDllInfo		= _RSP_HLE_GetDllInfo;
+		//_RSP_LINK_InitiateRSP_1_0	= _RSP_HLE_InitiateRSP;
+		_RSP_LINK_InitiateRSP_1_1	= _RSP_HLE_InitiateRSP;
+	}
+	else if(g_iRspPlugin == _RSPPluginM64p)
+	{
+		_RSP_LINK_DoRspCycles 		= _RSP_M64p_DoRspCycles;
+		_RSP_LINK_CloseDLL	 		= _RSP_M64p_CloseDLL;
+		_RSP_LINK_RomClosed	 		= _RSP_M64p_RomClosed;
+		_RSP_LINK_DllConfig		 	= _RSP_M64p_DllConfig;
+		//_RSP_LINK_DllAbout		 	= NULL;
+		_RSP_LINK_GetDllInfo		= _RSP_M64p_GetDllInfo;
+		//_RSP_LINK_InitiateRSP_1_0	= _RSP_M64p_InitiateRSP;
+		_RSP_LINK_InitiateRSP_1_1	= _RSP_M64p_InitiateRSP;
+	}
+
+	
+	GetDllInfo = (void ( *)(PLUGIN_INFO *))_RSP_LINK_GetDllInfo;
 	if (GetDllInfo == NULL) { return FALSE; }
 
 	GetDllInfo(&PluginInfo);
@@ -456,60 +527,36 @@ BOOL LoadGFXDll(char * RspDll) {
 	RSPVersion = PluginInfo.Version;
 	if (RSPVersion == 1) { RSPVersion = 0x0100; }
 
-	DoRspCycles = (DWORD ( *)(DWORD))_RSP_DoRspCycles;
+	DoRspCycles = (DWORD ( *)(DWORD))_RSP_LINK_DoRspCycles;
 	if (DoRspCycles == NULL) { return FALSE; }
 	InitiateRSP_1_0 = NULL;
 	InitiateRSP_1_1 = NULL;
 	if (RSPVersion == 0x100) {
-		InitiateRSP_1_0 = (void *)_RSP_InitiateRSP;
+		InitiateRSP_1_0 = (void *)_RSP_LINK_InitiateRSP_1_1; //_RSP_LINK_InitiateRSP_1_0
 		if (InitiateRSP_1_0 == NULL) { return FALSE; }
 	}
 	if (RSPVersion == 0x101) {
-		InitiateRSP_1_1 = (void *)_RSP_InitiateRSP;
+		InitiateRSP_1_1 = (void *)_RSP_LINK_InitiateRSP_1_1;
 		if (InitiateRSP_1_1 == NULL) { return FALSE; }
 	}
-	RSPRomClosed = (void *)_RSP_RomClosed;
+	RSPRomClosed = (void *)_RSP_LINK_RomClosed;
 	if (RSPRomClosed == NULL) { return FALSE; }
-	RSPCloseDLL = (void ( *)(void))_RSP_CloseDLL;
+	RSPCloseDLL = (void ( *)(void))_RSP_LINK_CloseDLL;
 	if (RSPCloseDLL == NULL) { return FALSE; }
 	
-	RSPDllConfig = (void ( *)(HWND))_RSP_DllConfig;
-	return TRUE;
-}*/
-
-BOOL LoadHLERSPDll(void) {
-	PLUGIN_INFO PluginInfo;
- 
-
-	hRspDll = (HANDLE)1;
-	if (hRspDll == NULL) {  return FALSE; }
-
-	GetDllInfo = (void ( *)(PLUGIN_INFO *))_RSP_GetDllInfo;
-	if (GetDllInfo == NULL) { return FALSE; }
-
-	GetDllInfo(&PluginInfo);
-	if (!ValidPluginVersion(&PluginInfo) || PluginInfo.MemoryBswaped == FALSE) { return FALSE; }
-	RSPVersion = PluginInfo.Version;
-	if (RSPVersion == 1) { RSPVersion = 0x0100; }
-
-	DoRspCycles = (DWORD ( *)(DWORD))_RSP_DoRspCycles;
-	if (DoRspCycles == NULL) { return FALSE; }
-	InitiateRSP_1_0 = NULL;
-	InitiateRSP_1_1 = NULL;
-	if (RSPVersion == 0x100) {
-		InitiateRSP_1_0 = (void *)_RSP_InitiateRSP;
-		if (InitiateRSP_1_0 == NULL) { return FALSE; }
-	}
-	if (RSPVersion == 0x101) {
-		InitiateRSP_1_1 = (void *)_RSP_InitiateRSP;
-		if (InitiateRSP_1_1 == NULL) { return FALSE; }
-	}
-	RSPRomClosed = (void *)_RSP_RomClosed;
-	if (RSPRomClosed == NULL) { return FALSE; }
-	RSPCloseDLL = (void ( *)(void))_RSP_CloseDLL;
-	if (RSPCloseDLL == NULL) { return FALSE; }
+	RSPDllConfig = (void ( *)(HWND))_RSP_LINK_DllConfig;
 	
-	RSPDllConfig = (void ( *)(HWND))_RSP_DllConfig;
+	{
+		_RSP_LINK_DoRspCycles 		= NULL;
+		_RSP_LINK_CloseDLL	 		= NULL;
+		_RSP_LINK_RomClosed	 		= NULL;
+		_RSP_LINK_DllConfig		 	= NULL;
+		//_RSP_LINK_DllAbout		 	= NULL;
+		_RSP_LINK_GetDllInfo		= NULL;
+		//_RSP_LINK_InitiateRSP_1_0	= NULL;
+		_RSP_LINK_InitiateRSP_1_1	= NULL;
+	}
+	
 	return TRUE;
 }
 
@@ -565,36 +612,10 @@ void SetupPlugins (HWND hWnd) {
 	}
 
 
-	// Ez0n3 - plugin selection to replace bools: g_bUseBasicAudio = g_bUseLLERspPlugin;
+	// plugin selection to replace bools: g_bUseBasicAudio = g_bUseLLERspPlugin;
 	//if (g_bUseBasicAudio) success = LoadAudioBasicDll();
 	//else success = LoadAudioJttLDll();
-	if (g_iAudioPlugin == _AudioPluginNone)
-	{
-		success = LoadAudioNoneDll();
-	}
-	else if (g_iAudioPlugin == _AudioPluginLleRsp)
-	{
-		// set audio basic so it doesn't crash
-		success = LoadAudioBasicDll();
-	}
-	else if (g_iAudioPlugin == _AudioPluginBasic)
-	{
-		success = LoadAudioBasicDll();
-	}
-	else if (g_iAudioPlugin == _AudioPluginJttl)
-	{
-		success = LoadAudioJttLDll();
-	}
-	else if (g_iAudioPlugin == _AudioPluginAzimer)
-	{
-		success = LoadAudioAzimerDll();
-	}
-	
-	else if (g_iAudioPlugin == _AudioPluginMusyX)
-	{
-		success = LoadAudioMusyXDll();
-	}
-	
+	success = LoadAudioDll();
 
 	if (!success) {
 		AiCloseDLL       = NULL;
@@ -637,10 +658,13 @@ void SetupPlugins (HWND hWnd) {
 		}
 		 
 	}
-
-	if (!LoadHLERSPDll())
+	
+	if (!LoadRSPDll()) {
 		return;
+	}
 
+	// control RSP with multi plugin options
+	// pj64 seems to break without rsp
 	{
 		RSP_INFO_1_0 RspInfo10;
 		RSP_INFO_1_1 RspInfo11;
@@ -650,8 +674,8 @@ void SetupPlugins (HWND hWnd) {
 		RspInfo10.ProcessDlist = ProcessDList;
 		RspInfo11.ProcessDlist = ProcessDList;
 
-		// Ez0n3 - use iAudioPlugin instead to determine if basic audio is used
-		if (g_iAudioPlugin == _AudioPluginLleRsp) //g_bUseLLERspPlugin	//_AudioPluginBasic
+		// going to use rsp audio plugin here instead of the use lle rsp bool
+		if (g_bUseRspAudio) // g_bUseLLERspPlugin // g_iAudioPlugin != _AudioPluginLleRsp
 		{
 			RspInfo10.ProcessAlist = NULL;
 			RspInfo11.ProcessAlist = NULL;
@@ -801,13 +825,9 @@ void SetupPlugins (HWND hWnd) {
  
 }
 
-void SetupPluginScreen (HWND hDlg) {
- 
-}
+void SetupPluginScreen (HWND hDlg) {}
 
-void ShutdownPlugins (void) {
- 
-}
+void ShutdownPlugins (void) {}
 
 BOOL ValidPluginVersion ( PLUGIN_INFO * PluginInfo ) {
 	switch (PluginInfo->Type) {

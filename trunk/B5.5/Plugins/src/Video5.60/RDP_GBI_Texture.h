@@ -655,6 +655,24 @@ void LoadTexture(uint32 tileno)
 
 	gti.pPhysicalAddress = ((BYTE*)g_pRDRAMu32)+gti.Address;
 
+	//freakdave - found this in 6.11 (RDP_Texture.h -> line 853 -> TxtrCacheEntry* LoadTexture(uint32 tileno)
+#ifdef _XBOX
+	// Hack for XBOX, don't use too big textures
+	if( gti.HeightToCreate/gti.HeightToLoad >= 2 && gti.HeightToCreate > 128 )//&& tile.bClampT )//&& tile.dwMaskT )
+	{
+		tile.bClampT = 0;
+		gti.HeightToCreate = gti.HeightToLoad;
+		tile.dwHeight = gti.HeightToLoad;
+	}
+
+	if( gti.WidthToCreate/gti.WidthToLoad >= 2 && gti.WidthToCreate > 128 )//&& tile.bClampS )//&& tile.dwMaskS )
+	{
+		tile.bClampS = 0;
+		gti.WidthToCreate = gti.WidthToLoad;
+		tile.dwWidth = gti.WidthToLoad;
+	}
+#endif
+
 #ifdef _DEBUG
 	if( logTextures )
 	{
@@ -767,6 +785,24 @@ void LoadTextureNew(uint32 tileno)
 
 	if (gti.Format == TXT_FMT_CI && gti.TLutFmt == TLUT_FMT_NONE )
 		gti.TLutFmt = TLUT_FMT_RGBA16;		// Force RGBA
+
+		//freakdave - found this in 6.11 (RDP_Texture.h -> line 853 -> TxtrCacheEntry* LoadTexture(uint32 tileno)
+#ifdef _XBOX
+	// Hack for XBOX, don't use too big textures
+	if( gti.HeightToCreate/gti.HeightToLoad >= 2 && gti.HeightToCreate > 128 )//&& tile.bClampT )//&& tile.dwMaskT )
+	{
+		tile.bClampT = 0;
+		gti.HeightToCreate = gti.HeightToLoad;
+		tile.dwHeight = gti.HeightToLoad;
+	}
+
+	if( gti.WidthToCreate/gti.WidthToLoad >= 2 && gti.WidthToCreate > 128 )//&& tile.bClampS )//&& tile.dwMaskS )
+	{
+		tile.bClampS = 0;
+		gti.WidthToCreate = gti.WidthToLoad;
+		tile.dwWidth = gti.WidthToLoad;
+	}
+#endif
 
 #ifdef _DEBUG
 	if( logTextures )

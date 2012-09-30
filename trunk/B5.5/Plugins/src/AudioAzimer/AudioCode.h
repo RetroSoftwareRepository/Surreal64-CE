@@ -5,8 +5,8 @@
 #include <xtl.h>
 #else
 #include <windows.h>
-#include <dsound.h>
 #endif
+#include <dsound.h>
 
 #define SND_IS_NOT_EMPTY 0x4000000
 #define SND_IS_FULL		 0x8000000

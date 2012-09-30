@@ -138,7 +138,7 @@ typedef struct
 
 	RenderShadeMode	shadeMode;
 	bool	bCullFront;
-	float	bCullBack;
+	bool	bCullBack;
 	bool	bLightingEnable;
 	bool	bTextureGen;
 	bool	bFogEnabled;

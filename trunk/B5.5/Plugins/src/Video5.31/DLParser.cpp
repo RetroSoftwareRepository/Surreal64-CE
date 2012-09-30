@@ -21,7 +21,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "ucode.h"
 
-#include "./Menu/MenuMain.h"
+//#include "./Menu/MenuMain.h"
+extern void RunIngameMenu();
 
 // Lkb added mirroring support for cards that don't support it. Thanks Lkb!
 /*
@@ -858,9 +859,11 @@ void SetVIScales();
 extern BOOL _INPUT_IsIngameMenuWaiting();
 extern BOOL _INPUT_UpdatePaks();
 extern BOOL _INPUT_UpdateControllerStates();
+extern void _INPUT_RumblePause(bool bPause);
 extern "C" void ReInitVirtualDynaMemory(boolean charge);
 extern int TextureMode;
 extern bool FrameSkip;
+
 void DLParser_Process(OSTask * pTask)
 {
 	static int skipframe=0;
@@ -1012,9 +1015,6 @@ void DLParser_Process(OSTask * pTask)
 			}
 		}
 
-		XboxCheckMenuAndDebugInfo();
-		XboxDrawTemporaryMessage();
-
 		CDaedalusRender::g_pRender->EndRendering();
 	}
 
@@ -1024,12 +1024,16 @@ void DLParser_Process(OSTask * pTask)
 	//freakdave
 	if (_INPUT_IsIngameMenuWaiting())
 	{
+		_INPUT_RumblePause(true);
+	
 		ReInitVirtualDynaMemory(false);
 		RunIngameMenu();
 		options.forceTextureFilter=TextureMode;
 		_INPUT_UpdatePaks();//added by freakdave
 		_INPUT_UpdateControllerStates();//added by freakdave
 		ReInitVirtualDynaMemory(true);
+		
+		_INPUT_RumblePause(false);
 	}
 }
 

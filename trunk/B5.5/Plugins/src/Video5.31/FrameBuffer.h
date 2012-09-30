@@ -23,7 +23,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // ===========================================================================
 
 // fix me, make me not depend on DirectX
+#ifdef _XBOX
 #include <xgraphics.h>
+#endif
 #include "DirectXGraphicsContext.h"
 #include "DaedalusRender.h"
 #include "D3DRender.h"

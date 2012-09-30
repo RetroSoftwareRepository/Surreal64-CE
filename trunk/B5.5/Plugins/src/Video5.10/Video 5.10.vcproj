@@ -4,6 +4,7 @@
 	Version="7.10"
 	Name="Video5.10"
 	ProjectGUID="{B03134F1-3846-4D16-B5F3-3F69C54DE23A}"
+	RootNamespace="Video5.10"
 	Keyword="XboxProj">
 	<Platforms>
 		<Platform
@@ -20,14 +21,59 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				OptimizeForProcessor="2"
-				AdditionalIncludeDirectories="$(SolutionDir)Include; ..\lib"
+				AdditionalIncludeDirectories="..\..\..\Include"
 				PreprocessorDefinitions="DEBUG;_XBOX;_LIB"
-				StringPooling="TRUE"
+				BasicRuntimeChecks="0"
 				RuntimeLibrary="0"
+				BufferSecurityCheck="FALSE"
 				EnableFunctionLevelLinking="TRUE"
 				EnableEnhancedInstructionSet="1"
 				UsePrecompiledHeader="0"
-				PrecompiledHeaderFile="obj\Debug\$(ProjectName).pch"
+				PrecompiledHeaderFile="$(IntDir)\$(ProjectName).pch"
+				BrowseInformation="1"
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="FALSE"
+				DebugInformationFormat="4"
+				CallingConvention="1"/>
+			<Tool
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCLibrarianTool"
+				OutputFile="../../lib/Video510.lib"/>
+			<Tool
+				Name="VCPostBuildEventTool"/>
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+		</Configuration>
+		<Configuration
+			Name="Profile|Xbox"
+			OutputDirectory="obj\Profile"
+			IntermediateDirectory="obj\Profile"
+			ConfigurationType="4"
+			CharacterSet="2"
+			WholeProgramOptimization="FALSE">
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="3"
+				GlobalOptimizations="TRUE"
+				InlineFunctionExpansion="2"
+				EnableIntrinsicFunctions="TRUE"
+				FavorSizeOrSpeed="1"
+				OmitFramePointers="TRUE"
+				EnableFiberSafeOptimizations="TRUE"
+				OptimizeForProcessor="2"
+				AdditionalIncludeDirectories="..\..\..\Include"
+				PreprocessorDefinitions="NDEBUG;_XBOX;_LIB;PROFILE"
+				StringPooling="TRUE"
+				RuntimeLibrary="0"
+				BufferSecurityCheck="FALSE"
+				EnableFunctionLevelLinking="TRUE"
+				EnableEnhancedInstructionSet="1"
+				UsePrecompiledHeader="0"
+				PrecompiledHeaderFile="$(IntDir)\$(ProjectName).pch"
+				BrowseInformation="1"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
 				DebugInformationFormat="3"
@@ -36,8 +82,51 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="../../lib/Video510.lib"
-				AdditionalLibraryDirectories=""/>
+				OutputFile="../../lib/Video510.lib"/>
+			<Tool
+				Name="VCPostBuildEventTool"/>
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+		</Configuration>
+		<Configuration
+			Name="Profile_FastCap|Xbox"
+			OutputDirectory="obj\Profile_FastCap"
+			IntermediateDirectory="obj\Profile_FastCap"
+			ConfigurationType="4"
+			CharacterSet="2"
+			WholeProgramOptimization="FALSE">
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="3"
+				GlobalOptimizations="TRUE"
+				InlineFunctionExpansion="2"
+				EnableIntrinsicFunctions="TRUE"
+				FavorSizeOrSpeed="1"
+				OmitFramePointers="TRUE"
+				EnableFiberSafeOptimizations="TRUE"
+				OptimizeForProcessor="2"
+				AdditionalIncludeDirectories="..\..\..\Include"
+				PreprocessorDefinitions="NDEBUG;_XBOX;_LIB;PROFILE;FASTCAP"
+				StringPooling="TRUE"
+				RuntimeLibrary="0"
+				BufferSecurityCheck="FALSE"
+				EnableFunctionLevelLinking="TRUE"
+				EnableEnhancedInstructionSet="1"
+				UsePrecompiledHeader="0"
+				PrecompiledHeaderFile="$(IntDir)\$(ProjectName).pch"
+				BrowseInformation="1"
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="FALSE"
+				DebugInformationFormat="3"
+				CallingConvention="1"
+				FastCAP="TRUE"/>
+			<Tool
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCLibrarianTool"
+				OutputFile="../../lib/Video510.lib"/>
 			<Tool
 				Name="VCPostBuildEventTool"/>
 			<Tool
@@ -50,7 +139,8 @@
 			OutputDirectory="obj\Release"
 			IntermediateDirectory="obj\Release"
 			ConfigurationType="4"
-			CharacterSet="2">
+			CharacterSet="2"
+			WholeProgramOptimization="FALSE">
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="2"
@@ -62,18 +152,63 @@
 				OmitFramePointers="TRUE"
 				EnableFiberSafeOptimizations="TRUE"
 				OptimizeForProcessor="2"
-				AdditionalIncludeDirectories="$(SolutionDir)Include"
+				AdditionalIncludeDirectories="..\..\..\Include"
 				PreprocessorDefinitions="NDEBUG;_XBOX;_LIB"
 				StringPooling="TRUE"
 				RuntimeLibrary="0"
+				BufferSecurityCheck="FALSE"
 				EnableFunctionLevelLinking="TRUE"
 				EnableEnhancedInstructionSet="1"
 				UsePrecompiledHeader="0"
-				PrecompiledHeaderFile="obj\Release\$(ProjectName).pch"
+				PrecompiledHeaderFile="$(IntDir)\$(ProjectName).pch"
 				BrowseInformation="1"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
-				DebugInformationFormat="0"
+				DebugInformationFormat="3"
+				CallingConvention="1"/>
+			<Tool
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCLibrarianTool"
+				OutputFile="../../lib/Video510.lib"/>
+			<Tool
+				Name="VCPostBuildEventTool"/>
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+		</Configuration>
+		<Configuration
+			Name="Release_LTCG|Xbox"
+			OutputDirectory="obj\Release_LTCG"
+			IntermediateDirectory="obj\Release_LTCG"
+			ConfigurationType="4"
+			CharacterSet="2"
+			WholeProgramOptimization="TRUE">
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="3"
+				GlobalOptimizations="TRUE"
+				InlineFunctionExpansion="2"
+				EnableIntrinsicFunctions="FALSE"
+				ImproveFloatingPointConsistency="FALSE"
+				FavorSizeOrSpeed="1"
+				OmitFramePointers="TRUE"
+				EnableFiberSafeOptimizations="TRUE"
+				OptimizeForProcessor="2"
+				AdditionalIncludeDirectories="..\..\..\Include"
+				PreprocessorDefinitions="NDEBUG;_XBOX;_LIB;LTCG"
+				StringPooling="TRUE"
+				RuntimeLibrary="0"
+				BufferSecurityCheck="FALSE"
+				EnableFunctionLevelLinking="TRUE"
+				EnableEnhancedInstructionSet="1"
+				UsePrecompiledHeader="0"
+				PrecompiledHeaderFile="$(IntDir)\$(ProjectName).pch"
+				BrowseInformation="1"
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="FALSE"
+				DebugInformationFormat="3"
 				CallingConvention="1"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
@@ -193,18 +328,6 @@
 			</File>
 			<File
 				RelativePath=".\StdAfx.cpp">
-				<FileConfiguration
-					Name="Debug|Xbox">
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Xbox">
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\TextureCache.cpp">
@@ -228,9 +351,6 @@
 			</File>
 			<File
 				RelativePath=".\CombinerDefs.h">
-			</File>
-			<File
-				RelativePath=".\Common.h">
 			</File>
 			<File
 				RelativePath=".\Config.h">
@@ -378,31 +498,114 @@
 			Name="Xbox Additions"
 			Filter="">
 			<File
-				RelativePath=".\Menu\Common.h">
+				RelativePath="..\..\..\config.cpp">
+				<FileConfiguration
+					Name="Debug|Xbox">
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Profile|Xbox">
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Profile_FastCap|Xbox">
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Xbox">
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release_LTCG|Xbox">
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\Exports.cpp">
+				RelativePath="..\..\..\config.h">
 			</File>
-			<File
-				RelativePath="..\..\..\Ingamemenu\IoSupport.h">
-			</File>
-			<File
-				RelativePath=".\Menu\MenuMain.cpp">
-			</File>
-			<File
-				RelativePath=".\Menu\MenuMain.h">
-			</File>
-			<File
-				RelativePath=".\Misc.cpp">
-			</File>
+			<Filter
+				Name="Common"
+				Filter="">
+				<File
+					RelativePath="..\Common\Video\XboxOSD.cpp">
+				</File>
+				<Filter
+					Name="Menu"
+					Filter="">
+					<File
+						RelativePath="..\Common\Video\Menu\Common.h">
+					</File>
+					<File
+						RelativePath="..\Common\Video\Menu\D3DSave.cpp">
+					</File>
+					<File
+						RelativePath="..\Common\Video\Menu\D3DSave.h">
+					</File>
+					<File
+						RelativePath="..\Common\Video\Menu\MenuMain.cpp">
+					</File>
+					<File
+						RelativePath="..\Common\Video\Menu\MenuMain.h">
+					</File>
+					<File
+						RelativePath="..\Common\Video\Menu\Util.cpp">
+					</File>
+					<File
+						RelativePath="..\Common\Video\Menu\Util.h">
+					</File>
+				</Filter>
+			</Filter>
 			<Filter
 				Name="Ingame Menu"
 				Filter="">
 				<File
-					RelativePath="..\..\..\controller.cpp">
+					RelativePath="..\..\..\Ingamemenu\controller.cpp">
 				</File>
 				<File
 					RelativePath="..\..\..\Ingamemenu\IoSupport.cpp">
+					<FileConfiguration
+						Name="Debug|Xbox">
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Profile|Xbox">
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Profile_FastCap|Xbox">
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Xbox">
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release_LTCG|Xbox">
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath="..\..\..\Ingamemenu\IoSupport.h">
 				</File>
 				<File
 					RelativePath="..\..\..\Ingamemenu\Panel.cpp">
@@ -418,7 +621,7 @@
 				</File>
 			</Filter>
 			<Filter
-				Name="include"
+				Name="Include"
 				Filter="">
 				<File
 					RelativePath="..\..\..\Include\xbapp.cpp">
@@ -430,46 +633,25 @@
 					RelativePath="..\..\..\Include\xbinput.cpp">
 				</File>
 				<File
+					RelativePath="..\..\..\Include\xbprofiling.cpp">
+					<FileConfiguration
+						Name="Debug|Xbox"
+						ExcludedFromBuild="true">
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release|Xbox"
+						ExcludedFromBuild="true">
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release_LTCG|Xbox"
+						ExcludedFromBuild="true">
+					</FileConfiguration>
+				</File>
+				<File
 					RelativePath="..\..\..\Include\xbresource.cpp">
 				</File>
 				<File
 					RelativePath="..\..\..\Include\xbutil.cpp">
-				</File>
-			</Filter>
-			<Filter
-				Name="Graphics"
-				Filter="">
-				<File
-					RelativePath=".\Menu\D3DSave.cpp">
-				</File>
-				<File
-					RelativePath=".\Menu\D3DSave.h">
-				</File>
-			</Filter>
-			<Filter
-				Name="Input"
-				Filter="">
-				<File
-					RelativePath=".\Menu\Input.cpp">
-				</File>
-				<File
-					RelativePath=".\Menu\Input.h">
-				</File>
-			</Filter>
-			<Filter
-				Name="Misc"
-				Filter="">
-				<File
-					RelativePath="..\..\..\config.cpp">
-				</File>
-				<File
-					RelativePath="..\..\..\config.h">
-				</File>
-				<File
-					RelativePath=".\Menu\Util.cpp">
-				</File>
-				<File
-					RelativePath=".\Menu\Util.h">
 				</File>
 			</Filter>
 		</Filter>

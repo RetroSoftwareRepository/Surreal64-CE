@@ -2,8 +2,8 @@
 #include <xtl.h>
 #else
 #include <windows.h>
-#include <dsound.h>
 #endif
+#include <dsound.h>
 #include <stdio.h>
 #include "AudioCode.h"
 #include "Audio.h"
@@ -120,6 +120,7 @@ _exit_:
 // Setup and Teardown Functions
 
 // Generates nice alignment with N64 samples...
+extern BOOL bAudioBoostAzimer;
 void AudioCode::SetSegmentSize (DWORD length) {
 
     DSBUFFERDESC        dsbdesc;
@@ -151,6 +152,27 @@ void AudioCode::SetSegmentSize (DWORD length) {
 		return;
 	}
 
+	if (bAudioBoostAzimer) {
+	DSMIXBINS			dsmb;
+
+	DSMIXBINVOLUMEPAIR dsmbvp[8] = {
+    {DSMIXBIN_FRONT_LEFT, DSBVOLUME_MAX},
+    {DSMIXBIN_FRONT_RIGHT, DSBVOLUME_MAX},
+    {DSMIXBIN_FRONT_CENTER, DSBVOLUME_MAX},
+    {DSMIXBIN_FRONT_CENTER, DSBVOLUME_MAX},
+    {DSMIXBIN_BACK_LEFT, DSBVOLUME_MAX},
+    {DSMIXBIN_BACK_RIGHT, DSBVOLUME_MAX},
+    {DSMIXBIN_LOW_FREQUENCY, DSBVOLUME_MAX},
+    {DSMIXBIN_LOW_FREQUENCY, DSBVOLUME_MAX}};
+	
+	IDirectSoundBuffer_SetVolume(lpdsbuf, DSBVOLUME_MAX);
+	IDirectSoundBuffer_SetHeadroom(lpdsbuf, DSBHEADROOM_MIN);
+
+	dsmb.dwMixBinCount = 8;
+	dsmb.lpMixBinVolumePairs = dsmbvp;
+	IDirectSoundBuffer_SetMixBins(lpdsbuf, &dsmb);
+	}	
+	
 	IDirectSoundBuffer_Play(lpdsbuf, 0, 0, DSBPLAY_LOOPING );
 	lpdsbuff = this->lpdsbuf;
 	ReleaseMutex (hMutex);
@@ -205,7 +227,7 @@ void AudioCode::DeInitialize () {
 }
 
 // ---------BLAH--------
-#define u32 DWORD
+//#define u32 DWORD // redef
 
 static u32 Frequency = 0;
 static u32 Length = 0;

@@ -77,7 +77,7 @@ public:
 	void SetTextureEnableAndScale(int dwTile, bool enable, float fScaleX, float fScaleY);
 	
 	virtual void SetFogEnable(BOOL bEnable) { gRSP.bFogEnabled = bEnable&&options.bEnableFog; }
-	virtual void SetFogMinMax(float fMin, float fMax) = 0;
+	virtual void SetFogMinMax(float fMin, float fMax, float fMul, float fOffset) = 0;
 	virtual void TurnFogOnOff(BOOL flag)=0;
 	BOOL m_bFogStateSave;
 	void SetFogFlagForNegativeW();

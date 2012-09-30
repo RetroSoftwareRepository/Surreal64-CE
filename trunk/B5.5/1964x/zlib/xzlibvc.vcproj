@@ -306,7 +306,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				PreprocessorDefinitions="_DEBUG;_XBOX;BUILD_ZLIBDLL;ZLIB_DLL"
-				RuntimeLibrary="1"
+				RuntimeLibrary="0"
 				PrecompiledHeaderFile=".\Debug/zlibvc.pch"
 				AssemblerListingLocation=".\Debug/"
 				ObjectFile=".\Debug/"

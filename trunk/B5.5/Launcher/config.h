@@ -13,6 +13,11 @@
  * authors: email: buttza@hotmail.com, lantus@lantus-x.com
  */
 
+// lets try relying on ./config.cpp instead
+#include "../Config.h"
+#include "RomList.h" // only diff is we need the romlist in the main menu
+
+/*
 #include <stdlib.h>
 #include <io.h>
 #include <iostream>
@@ -41,11 +46,13 @@ extern int dw1964DynaMem;
 extern int dw1964PagingMem;
 extern int dwPJ64DynaMem;
 extern int dwPJ64PagingMem;
-extern bool bUseLLERSP; // Ez0n3 - use iAudioPlugin instead, but leave this in case it's set in ini
+extern bool bUseLLERSP; // use iAudioPlugin instead, but leave this in case it's set in ini
 
 // Ez0n3 - use iAudioPlugin instead to determine if basic audio is used
 extern int iAudioPlugin;
 extern int videoplugin;
+extern int iRspPlugin;
+extern bool bUseRspAudio; // control a listing
 
 // Ez0n3 - reinstate max video mem until freakdave finishes this
 //extern int dwFreeMem;
@@ -56,8 +63,7 @@ extern bool SoftDisplayFilter;
 extern int TextureMode;
 extern int VertexMode;
 extern bool FrameSkip;
-extern float XBINPUT_DEADZONE;
-extern float XBINPUT_SUMMAND;
+extern int VSync;
 extern float XBOX_CONTROLLER_DEAD_ZONE;
 extern float Deadzone;
 extern unsigned int Sensitivity;
@@ -66,3 +72,4 @@ extern bool EnableController1;
 extern bool EnableController2;
 extern bool EnableController3;
 extern bool EnableController4;
+*/

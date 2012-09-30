@@ -20,14 +20,13 @@ __int32 ReadSWORDFromROM_EAXOnly(uint32 location);
 uint8 ReadUBYTEFromROM(uint32 location);
 BOOL CheckIfInRom(uint32 location);
 
-//weinerschnitzel - split paging methods for 64 old / 128 new
-// Ez0n3 - old method of rom paging
-#define RP_PAGE_SIZE_O		0x10000		// 64k pages
-// freakdave - new method of rom paging
-#define RP_PAGE_SIZE_N		0x40000		// 64k pages
+//#define RP_PAGE_SIZE		0x10000		// 64k pages
+//#define RP_PAGE_SIZE		0x40000		// 64k pages
 
-
+extern DWORD g_dwPageSize;
 extern DWORD g_dwNumFrames;
+extern int g_iPagingMethod;
+extern char g_temporaryRomPath[260];
 
 typedef struct
 {
@@ -35,5 +34,7 @@ typedef struct
 	uint32			pageNum;
 } Frame;
 
-extern Frame *g_frameTable;
-extern uint8 *g_memory;
+extern void __EMU_GetStateFilename(int index, char *filename, int mode);
+
+//extern Frame *g_frameTable;
+//extern uint8 *g_memory;

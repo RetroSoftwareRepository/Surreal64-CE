@@ -17,7 +17,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include "stdafx.h"
+#ifdef _XBOX
 #include <xgraphics.h>
+#endif
 
 extern BYTE g_ucTempBuffer[1024*1024*2];
 

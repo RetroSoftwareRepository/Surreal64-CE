@@ -19,6 +19,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "stdafx.h"
 #include "_BldNum.h"
 
+BOOL g_bTempMessage = FALSE;
+DWORD g_dwTempMessageStart = 0;
+char g_szTempMessage[100];
+
 PluginStatus status;
 
 HINSTANCE myhInst = NULL;
@@ -71,7 +75,11 @@ extern DWORD g_maxTextureMemUsage;
 
 void GetPluginDir( char * Directory ) 
 {
- 
+#ifdef _XBOX
+	//strcpy(Directory,"D:\\");
+	strcpy(Directory,"T:\\");
+#else
+#endif
 }
 
 //-------------------------------------------------------------------------------------
@@ -323,7 +331,7 @@ EXPORT void CALL _VIDEO_RomClosed (void)
 #else
 	StopVideo();
 #endif
-	Ini_StoreRomOptions(&g_curRomInfo);
+	//Ini_StoreRomOptions(&g_curRomInfo);
 }
 
 EXPORT void CALL _VIDEO_RomOpen (void)
@@ -649,12 +657,66 @@ EXPORT BOOL CALL _VIDEO_InitiateGFX(GFX_INFO Gfx_Info)
 
 void __cdecl MsgInfo (char * Message, ...)
 {
-	 
+#ifndef _XBOX
+	char Msg[400];
+	va_list ap;
+
+	va_start( ap, Message );
+	vsprintf( Msg, Message, ap );
+	va_end( ap );
+
+	char str[200];
+	sprintf(str, "Rice's Daedalus %d.%d.%d",FILE_VERSION0,FILE_VERSION1,FILE_VERSION2);
+	MessageBox(NULL,Msg,"str",MB_OK|MB_ICONINFORMATION);
+#else
+
+	OutputDebugString("Rice MSG: ");
+//#ifdef DEBUG
+	char Msg[400];
+	
+	va_list ap;
+	va_start( ap, Message );
+	vsprintf( Msg, Message, ap );
+	va_end( ap );
+	
+	OutputDebugString(Msg);
+/*#else
+	OutputDebugString(Message);
+#endif*/
+	OutputDebugString("\n");
+#endif
 }
 
 void __cdecl ErrorMsg (char * Message, ...)
 {
-	 
+#ifndef _XBOX
+	char Msg[400];
+	va_list ap;
+	
+	va_start( ap, Message );
+	vsprintf( Msg, Message, ap );
+	va_end( ap );
+	
+	char str[200];
+	sprintf(str, "Rice's Daedalus %d.%d.%d",FILE_VERSION0,FILE_VERSION1,FILE_VERSION2);
+	MessageBox(NULL,Msg,"str",MB_OK|MB_ICONERROR);
+#else
+
+	OutputDebugString("Rice ERR: ");
+//#ifdef DEBUG
+	char Msg[400];
+	
+	va_list ap;
+	va_start( ap, Message );
+	vsprintf( Msg, Message, ap );
+	va_end( ap );
+	
+	OutputDebugString(Msg);
+/*#else
+	OutputDebugString(Message);
+#endif*/
+	OutputDebugString("\n");
+#endif
 }
 
 //---------------------------------------------------------------------------------------
@@ -923,19 +985,23 @@ void CALL _VIDEO_ShowCFB (void)
 	status.toShowCFB = true;
 }
 
-
-// Ez0n3 - reinstate max video mem
 void _VIDEO_SetMaxTextureMem(DWORD mem)
 {
-	// Ez0n3 - reinstate max video mem until freakdave finishes this
-	if (mem == 0)
+	if (mem == 0) // auto mem
 	{
 		g_bUseSetTextureMem = false;
 	}
-	else
+	else // set mem
 	{
 		g_bUseSetTextureMem = true;
 		g_maxTextureMemUsage = mem * 1024 * 1024;
 	}
+}
+
+void _VIDEO_DisplayTemporaryMessage(const char *msg)
+{
+	g_bTempMessage = TRUE;
+	strncpy(g_szTempMessage, msg, 99);
+	g_dwTempMessageStart = GetTickCount();
 }
  

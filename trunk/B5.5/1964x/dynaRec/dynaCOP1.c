@@ -549,7 +549,7 @@ void dyna4300i_cop1_dmfc1(OP_PARAMS)
 	INTERPRET_FLUSH1(r4300i_COP1_dmfc1, __RT);
 
 	if(currentromoptions.Assume_32bit == ASSUME_32BIT_YES)
-		OutputDebugString("Need to compile dmfc1 for 32bit? Please use 64bit for now.");
+		DisplayError("Need to compile dmfc1 for 32bit? Please use 64bit for now.");
 
 	if(xRT->mips_reg != 0)	/* mandatory */
 	{

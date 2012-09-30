@@ -144,7 +144,26 @@ int GenerateCurrentRomOptions(void)
 
 	strcpy(iniFilePath, directories.main_directory);
 	strcat(iniFilePath, "1964.ini");
-
+	
+	if(!PathFileExists(iniFilePath)) {
+		OutputDebugString(iniFilePath);
+		OutputDebugStringA(" Failed to Load!\n");
+		sprintf(iniFilePath, "D:\\1964.ini");
+		if(!PathFileExists(iniFilePath)) {
+			OutputDebugString(iniFilePath);
+			OutputDebugStringA(" Failed to Load!\n");
+			// FIXME!
+			//sprintf(iniFilePath, "T:\\1964.ini");
+			// WRITE INI FILE
+		} else {
+			OutputDebugString(iniFilePath);
+			OutputDebugStringA(" Successfully Loaded!\n");
+		}
+	} else {
+		OutputDebugString(iniFilePath);
+		OutputDebugStringA(" Successfully Loaded!\n");
+	}
+	
 	iniFile = fopen(iniFilePath, "rt");
 	if(iniFile == NULL)
 	{

@@ -34,8 +34,11 @@ CGraphicsContext::CGraphicsContext() :
 	m_hWnd(NULL),			// TODO: Assign window handle somewhere
 	m_hWndFocus(NULL),		// TODO: Assign window handle somewhere
 	m_hMenu(NULL),
-	m_dwChosenWidth(640),
-	m_dwChosenHeight(480),
+	
+	m_dwChosenWidth(640),  // This is a default value, its' changed on Initialization. 
+	m_dwChosenHeight(480), // Shouldn't need to change these
+	
+	
     m_bShowCursorWhenFullscreen(FALSE),
 	m_supportTextureMirror(false)
 {

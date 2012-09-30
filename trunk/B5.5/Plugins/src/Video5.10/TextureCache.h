@@ -228,6 +228,10 @@ public:
 
 	HRESULT InvalidateDeviceObjects();
 	
+#ifndef OLDTXTCACHE
+	void FreeTextures();
+#endif
+	
 #ifdef DEBUGGING_ENABLED
 	TextureEntry * GetCachedTexture(u32 tex);
 	u32 GetNumOfCachedTexture();
@@ -236,10 +240,8 @@ public:
 
 extern CTextureCache gTextureCache;		// The global instance of CTextureCache class
 
-
-// Ez0n3 - reinstate max video mem until freakdave finishes this
+// reinstate max video mem
 extern bool g_bUseSetTextureMem;
 extern DWORD g_maxTextureMemUsage;
-
 
 #endif

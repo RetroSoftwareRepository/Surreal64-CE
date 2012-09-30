@@ -32,9 +32,9 @@ typedef struct
 	                          bswap on a dword (32 bits) boundry */
 } PLUGIN_INFO;
 
-#define SYSTEM_NTSC					1
-#define SYSTEM_PAL					0
-#define SYSTEM_MPAL					0
+#define SYSTEM_NTSC					0 //1
+#define SYSTEM_PAL					1 //0
+#define SYSTEM_MPAL					2 //0
 
 /***** Structures *****/
 typedef struct 
@@ -179,7 +179,7 @@ typedef struct
   input:    none
   output:   none
 *******************************************************************/ 
- void  _AUDIO_AZIMER_RomClosed (void);
+ void  _AUDIO_AZIMER_RomClosed (void); void _AUDIO_AZIMER_AudioBoost (BOOL Boost);
 #if defined(__cplusplus)
 }
 #endif

@@ -33,7 +33,8 @@ public: //functions
 		
 	BOOL ReadIniFile();
 	// (STRMNNRMN - Write ini back out to disk?)
-	void WriteIniFile(LPCTSTR szFileName);
+	//void WriteIniFile(LPCTSTR szFileName);
+	void WriteIniFile();
 
 	// Find entry in list, create if missing
 	int FindEntry(DWORD dwCRC1, DWORD dwCRC2, BYTE nCountryID, LPCTSTR szName); 

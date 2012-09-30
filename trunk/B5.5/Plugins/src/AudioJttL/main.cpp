@@ -158,19 +158,19 @@ void InitializeSDL();
 // Ez0n3 - already declared in the Azimer/JttL lib :(
 void my_audio_callback(void *userdata, Uint8 *stream, int len);
 
-void _AUDIO_AiDacrateChanged( int SystemType )
+void _AUDIO_JTTL_AiDacrateChanged( int SystemType )
 {
 	int f = frequency;
 
 	switch (SystemType)
 	{
-	case 0:
+        case SYSTEM_NTSC:
 			f = 48681812 / (*AudioInfo.AI_DACRATE_RG + 1);
 			break;
-	case 1:
+        case SYSTEM_PAL:
 			f = 49656530 / (*AudioInfo.AI_DACRATE_RG + 1);
 			break;
-	case 2:
+        case SYSTEM_MPAL:
 			f = 48628316 / (*AudioInfo.AI_DACRATE_RG + 1);
 			break;
 	}
@@ -178,11 +178,11 @@ void _AUDIO_AiDacrateChanged( int SystemType )
 	InitializeAudio(f);
 }
 
-void  _AUDIO_AiUpdate(BOOL Wait)
+void  _AUDIO_JTTL_AiUpdate(BOOL Wait)
 {
 }
 
-void _AUDIO_AiLenChanged( void )
+void _AUDIO_JTTL_AiLenChanged( void )
 {
     /* Time that should be sleeped to keep game in sync */
     int wait_time = 0;
@@ -236,10 +236,10 @@ void _AUDIO_AiLenChanged( void )
 			by inaccuracy in machines clock. */
 		if(buffer_pos > HighBufferLoadLevel)
 		{
-			wait_time += (float)(buffer_pos - HIGH_BUFFER_LOAD_LEVEL) / (float)(frequency / 250);
+			wait_time += (int)((float)(buffer_pos - HIGH_BUFFER_LOAD_LEVEL) / (float)(frequency / 250));
 		}
 
-		expected_ticks = ((float)(prev_len_reg) / (float)(frequency / 250));
+		expected_ticks = (Uint32)((float)(prev_len_reg) / (float)(frequency / 250));
 
 		if(last_ticks + expected_ticks > SDL_GetTicks()) 
 		{
@@ -252,28 +252,28 @@ void _AUDIO_AiLenChanged( void )
 	prev_len_reg = LenReg;
 }
 
-DWORD _AUDIO_AiReadLength( void )
+DWORD _AUDIO_JTTL_AiReadLength( void )
 {
    return 0;
 }
 
-void _AUDIO_CloseDLL( void )
+void _AUDIO_JTTL_CloseDLL( void )
 {
 }
 
-void _AUDIO_DllAbout( HWND hParent )
+void _AUDIO_JTTL_DllAbout( HWND hParent )
 {
 }
 
-void _AUDIO_DllConfig ( HWND hParent )
+void _AUDIO_JTTL_DllConfig ( HWND hParent )
 {
 }
 
-void _AUDIO_DllTest ( HWND hParent )
+void _AUDIO_JTTL_DllTest ( HWND hParent )
 {
 }
 
-void _AUDIO_GetDllInfo( PLUGIN_INFO * PluginInfo )
+void _AUDIO_JTTL_GetDllInfo( PLUGIN_INFO * PluginInfo )
 {
 	PluginInfo->Version = 0x0101;
 	PluginInfo->Type    = PLUGIN_TYPE_AUDIO;
@@ -282,7 +282,7 @@ void _AUDIO_GetDllInfo( PLUGIN_INFO * PluginInfo )
 	PluginInfo->MemoryBswaped = TRUE;
 }
 
-BOOL _AUDIO_InitiateAudio( AUDIO_INFO Audio_Info )
+BOOL _AUDIO_JTTL_InitiateAudio( AUDIO_INFO Audio_Info )
 {
 	ChangeABI(0);
 	AudioInfo = Audio_Info;
@@ -292,7 +292,7 @@ BOOL _AUDIO_InitiateAudio( AUDIO_INFO Audio_Info )
 // Ez0n3 - already declared in the Azimer/JttL lib :(
 void my_audio_callback(void *userdata, Uint8 *stream, int len)
 {
-    if(buffer_pos > len)
+    if(buffer_pos > (unsigned int)len)
     {
         memcpy(stream, buffer, len);
         memmove(buffer, &buffer[ len ], buffer_pos  - len);
@@ -385,7 +385,7 @@ void InitializeAudio(int freq)
     }
 }
 
-void _AUDIO_RomClosed(void)
+void _AUDIO_JTTL_RomClosed(void)
 {
    SDL_PauseAudio(1);
 
@@ -400,9 +400,15 @@ void _AUDIO_RomClosed(void)
    SDL_Quit();
 }
 
-void _AUDIO_ProcessAList(void)
+void _AUDIO_JTTL_ProcessAList(void)
 {
 	if (AudioInfo.DMEM)
 		HLEStart();
 }
 
+//BOOL bAudioBoostJttL = FALSE;
+void _AUDIO_JTTL_AudioBoost (BOOL Boost)
+{
+	//bAudioBoostJttL = Boost;
+	SDL_AudioBoost(Boost ? 1 : 0);
+}

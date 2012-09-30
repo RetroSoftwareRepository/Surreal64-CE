@@ -125,6 +125,7 @@ D3DXVECTOR4	g_vtxTransformed[MAX_VERTS];
 #endif
 float		g_vtxProjected5[1000][5];
 BYTE		g_FogBytes[MAX_VERTS];
+float		g_fFogCoord[MAX_VERTS]; // Rice 5.10 fog
 DWORD		g_dwVtxFlags[MAX_VERTS];			// Z_POS Z_NEG etc
 VECTOR2		g_fVtxTxtCoords[MAX_VERTS];
 DWORD		g_dwVtxDifColor[MAX_VERTS];
@@ -140,6 +141,7 @@ unsigned int		g_minIndex, g_maxIndex;
 BYTE				g_oglVtxColors[1000][4];
 float				gRSPfFogMin;
 float				gRSPfFogMax;
+float				gRSPfFogDivider;
 
 DWORD			gRSPnumLights;
 Light	gRSPlights[16];
@@ -536,7 +538,7 @@ void InitRenderBase()
 		ProcessVertexData = ProcessVertexDataSSE;
 	}
 
-	gRSPfFogMin = gRSPfFogMax = 0.0f;
+	gRSPfFogMin = gRSP.fFogMul = gRSP.fFogOffset = gRSPfFogMax = 0.0f;
 	windowSetting.fMultX = windowSetting.fMultY = 2.0f;
 	windowSetting.vpLeftW = windowSetting.vpTopW = 0;
 	windowSetting.vpRightW = windowSetting.vpWidthW = 640;
@@ -624,7 +626,8 @@ void InitRenderBase()
 void SetFogMinMax(float fMin, float fMax, float fMul, float fOffset)
 {
 	//DEBUGGER_IF_DUMP(pauseAtNext,{DebuggerAppendMsg("Set Fog Min=%f, Max=%f", fMin, fMax);});
-
+/*
+//Rice 5.60
 	if( fMin > fMax )
 	{
 		float temp = fMin;
@@ -643,6 +646,17 @@ void SetFogMinMax(float fMin, float fMax, float fMul, float fOffset)
 		gRSPfFogMax = fMax/500-1;
 	}
 	CRender::g_pRender->SetFogMinMax(fMin, fMax);
+*/
+	//Rice 5.10
+	
+	gRSPfFogMin = max(0,-gRSP.fFogOffset/gRSP.fFogMul);
+	//gRSPfFogMax = min(1,(255.0f-gRSP.fFogOffset)/gRSP.fFogMul);
+	gRSPfFogMax = (255.0f-gRSP.fFogOffset)/gRSP.fFogMul;
+	//gRSPfFogMax = (gRSP.fFogMul-gRSP.fFogOffset)/gRSP.fFogMul;
+	gRSP.fFogMul = fMul;
+	gRSP.fFogOffset = fOffset;
+
+	gRSPfFogDivider = 255/(gRSPfFogMax-gRSPfFogMin);
 }
 
 void InitVertexColors()
@@ -742,7 +756,7 @@ void ComputeLOD(bool openGL)
 	frac = (lod / pow(2.0f,floor(frac)));
 	frac = frac - floor(frac);
 	//DEBUGGER_IF_DUMP(pauseAtNext,{DebuggerAppendMsg("LOD = %f, frac = %f", lod, frac);});
-	gRDP.LODFrac = frac*255;
+	gRDP.LODFrac = (DWORD)(frac*255);
 	CRender::g_pRender->SetCombinerAndBlender();
 }
 
@@ -774,7 +788,19 @@ void InitVertex(DWORD dwV, DWORD vtxIndex, bool bTexture, bool openGL)
 
 		if( gRSP.bProcessSpecularColor )
 		{
-			v.dcSpecular = CRender::g_pRender->PostProcessSpecularColor();
+			//v.dcSpecular = CRender::g_pRender->PostProcessSpecularColor();
+		//}
+			if( gRSP.bFogEnabled )
+			{
+				v.dcSpecular &= 0x00FFFFFF;
+				DWORD	fogFct = 0xFF-(BYTE)((g_fFogCoord[dwV]-gRSPfFogMin)*gRSPfFogDivider);
+				v.dcSpecular |= (fogFct<<24);
+			}
+		}
+		else if( gRSP.bFogEnabled )
+		{
+			DWORD	fogFct = 0xFF-(BYTE)((g_fFogCoord[dwV]-gRSPfFogMin)*gRSPfFogDivider);
+			v.dcSpecular = (fogFct<<24);
 		}
 	}
 
@@ -1093,7 +1119,41 @@ void ProcessVertexDataSSE(DWORD dwAddr, DWORD dwV0, DWORD dwNum)
 
 		SSEVec3Transform(i);
 
-		ReplaceAlphaWithFogFactor(i);
+		if( gRSP.bFogEnabled ) // Rice 5.10
+		{
+			/*
+			if( g_vecProjected[i].w < 0 || g_vecProjected[i].z < gRSPfFogMin )
+				g_fFogCoord[i] = gRSPfFogMin;
+			else
+				g_fFogCoord[i] = g_vecProjected[i].z;
+
+			*(((BYTE*)&(g_dwVecDiffuseCol[i]))+3) = (BYTE)(g_fFogCoord[i]*255);	
+			*/
+
+			__asm {
+				mov			eax, i;
+				shl			eax, 2
+				movss		xmm0, dword ptr g_vecProjected[eax*4][8];
+				movss		xmm1, dword ptr g_vecProjected[eax*4][12];
+
+				comiss		xmm1,zero;
+				jc			step2;
+
+				comiss		xmm0, dword ptr gRSPfFogMin;
+				jc			step2;
+
+				jmp			step3;
+step2:
+				movss		xmm0, dword ptr gRSPfFogMin;
+step3:
+				movss		dword ptr g_fFogCoord[eax], xmm0;
+				mulss		xmm0, real255;
+				cvtss2si	ecx,xmm0;	// move the 1st DWORD to ecx
+				mov			byte ptr g_dwVtxDifColor[eax][3], cl; // Change to dwVtxDifColor to follow Rice 5.60
+			}
+		}
+		
+		//ReplaceAlphaWithFogFactor(i); // Rice 5.60
 
 
 #ifdef _DEBUG
@@ -1216,6 +1276,14 @@ void ProcessVertexDataNoSSE(DWORD dwAddr, DWORD dwV0, DWORD dwNum)
 		{
 			g_vecProjected[i].z = g_vtxTransformed[i].z * g_vecProjected[i].w;
 		}
+		
+		//Rice 5.10 Fog
+		if( gRSP.bFogEnabled )
+		{
+			g_fFogCoord[i] = g_vecProjected[i].z;
+			if( g_vecProjected[i].w < 0 || g_vecProjected[i].z < 0 || g_fFogCoord[i] < gRSPfFogMin )
+				g_fFogCoord[i] = gRSPfFogMin;
+		}
 
 #ifdef _DEBUG
 		if( pauseAtNext && logVertex ) 
@@ -1263,7 +1331,7 @@ void ProcessVertexDataNoSSE(DWORD dwAddr, DWORD dwV0, DWORD dwNum)
 			g_dwVtxDifColor[i] = COLOR_RGBA(vert.rgba.r, vert.rgba.g, vert.rgba.b, vert.rgba.a);
 		}
 
-		ReplaceAlphaWithFogFactor(i);
+		//ReplaceAlphaWithFogFactor(i); //Rice 5.60
 
 		// Update texture coords n.b. need to divide tu/tv by bogus scale on addition to buffer
 
@@ -2828,7 +2896,9 @@ void UpdateCombinedMatrix()
 			D3DXMatrixTranspose(&gRSPworldProjectTransported, &gRSPworldProject);
 			D3DXMatrixTranspose(&gRSPmodelViewTopTranspose, &gRSPmodelViewTop);
 		}
+		
+		gRSP.bCombinedMatrixIsUpdated = false; // it's here in 6x
 	}
 
-	gRSP.bCombinedMatrixIsUpdated = false; 
+	//gRSP.bCombinedMatrixIsUpdated = false; 
 }

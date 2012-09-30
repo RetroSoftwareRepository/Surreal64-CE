@@ -962,7 +962,7 @@ void GetFileName(char *Directory, char *Ext)
 		Ext
 	);*/
 
-	sprintf(Directory, "T:\\%08X-%08X-%02X.%s", currentromoptions.crc1, currentromoptions.crc2, currentromoptions.countrycode, Ext);
+	sprintf(Directory, "%s%08x\\%08X-%08X-%02X.%s", g_szPathSaves, currentromoptions.crc1, currentromoptions.crc1, currentromoptions.crc2, currentromoptions.countrycode, Ext);
 
 	//AnalyzeString(Directory);
 }
@@ -997,6 +997,9 @@ void FileIO_WriteMemPak(int pak_no)
 #endif
 		fwrite(gamesave.mempak[0], 1024 * 32, 1, stream);
 		fclose(stream);
+#ifdef DEBUG_PAKS
+		TRACE1("FileIO_WriteMemPak: %s", temp);
+#endif
 	}
 }
 

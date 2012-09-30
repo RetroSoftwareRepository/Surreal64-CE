@@ -53,6 +53,8 @@ AUDIO_INFO AudioInfo;
 BYTE *Snd1ReadPos;
 extern BOOL ucodeDetected;
 
+BOOL bAudioBoostMusyX = FALSE;
+
 // ---------------- Needed for RSP --------------------------
 char *pRDRAM;
 char *pDMEM;
@@ -259,92 +261,10 @@ DWORD dwEvt;
 
 HWND hWndConfig;
 CRITICAL_SECTION CriticalSection;
-/*
-BOOL CALLBACK DeleteItemProc(HWND hwndDlg, UINT message, WPARAM wParam, LPARAM lParam) 
-{ 
-	switch (message) 
-    { 
-		case WM_ACTIVATE:
-			CheckDlgButton(hwndDlg, 
-				IDC_SYNC, 
-				SyncSpeed);
-			CheckDlgButton(hwndDlg, 
-				IDC_REVERSE_STEREO, 
-				ReverseStereo);
 
-			break;
-	
-		case WM_COMMAND: 
-            switch (LOWORD(wParam)) 
-            { 
-                case IDOK: 
-//                    if (!GetDlgItemText(hwndDlg, ID_ITEMNAME, 
-  //                           szItemName, 80)) 
-    //                     *szItemName=0; 
- 
-                    // Fall through. 
- 
-                case IDCANCEL: 
-                    EndDialog(hwndDlg, wParam); 
-					DestroyWindow(hWndConfig);
-					hWndConfig = NULL;
-                    return TRUE; 
-
-				case IDC_ABOUT:
-					DllAbout(AudioInfo.hwnd);
-					break;
-
-            }
-		break;
-		case WM_NOTIFY:
-		switch(LOWORD(wParam))
-		{
-			case IDC_SYNC:
-			if(	SyncSpeed
-				!= ( SendDlgItemMessage( hwndDlg, IDC_SYNC, BM_GETCHECK, 0, 0)
-				== BST_CHECKED))
-			{					
-				int TempgUcode = gUcode;
-				InitializeCriticalSection(&CriticalSection);
-				SyncSpeed = ( SendDlgItemMessage( hwndDlg, IDC_SYNC, BM_GETCHECK, 0, 0)	== BST_CHECKED);
-				EnterCriticalSection(&CriticalSection);
-				RomClosed();
-				gUcode = TempgUcode;
-				LeaveCriticalSection(&CriticalSection);
-				DeleteCriticalSection(&CriticalSection);
-
-
-				//	REGISTRY_WriteDWORD( "AutoFullScreen", emuoptions.auto_full_screen);
-			}
-			break;
-			case IDC_REVERSE_STEREO:
-			if(	ReverseStereo
-				!= ( SendDlgItemMessage( hwndDlg, IDC_REVERSE_STEREO, BM_GETCHECK, 0, 0)
-				== BST_CHECKED))
-			{
-				HANDLE hMutex = CreateMutex(NULL,FALSE,NULL);
-				WaitForSingleObject (hMutex, INFINITE);
-					
-				ReverseStereo = ( SendDlgItemMessage( hwndDlg, IDC_REVERSE_STEREO, BM_GETCHECK, 0, 0)	== BST_CHECKED);
-
-				ReleaseMutex(hMutex);
-
-				//	REGISTRY_WriteDWORD( "AutoFullScreen", emuoptions.auto_full_screen);
-			}
-			break;			
-		}
-		break;
-    } 
-    return FALSE; 
-} 
-*/
 void _AUDIO_MUSYX_DllConfig ( HWND hParent )
 {
-/*	if (hWndConfig == NULL)
-	{
-	hWndConfig = CreateDialog(AudioInfo.hinst, MAKEINTRESOURCE(IDD_DIALOG1), AudioInfo.hwnd, (DLGPROC)DeleteItemProc);
-	ShowWindow(hWndConfig, SW_SHOW);
-	}*/
+
 }
 
 void _AUDIO_MUSYX_DllTest ( HWND hParent )
@@ -378,9 +298,14 @@ void _AUDIO_MUSYX_CloseDLL (void)
 	//TerminateThread (handleAudioThread, 0);
 	ExitThread(0);
 #endif
-
+DWORD dwStatus;
 	if (lpdsbuf) { 
-        IDirectSoundBuffer_Stop(lpdsbuf);
+        IDirectSoundBuffer_StopEx(lpdsbuf, 0, DSBSTOPEX_IMMEDIATE);
+		do
+		{
+			IDirectSoundBuffer_GetStatus(lpdsbuf, &dwStatus );
+		} while( dwStatus & DSBSTATUS_PLAYING );
+
 		IDirectSoundBuffer_Release(lpdsbuf);
         lpdsbuf = NULL;
 	}
@@ -388,20 +313,16 @@ void _AUDIO_MUSYX_CloseDLL (void)
 		IDirectSound8_Release(lpds);
         lpds = NULL;
 	}
+
+
+
+
+
+
 }
 
 extern void DisplayError (char *Message);
-/*
-void __cdecl DisplayError (char * Message, ...) {
-	char Msg[400];
-	va_list ap;
 
-	va_start( ap, Message );
-	vsprintf( Msg, Message, ap );
-	va_end( ap );
-//	MessageBox(AudioInfo.hwnd,Msg,"Error",MB_OK|MB_ICONEXCLAMATION);
-	OutputDebugString(Msg);
-}*/
 extern void PlayIt();
 
 DWORD WINAPI AudioThreadProc (void) 
@@ -421,13 +342,8 @@ DWORD WINAPI AudioThreadProc (void)
 	}
 }
 
-void _AUDIO_MUSYX_DllAbout ( HWND hParent ) {
-	/*char Scratch[700];
-	char Caption[0x80];
-	strcpy(Caption, "About 1964 Audio version ");
-	strcat(Caption, PLUGIN_VERSION);
-	LoadString(AudioInfo.hinst, IDS_ABOUT, Scratch, 700);
-	MessageBox (hParent, Scratch, Caption, MB_OK);*/
+void _AUDIO_MUSYX_DllAbout ( HWND hParent ) 
+{
 }
 
 __forceinline void StartAudio () {
@@ -545,7 +461,7 @@ __forceinline void FillBuffer ( int buffer ) {
 
 __forceinline BOOL FillBufferWithSilence( LPDIRECTSOUNDBUFFER lpDsb ) {
     WAVEFORMATEX    wfx;
-//    DWORD           dwSizeWritten;
+    DWORD           dwSizeWritten;
 	
     PBYTE   pb1;
     DWORD   cb1;
@@ -555,10 +471,8 @@ __forceinline BOOL FillBufferWithSilence( LPDIRECTSOUNDBUFFER lpDsb ) {
 //        return FALSE;
 //	}
 
-
-
 	//freakdave - IDirectSoundBuffer_GetFormat wrapping
-	memset( &wfx, 0, sizeof(WAVEFORMATEX));
+	memset( &wfx, (int)&dwSizeWritten, sizeof(WAVEFORMATEX));
 	wfx.wFormatTag = WAVE_FORMAT_PCM;
 	wfx.nChannels = 2;
 	wfx.nSamplesPerSec = Frequency;
@@ -726,49 +640,6 @@ __forceinline BOOL SetupDSoundBuffers(void) {
         rghEvent[count] = CreateEvent( NULL, FALSE, FALSE, NULL );
         if (rghEvent[count] == NULL ) { return FALSE; }
     }
-	
-/*
-	memset( &dsPrimaryBuff, 0, sizeof( DSBUFFERDESC ) ); 
-    
-	dsPrimaryBuff.dwSize        = sizeof( DSBUFFERDESC ); 
-    dsPrimaryBuff.dwFlags       = 0; 
-	dsPrimaryBuff.dwBufferBytes = 0;  
-    dsPrimaryBuff.lpwfxFormat   = NULL; 
-
-    memset( &wfm, 0, sizeof( WAVEFORMATEX ) ); 
-
-	wfm.wFormatTag = WAVE_FORMAT_PCM;
-	wfm.nChannels = 2;
-	wfm.nSamplesPerSec = 44100;
-	wfm.wBitsPerSample = 16;
-	wfm.nBlockAlign = wfm.wBitsPerSample / 8 * wfm.nChannels;
-	wfm.nAvgBytesPerSec = wfm.nSamplesPerSec * wfm.nBlockAlign;
-
-
-
-	hr = IDirectSound8_CreateSoundBuffer(lpds,&dsPrimaryBuff, &lpdsb, NULL);
-	
-	if (SUCCEEDED ( hr ) ) {
-		IDirectSoundBuffer_SetFormat(lpdsb, &wfm );
-	    IDirectSoundBuffer_Play(lpdsb, 0, 0, DSBPLAY_LOOPING );
-	}
-
-	wfm.nSamplesPerSec = Frequency;
-	wfm.wBitsPerSample = 16;
-	wfm.nBlockAlign = wfm.wBitsPerSample / 8 * wfm.nChannels;
-	wfm.nAvgBytesPerSec = wfm.nSamplesPerSec * wfm.nBlockAlign;
-
-    memset( &dsbdesc, 0, sizeof( DSBUFFERDESC ) ); 
-    dsbdesc.dwSize = sizeof( DSBUFFERDESC ); 
-//    dsbdesc.dwFlags = DSBCAPS_GLOBALFOCUS | DSBCAPS_CTRLPOSITIONNOTIFY;
-    dsbdesc.dwBufferBytes = BufferSize * 3;  
-    dsbdesc.lpwfxFormat = &wfm; 
-
-	if ( FAILED( hr = IDirectSound8_CreateSoundBuffer(lpds, &dsbdesc, &lpdsbuf, NULL ) ) ) {
-		//DisplayError("Failed in creation of Play buffer 1");
-		OutputDebugString("Failed in creation of Play buffer 1\n");
-	}
-*/
 
 	//freakdave - Set up Wave format structure
     memset( &wfm, 0, sizeof( WAVEFORMATEX ) );
@@ -790,8 +661,35 @@ __forceinline BOOL SetupDSoundBuffers(void) {
 	hr = IDirectSound8_CreateSoundBuffer(lpds,&dsPrimaryBuff, &lpdsbuf, NULL);
 
 	if (SUCCEEDED ( hr ) ) {
+	
+		if (bAudioBoostMusyX) {
+		DSMIXBINVOLUMEPAIR dsmbvp[8] = {
+		{DSMIXBIN_FRONT_LEFT, DSBVOLUME_MAX},
+		{DSMIXBIN_FRONT_RIGHT, DSBVOLUME_MAX},
+		{DSMIXBIN_FRONT_CENTER, DSBVOLUME_MAX},
+		{DSMIXBIN_FRONT_CENTER, DSBVOLUME_MAX},
+		{DSMIXBIN_BACK_LEFT, DSBVOLUME_MAX},
+		{DSMIXBIN_BACK_RIGHT, DSBVOLUME_MAX},
+		{DSMIXBIN_LOW_FREQUENCY, DSBVOLUME_MAX},
+		{DSMIXBIN_LOW_FREQUENCY, DSBVOLUME_MAX}};
+	    
+		DSMIXBINS dsmb;
+
+		dsmb.dwMixBinCount = 8;
+		dsmb.lpMixBinVolumePairs = dsmbvp;
+
+		IDirectSoundBuffer_SetFormat(lpdsbuf, &wfm );
+		IDirectSoundBuffer_SetVolume(lpdsbuf, DSBVOLUME_MAX);
+		IDirectSoundBuffer_SetHeadroom(lpdsbuf, DSBHEADROOM_MIN);
+		IDirectSoundBuffer_SetMixBins(lpdsbuf, &dsmb);
+		IDirectSoundBuffer_Play(lpdsbuf, 0, 0, DSBPLAY_LOOPING );
+		}
+		else
+		{
 		IDirectSoundBuffer_SetFormat(lpdsbuf, &wfm );
 		IDirectSoundBuffer_Play(lpdsbuf, 0, 0, DSBPLAY_LOOPING );
+		}
+		
 	}
 	else
 	{
@@ -809,19 +707,6 @@ __forceinline BOOL SetupDSoundBuffers(void) {
     rgdscbpn[2].hEventNotify = rghEvent[2];
     rgdscbpn[3].dwOffset = DSBPN_OFFSETSTOP;
     rgdscbpn[3].hEventNotify = rghEvent[3];
-/*
-    if ( FAILED( hr = IDirectSound_QueryInterface(lpdsbuf, &IID_IDirectSoundNotify, ( VOID ** )&lpdsNotify ) ) ) {
-		DisplayError("IDirectSound8_QueryInterface: Failed\n");
-		return;
-	}
-*/
-    // Set capture buffer notifications.
-/*    if ( FAILED( hr = IDirectSoundNotify_SetNotificationPositions(lpdsNotify, NUMCAPTUREEVENTS, rgdscbpn ) ) ) {
-		//DisplayError("IDirectSoundNotify_SetNotificationPositions: Failed");
-		OutputDebugString("IDirectSoundNotify_SetNotificationPositions: Failed\n");
-		return;
-    }*/
-
 	
 	if ( FAILED( hr = IDirectSoundBuffer_SetNotificationPositions(lpdsbuf, NUMCAPTUREEVENTS, rgdscbpn ) ) ) {
 		OutputDebugString("IDirectSoundBuffer_SetNotificationPositions: Failed\n");
@@ -953,40 +838,8 @@ void rdp_enddl(int val)
 {
 //empty.
 }
-/*
-#ifdef _DEBUG
-void (__cdecl *_DebuggerMsgCallBackFunc) (char *msg) = NULL;
-EXPORT void CALL SetDebuggerCallBack(void (_cdecl *DbgCallBackFun)(char *msg))
-{
-	_DebuggerMsgCallBackFunc = DbgCallBackFun;
-}
 
-void DebuggerMsgToEmuCore(char *msg)
+void _AUDIO_MUSYX_AudioBoost (BOOL Boost)
 {
-	if( _DebuggerMsgCallBackFunc )
-	{
-		_DebuggerMsgCallBackFunc(msg);
-	}
+	bAudioBoostMusyX = Boost;
 }
-#endif
-
-//Adding effects fails for Sim City 2000 because of rate.
-void AddEffect(void)
-{
-HRESULT                 hr;
-DWORD dwResults;
- 
-DSEFFECTDESC dsEffect;
-dsEffect.dwSize = sizeof(DSEFFECTDESC);
-dsEffect.dwFlags = 0; //creates temp buffer
-dsEffect.guidDSFXClass = GUID_DSFX_STANDARD_ECHO;
-dsEffect.guidDSFXClass = GUID_DSFX_WAVES_REVERB;
-dsEffect.guidDSFXClass = GUID_DSFX_STANDARD_CHORUS;
-dsEffect.guidDSFXClass = GUID_DSFX_STANDARD_FLANGER;
-dsEffect.dwReserved1 = 0;
-dsEffect.dwReserved2 = 0;
- 
-// Set the effect
-//if (FAILED(hr = IDirectSoundBuffer_SetFX(lpdsbuf, 1, &dsEffect, &dwResults)))
-//    MessageBox(0, "Add effect failed", "", 0);//return hr;
-}*/

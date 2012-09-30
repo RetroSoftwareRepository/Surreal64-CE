@@ -25,7 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // Constructors / Deconstructors
 
 // Probably shouldn't need more than 4096 * 4096
-BYTE g_ucTempBuffer[1024*1024*4];
+BYTE g_ucTempBuffer[1024*1024*2];
 
 CTexture::CTexture(DWORD dwWidth, DWORD dwHeight, bool asRenderTarget) :
 	m_pTexture(NULL),

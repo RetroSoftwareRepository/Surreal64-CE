@@ -340,9 +340,9 @@ uint32 DLParser_CheckUcode(u32 ucStart, u32 ucDStart, u32 ucSize, u32 ucDSize);
 void SaveFakeFrameBuffer(void);
 void CopyBackToFrameBuffer(DWORD addr, DWORD fmt, DWORD siz, DWORD width, DWORD height, DWORD pitch=0, D3DFORMAT surf_fmt=D3DFMT_A8R8G8B8, IDirect3DSurface8 *surf=NULL);
 
-extern BOOL g_bTempMessage;
+/*extern BOOL g_bTempMessage;
 extern DWORD g_dwTempMessageStart;
-extern char g_szTempMessage[100];
+extern char g_szTempMessage[100];*/
 
 // Lkb - I changed this to DAEDALUS_RELEASE_BUILD (from _DEBUG) because
 // I tend to dump display lists a lot when developing. This #define 

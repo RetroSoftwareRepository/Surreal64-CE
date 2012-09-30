@@ -21,20 +21,20 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <xbapp.h>
 #include <xbresource.h>
-#include <xbfont.h>
+
+extern void XboxDrawOSD();
+extern int AntiAliasMode;
+char emuvidname[128];
 
 LPDIRECT3DDEVICE8 g_pD3DDev = NULL;
 D3DCAPS8 g_D3DDeviceCaps;
 extern DWORD statusBarHeightToUse;
 extern DWORD toolbarHeight;
-D3DPRESENT_PARAMETERS d3dpp;
+//D3DPRESENT_PARAMETERS d3dpp;
 extern LPDIRECT3DSURFACE8		g_pBackBuffer;
 extern LPDIRECT3DSURFACE8		g_pDepthBuffer;
-CXBFont		m_Font;					// Font	for	text display
-CXBFont		m_MSFont;					// Font	for	buttons
 extern void CreateRenderTarget();
-extern char skinname[32];
-extern "C" char emuname[256];
+
 /*
  *	Constants
  */
@@ -64,9 +64,9 @@ BufferSettingInfo DirectXDepthBufferSetting[] =
 	"Default",					D3DFMT_D16,				D3DFMT_D16,
 	"16-bit",					D3DFMT_D16,				D3DFMT_D16,
 //	"16-bit signed",			D3DFMT_D15S1,			D3DFMT_D15S1,
-//	"16-bit lockable",			D3DFMT_D16_LOCKABLE,	D3DFMT_D16_LOCKABLE,
+	"16-bit lockable",			D3DFMT_D16_LOCKABLE,	D3DFMT_D16_LOCKABLE,
 //	"32-bit Depth Buffer",		D3DFMT_D32,				D3DFMT_D32,
-//	"32-bit signed",			D3DFMT_D24S8,			D3DFMT_D24S8,
+	"32-bit signed",			D3DFMT_D24S8,			D3DFMT_D24S8,
 //	"32-bit D24X8",				D3DFMT_D24X4S4,			D3DFMT_D24X4S4,
 //	"32-bit D24X4S4",			D3DFMT_D24X8,			D3DFMT_D24X8,
 };
@@ -99,8 +99,7 @@ CDirectXGraphicsContext::CDirectXGraphicsContext() :
 	m_dwCreateFlags(0),
 	m_dwMinDepthBits(16),
 	m_dwMinStencilBits(0),
-	//m_desktopFormat(D3DFMT_A8R8G8B8),
-	m_desktopFormat(D3DFMT_LIN_R5G6B5),
+	m_desktopFormat(D3DFMT_A8R8G8B8),
 	pCurrentRenderBuffer(NULL)
 {
 	m_strDeviceStats[0] = '\0';
@@ -136,83 +135,50 @@ bool FrameBufferInRDRAMCheckCRC();
 void ClearFrameBufferToBlack(DWORD left=0, DWORD top=0, DWORD width=0, DWORD height=0);
 bool ProcessFrameWriteRecord();
 extern RECT frameWriteByCPURect;
-extern bool bloadstate[5];
-extern bool bsavestate[5];
+extern bool bloadstate[MAX_SAVE_STATES];
+extern bool bsavestate[MAX_SAVE_STATES];
 extern "C" void __EMU_SaveState(int index);
 extern "C" void __EMU_LoadState(int index);
-extern bool onhd;
-extern bool showdebug;
-extern DWORD dwTitleColor;
+extern bool bSatesUpdated;
+
 extern void RenderScreen();
 extern void SetAsRenderTarget();
 extern LPDIRECT3DSURFACE8 pTargetSurface;
 bool draw = true;
-void CDirectXGraphicsContext::UpdateFrame(bool swaponly)
+
+__forceinline void CDirectXGraphicsContext::UpdateFrame(bool swaponly)
 {
 
-	HRESULT hr;
+	//HRESULT hr; // unreferenced
 
-				for (int i=0;i<5;i++){
-			if (bloadstate [i]) {
+	if (bSatesUpdated) {
+		bSatesUpdated = false;
+		
+		for (int i=0; i<MAX_SAVE_STATES; i++) {
+			if (bloadstate[i]) {
 				__EMU_LoadState(i+1);
-			    bloadstate[i]=false;}
-			if (bsavestate [i]) {
+				bloadstate[i]=false;
+				break;
+			}
+			else if (bsavestate[i]) {
 				__EMU_SaveState(i+1);
-			    bsavestate[i]=false;}
+				bsavestate[i]=false;
+				break;
+			}
 		}
+	}
 
 	CGraphicsContext::UpdateFrameBufferBeforeUpdateFrame();
 
+#ifndef OLDTXTCACHE
+	if (!g_bUseSetTextureMem)
+		gTextureCache.FreeTextures();
+#endif
+	
+	XboxDrawOSD();
+	
 
-		static DWORD lastTick = GetTickCount() / 1000;
-		static int lastTickFPS = 0;
-		static int frameCount = 0;
 
-		if (lastTick != GetTickCount() / 1000)
-		{
-			lastTickFPS = frameCount;
-			frameCount = 0;
-			lastTick = GetTickCount() / 1000;
-		}
-frameCount++;
-WCHAR str[10];
-swprintf(str,L"%i fps", lastTickFPS);
-MEMORYSTATUS memStat;
-WCHAR szMemStatus[128];
-
-GlobalMemoryStatus(&memStat);
-//Check Memory, Warn User, Return to Launcher
-if (memStat.dwAvailPhys / 1024 / 1024 < 1)
-	{
-		swprintf(szMemStatus,L"Out of Memory! Returning to Launcher...");
-		m_Font.Begin();
-		m_Font.DrawText(320, 240, dwTitleColor, szMemStatus, XBFONT_CENTER_X);
-		m_Font.End();
-		XLaunchNewImage("D:\\default.xbe", NULL);
-	}
-	if (showdebug)
-	 {
-
-	swprintf(szMemStatus,L"%d Mb Free",(memStat.dwAvailPhys /1024 /1024));
-	WCHAR debugemu[256];
-	swprintf(debugemu,L"%S",emuname);
-
-	// m_pd3dDevice->Clear(0,NULL,D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER,D3DCOLOR_XRGB(100,100,100),1.0f,0);
-	//  SetAsRenderTarget();
-	//  Clear(CLEAR_DEPTH_BUFFER);
-  
-	m_Font.Begin();
-	m_Font.DrawText(60, 35, dwTitleColor, szMemStatus, XBFONT_LEFT);
-	m_Font.DrawText(60, 50, dwTitleColor, str, XBFONT_LEFT);
-	m_Font.DrawText(60, 65, dwTitleColor, debugemu, XBFONT_LEFT);
-	m_Font.End();
-
-//  RenderScreen();
-//  m_pd3dDevice->Present( NULL, NULL, NULL, NULL );
-
-	}
-
-  m_pd3dDevice->Present( NULL, NULL, NULL, NULL );
 
 /*	Lock();
 	if (m_pd3dDevice == NULL)
@@ -242,6 +208,11 @@ if (memStat.dwAvailPhys / 1024 / 1024 < 1)
  
 	Unlock();*/
 
+	if( !currentRomOptions.forceBufferClear ){
+		Clear(CLEAR_DEPTH_BUFFER);}
+
+	m_pd3dDevice->Present( NULL, NULL, NULL, NULL );
+
 	if( currentRomOptions.forceBufferClear )	needCleanScene = true;
 }
 
@@ -255,6 +226,44 @@ void CDirectXGraphicsContext::DumpScreenShot()
 }
 
 //-----------------------------------------------------------------------------
+// Name: SetAntiAliasMode()
+// Desc: Surreal64 function to set the antialiasing mode determined by the
+//       Launcher. Edge AntiAliasing may work better on the xbox compared to
+//	     the FSAA modes. 4x Gaussian is the reccomended then to 2x Quincunx if 
+//	     the framerate plunges. Linear modes are also available if those
+//	     methods are prefered.
+//-----------------------------------------------------------------------------
+DWORD SetAntiAliasMode(int AAMode){
+	DWORD useAAMode;
+	switch (AAMode)
+	{
+		case 0:
+			useAAMode = D3DMULTISAMPLE_NONE;
+		break;
+
+		case 1:
+			useAAMode = D3DMULTISAMPLE_NONE;
+		break;
+
+		case 2:
+			useAAMode = D3DMULTISAMPLE_2_SAMPLES_MULTISAMPLE_LINEAR;
+		break;
+
+		case 3:
+			useAAMode = D3DMULTISAMPLE_2_SAMPLES_MULTISAMPLE_QUINCUNX;
+		break;
+
+		case 4:
+			useAAMode = D3DMULTISAMPLE_4_SAMPLES_MULTISAMPLE_LINEAR;
+		break;
+
+		case 5:
+			useAAMode = D3DMULTISAMPLE_4_SAMPLES_MULTISAMPLE_GAUSSIAN;
+		break;
+	}
+	return useAAMode;
+}
+//-----------------------------------------------------------------------------
 // Name: FindDepthStencilFormat()
 // Desc: Finds a depth/stencil format for the given device that is compatible
 //       with the render target format and meets the needs of the app.
@@ -263,84 +272,6 @@ BOOL CDirectXGraphicsContext::FindDepthStencilFormat( UINT iAdapter, D3DDEVTYPE 
 											  D3DFORMAT TargetFormat,
 											  D3DFORMAT* pDepthStencilFormat )
 {
-	
-	/*if( m_dwMinDepthBits <= 16 && m_dwMinStencilBits == 0 )
-	{
-		if( SUCCEEDED( m_pD3D->CheckDeviceFormat( iAdapter, DeviceType,
-			TargetFormat, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_SURFACE, D3DFMT_D16 ) ) )
-		{
-			if( SUCCEEDED( m_pD3D->CheckDepthStencilMatch( iAdapter, DeviceType,
-				TargetFormat, TargetFormat, D3DFMT_D16 ) ) )
-			{
-					
-				*pDepthStencilFormat = D3DFMT_D16;
-				return TRUE;
-			}
-		}
-	}
-	
- 
-	
-	if( m_dwMinDepthBits <= 24 && m_dwMinStencilBits == 0 )
-	{
-		if( SUCCEEDED( m_pD3D->CheckDeviceFormat( iAdapter, DeviceType,
-			TargetFormat, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_SURFACE, D3DFMT_D24S8 ) ) )
-		{
-			if( SUCCEEDED( m_pD3D->CheckDepthStencilMatch( iAdapter, DeviceType,
-				TargetFormat, TargetFormat, D3DFMT_D24S8 ) ) )
-			{
-				*pDepthStencilFormat = D3DFMT_D24S8;
-				return TRUE;
-			}
-		}
-	}
-	
-	if( m_dwMinDepthBits <= 24 && m_dwMinStencilBits <= 8 )
-	{
-		if( SUCCEEDED( m_pD3D->CheckDeviceFormat( iAdapter, DeviceType,
-			TargetFormat, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_SURFACE, D3DFMT_D24S8 ) ) )
-		{
-			if( SUCCEEDED( m_pD3D->CheckDepthStencilMatch( iAdapter, DeviceType,
-				TargetFormat, TargetFormat, D3DFMT_D24S8 ) ) )
-			{
-				
-				
-				*pDepthStencilFormat = D3DFMT_D24S8;
-				return TRUE;
-				
-			}
-		}
-	}
-	
-	if( m_dwMinDepthBits <= 24 && m_dwMinStencilBits <= 4 )
-	{
-		if( SUCCEEDED( m_pD3D->CheckDeviceFormat( iAdapter, DeviceType,
-			TargetFormat, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_SURFACE, D3DFMT_D24S8 ) ) )
-		{
-			if( SUCCEEDED( m_pD3D->CheckDepthStencilMatch( iAdapter, DeviceType,
-				TargetFormat, TargetFormat, D3DFMT_D24S8 ) ) )
-			{
-				*pDepthStencilFormat = D3DFMT_D24S8;
-				return TRUE;
-			}
-		}
-	}
-	
-	if( m_dwMinDepthBits <= 32 && m_dwMinStencilBits == 0 )
-	{
-		if( SUCCEEDED( m_pD3D->CheckDeviceFormat( iAdapter, DeviceType,
-			TargetFormat, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_SURFACE, D3DFMT_D24S8 ) ) )
-		{
-			if( SUCCEEDED( m_pD3D->CheckDepthStencilMatch( iAdapter, DeviceType,
-				TargetFormat, TargetFormat, D3DFMT_D24S8 ) ) )
-			{
-				*pDepthStencilFormat = D3DFMT_D24S8;
-				return TRUE;
-			}
-		}
-	}
-	
-	return FALSE;*/
 
 	*pDepthStencilFormat = D3DFMT_D16;
 	return TRUE;
@@ -351,7 +282,7 @@ BOOL CDirectXGraphicsContext::FindDepthStencilFormat( UINT iAdapter, D3DDEVTYPE 
 //*****************************************************************************
 extern void WriteConfiguration(void);
 extern "C" void _INPUT_LoadButtonMap(int *cfgData); 
-extern int ControllerConfig[72];
+extern int ControllerConfig[76];
 
 bool CDirectXGraphicsContext::Initialize(HWND hWnd, HWND hWndStatus,
 									 DWORD dwWidth, DWORD dwHeight,
@@ -428,17 +359,11 @@ bool CDirectXGraphicsContext::Initialize(HWND hWnd, HWND hWndStatus,
 
 	// GogoAckman
 	g_pd3dDevice = g_pD3DDev;
-	char fontname[256];
-	sprintf(fontname,"D:\\Skins\\%s\\Font.xpr",skinname);
-	m_Font.Create(fontname);
-	sprintf(fontname,"D:\\Skins\\%s\\MsFont.xpr",skinname);
-	m_MSFont.Create(fontname); 
+	sprintf(emuvidname,"Video 5.10");
 
 	_INPUT_LoadButtonMap(ControllerConfig);
 
-    strcat(emuname," Video 5.10");
 	//D3DDevice::GetDepthStencilSurface(&g_pDepthBuffer);
-
 
 	//CreateRenderTarget();
 	return hr==S_OK;
@@ -475,7 +400,7 @@ HRESULT CDirectXGraphicsContext::Create( BOOL bWindowed )
 
 //-----------------------------------------------------------------------------
 // Name: InitializeD3DEnvironment()
-// Desc:
+// Desc: I can has cheezburger?
 //-----------------------------------------------------------------------------
 
 HRESULT CDirectXGraphicsContext::InitializeD3DEnvironment()
@@ -490,32 +415,47 @@ HRESULT CDirectXGraphicsContext::InitializeD3DEnvironment()
     ZeroMemory( &m_d3dpp, sizeof(m_d3dpp) );
     m_d3dpp.Windowed               = FALSE;
     m_d3dpp.BackBufferCount        = 1;
-	//m_d3dpp.MultiSampleType        = D3DMULTISAMPLE_2_SAMPLES_MULTISAMPLE_QUINCUNX;
+	//m_d3dpp.BackBufferWidth  = pModeInfo->Width;
+    //m_d3dpp.BackBufferHeight = pModeInfo->Height;
+	m_d3dpp.BackBufferWidth = 640;
+	m_d3dpp.BackBufferHeight = 480;
+    //m_d3dpp.BackBufferFormat = D3DFMT_LIN_R5G6B5;
+	m_d3dpp.BackBufferFormat = D3DFMT_A8R8G8B8;
+	m_d3dpp.MultiSampleType        = SetAntiAliasMode(AntiAliasMode);
     //m_d3dpp.SwapEffect             = bufferSettings[curBufferSetting].swapEffect;
     m_d3dpp.SwapEffect             =  D3DSWAPEFFECT_COPY;
 	m_d3dpp.EnableAutoDepthStencil = TRUE; /*m_bUseDepthBuffer;*/
     //m_d3dpp.AutoDepthStencilFormat = pModeInfo->DepthStencilFormat;
 	m_d3dpp.AutoDepthStencilFormat = D3DFMT_D16;
     m_d3dpp.hDeviceWindow          = m_hWnd;
-	m_d3dpp.FullScreen_PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE/*D3DPRESENT_INTERVAL_ONE*/;
+	switch (VSync){
+		case 0 : 	m_d3dpp.FullScreen_PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
+			break;
+		case 1 : 	m_d3dpp.FullScreen_PresentationInterval = D3DPRESENT_INTERVAL_ONE;
+			break;
+		case 2 : 	m_d3dpp.FullScreen_PresentationInterval = D3DPRESENT_INTERVAL_ONE_OR_IMMEDIATE;
+			break;
+/*		case 2 : 	m_d3dpp.FullScreen_PresentationInterval = D3DPRESENT_INTERVAL_TWO;
+			break;
+		case 3 : 	m_d3dpp.FullScreen_PresentationInterval = D3DPRESENT_INTERVAL_THREE;
+			break;
+		case 4 : 	m_d3dpp.FullScreen_PresentationInterval = D3DPRESENT_INTERVAL_DEFAULT;
+			break;
+		case 5 : 	m_d3dpp.FullScreen_PresentationInterval = D3DPRESENT_INTERVAL_ONE_OR_IMMEDIATE;
+			break;
+		case 6 : 	m_d3dpp.FullScreen_PresentationInterval = D3DPRESENT_INTERVAL_TWO_OR_IMMEDIATE;
+			break;
+		case 7 : 	m_d3dpp.FullScreen_PresentationInterval = D3DPRESENT_INTERVAL_THREE_OR_IMMEDIATE;
+			break;*/
+	}
 	
-	m_d3dpp.FullScreen_RefreshRateInHz = D3DPRESENT_RATE_DEFAULT;
+	m_d3dpp.FullScreen_RefreshRateInHz = 60;//D3DPRESENT_RATE_DEFAULT;
 	//m_d3dpp.Flags = D3DPRESENTFLAG_EMULATE_REFRESH_RATE;
 
-    //m_d3dpp.BackBufferWidth  = pModeInfo->Width;
-    //m_d3dpp.BackBufferHeight = pModeInfo->Height;
-	m_d3dpp.BackBufferWidth = 640;
-	m_d3dpp.BackBufferHeight = 480;
-    m_d3dpp.BackBufferFormat = D3DFMT_LIN_R5G6B5;
-	//m_d3dpp.BackBufferFormat = D3DFMT_A8R8G8B8;
+	m_desktopFormat = D3DFMT_A8R8G8B8;//D3DFMT_X1R5G5B5;
+	//m_desktopFormat = D3DFMT_LIN_R5G6B5;
 
-	windowSetting.uDisplayWidth = m_d3dpp.BackBufferWidth;
-	windowSetting.uDisplayHeight = m_d3dpp.BackBufferHeight;
-
-	//m_desktopFormat = D3DFMT_A8R8G8B8/*D3DFMT_X1R5G5B5*/;
-	m_desktopFormat = D3DFMT_LIN_R5G6B5;
-
-DWORD videoFlags = XGetVideoFlags();
+	DWORD videoFlags = XGetVideoFlags();
 	if(XGetVideoStandard() == XC_VIDEO_STANDARD_PAL_I)
 	{
 		if(videoFlags & XC_VIDEO_FLAGS_PAL_60Hz)		// PAL 60 user
@@ -530,54 +470,57 @@ DWORD videoFlags = XGetVideoFlags();
 		m_d3dpp.Flags = D3DPRESENTFLAG_WIDESCREEN;
 	 }
 
-		//480p
 	 if(XGetAVPack() == XC_AV_PACK_HDTV){
-		if( videoFlags & XC_VIDEO_FLAGS_HDTV_480p){
+		//720p
+		if( videoFlags & XC_VIDEO_FLAGS_HDTV_720p && bEnableHDTV){
+			m_d3dpp.BackBufferWidth = 1280;
+			m_d3dpp.BackBufferHeight = 720;
+			m_d3dpp.Flags = D3DPRESENTFLAG_PROGRESSIVE | D3DPRESENTFLAG_WIDESCREEN;
+			m_d3dpp.BackBufferFormat = D3DFMT_A8R8G8B8;
+		}
+		//480p
+		else if( videoFlags & XC_VIDEO_FLAGS_HDTV_480p){
 			m_d3dpp.Flags = D3DPRESENTFLAG_PROGRESSIVE;
 			m_d3dpp.BackBufferFormat = D3DFMT_A8R8G8B8;
 		}
 	 }
     
-	//freakdave
+	//apply final width and height. Leave this here!
+	windowSetting.uDisplayWidth = m_d3dpp.BackBufferWidth;
+	windowSetting.uDisplayHeight = m_d3dpp.BackBufferHeight;
+
 	if(VertexMode == 0){
     // Create the device
     hr = m_pD3D->CreateDevice( D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL,
 								NULL, D3DCREATE_PUREDEVICE, &m_d3dpp,
 								&m_pd3dDevice );
-
 	}
 
-
-	if(VertexMode == 1){
+	else if(VertexMode == 1){
     // Create the device
     hr = m_pD3D->CreateDevice( D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL,
 								NULL, D3DCREATE_SOFTWARE_VERTEXPROCESSING, &m_d3dpp,
 								&m_pd3dDevice );
-
 	}
 
-	if(VertexMode == 2){
+	else if(VertexMode == 2){
     // Create the device
     hr = m_pD3D->CreateDevice( D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL,
 								NULL, D3DCREATE_HARDWARE_VERTEXPROCESSING, &m_d3dpp,
 								&m_pd3dDevice );
-
 	}
 
-	if(VertexMode == 3){
+	else if(VertexMode == 3){
     // Create the device
     hr = m_pD3D->CreateDevice( D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL,
 								NULL, D3DCREATE_MIXED_VERTEXPROCESSING, &m_d3dpp,
 								&m_pd3dDevice );
-
 	}
-
-
 
     if( SUCCEEDED(hr) && m_pd3dDevice )
     {
 		g_pD3DDev = m_pd3dDevice;
-		d3dpp = m_d3dpp;
+		//d3dpp = m_d3dpp;
 		
         // When moving from fullscreen to windowed mode, it is important to
         // adjust the window size after recreating the device rather than
@@ -592,24 +535,21 @@ DWORD videoFlags = XGetVideoFlags();
         // Store device Caps
         m_pd3dDevice->GetDeviceCaps( &m_d3dCaps );
 
-		//freakdave
 		if(VertexMode == 0){
         m_dwCreateFlags = D3DCREATE_PUREDEVICE;
 		}
 
-		if(VertexMode == 1){
+		else if(VertexMode == 1){
         m_dwCreateFlags = D3DCREATE_SOFTWARE_VERTEXPROCESSING;
 		}
 
-		if(VertexMode == 2){
+		else if(VertexMode == 2){
         m_dwCreateFlags = D3DCREATE_HARDWARE_VERTEXPROCESSING;
 		}
 
-		if(VertexMode == 3){
+		else if(VertexMode == 3){
         m_dwCreateFlags = D3DCREATE_MIXED_VERTEXPROCESSING;
 		}
-
-
 
 	/*
         // Store device description
@@ -653,8 +593,6 @@ DWORD videoFlags = XGetVideoFlags();
             lstrcat( m_strDeviceStats, pAdapterInfo->d3dAdapterIdentifier.Description );
         } */
 
-	 
-		
         // Store render target surface desc
       LPDIRECT3DSURFACE8 pBackBuffer;
         m_pd3dDevice->GetBackBuffer( 0, D3DBACKBUFFER_TYPE_MONO, &pBackBuffer );
@@ -682,30 +620,8 @@ DWORD videoFlags = XGetVideoFlags();
         SAFE_RELEASE( m_pd3dDevice );
     }
 	else
-	{
-		 
+	{	 
 	}
-	
-	/*
-	extern LPDIRECT3DSURFACE8 g_pLockableBackBuffer;
-	if( g_pLockableBackBuffer == NULL )
-	{
-		if( IsResultGood(g_pD3DDev->CreateDepthStencilSurface(windowSetting.uDisplayWidth, windowSetting.uDisplayHeight, D3DFMT_D16_LOCKABLE, D3DMULTISAMPLE_NONE, &g_pLockableBackBuffer)) && g_pLockableBackBuffer )
-		{
-			g_pD3DDev->SetRenderTarget(NULL, g_pLockableBackBuffer);
-			TRACE0("Created and use lockable depth buffer");
-		}
-		else
-		{
-			if( g_pLockableBackBuffer )
-			{
-				g_pLockableBackBuffer->Release();
-				g_pLockableBackBuffer = NULL;
-			}
-			TRACE0("Can not create lockable depth buffer");
-		}
-	}
-	*/
 
     // If that failed, fall back to the reference rasterizer (removed)
 	
@@ -718,38 +634,7 @@ DWORD videoFlags = XGetVideoFlags();
 // Desc:
 //-----------------------------------------------------------------------------
 HRESULT CDirectXGraphicsContext::ResizeD3DEnvironment()
-{
-   /* HRESULT hr;
-	
-    // Release all vidmem objects
-    if( FAILED( hr = InvalidateDeviceObjects() ) )
-        return hr;
-	
-    // Reset the device
-    if( IsResultGood( hr = m_pd3dDevice->Reset( &m_d3dpp ), true ) )
-	{
-		while ( hr == D3DERR_DEVICELOST )
-		{
-			Pause(true);
-			hr = m_pd3dDevice->Reset( &m_d3dpp );
-		}
-	}
-	else
-	{
-        return hr;
-	}
-	
-    // Store render target surface desc
-    LPDIRECT3DSURFACE8 pBackBuffer;
-    m_pd3dDevice->GetBackBuffer( 0, D3DBACKBUFFER_TYPE_MONO, &pBackBuffer );
-    pBackBuffer->GetDesc( &m_d3dsdBackBuffer );
-    pBackBuffer->Release();
- 
-    // Initialize the app's device-dependent objects
-    hr = RestoreDeviceObjects();
-    if( FAILED(hr) )
-        return hr; */
-	
+{	
     return S_OK;
 }
 
@@ -760,61 +645,6 @@ HRESULT CDirectXGraphicsContext::ResizeD3DEnvironment()
 //-----------------------------------------------------------------------------
 HRESULT CDirectXGraphicsContext::DoToggleFullscreen()
 {
-  /*  // Get access to current adapter, device, and mode
-    D3DAdapterInfo* pAdapterInfo = &m_Adapters[m_dwAdapter];
-    D3DDeviceInfo*  pDeviceInfo  = &pAdapterInfo->devices[pAdapterInfo->dwCurrentDevice];
-    D3DModeInfo*    pModeInfo    = &pDeviceInfo->modes[pDeviceInfo->dwCurrentMode];
-	
-    // Need device change if going windowed and the current device
-    // can only be fullscreen
-    if( !m_bWindowed && !pDeviceInfo->bCanDoWindowed )
-	{
-		statusBarHeightToUse = statusBarHeight;
-		toolbarHeightToUse = toolbarHeight;
-		return ForceWindowed();
-	}
-	
-    m_bReady = false;
-	
-    // Toggle the windowed state
-    m_bWindowed = !m_bWindowed;
-    pDeviceInfo->bWindowed = m_bWindowed;
-	if( m_bWindowed )
-	{
-		statusBarHeightToUse = statusBarHeight;
-		toolbarHeightToUse = toolbarHeight;
-	}
-	else
-	{
-		statusBarHeightToUse = 0;
-		toolbarHeightToUse = 0;
-	}
-	
-    // Prepare window for windowed/fullscreen change
-    AdjustWindowForChange();
-	
-	Lock();
-	CleanUp();
-    m_pD3D = Direct3DCreate8( D3D_SDK_VERSION );
-    if( m_pD3D == NULL )
-	{
-		Unlock();
-        return DisplayErrorMsg( D3DAPPERR_NODIRECT3D, MSGERR_APPMUSTEXIT );
-	}
-	InitializeD3DEnvironment();
-	Unlock();
-
-	
-    // When moving from fullscreen to windowed mode, it is important to
-    // adjust the window size after resetting the device rather than
-    // beforehand to ensure that you get the window size you want.  For
-    // example, when switching from 640x480 fullscreen to windowed with
-    // a 1000x600 window on a 1024x768 desktop, it is impossible to set
-    // the window size to 1000x600 until after the display mode has
-    // changed to 1024x768, because windows cannot be larger than the
-    // desktop.
- 
-	*/
     m_bReady = true;
 	
     return S_OK; 
@@ -829,70 +659,7 @@ HRESULT CDirectXGraphicsContext::DoToggleFullscreen()
 //       and/or adapter
 //-----------------------------------------------------------------------------
 HRESULT CDirectXGraphicsContext::ForceWindowed()
-{
-/*    HRESULT hr;
-    D3DAdapterInfo* pAdapterInfoCur = &m_Adapters[m_dwAdapter];
-    D3DDeviceInfo*  pDeviceInfoCur  = &pAdapterInfoCur->devices[pAdapterInfoCur->dwCurrentDevice];
-    BOOL bFoundDevice = FALSE;
-	
-    if( pDeviceInfoCur->bCanDoWindowed )
-    {
-        bFoundDevice = TRUE;
-    }
-    else
-    {
-        // Look for a windowable device on any adapter
-        D3DAdapterInfo* pAdapterInfo;
-        DWORD dwAdapter;
-        D3DDeviceInfo* pDeviceInfo;
-        DWORD dwDevice;
-        for( dwAdapter = 0; dwAdapter < m_dwNumAdapters; dwAdapter++ )
-        {
-            pAdapterInfo = &m_Adapters[dwAdapter];
-            for( dwDevice = 0; dwDevice < pAdapterInfo->dwNumDevices; dwDevice++ )
-            {
-                pDeviceInfo = &pAdapterInfo->devices[dwDevice];
-                if( pDeviceInfo->bCanDoWindowed )
-                {
-                    m_dwAdapter = dwAdapter;
-                    pDeviceInfoCur = pDeviceInfo;
-                    pAdapterInfo->dwCurrentDevice = dwDevice;
-                    bFoundDevice = TRUE;
-                    break;
-                }
-            }
-            if( bFoundDevice )
-                break;
-        }
-    }
-	
-    if( !bFoundDevice )
-        return E_FAIL;
-	
-    pDeviceInfoCur->bWindowed = TRUE;
-    m_bWindowed = true;
-	
-    // Now destroy the current 3D device objects, then reinitialize
-	
-    m_bReady = false;
-	
-    // Release all scene objects that will be re-created for the new device
-    InvalidateDeviceObjects();
-    DeleteDeviceObjects();
-	
-    // Release display objects, so a new device can be created
-	LONG nRefCount = m_pd3dDevice->Release();
-    if( nRefCount > 0L )
-	{
-		//DBGConsole_Msg(0, "Refcount of device is %d", nRefCount );
-        return DisplayErrorMsg( D3DAPPERR_NONZEROREFCOUNT, MSGERR_APPMUSTEXIT );
-	}
-	
-    // Create the new device
-    if( FAILED( hr = InitializeD3DEnvironment() ) )
-        return DisplayErrorMsg( hr, MSGERR_APPMUSTEXIT );
-    m_bReady = true; */
-	
+{	
     return S_OK;
 }
 
@@ -931,281 +698,7 @@ static int _cdecl SortModesCallback( const VOID* arg1, const VOID* arg2 )
 // Desc: From DX8 SDK Copyright (c) 1998-2000 Microsoft
 //-----------------------------------------------------------------------------
 HRESULT CDirectXGraphicsContext::BuildDeviceList()
-{
-   /* const DWORD dwNumDeviceTypes = 2;
-    const CHAR* strDeviceDescs[] = { "HAL", "REF" };
-    const D3DDEVTYPE DeviceTypes[] = { D3DDEVTYPE_HAL, D3DDEVTYPE_REF };
-	
-    BOOL bHALExists = FALSE;
-    BOOL bHALIsWindowedCompatible = FALSE;
-    BOOL bHALIsDesktopCompatible = FALSE;
-    BOOL bHALIsSampleCompatible = FALSE;
-	
-    // Loop through all the adapters on the system (usually, there's just one
-    // unless more than one graphics card is present).
-    for( UINT iAdapter = 0; iAdapter < m_pD3D->GetAdapterCount(); iAdapter++ )
-    {
-        // Fill in adapter info
-        D3DAdapterInfo* pAdapter  = &m_Adapters[m_dwNumAdapters];
-        m_pD3D->GetAdapterIdentifier( iAdapter, 0, &pAdapter->d3dAdapterIdentifier );
-        m_pD3D->GetAdapterDisplayMode( iAdapter, &pAdapter->d3ddmDesktop );
-        pAdapter->dwNumDevices    = 0;
-        pAdapter->dwCurrentDevice = 0;
-		
-		//
-        // Enumerate all display modes on this adapter
-		//
-        D3DDISPLAYMODE modes[100];
-        D3DFORMAT      formats[20];
-        DWORD dwNumFormats      = 0;
-        DWORD dwNumModes        = 0;
-        DWORD dwNumAdapterModes = m_pD3D->GetAdapterModeCount( iAdapter );
-		
-        // Add the adapter's current desktop format to the list of formats
-        formats[dwNumFormats++] = pAdapter->d3ddmDesktop.Format;
-		
-        for( UINT iMode = 0; iMode < dwNumAdapterModes; iMode++ )
-        {
-            // Get the display mode attributes
-            D3DDISPLAYMODE DisplayMode;
-            m_pD3D->EnumAdapterModes( iAdapter, iMode, &DisplayMode );
-			
-            // Filter out low-resolution modes
-            if( DisplayMode.Width  < 320 || DisplayMode.Height < 200 )
-                continue;
-			
-            // Check if the mode already exists (to filter out refresh rates)
-            for( DWORD m=0L; m<dwNumModes; m++ )
-            {
-                if( ( modes[m].Width  == DisplayMode.Width  ) &&
-                    ( modes[m].Height == DisplayMode.Height ) &&
-                    ( modes[m].Format == DisplayMode.Format ) )
-                    break;
-            }
-			
-            // If we found a new mode, add it to the list of modes
-            if( m == dwNumModes )
-            {
-                modes[dwNumModes].Width       = DisplayMode.Width;
-                modes[dwNumModes].Height      = DisplayMode.Height;
-                modes[dwNumModes].Format      = DisplayMode.Format;
-                modes[dwNumModes].RefreshRate = 0;
-                dwNumModes++;
-				
-                // Check if the mode's format already exists
-                for( DWORD f=0; f<dwNumFormats; f++ )
-                {
-                    if( DisplayMode.Format == formats[f] )
-                        break;
-                }
-				
-                // If the format is new, add it to the list
-                if( f== dwNumFormats )
-                    formats[dwNumFormats++] = DisplayMode.Format;
-            }
-        }
-		
-        // Sort the list of display modes (by format, then width, then height)
-        qsort( modes, dwNumModes, sizeof(D3DDISPLAYMODE), SortModesCallback );
-		
-        // Add devices to adapter
-        for( UINT iDevice = 0; iDevice < dwNumDeviceTypes; iDevice++ )
-        {
-            // Fill in device info
-            D3DDeviceInfo* pDevice;
-            pDevice                 = &pAdapter->devices[pAdapter->dwNumDevices];
-            pDevice->DeviceType     = DeviceTypes[iDevice];
-            m_pD3D->GetDeviceCaps( iAdapter, DeviceTypes[iDevice], &pDevice->d3dCaps );
-            pDevice->strDesc        = strDeviceDescs[iDevice];
-            pDevice->dwNumModes     = 0;
-            pDevice->dwCurrentMode  = 0;
-            pDevice->bCanDoWindowed = FALSE;
-            pDevice->bWindowed      = FALSE;
-            pDevice->MultiSampleType = D3DMULTISAMPLE_NONE;
-			
-            // Examine each format supported by the adapter to see if it will
-            // work with this device and meets the needs of the application.
-            BOOL  bFormatConfirmed[20];
-            DWORD dwBehavior[20];
-            D3DFORMAT fmtDepthStencil[20];
-			
-            for( DWORD f=0; f<dwNumFormats; f++ )
-            {
-                bFormatConfirmed[f] = FALSE;
-                fmtDepthStencil[f] = D3DFMT_UNKNOWN;
-				
-                // Skip formats that cannot be used as render targets on this device
-                if( FAILED( m_pD3D->CheckDeviceType( iAdapter, pDevice->DeviceType,
-					formats[f], formats[f], FALSE ) ) )
-                    continue;
-				
-                if( pDevice->DeviceType == D3DDEVTYPE_HAL )
-                {
-                    // This system has a HAL device
-                    bHALExists = TRUE;
-					
-                    if( pDevice->d3dCaps.Caps2 & D3DCAPS2_CANRENDERWINDOWED )
-                    {
-                        // HAL can run in a window for some mode
-                        bHALIsWindowedCompatible = TRUE;
-						
-                        if( f == 0 )
-                        {
-                            // HAL can run in a window for the current desktop mode
-                            bHALIsDesktopCompatible = TRUE;
-                        }
-                    }
-                }
-				
-                // Confirm the device/format for HW vertex processing
-                if( pDevice->d3dCaps.DevCaps&D3DDEVCAPS_HWTRANSFORMANDLIGHT )
-                {
-                    if( pDevice->d3dCaps.DevCaps&D3DDEVCAPS_PUREDEVICE )
-                    {
-                        dwBehavior[f] = D3DCREATE_SOFTWARE_VERTEXPROCESSING  
-							 ;
-						
-                        if( SUCCEEDED( ConfirmDevice( &pDevice->d3dCaps, dwBehavior[f],
-							formats[f] ) ) )
-                            bFormatConfirmed[f] = TRUE;
-                    }
-				
-                    if ( FALSE == bFormatConfirmed[f] )
-                    {
-                        dwBehavior[f] = D3DCREATE_HARDWARE_VERTEXPROCESSING;
-						
-                        if( SUCCEEDED( ConfirmDevice( &pDevice->d3dCaps, dwBehavior[f],
-							formats[f] ) ) )
-                            bFormatConfirmed[f] = TRUE;
-                    }
-					
-                    if ( FALSE == bFormatConfirmed[f] )
-                    {
-                        dwBehavior[f] = D3DCREATE_MIXED_VERTEXPROCESSING;
-						
-                        if( SUCCEEDED( ConfirmDevice( &pDevice->d3dCaps, dwBehavior[f],
-							formats[f] ) ) )
-                            bFormatConfirmed[f] = TRUE;
-                    }
-                }
-				
-                // Confirm the device/format for SW vertex processing
-                if( FALSE == bFormatConfirmed[f] )
-                {
-                    dwBehavior[f] = D3DCREATE_SOFTWARE_VERTEXPROCESSING;
-					
-                    if( SUCCEEDED( ConfirmDevice( &pDevice->d3dCaps, dwBehavior[f],
-						formats[f] ) ) )
-                        bFormatConfirmed[f] = TRUE;
-                }
-				
-                // Find a suitable depth/stencil buffer format for this device/format
-                if( bFormatConfirmed[f] ) //&& m_bUseDepthBuffer
-                {
-                    if( !FindDepthStencilFormat( iAdapter, pDevice->DeviceType,
-                        formats[f], &fmtDepthStencil[f] ) )
-                    {
-                        bFormatConfirmed[f] = FALSE;
-                    }
-                }
-            }
-			
-            // Add all enumerated display modes with confirmed formats to the
-            // device's list of valid modes
-            for( DWORD m=0L; m<dwNumModes; m++ )
-            {
-                for( DWORD f=0; f<dwNumFormats; f++ )
-                {
-                    if( modes[m].Format == formats[f] )
-                    {
-                        if( bFormatConfirmed[f] == TRUE )
-                        {
-                            // Add this mode to the device's list of valid modes
-                            pDevice->modes[pDevice->dwNumModes].Width      = modes[m].Width;
-                            pDevice->modes[pDevice->dwNumModes].Height     = modes[m].Height;
-                            pDevice->modes[pDevice->dwNumModes].Format     = modes[m].Format;
-                            pDevice->modes[pDevice->dwNumModes].dwBehavior = dwBehavior[f];
-                            pDevice->modes[pDevice->dwNumModes].DepthStencilFormat = fmtDepthStencil[f];
-                            pDevice->dwNumModes++;
-							
-                            if( pDevice->DeviceType == D3DDEVTYPE_HAL )
-                                bHALIsSampleCompatible = TRUE;
-                        }
-                    }
-                }
-            }
-			
-            // Select any 640x480 mode for default (but prefer a 16-bit mode)
-            for( m=0; m<pDevice->dwNumModes; m++ )
-            {
-//                if( pDevice->modes[m].Width==640 && pDevice->modes[m].Height==480 )
-                if( pDevice->modes[m].Width==windowSetting.uFullScreenDisplayWidth && pDevice->modes[m].Height==windowSetting.uFullScreenDisplayHeight )
-                {
-                    pDevice->dwCurrentMode = m;
-                    if( pDevice->modes[m].Format == D3DFMT_R5G6B5 ||
-                        pDevice->modes[m].Format == D3DFMT_X1R5G5B5 ||
-                        pDevice->modes[m].Format == D3DFMT_A1R5G5B5 )
-                    {
-                        break;
-                    }
-                }
-            }
-			
-            // Check if the device is compatible with the desktop display mode
-            // (which was added initially as formats[0])
-            if( bFormatConfirmed[0] && (pDevice->d3dCaps.Caps2 & D3DCAPS2_CANRENDERWINDOWED) )
-            {
-                pDevice->bCanDoWindowed = TRUE;
-                pDevice->bWindowed      = TRUE;
-            }
-			
-            // If valid modes were found, keep this device
-            if( pDevice->dwNumModes > 0 )
-                pAdapter->dwNumDevices++;
-        }
-		
-        // If valid devices were found, keep this adapter
-        if( pAdapter->dwNumDevices > 0 )
-            m_dwNumAdapters++;
-    }
-	
-    // Return an error if no compatible devices were found
-    if( 0L == m_dwNumAdapters )
-        return D3DAPPERR_NOCOMPATIBLEDEVICES;
-	
-    // Pick a default device that can render into a window
-    // (This code assumes that the HAL device comes before the REF
-    // device in the device array).
-    for( DWORD a=0; a<m_dwNumAdapters; a++ )
-    {
-        for( DWORD d=0; d < m_Adapters[a].dwNumDevices; d++ )
-        {
-            if( m_Adapters[a].devices[d].bWindowed )
-            {
-                m_Adapters[a].dwCurrentDevice = d;
-                m_dwAdapter = a;
-				m_bWindowed = true;
-				
-                // Display a warning message
-                if( m_Adapters[a].devices[d].DeviceType == D3DDEVTYPE_REF )
-                {
-                    if( !bHALExists )
-                        DisplayErrorMsg( D3DAPPERR_NOHARDWAREDEVICE, MSGWARN_SWITCHEDTOREF );
-                    else if( !bHALIsSampleCompatible )
-                        DisplayErrorMsg( D3DAPPERR_HALNOTCOMPATIBLE, MSGWARN_SWITCHEDTOREF );
-                    else if( !bHALIsWindowedCompatible )
-                        DisplayErrorMsg( D3DAPPERR_NOWINDOWEDHAL, MSGWARN_SWITCHEDTOREF );
-                    else if( !bHALIsDesktopCompatible )
-                        DisplayErrorMsg( D3DAPPERR_NODESKTOPHAL, MSGWARN_SWITCHEDTOREF );
-                    else // HAL is desktop compatible, but not sample compatible
-                        DisplayErrorMsg( D3DAPPERR_NOHALTHISMODE, MSGWARN_SWITCHEDTOREF );
-                }
-				
-                return S_OK;
-            }
-        }
-    } */
-	
+{	
     return S_OK;
 }
 
@@ -1271,17 +764,7 @@ VOID CDirectXGraphicsContext::CleanUp()
 
 int CDirectXGraphicsContext::ToggleFullscreen()
 {
-    // Toggle the fullscreen/window mode
-   /* if( m_bActive && m_bReady )
-    {
-        if( FAILED( DoToggleFullscreen() ) )
-        {
-            DisplayErrorMsg( D3DAPPERR_RESIZEFAILED, MSGERR_APPMUSTEXIT );
-        }
-		CDaedalusRender::GetRender()->Initialize();
-    }
-	return m_bWindowed?0:1;*/
-
+// Toggle the fullscreen/window mode
 	return 1;
 }
 

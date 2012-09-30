@@ -41,8 +41,14 @@ typedef struct _XLMenuitem
 #define MENU_SELECTITEM2        0x0006            // select this menu item
 
 // menu flags
-#define MENU_LEFT            0x0001            // left justify menu text
-#define MENU_RIGHT            0x0002            // right justify menu text
+/*#define MENU_LEFT            0x0001            // left justify menu text
+#define MENU_RIGHT            0x0002            // right justify menu text*/
+// like xbfont
+#define MENU_LEFT            0x0000            // left justify menu text
+#define MENU_RIGHT            0x0001            // right justify menu text
+#define MENU_CENTER_X            0x0002            // center menu text
+//#define MENU_CENTER_Y            0x0003            // center menu text
+
 #define MENU_WRAP            0x0004            // wrap menu selection
 #define MENU_NOBACK            0x0008            // cannot use back button
 

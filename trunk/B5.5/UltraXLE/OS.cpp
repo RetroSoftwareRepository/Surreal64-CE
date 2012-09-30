@@ -748,12 +748,12 @@ void osMapTLB(dword x,dword pagemask, dword m_ptr, dword a,dword b,dword c)
     {
         case 0x1ffe000: pagesize=4*4*4*4*4*4*4096; break; // 16M
         case 0x07fe000: pagesize=4*4*4*4*4*4096; break; // 4MB
-        case 0x01fe000: pagesize=4*4*4*4*4096; break;
-        case 0x007e000: pagesize=4*4*4*4096; break;
-        case 0x001e000: pagesize=4*4*4096; break;
-        case 0x0006000: pagesize=4*4096; break;
+        case 0x01fe000: pagesize=4*4*4*4*4096; break; // 1MB
+        case 0x007e000: pagesize=4*4*4*4096; break; // 0.25MB
+        case 0x001e000: pagesize=4*4*4096; break; // 0.0625MB
+        case 0x0006000: pagesize=4*4096; break; // 0.015625MB
         default:
-        case 0x0000000: pagesize=4096; break;
+        case 0x0000000: pagesize=4096; break; // 0.00390625MB
     }
     pagebase=m_ptr;
     srcmin=a;

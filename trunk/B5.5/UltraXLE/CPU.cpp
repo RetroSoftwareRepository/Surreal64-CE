@@ -802,6 +802,7 @@ void cpu_exec(qword ops0,int fast)
             if(ops<CYCLES_BURST) num=ops; else num=CYCLES_BURST;
 
             st.bailout=num;
+
             if(fast) a_exec();
             else c_exec();
 

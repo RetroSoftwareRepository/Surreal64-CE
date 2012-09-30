@@ -25,6 +25,9 @@ extern RecentCIInfo* g_uRecentCIInfoPtrs[];
 
 //9 would be dwFreeMem but this doesn't work atm - freakdave
 //static const DWORD MEM_KEEP_FREE = (6*1024*1024);//freakdave
+#ifndef OLDTXTCACHE
+static const DWORD MEM_KEEP_FREE = (2*1024*1024); // keep 2MB free
+#endif
 //static bool g_bUseSetTextureMem = true;		   // we pretty much always wanna use a set texture mem
 
 // Ez0n3 - lets revert until freakdave finishes this ( "Default Max Video Mem" would change "g_maxTextureMemUsage", but it's static instead - unsure why)
@@ -32,8 +35,6 @@ extern RecentCIInfo* g_uRecentCIInfoPtrs[];
 bool g_bUseSetTextureMem = true;
 DWORD g_maxTextureMemUsage = (5*1024*1024);
 DWORD g_amountToFree = (512*1024);
-
-
 
 // Returns the first prime greater than or equal to nFirst
 inline LONG GetNextPrime(LONG nFirst)
@@ -116,6 +117,7 @@ CTextureManager::~CTextureManager()
 {
 	DropTextures();
 	
+#ifdef OLDTXTCACHE
 	if (!g_bUseSetTextureMem)
 	{
 		while (m_pFirstUsedSurface)
@@ -126,6 +128,7 @@ CTextureManager::~CTextureManager()
 			delete pVictim;
 		}
 	}
+#endif
 
 	delete []m_pTextureHash;
 	m_pTextureHash = NULL;	
@@ -156,6 +159,7 @@ bool CTextureManager::CleanUp()
 	memset(&m_LODFracTextureEntry, 0, sizeof(TextureEntry));
 	memset(&m_PrimLODFracTextureEntry, 0, sizeof(TextureEntry));
 
+#ifdef OLDTXTCACHE
 	if (!g_bUseSetTextureMem)
 	{
 		while (m_pFirstUsedSurface)
@@ -166,6 +170,7 @@ bool CTextureManager::CleanUp()
 			delete pVictim;
 		}
 	}
+#endif
 
 	return true;
 }
@@ -173,6 +178,7 @@ bool CTextureManager::CleanUp()
 // Purge any textures whos last usage was over 5 seconds ago
 void CTextureManager::PurgeOldTextures()
 {
+#ifdef OLDTXTCACHE
 	if (m_pTextureHash == NULL)
 		return;
 
@@ -231,6 +237,9 @@ void CTextureManager::PurgeOldTextures()
 			pCurr = pNext;
 		}
 	}
+#else
+	return;
+#endif
 }
 
 void CTextureManager::DropTextures()
@@ -254,10 +263,14 @@ void CTextureManager::DropTextures()
 			dwTotalUses += pTVictim->dwUses;
 			dwCount++;
 			
+#ifdef OLDTXTCACHE
 			if (g_bUseSetTextureMem)
 				delete pTVictim;
 			else
 				AddToRecycleList(pTVictim);
+#else
+				delete pTVictim;
+#endif
 		}
 	}
 }
@@ -266,6 +279,7 @@ void CTextureManager::DropTextures()
 // Add to the recycle list
 void CTextureManager::AddToRecycleList(TextureEntry *pEntry)
 {
+#ifdef OLDTXTCACHE
 	if (g_bUseSetTextureMem)
 		return;
 
@@ -289,11 +303,15 @@ void CTextureManager::AddToRecycleList(TextureEntry *pEntry)
 		SAFE_DELETE(pEntry->pEnhancedTexture);
 		m_pFirstUsedSurface = pEntry;
 	}
+#else
+	return;
+#endif
 }
 
 // Search for a texture of the specified dimensions to recycle
 TextureEntry * CTextureManager::ReviveUsedTexture( DWORD width, DWORD height )
 {
+#ifdef OLDTXTCACHE
 	if (g_bUseSetTextureMem)
 		return NULL;
 
@@ -318,7 +336,8 @@ TextureEntry * CTextureManager::ReviveUsedTexture( DWORD width, DWORD height )
 		pPrev = pCurr;
 		pCurr = pCurr->pNext;
 	}
-	
+#endif
+
 	return NULL;
 }
 
@@ -332,8 +351,10 @@ DWORD CTextureManager::Hash(DWORD dwValue)
 
 void CTextureManager::MakeTextureYoungest(TextureEntry *pEntry)
 {
+#ifdef OLDTXTCACHE
 	if (!g_bUseSetTextureMem)
 		return;
+#endif
 
 	if (pEntry == m_pYoungestTexture)
 		return;
@@ -442,10 +463,10 @@ void CTextureManager::RemoveTextureEntry(TextureEntry * pEntry)
 			else			   
 				m_pTextureHash[dwKey] = pCurr->pNext;
 
-				
-			// Ez0n3 - we'll use the old way until freakdave finishes this
+#ifdef OLDTXTCACHE
 			if (g_bUseSetTextureMem)
 			{
+#endif
 				// remove the texture from the age list
 				if (pEntry->pNextYoungest != NULL)
 				{
@@ -460,35 +481,13 @@ void CTextureManager::RemoveTextureEntry(TextureEntry * pEntry)
 				m_currentTextureMemUsage -= (pEntry->pTexture->m_dwWidth * pEntry->pTexture->m_dwHeight * 4);
 			
 				delete pEntry;
+#ifdef OLDTXTCACHE
 			}
 			else
 			{
 				AddToRecycleList(pEntry);
 			}
-				
-			// new way	
-			/*
-			if (g_bUseSetTextureMem)
-			{
-				// remove the texture from the age list
-				if (pEntry->pNextYoungest != NULL)
-				{
-					pEntry->pNextYoungest->pLastYoungest = pEntry->pLastYoungest;
-				}
-				if (pEntry->pLastYoungest != NULL)
-				{
-					pEntry->pLastYoungest->pNextYoungest = pEntry->pNextYoungest;
-				}
-			
-				delete pEntry;
-			}
-			else
-			{
-				AddToRecycleList(pEntry);
-			}
-			*/
-			
-
+#endif
 			break;
 		}
 
@@ -500,6 +499,36 @@ void CTextureManager::RemoveTextureEntry(TextureEntry * pEntry)
 	{
 	}
 }
+
+#ifndef OLDTXTCACHE
+bool bFreeingTextures = false;
+void CTextureManager::FreeTextures()
+{
+	if(bFreeingTextures)
+		return;
+		
+	MEMORYSTATUS ms;
+	GlobalMemoryStatus(&ms);
+
+	// keep freeing textures till enough memory is free
+	while (ms.dwAvailPhys < MEM_KEEP_FREE && m_pOldestTexture != NULL)
+	{
+		if (!bFreeingTextures) bFreeingTextures = true;
+	
+		TextureEntry *nextYoungest = m_pOldestTexture->pNextYoungest;
+
+		RemoveTextureEntry(m_pOldestTexture);
+
+		m_pOldestTexture = nextYoungest;
+		
+		//OutputDebugString("Freeing Texture\n");
+
+		GlobalMemoryStatus(&ms);
+	}
+	
+	bFreeingTextures = false;
+}
+#endif
 
 TextureEntry * CTextureManager::CreateEntry(DWORD dwAddr, DWORD dwWidth, DWORD dwHeight)
 {
@@ -523,47 +552,23 @@ TextureEntry * CTextureManager::CreateEntry(DWORD dwAddr, DWORD dwWidth, DWORD d
 			//OutputDebugString("Freeing Texture\n");
 		}
 
-		m_currentTextureMemUsage += dwWidth * dwHeight * 4;
+		//m_currentTextureMemUsage += dwWidth * dwHeight * 4;
 	}
 	else
 	{
+#ifdef OLDTXTCACHE
 		// Find a used texture
 		pEntry = ReviveUsedTexture(dwWidth, dwHeight);
+#else
+		FreeTextures();
+#endif
 	}
+	m_currentTextureMemUsage += (dwWidth * dwHeight * 4);
 	
-	// new way
-	/*
-	if (g_bUseSetTextureMem)
-	{
-		MEMORYSTATUS ms;
-		GlobalMemoryStatus(&ms);
-
-		// keep freeing textures till enough memory is free
-		while (ms.dwAvailPhys < MEM_KEEP_FREE)
-		{
-			TextureEntry *nextYoungest = m_pOldestTexture->pNextYoungest;
-
-			RemoveTextureEntry(m_pOldestTexture);
-
-			m_pOldestTexture = nextYoungest;
-
-			// no more textures to free! O ohh!
-			if (m_pOldestTexture == NULL)
-				break;
-
-			GlobalMemoryStatus(&ms);
-		}
-	}
-	else
-	{
-		// Find a used texture
-		pEntry = ReviveUsedTexture(dwWidth, dwHeight);
-	}
-	*/
-	
-	
+#ifdef OLDTXTCACHE
 	if (pEntry == NULL || g_bUseSetTextureMem)
 	{
+#endif
 		// Create a new texture
 		pEntry = new TextureEntry;
 		if (pEntry == NULL)
@@ -579,7 +584,9 @@ TextureEntry * CTextureManager::CreateEntry(DWORD dwAddr, DWORD dwWidth, DWORD d
 			pEntry->pTexture->m_bScaledS = false;
 			pEntry->pTexture->m_bScaledT = false;
 		}
+#ifdef OLDTXTCACHE
 	}
+#endif
 	
 	// Initialize
 	pEntry->ti.Address = dwAddr;

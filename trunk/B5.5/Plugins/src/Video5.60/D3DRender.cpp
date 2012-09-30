@@ -126,22 +126,47 @@ bool D3DRender::InitDeviceObjects()
 
 	g_pD3DDev->SetRenderState( D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
 	SetD3DRSZWriteEnable( TRUE);
+
+	//weinersch - do xbox antialiasing here
+#ifdef _XBOX
+
+	if(AntiAliasMode>1){
+		g_pD3DDev->SetRenderState( D3DRS_MULTISAMPLEANTIALIAS , TRUE);
+	}else if(AntiAliasMode==1){
+		g_pD3DDev->SetRenderState( D3DRS_MULTISAMPLEANTIALIAS , FALSE);
+		g_pD3DDev->SetRenderState( D3DRS_ALPHABLENDENABLE , TRUE);
+		g_pD3DDev->SetRenderState( D3DRS_EDGEANTIALIAS , TRUE);
+	}else{
+		g_pD3DDev->SetRenderState( D3DRS_MULTISAMPLEANTIALIAS , FALSE);
+	}
+
+#else	
 	
 	if( ((CDXGraphicsContext*)CGraphicsContext::g_pGraphicsContext)->IsFSAAEnable() )
 		g_pD3DDev->SetRenderState( D3DRS_MULTISAMPLEANTIALIAS , TRUE);
 	else
 		g_pD3DDev->SetRenderState( D3DRS_MULTISAMPLEANTIALIAS, FALSE);
 
+#endif
+
 	// Initialize all the renderstate to our defaults.
 	SetShadeMode( gRSP.shadeMode );
 	g_pD3DDev->SetRenderState( D3DRS_TEXTUREFACTOR, m_dwTextureFactor );
 
+	// weinersch - use old fog rendering for xbox - test this out
+/*
+	//Rice 5.60
 	g_pD3DDev->SetRenderState( D3DRS_FOGENABLE, FALSE);
 	float density = 1.0f;
 	g_pD3DDev->SetRenderState(D3DRS_FOGDENSITY,   *(DWORD *)(&density));
 	g_pD3DDev->SetRenderState(D3DRS_RANGEFOGENABLE, TRUE);
 	g_pD3DDev->SetRenderState( D3DRS_FOGTABLEMODE, D3DFOG_LINEAR );
-
+*/
+	//Rice 5.10
+	g_pD3DDev->SetRenderState( D3DRS_FOGENABLE, FALSE);
+	g_pD3DDev->SetRenderState( D3DRS_FOGCOLOR, gRDP.fogColor ); 
+//	g_pD3DDev->SetRenderState( D3DRS_FOGVERTEXMODE, D3DFOG_LINEAR );
+   
 	// Dafault is ZBuffer disabled
 	SetD3DRSZEnable( m_dwrsZEnable );
 
@@ -533,10 +558,18 @@ void D3DRender::SetAlphaTestEnable(BOOL bAlphaTestEnable)
 #endif
 }
 
-void D3DRender::SetFogMinMax(float fMin, float fMax)
+void D3DRender::SetFogMinMax(float fMin, float fMax, float fMul, float fOffset)
 {
-	g_pD3DDev->SetRenderState(D3DRS_FOGSTART, *(DWORD *)(&gRSPfFogMin));
-	g_pD3DDev->SetRenderState(D3DRS_FOGEND,   *(DWORD *)(&gRSPfFogMax));
+	
+	::SetFogMinMax(fMin, fMax, fMul, fOffset);
+	float fmin = fMin/1000;
+	float fmax = fMax/1000;
+	g_pD3DDev->SetRenderState(D3DRS_FOGSTART, *(DWORD *)(&fmin));
+	g_pD3DDev->SetRenderState(D3DRS_FOGEND,   *(DWORD *)(&fmax));
+	
+
+	//g_pD3DDev->SetRenderState(D3DRS_FOGSTART, *(DWORD *)(&gRSPfFogMin));
+	//g_pD3DDev->SetRenderState(D3DRS_FOGEND,   *(DWORD *)(&gRSPfFogMax));
 }
 
 void D3DRender::TurnFogOnOff(BOOL flag)
@@ -564,8 +597,11 @@ void D3DRender::SetFogEnable(BOOL bEnable)
 	{
 		g_pD3DDev->SetRenderState( D3DRS_FOGENABLE, TRUE);
 		g_pD3DDev->SetRenderState(D3DRS_FOGCOLOR, gRDP.fogColor);
-		g_pD3DDev->SetRenderState(D3DRS_FOGSTART, *(DWORD *)(&gRSPfFogMin));
-		g_pD3DDev->SetRenderState(D3DRS_FOGEND,   *(DWORD *)(&gRSPfFogMax));
+
+		//g_pD3DDev->SetRenderState(D3DRS_FOGSTART, *(DWORD *)(&gRSPfFogMin));
+		//g_pD3DDev->SetRenderState(D3DRS_FOGEND,   *(DWORD *)(&gRSPfFogMax));
+
+		g_pD3DDev->SetRenderState(D3DRS_RANGEFOGENABLE, TRUE); // weinersch - use 5.10 method
 	}
 	else
 	{

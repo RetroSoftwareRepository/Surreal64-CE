@@ -116,9 +116,6 @@ EXPORT void CALL CaptureScreen ( char * Directory );
 *******************************************************************/ 
 EXPORT void CALL _VIDEO_ChangeWindow (void);
 
-//freakdave
-//EXPORT void _VIDEO_DisplayTemporaryMessage(const char *msg);
-
 /******************************************************************
   Function: CloseDLL
   Purpose:  This function is called when the emulator is closing

@@ -158,13 +158,11 @@ extern PluginStatus status;
 extern char generalText[];
 
 void SetVIScales();
-extern void _VIDEO_DisplayTemporaryMessage2(const char *msg, ...);
+//extern void _VIDEO_DisplayTemporaryMessage2(const char *msg, ...);
 extern void _VIDEO_DisplayTemporaryMessage(const char *msg);
 extern void XBOX_Debugger_Log(const char *Message, ...);
 
-
-// Ez0n3 - reinstate max video mem until freakdave finishes this
-void	_VIDEO_SetMaxTextureMem(DWORD mem);
-
+// reinstate max video mem
+void _VIDEO_SetMaxTextureMem(DWORD mem);
 
 #endif

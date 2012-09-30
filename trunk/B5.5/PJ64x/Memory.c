@@ -1417,7 +1417,7 @@ int r4300i_LW_NonMemory ( DWORD PAddr, DWORD * Value ) {
 
 		if ((PAddr - 0x10000000) < RomFileSize) {
 			//*Value = *(DWORD *)&ROM[PAddr - 0x10000000];
-			*Value = (DWORD *)ReadSWORDFromROM_EAXOnly(PAddr - 0x10000000);
+			*Value = (DWORD)ReadSWORDFromROM_EAXOnly(PAddr - 0x10000000);
 			return TRUE;
 		} else {
 			*Value = PAddr & 0xFFFF;

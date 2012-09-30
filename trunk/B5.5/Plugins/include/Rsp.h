@@ -61,13 +61,21 @@ typedef struct {
 } RSP_INFO;
 
 
-/*void  _RSP_HLE_CloseDLL (void);
+void  _RSP_HLE_CloseDLL (void);
 void  _RSP_HLE_DllAbout ( HWND hParent );
 DWORD _RSP_HLE_DoRspCycles ( DWORD Cycles );
 void  _RSP_HLE_GetDllInfo ( PLUGIN_INFO * PluginInfo );
 void  _RSP_HLE_InitiateRSP ( RSP_INFO Rsp_Info, DWORD * CycleCount);
 void  _RSP_HLE_RomClosed (void);
-void  _RSP_HLE_DllConfig (HWND hWnd);*/void   _RSP_CloseDLL (void);
+void  _RSP_HLE_DllConfig (HWND hWnd);void  _RSP_M64p_CloseDLL (void);
+void  _RSP_M64p_DllAbout ( HWND hParent );
+DWORD _RSP_M64p_DoRspCycles ( DWORD Cycles );
+void  _RSP_M64p_GetDllInfo ( PLUGIN_INFO * PluginInfo );
+void  _RSP_M64p_InitiateRSP ( RSP_INFO Rsp_Info, DWORD * CycleCount);
+void  _RSP_M64p_RomClosed (void);
+void  _RSP_M64p_DllConfig (HWND hWnd);
+
+void   _RSP_CloseDLL (void);
 void   _RSP_DllAbout ( HWND hParent );
 DWORD  _RSP_DoRspCycles ( DWORD Cycles );
 void   _RSP_GetDllInfo ( PLUGIN_INFO * PluginInfo );

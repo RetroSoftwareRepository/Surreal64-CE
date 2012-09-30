@@ -429,12 +429,12 @@ void TexRectToN64FrameBuffer_YUV_16b(DWORD x0, DWORD y0, DWORD width, DWORD heig
 	DWORD n64CIaddr = g_CI.dwAddr;
 	DWORD n64CIwidth = g_CI.dwWidth;
 
-	for (int y = 0; y < height; y++)
+	for (int y = 0; y < (int)height; y++)
 	{
 		DWORD* pN64Src = (DWORD*)(g_pRDRAMu8+(g_TI.dwAddr&(g_dwRamSize-1)))+y*(g_TI.dwWidth>>1);
 		WORD* pN64Dst = (WORD*)(g_pRDRAMu8+(n64CIaddr&(g_dwRamSize-1)))+(y+y0)*n64CIwidth;
 
-		for (int x = 0; x < width; x+=2)
+		for (int x = 0; x < (int)width; x+=2)
 		{
 			DWORD val = *pN64Src++;
 			int y0 = (BYTE)val&0xFF;

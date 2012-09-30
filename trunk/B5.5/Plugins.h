@@ -25,6 +25,7 @@ enum VideoPlugins
 	_VideoPluginRice510,
 	_VideoPluginRice531,
 	_VideoPluginRice560,
+	_VideoPluginRice611,
 	_VideoPluginRice612,
 	_VideoPluginMissing
 };
@@ -34,11 +35,36 @@ enum VideoPlugins
 enum AudioPlugins 
 {
 	_AudioPluginNone,
-	_AudioPluginLleRsp,
+	_AudioPluginLleRsp, // just make sure this one doesn't get removed - ini's may depend on it
 	_AudioPluginBasic,
 	_AudioPluginJttl,
 	_AudioPluginAzimer,
 	_AudioPluginMusyX,
 	_AudioPluginMissing
 };
+
+enum AudioPluginsTest
+{
+	_AudioPluginM64p = 99 // mupen 1.5 audio
+};
+
+//RSP Plugins
+enum RSPPlugins 
+{
+	_RSPPluginNone,
+	_RSPPluginLLE,
+	_RSPPluginHLE,
+	_RSPPluginM64p,
+	_RSPPluginMissing
+};
+
+//Rom Paging Methods
+enum PagingMethods
+{
+	_PagingXXX, // Surreal XXX
+	_PagingS10, // Surreal 1.0
+	//_PagingVMM, // VMM maybe?
+	_PagingMissing
+};
+
 

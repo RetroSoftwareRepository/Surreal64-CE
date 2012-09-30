@@ -1,8 +1,11 @@
-#include "xtl.h"
-#include "stdlib.h"
-#include "stdio.h"
-#include "io.h"
-#include "HTTP.h"
+#pragma once
+
+#include "Launcher.h"
+#include <xvoice.h>
+#include <xonline.h>
+#include "ftplib.h"
+
+#define BUFFER_SIZE (4096)
 
 /* DNS stuff (borrowed from XBMP) */
 struct  hostent {
@@ -21,7 +24,29 @@ char addr[16];
 char* addr_list[4];
 } HostEnt;
 
-/* Wrapper functions for gethostbyname() */
-struct hostent* _cdecl gethostbyname( const char *name );
-struct hostent* _cdecl gethostbyname(const char*);
 
+class XNetwork
+{
+public:
+	XNetwork(void);
+	virtual ~XNetwork(void);
+	bool InitNetwork(void);
+	bool InitWinsock(void);
+	void CleanupNetwork(void);
+	void CleanupWinsock(void);
+
+	bool IsXboxConnected(void);
+
+	DWORD GetHostAddress(const char *host);
+
+	bool DownloadFile(const char *host, const char *path_and_filename, const char *save_dir);
+
+
+
+private:
+	int err; 
+	bool err1, err2, err3;
+};
+
+
+extern XNetwork g_xNet;

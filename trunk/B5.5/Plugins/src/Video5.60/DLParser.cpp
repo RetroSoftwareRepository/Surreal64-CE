@@ -19,7 +19,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "stdafx.h"
 #include "ucode.h"
-#include "menu/menumain.h"
+//#include "menu/menumain.h"
+extern void RunIngameMenu();
 
 // Lkb added mirroring support for cards that don't support it. Thanks Lkb!
 /*
@@ -837,6 +838,7 @@ extern bool bHalfTxtScale;
 extern BOOL _INPUT_IsIngameMenuWaiting();
 extern BOOL _INPUT_UpdatePaks();
 extern BOOL _INPUT_UpdateControllerStates();
+extern void _INPUT_RumblePause(bool bPause);
 extern "C" void ReInitVirtualDynaMemory(boolean charge);
 extern int TextureMode;
 extern bool FrameSkip;
@@ -1016,12 +1018,16 @@ void DLParser_Process(OSTask * pTask)
 
 	if (_INPUT_IsIngameMenuWaiting())
 	{
+		_INPUT_RumblePause(true);
+		
 		ReInitVirtualDynaMemory(false);
 		RunIngameMenu();
 		options.forceTextureFilter=TextureMode;
 		_INPUT_UpdatePaks();//added by freakdave
 		_INPUT_UpdateControllerStates();//added by freakdave
 		ReInitVirtualDynaMemory(true);
+		
+		_INPUT_RumblePause(false);
 	}
 }
 

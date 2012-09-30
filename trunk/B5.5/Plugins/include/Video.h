@@ -270,6 +270,8 @@ typedef struct
 
  void	_VIDEO_SetMaxTextureMem(DWORD mem);
 
+ void _VIDEO_FBGetFrameBufferInfo(void *pinfo);
+
 //void InitGraphicsPlugin(HINSTANCE hInstance);
 //void DestroyGraphicsPlugin();
 

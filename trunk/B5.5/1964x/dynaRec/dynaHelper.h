@@ -31,7 +31,7 @@
  =======================================================================================================================
  */
 
-void HELP_Call(unsigned long function)
+__forceinline void HELP_Call(unsigned long function)
 {
 	FlushAllRegisters();
 	MOV_ImmToReg(1, Reg_ECX, gHWS_pc);
@@ -42,7 +42,7 @@ void HELP_Call(unsigned long function)
  =======================================================================================================================
  =======================================================================================================================
  */
-void DoSpeedHack(void)
+__forceinline void DoSpeedHack(void)
 {
 	if(Is_CPU_Doing_Other_Tasks()) return;
 
@@ -57,7 +57,7 @@ void		COP1_instr(uint32 Instruction);
  =======================================================================================================================
  =======================================================================================================================
  */
-void Do_COP1_with_exception(uint32 Instruction)
+__forceinline void Do_COP1_with_exception(uint32 Instruction)
 {
 	if((gHWS_COP0Reg[STATUS] & STATUS_CU1) == 0)	/* CPU1 is not usable */
 	{
@@ -80,7 +80,7 @@ extern uint32	g_pc_is_rdram;
  =======================================================================================================================
  */
 
-void Set_Translate_PC(void)
+__forceinline void Set_Translate_PC(void)
 {
 	/*~~~~~~~~~~~~~~~~~~~~~~~~*/
 	register uint32 translatepc;
@@ -113,7 +113,7 @@ uint32	*test;
  =======================================================================================================================
  =======================================================================================================================
  */
-void Set_Translate_PC_No_Check(void)
+__forceinline void Set_Translate_PC_No_Check(void)
 {
 	/*~~~~~~~~~~~~~~~~~~~~~~~~~*/
 	register uint32 pc = gHWS_pc;
@@ -148,7 +148,7 @@ void Set_Translate_PC_No_Check(void)
  =======================================================================================================================
  =======================================================================================================================
  */
-void Set_Translate_PC_No_TLB(void)
+__forceinline void Set_Translate_PC_No_TLB(void)
 {
 	/*~~~~~~~~~~~~~~~~~~~~~~~~*/
 	register uint32 translatepc;
@@ -168,7 +168,7 @@ void Set_Translate_PC_No_TLB(void)
  =======================================================================================================================
  =======================================================================================================================
  */
-void Set_Translate_PC_No_TLB_No_Check(void)
+__forceinline void Set_Translate_PC_No_TLB_No_Check(void)
 {
 	g_LookupPtr = (uint32 *) ((uint8 *) sDYN_PC_LOOKUP[gHWS_pc >> 16] + (uint16) gHWS_pc);
 }
@@ -177,7 +177,7 @@ void Set_Translate_PC_No_TLB_No_Check(void)
  =======================================================================================================================
  =======================================================================================================================
  */
-void TLB_TRANSLATE_PC_INDIRECT(void)
+__forceinline void TLB_TRANSLATE_PC_INDIRECT(void)
 {
 	/* PushMap(); */
 	if(currentromoptions.Use_TLB != USETLB_YES)
@@ -202,7 +202,7 @@ void TLB_TRANSLATE_PC_INDIRECT(void)
  =======================================================================================================================
  =======================================================================================================================
  */
-void TLB_TRANSLATE_PC(uint32 pc)
+__forceinline void TLB_TRANSLATE_PC(uint32 pc)
 {
 	/*~~~~~~~~~~~~~~~~~~~~~~~~*/
 	register uint32 translatepc;

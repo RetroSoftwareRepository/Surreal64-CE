@@ -18,21 +18,18 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "stdafx.h"
 #include "../../../config.h"
+//#include "../../../ingamemenu/panel.h" // needed?
 
 #include <xbapp.h>
 #include <xbresource.h>
-#include <xbfont.h>
-#include "../../../ingamemenu/panel.h"
 
-extern bool onhd;
-CXBFont		m_Font;					// Font	for	text display
-CXBFont		m_MSFont;					// Font	for	buttons
-extern "C" char emuname[256];
+extern void XboxDrawOSD();
+extern int AntiAliasMode;
+char emuvidname[128];
 
 LPDIRECT3DDEVICE8 g_pD3DDev = NULL;
 D3DCAPS8 g_D3DDeviceCaps;
-D3DPRESENT_PARAMETERS d3dpp;
-extern char skinname[32];
+//D3DPRESENT_PARAMETERS d3dpp;
 extern void 	CreateRenderTarget();
 extern void     SetAsRenderTarget();
 extern void     RestoreRenderTarget();
@@ -42,8 +39,8 @@ int FormatToSize(D3DFORMAT fmt)
 	{/*
 	case D3DFMT_A8R8G8B8:
 	case D3DFMT_X8R8G8B8:
-		return 32;
-	default:*/
+		return 32;*/
+	default:
 	case D3DFMT_LIN_R5G6B5:
 	case D3DFMT_D16:
 		return 16;
@@ -70,8 +67,8 @@ CDXGraphicsContext::CDXGraphicsContext() :
 	m_dwCreateFlags(0),
 	m_dwMinDepthBits(16),
 	m_dwMinStencilBits(0),
-	//m_desktopFormat(D3DFMT_A8R8G8B8),
-	m_desktopFormat(D3DFMT_LIN_R5G6B5),
+	m_desktopFormat(D3DFMT_A8R8G8B8),
+	//m_desktopFormat(D3DFMT_LIN_R5G6B5),
 	m_FSAAIsEnabled(false),
 	m_bFontIsCreated(false)
 {
@@ -113,33 +110,40 @@ bool FrameBufferInRDRAMCheckCRC();
 void ClearFrameBufferToBlack(DWORD left=0, DWORD top=0, DWORD width=0, DWORD height=0);
 bool ProcessFrameWriteRecord();
 extern RECT frameWriteByCPURect;
-extern bool bloadstate[5];
-extern bool bsavestate[5];
+extern bool bloadstate[MAX_SAVE_STATES];
+extern bool bsavestate[MAX_SAVE_STATES];
 extern "C" void __EMU_SaveState(int index);
 extern "C" void __EMU_LoadState(int index);
+extern bool bSatesUpdated;
 
 LPDIRECT3DVERTEXBUFFER8 m_pVB;
 struct VERTEX { D3DXVECTOR4 p; FLOAT tu, tv; };
-LPDIRECT3DSURFACE8 surface2;
+/*LPDIRECT3DSURFACE8 surface2;
 D3DSURFACE_DESC    surfDesc2;
 LPDIRECT3DTEXTURE8 texture2;
-LPDIRECT3DSURFACE8 texSurface2;
-bool create=false;
-extern bool showdebug;
-extern DWORD dwTitleColor;
+LPDIRECT3DSURFACE8 texSurface2;*/
+//bool create=false;
 
-void CDXGraphicsContext::UpdateFrame(bool swaponly)
+__forceinline void CDXGraphicsContext::UpdateFrame(bool swaponly)
 {
-	HRESULT hr;
+	//HRESULT hr; //unreferenced
 
-			for (int i=0;i<5;i++){
-			if (bloadstate [i]) {
+	if (bSatesUpdated) {
+		bSatesUpdated = false;
+		
+		for (int i=0; i<MAX_SAVE_STATES; i++) {
+			if (bloadstate[i]) {
 				__EMU_LoadState(i+1);
-			    bloadstate[i]=false;}
-			if (bsavestate [i]) {
+				bloadstate[i]=false;
+				break;
+			}
+			else if (bsavestate[i]) {
 				__EMU_SaveState(i+1);
-			    bsavestate[i]=false;}
+				bsavestate[i]=false;
+				break;
+			}
 		}
+	}
 
 	status.gFrameCount++;
 	CGraphicsContext::UpdateFrameBufferBeforeUpdateFrame();
@@ -168,45 +172,13 @@ void CDXGraphicsContext::UpdateFrame(bool swaponly)
 		}
 	}*/
 
+#ifndef OLDTXTCACHE
+	if (!g_bUseSetTextureMem)
+		gTextureManager.FreeTextures();
+#endif
 
-		static DWORD lastTick = GetTickCount() / 1000;
-		static int lastTickFPS = 0;
-		static int frameCount = 0;
-
-		if (lastTick != GetTickCount() / 1000)
-		{
-			lastTickFPS = frameCount;
-			frameCount = 0;
-			lastTick = GetTickCount() / 1000;
-		}
-frameCount++;
-WCHAR str[10];
-swprintf(str,L"%i fps", lastTickFPS);
-MEMORYSTATUS memStat;
-WCHAR szMemStatus[128];
-
-GlobalMemoryStatus(&memStat);
-//Check Memory, Warn User, Return to Launcher
-if (memStat.dwAvailPhys / 1024 / 1024 < 1)
-	{
-		swprintf(szMemStatus,L"Out of Memory! Returning to Launcher...");
-		m_Font.Begin();
-		m_Font.DrawText(320, 240, dwTitleColor, szMemStatus, XBFONT_CENTER_X);
-		m_Font.End();
-		XLaunchNewImage("D:\\default.xbe", NULL);
-	}
-if (showdebug) {
-swprintf(szMemStatus,L"%d Mb Free",(memStat.dwAvailPhys /1024 /1024));
-WCHAR debugemu[256];
-swprintf(debugemu,L"%S",emuname);
-
-  m_Font.Begin();
-  m_Font.DrawText(60, 35, dwTitleColor, szMemStatus, XBFONT_LEFT);
-  m_Font.DrawText(60, 50, dwTitleColor, str, XBFONT_LEFT);
-  m_Font.DrawText(60, 65, dwTitleColor, debugemu, XBFONT_LEFT);
-  m_Font.End();
-}
-
+	XboxDrawOSD();
+/*
 	Lock();
 	if (m_pd3dDevice == NULL)
 	{
@@ -226,11 +198,9 @@ swprintf(debugemu,L"%S",emuname);
 		else
 		{
 			hr = m_pd3dDevice->Present( NULL, NULL, NULL, NULL );
-
 		}
 
 		m_backBufferIsSaved = false;
-
 
 #ifdef _DEBUG
 		if( pauseAtNext && eventToPause == NEXT_FRAME )
@@ -239,11 +209,17 @@ swprintf(debugemu,L"%S",emuname);
 		}
 #endif
 
-	}
-exit:
+	}*/
+//exit: // unrefrenced
 //	SetAsRenderTarget();
 
+	if( !g_curRomInfo.bForceScreenClear ){
+		Clear(CLEAR_DEPTH_BUFFER);}
+
 	m_pd3dDevice->Present( NULL, NULL, NULL, NULL );
+
+	m_backBufferIsSaved = false;
+
 //	RestoreRenderTarget();
 //	Unlock();
 
@@ -259,6 +235,45 @@ exit:
 
   //m_pd3dDevice->SetBackBufferScale(0.5f,0.5f); // remember that for FBA :D
 
+}
+
+//-----------------------------------------------------------------------------
+// Name: SetAntiAliasMode()
+// Desc: Surreal64 function to set the antialiasing mode determined by the
+//       Launcher. Edge AntiAliasing may work better on the xbox compared to
+//	     the FSAA modes. 4x Gaussian is the reccomended then to 2x Quincunx if 
+//	     the framerate plunges. Linear modes are also available if those
+//	     methods are prefered.
+//-----------------------------------------------------------------------------
+DWORD SetAntiAliasMode(int AAMode){
+	DWORD useAAMode;
+	switch (AAMode)
+	{
+		case 0:
+			useAAMode = D3DMULTISAMPLE_NONE;
+		break;
+
+		case 1:
+			useAAMode = D3DMULTISAMPLE_NONE;
+		break;
+
+		case 2:
+			useAAMode = D3DMULTISAMPLE_2_SAMPLES_MULTISAMPLE_LINEAR;
+		break;
+
+		case 3:
+			useAAMode = D3DMULTISAMPLE_2_SAMPLES_MULTISAMPLE_QUINCUNX;
+		break;
+
+		case 4:
+			useAAMode = D3DMULTISAMPLE_4_SAMPLES_MULTISAMPLE_LINEAR;
+		break;
+
+		case 5:
+			useAAMode = D3DMULTISAMPLE_4_SAMPLES_MULTISAMPLE_GAUSSIAN;
+		break;
+	}
+	return useAAMode;
 }
 
 //-----------------------------------------------------------------------------
@@ -281,7 +296,7 @@ BOOL CDXGraphicsContext::FindDepthStencilFormat( UINT iAdapter, D3DDEVTYPE Devic
 //*****************************************************************************
 extern void WriteConfiguration(void);
 extern "C" void _INPUT_LoadButtonMap(int *cfgData); 
-extern int ControllerConfig[72];
+extern int ControllerConfig[76];
 
 bool CDXGraphicsContext::Initialize(HWND hWnd, HWND hWndStatus,
 									 DWORD dwWidth, DWORD dwHeight,
@@ -349,6 +364,7 @@ bool CDXGraphicsContext::Initialize(HWND hWnd, HWND hWndStatus,
 	{
 		CGraphicsContext::Get()->m_supportTextureMirror = true;
 	}
+
 	
 #ifndef _XBOX
 	// Force to use Software T&L
@@ -360,17 +376,12 @@ bool CDXGraphicsContext::Initialize(HWND hWnd, HWND hWndStatus,
 
 	// GogoAckman
 	g_pd3dDevice = g_pD3DDev;
-	char fontname[256];
-	sprintf(fontname,"D:\\Skins\\%s\\Font.xpr",skinname);
-	m_Font.Create(fontname);
-	sprintf(fontname,"D:\\Skins\\%s\\MsFont.xpr",skinname);
-	m_MSFont.Create(fontname); 
-    d3dpp = m_d3dpp;
+	sprintf(emuvidname,"Video 5.60");
+    //d3dpp = m_d3dpp;
 
 	//CreateRenderTarget();
 	_INPUT_LoadButtonMap(ControllerConfig);
-    strcat(emuname," Video 5.60");
-
+	
 	return hr==S_OK;
 }
 
@@ -433,7 +444,8 @@ void CDXGraphicsContext::InitDeviceParameters()
 		pD3D->GetDeviceCaps( iAdapter, DeviceTypes[iDevice], &pDevice->d3dCaps );
 
 		pDevice->dwNumModes     = 0;
-		pDevice->MultiSampleType = D3DMULTISAMPLE_NONE;
+		pDevice->MultiSampleType = SetAntiAliasMode(AntiAliasMode);
+
 	}
 
 	// Check FSAA maximum
@@ -531,22 +543,42 @@ HRESULT CDXGraphicsContext::InitializeD3D()
     ZeroMemory( &m_d3dpp, sizeof(m_d3dpp) );
     m_d3dpp.Windowed               = FALSE;
     m_d3dpp.BackBufferCount        = 1;
-	//m_d3dpp.MultiSampleType        = D3DMULTISAMPLE_2_SAMPLES_MULTISAMPLE_QUINCUNX;
+	m_d3dpp.MultiSampleType        = SetAntiAliasMode(AntiAliasMode);
 	//m_d3dpp.SwapEffect             = bufferSettings[curBufferSetting].swapEffect;
     m_d3dpp.SwapEffect             =  D3DSWAPEFFECT_COPY;
 	m_d3dpp.EnableAutoDepthStencil = TRUE; /*m_bUseDepthBuffer;*/
     //m_d3dpp.AutoDepthStencilFormat = pModeInfo->DepthStencilFormat;
 	m_d3dpp.AutoDepthStencilFormat = D3DFMT_D16;
     m_d3dpp.hDeviceWindow          = m_hWnd;
-	m_d3dpp.FullScreen_PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
-	//m_d3dpp.FullScreen_PresentationInterval = D3DPRESENT_INTERVAL_ONE;
 	//m_d3dpp.Flags = D3DPRESENTFLAG_EMULATE_REFRESH_RATE;
 	//m_d3dpp.BackBufferWidth = 720;
 	//m_d3dpp.BackBufferHeight = 576;
 	m_d3dpp.BackBufferWidth = 640;
 	m_d3dpp.BackBufferHeight = 480;
-    m_d3dpp.BackBufferFormat = D3DFMT_LIN_R5G6B5;
-	
+    m_d3dpp.BackBufferFormat = D3DFMT_A8R8G8B8;
+
+	switch (VSync){
+		case 0 : 	m_d3dpp.FullScreen_PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
+			break;
+		case 1 : 	m_d3dpp.FullScreen_PresentationInterval = D3DPRESENT_INTERVAL_ONE;
+			break;
+		case 2 : 	m_d3dpp.FullScreen_PresentationInterval = D3DPRESENT_INTERVAL_ONE_OR_IMMEDIATE;
+			break;
+/*		case 2 : 	m_d3dpp.FullScreen_PresentationInterval = D3DPRESENT_INTERVAL_TWO;
+			break;
+		case 3 : 	m_d3dpp.FullScreen_PresentationInterval = D3DPRESENT_INTERVAL_THREE;
+			break;
+		case 4 : 	m_d3dpp.FullScreen_PresentationInterval = D3DPRESENT_INTERVAL_DEFAULT;
+			break;
+		case 5 : 	m_d3dpp.FullScreen_PresentationInterval = D3DPRESENT_INTERVAL_ONE_OR_IMMEDIATE;
+			break;
+		case 6 : 	m_d3dpp.FullScreen_PresentationInterval = D3DPRESENT_INTERVAL_TWO_OR_IMMEDIATE;
+			break;
+		case 7 : 	m_d3dpp.FullScreen_PresentationInterval = D3DPRESENT_INTERVAL_THREE_OR_IMMEDIATE;
+			break;*/
+	}
+	m_d3dpp.FullScreen_RefreshRateInHz = 60;
+
 
 DWORD videoFlags = XGetVideoFlags();
 	if(XGetVideoStandard() == XC_VIDEO_STANDARD_PAL_I)
@@ -557,15 +589,26 @@ DWORD videoFlags = XGetVideoFlags();
 			m_d3dpp.FullScreen_RefreshRateInHz = 50;
 	}
 
-	//Widescreen
+		//Widescreen
 	if((videoFlags & XC_VIDEO_FLAGS_WIDESCREEN) !=0)
 	 {
 		m_d3dpp.Flags = D3DPRESENTFLAG_WIDESCREEN;
 	 }
 
-		//480p
+		
 	 if(XGetAVPack() == XC_AV_PACK_HDTV){
-		if( videoFlags & XC_VIDEO_FLAGS_HDTV_480p){
+		
+		//720p
+
+		if( videoFlags & XC_VIDEO_FLAGS_HDTV_720p && bEnableHDTV){
+			m_d3dpp.BackBufferWidth = 1280;
+			m_d3dpp.BackBufferHeight = 720;
+			m_d3dpp.Flags = D3DPRESENTFLAG_PROGRESSIVE | D3DPRESENTFLAG_WIDESCREEN;
+			m_d3dpp.BackBufferFormat = D3DFMT_A8R8G8B8;
+		}
+		//480p
+
+		else if( videoFlags & XC_VIDEO_FLAGS_HDTV_480p){
 			m_d3dpp.Flags = D3DPRESENTFLAG_PROGRESSIVE;
 			m_d3dpp.BackBufferFormat = D3DFMT_A8R8G8B8;
 		}
@@ -574,8 +617,8 @@ DWORD videoFlags = XGetVideoFlags();
 	windowSetting.uDisplayWidth = m_d3dpp.BackBufferWidth;
 	windowSetting.uDisplayHeight = m_d3dpp.BackBufferHeight;
 
-	//m_desktopFormat = D3DFMT_A8R8G8B8;
-	m_desktopFormat = D3DFMT_LIN_R5G6B5;
+	m_desktopFormat = D3DFMT_A8R8G8B8;
+	//m_desktopFormat = D3DFMT_LIN_R5G6B5;
 	
 //freakdave
 	if(VertexMode == 0){
@@ -587,7 +630,7 @@ DWORD videoFlags = XGetVideoFlags();
 	}
 
 
-	if(VertexMode == 1){
+	else if(VertexMode == 1){
     // Create the device
     hr = m_pD3D->CreateDevice( D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL,
 								NULL, D3DCREATE_SOFTWARE_VERTEXPROCESSING, &m_d3dpp,
@@ -595,7 +638,7 @@ DWORD videoFlags = XGetVideoFlags();
 
 	}
 
-	if(VertexMode == 2){
+	else if(VertexMode == 2){
     // Create the device
     hr = m_pD3D->CreateDevice( D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL,
 								NULL, D3DCREATE_HARDWARE_VERTEXPROCESSING, &m_d3dpp,
@@ -603,7 +646,7 @@ DWORD videoFlags = XGetVideoFlags();
 
 	}
 
-	if(VertexMode == 3){
+	else if(VertexMode == 3){
     // Create the device
     hr = m_pD3D->CreateDevice( D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL,
 								NULL, D3DCREATE_MIXED_VERTEXPROCESSING, &m_d3dpp,
@@ -633,15 +676,15 @@ DWORD videoFlags = XGetVideoFlags();
         m_dwCreateFlags = D3DCREATE_PUREDEVICE;
 		}
 
-		if(VertexMode == 1){
+		else if(VertexMode == 1){
         m_dwCreateFlags = D3DCREATE_SOFTWARE_VERTEXPROCESSING;
 		}
 
-		if(VertexMode == 2){
+		else if(VertexMode == 2){
         m_dwCreateFlags = D3DCREATE_HARDWARE_VERTEXPROCESSING;
 		}
 
-		if(VertexMode == 3){
+		else if(VertexMode == 3){
         m_dwCreateFlags = D3DCREATE_MIXED_VERTEXPROCESSING;
 		}
  
@@ -742,68 +785,6 @@ HRESULT CDXGraphicsContext::DoToggleFullscreen()
 //-----------------------------------------------------------------------------
 HRESULT CDXGraphicsContext::ForceWindowed()
 {
-    HRESULT hr;
-    D3DAdapterInfo* pAdapterInfoCur = &m_Adapters[m_dwAdapter];
-    //D3DDeviceInfo*  pDeviceInfoCur  = &pAdapterInfoCur->devices[pAdapterInfoCur->dwCurrentDevice];
-	D3DDeviceInfo*  pDeviceInfoCur  = &pAdapterInfoCur->devices[options.DirectXDevice];
-    BOOL bFoundDevice = FALSE;
-	
-    if( pDeviceInfoCur->bCanDoWindowed )
-    {
-        bFoundDevice = TRUE;
-    }
-    else
-    {
-        // Look for a windowable device on any adapter
-        D3DAdapterInfo* pAdapterInfo;
-        int dwAdapter;
-        D3DDeviceInfo* pDeviceInfo;
-        int dwDevice;
-        for( dwAdapter = 0; dwAdapter < m_dwNumAdapters; dwAdapter++ )
-        {
-            pAdapterInfo = &m_Adapters[dwAdapter];
-            for( dwDevice = 0; dwDevice < pAdapterInfo->dwNumDevices; dwDevice++ )
-            {
-                pDeviceInfo = &pAdapterInfo->devices[dwDevice];
-                if( pDeviceInfo->bCanDoWindowed )
-                {
-                    m_dwAdapter = dwAdapter;
-                    pDeviceInfoCur = pDeviceInfo;
-                    pAdapterInfo->dwCurrentDevice = dwDevice;
-                    bFoundDevice = TRUE;
-                    break;
-                }
-            }
-            if( bFoundDevice )
-                break;
-        }
-    }
-	
-    if( !bFoundDevice )
-        return E_FAIL;
-	
-    pDeviceInfoCur->bWindowed = true;
-    m_bWindowed = true;
-	
-    // Now destroy the current 3D device objects, then reinitialize
-	
-    m_bReady = false;
-	
-    // Release all scene objects that will be re-created for the new device
-    CleanDeviceObjects();
-	
-    // Release display objects, so a new device can be created
-	LONG nRefCount = m_pd3dDevice->Release();
-    if( nRefCount > 0L )
-	{
-        return DisplayD3DErrorMsg( D3DAPPERR_NONZEROREFCOUNT, MSGERR_APPMUSTEXIT );
-	}
-	
-    // Create the new device
-    if( FAILED( hr = InitializeD3D() ) )
-        return DisplayD3DErrorMsg( hr, MSGERR_APPMUSTEXIT );
-    m_bReady = true;
-	
     return S_OK;
 }
 
@@ -866,7 +847,9 @@ int	CDXGraphicsContext::FindCurrentDisplayModeIndex()
 	TRACE0("Cannot find a matching mode");
 	for( m=0; m<device.dwNumModes; m++ )
 	{
-		if( device.modes[m].Width==640 && device.modes[m].Height==480 )
+		if( device.modes[m].Width==1280 && device.modes[m].Height==720 )
+			return m;
+		else if( device.modes[m].Width==640 && device.modes[m].Height==480 )
 		{
 			return m;
 		}
@@ -901,108 +884,9 @@ HRESULT CDXGraphicsContext::ConfirmDevice( D3DCAPS8* pCaps, DWORD dwBehavior,
 //-----------------------------------------------------------------------------
 HRESULT CDXGraphicsContext::DisplayD3DErrorMsg( HRESULT hr, DWORD dwType )
 {
-    TCHAR strMsg[512];
-	
-    switch( hr )
-    {
-	case D3DAPPERR_NODIRECT3D:
-		strcpy( strMsg, "Could not initialize Direct3D. You may\n"
-			"want to check that the latest version of\n"
-			"DirectX is correctly installed on your\n"
-			"system." );
-		break;
-		
-	case D3DAPPERR_NOCOMPATIBLEDEVICES:
-		strcpy( strMsg, "Could not find any compatible Direct3D\n"
-			"devices." );
-		break;
-		
-	case D3DAPPERR_NOWINDOWABLEDEVICES:
-		strcpy( strMsg, "This program cannot run in a desktop\n"
-			"window with the current display settings.\n"
-			"Please change your desktop settings to a\n"
-			"16- or 32-bit display mode and re-run this\n"
-			"sample." );
-		break;
-		
-	case D3DAPPERR_NOHARDWAREDEVICE:
-		strcpy( strMsg, "No hardware-accelerated Direct3D devices\n"
-			"were found." );
-		break;
-		
-	case D3DAPPERR_HALNOTCOMPATIBLE:
-		strcpy( strMsg, "This program requires functionality that\n"
-			"is not available on your Direct3D hardware\n"
-			"accelerator." );
-		break;
-		
-	case D3DAPPERR_NOWINDOWEDHAL:
-		strcpy( strMsg, "Your Direct3D hardware accelerator cannot\n"
-			"render into a window." );
-		break;
-		
-	case D3DAPPERR_NODESKTOPHAL:
-		strcpy( strMsg, "Your Direct3D hardware accelerator cannot\n"
-			"render into a window with the current\n"
-			"desktop display settings." );
-		break;
-		
-	case D3DAPPERR_NOHALTHISMODE:
-		strcpy( strMsg, "This program requires functionality that is\n"
-			"not available on your Direct3D hardware\n"
-			"accelerator with the current desktop display\n"
-			"settings." );
-		break;
-		
-	case D3DAPPERR_RESIZEFAILED:
-		strcpy( strMsg, "Could not reset the Direct3D device." );
-		break;
-		
-	case D3DAPPERR_NONZEROREFCOUNT:
-		strcpy( strMsg, "A D3D object has a non-zero reference\n"
-			"count (meaning things were not properly\n"
-			"cleaned up)." );
-		break;
-		
-	case E_OUTOFMEMORY:
-		strcpy( strMsg, "Not enough memory." );
-		break;
-		
-	case D3DERR_OUTOFVIDEOMEMORY:
-		strcpy( strMsg, "Not enough video memory." );
-		break;
-		
-	default:
-		strcpy( strMsg, "Generic application error. Enable\n"
-			"debug output for detailed information." );
-    }
-	
-	// TODO: Use IDS_D3DERROR resource
-	// IDS_D3DERROR has one %s for the error message
-	//wsprintf(szMsg, CResourceString(IDS_D3DERROR), szError);
-	
-	
-    if( MSGERR_APPMUSTEXIT == dwType )
-    {
-        strcat( strMsg, "\n\nThis program will now exit." );
-    }
-    else
-    {
-        if( MSGWARN_SWITCHEDTOREF == dwType )
-            strcat( strMsg, "\n\nSwitching to the reference rasterizer,\n"
-			"a software device that implements the entire\n"
-			"Direct3D feature set, but runs very slowly." );
-    }
-
-	OutputDebugString( strMsg );
  
-
     return hr;
 }
-
-
-
-
 
 
 //-----------------------------------------------------------------------------

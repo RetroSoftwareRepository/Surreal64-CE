@@ -28,7 +28,8 @@ extern int TextureMode;
 extern bool FrameSkip;
 
 #define MAIN_RICE_VIDEO		"Software\\RICEVIDEO560\\WINDOW"
-#define RICE_VIDEO_INI_FILE		"D:\\RiceVideo5.6.0.ini"
+//#define RICE_VIDEO_INI_FILE		"D:\\RiceVideo5.6.0.ini"
+#define RICE_VIDEO_INI_FILE		"RiceVideo5.6.0.ini"
 
 char *frameBufferSettings[] =
 {
@@ -348,9 +349,6 @@ void WriteConfiguration(void)
  
 }
 
- 
-
-
 bool isMMXSupported() 
 { 
 	int IsMMXSupported; 
@@ -403,7 +401,7 @@ void ReadConfiguration(void)
 	defaultRomOptions.N64RenderToTextureEmuType = TXT_BUF_NONE;
 		
 	
-		options.bEnableFog = FALSE;
+		options.bEnableFog = TRUE;
 		options.bWinFrameMode = FALSE;
 		options.bFullTMEM = TRUE;
 		options.bUseFullTMEM = TRUE;
@@ -421,7 +419,7 @@ void ReadConfiguration(void)
 		options.OpenglDepthBufferSetting = 16;
 		options.colorQuality = TEXTURE_FMT_A8R8G8B8;
 		options.textureEnhancement = 0;
-		options.textureEnhancementControl = 0;
+		options.textureEnhancementControl = 1;
 		options.bSkipFrame = FrameSkip;
 		options.bDisplayTooltip = FALSE;
 		options.bHideAdvancedOptions = TRUE;
@@ -442,8 +440,8 @@ void ReadConfiguration(void)
 		defaultRomOptions.bFastTexCRC=TRUE;
 		defaultRomOptions.bNormalCombiner = FALSE;
 		defaultRomOptions.bAccurateTextureMapping = TRUE;
-		defaultRomOptions.bInN64Resolution = FALSE;
-		defaultRomOptions.bSaveVRAM = FALSE;
+		defaultRomOptions.bInN64Resolution = TRUE;//FALSE
+		defaultRomOptions.bSaveVRAM = TRUE;//FALSE
 		defaultRomOptions.bOverlapAutoWriteBack = FALSE;
 		defaultRomOptions.bDoubleSizeForSmallTxtrBuf = FALSE;
 		windowSetting.uFullScreenRefreshRate = 0;	// 0 is the default value, means to use Window default frequency
@@ -459,15 +457,21 @@ void ReadConfiguration(void)
 	//get TextureFilter information from ini file
 	options.forceTextureFilter = TextureMode;
 	 
-
+	if (status.isMMXSupported)
+		MsgInfo("MMX Enabled");
+	else
+		MsgInfo("MMX Disabled");
+	 
 	status.isSSEEnabled = status.isSSESupported && options.bEnableSSE;
 	if( status.isSSEEnabled )
 	{
 		ProcessVertexData = ProcessVertexDataSSE;
+		MsgInfo("SSE Enabled");
 	}
 	else
 	{
 		ProcessVertexData = ProcessVertexDataNoSSE;
+		MsgInfo("SSE Disabled");
 	}
 }
 	
@@ -481,16 +485,17 @@ BOOL InitConfiguration(void)
 		g_pIniFile = new IniFile(RICE_VIDEO_INI_FILE);
 		if (g_pIniFile == NULL)
 		{
+			ReadConfiguration(); //defaults
 			return FALSE;
 		}
 
 		if (!g_pIniFile->ReadIniFile())
 		{
 			ErrorMsg("Unable to read ini file from disk");
+			ReadConfiguration(); //defaults
 			g_pIniFile->WriteIniFile();
 			return FALSE;
 		}
-
 	}
 
 	ReadConfiguration();
@@ -920,8 +925,23 @@ BOOL IniFile::ReadIniFile()
 	char trim[]="{}"; //remove first and last character
 
 	char filename[256];
-	 
-	strcpy(filename,m_szFileName);
+	GetPluginDir(filename);
+	strcat(filename,m_szFileName);
+	//strcpy(filename,m_szFileName);
+
+	// try D if it's not on T
+	if (!PathFileExists(filename)) {
+		sprintf(filename, "D:\\%s", m_szFileName);
+		if (!PathFileExists(filename)) {
+			ErrorMsg("%s Failed to Load!", filename);
+			return FALSE;
+		} else {
+			MsgInfo("%s Loaded Successfully!", filename);
+		}
+	} else {
+		MsgInfo("%s Loaded Successfully!", filename);
+	}
+	
 	inifile.open(filename);
 
 	if (inifile.fail())
@@ -1081,6 +1101,9 @@ std::ifstream & getline(std::ifstream & is, char *str)
 
 void IniFile::WriteIniFile()
 {
+	// noting to write atm - needs work
+	return;
+
 	TCHAR szFileNameOut[MAX_PATH+1];
 	TCHAR szFileNameDelete[MAX_PATH+1];
 	TCHAR filename[MAX_PATH+1];

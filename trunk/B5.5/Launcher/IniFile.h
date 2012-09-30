@@ -16,6 +16,7 @@
 #pragma once
 
 #include "Launcher.h"
+#include "../simpleini.h" // ini parser
 
 // Ez0n3 - plugins
 #include "../Plugins.h"
@@ -34,7 +35,8 @@ struct RomIniEntry
 
 	// what emulators support this game
 	bool pbEmuSupported[3];
-	int iPreferredEmulator;
+	
+	int preferedemu; //int iPreferredEmulator;
 	
 	//Ez0n3 - preferred plugins
 	//int iPreferredVideoPlugin; 
@@ -42,7 +44,7 @@ struct RomIniEntry
 	
 
 	// controller config
-	byte pbyControllerConfig[72];
+	byte pbyControllerConfig[76];
 
 	// 1964 settings
 	dword dw1964DynaMem;
@@ -51,8 +53,12 @@ struct RomIniEntry
 	// Pj64 settings
 	dword dwPJ64DynaMem;
 	dword dwPJ64PagingMem;
+	
+	// ultrahle mem settings
+	dword dwUltraCodeMem;
+	dword dwUltraGroupMem;
 
-	// Ez0n3 - leave these for now incase they are set in ini file
+	// leave these for now incase they are set in ini file
 	// common settings
 	bool bUseLLERSP;
 	bool bUseBasicAudio;
@@ -61,6 +67,10 @@ struct RomIniEntry
 	dword dwMaxVideoMem;
 	int iAudioPlugin;
 	int videoplugin;
+	int iRspPlugin;
+	bool bUseRspAudio; // control a listing
+	
+	int iPagingMethod;
 	
 
 	RomIniEntry *pNextEntry;
@@ -74,29 +84,42 @@ public:
 
 	bool Load(const string &szIniFilename);
 	bool Save(const string &szIniFilename);
+	bool CreateAndSaveDefaultIniEntry(const string &szIniFilename); // new
+	bool CheckForIniEntry(const string &szIniFilename); // new - needed?
+	
+	bool IsLoaded();
 
 	// Settings
 	string GetRomPath();
-	void SetRomPath(const string &romPath);
+	void SetRomPath(const string &romPath); //needed?
 	string GetMediaPath();
-	void SetMediaPath(const string &mediaPath);
+	void SetMediaPath(const string &mediaPath); //needed?
+
+	string GetSkinPath();
+	string GetSavePath();
+	string GetScreenshotPath();
 
 	// Rom Entries
 	RomIniEntry *CreateRomEntry(dword crc1, dword crc2, byte country);
 	RomIniEntry *GetRomEntry(dword crc1, dword crc2, byte country);
-	RomIniEntry *GetDefaultRomEntry();
+	RomIniEntry *GetDefaultRomEntry(); //needed?
 
-private:
-	void ParseSettingsEntry(const string &szLine);
-	void ParseRomEntry(RomIniEntry *pCurrentEntry, const string &szLine);
-
+	RomIniEntry m_currentIniEntry;
+	
 private:
 	/**
 	 * All variables to do with setting
 	 */
 	string m_szRomPath;
 	string m_szMediaPath;
-	RomIniEntry m_defaultEntry;
+	
+	string m_szSkinPath;
+	string m_szSavePath;
+	string m_szScreenshotPath;
+	
+	bool m_bIniLoaded;
+	
+	RomIniEntry m_defaultIniEntry;
 
 	/**
 	 * A chaining hash table used to store the ini entries

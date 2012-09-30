@@ -354,10 +354,10 @@ void fixpath(char *path,int striplastname)
 
 void main_startup(void)
 {
-    char *cmd,*p;
+    //char *cmd,*p; // unrefrenced
     int   showhelp=0;
     int   romname=0;
-    int   a;
+    //int   a; // unrefrenced
 
     //cmd=GetCommandLine();
 

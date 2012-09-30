@@ -25,6 +25,7 @@
 
 #include "../config.h"
 
+int fontcenter = 320;
 D3D g_d3d;
 HRESULT g_hResult;
 
@@ -51,13 +52,13 @@ bool D3D::Create()
 
     d3dpp.BackBufferWidth					= 640;
     d3dpp.BackBufferHeight					= 480;
-    d3dpp.BackBufferFormat					= D3DFMT_LIN_R5G6B5; //D3DFMT_A8R8G8B8;
+    d3dpp.BackBufferFormat					= D3DFMT_A8R8G8B8;
     d3dpp.BackBufferCount					= 1;
 	d3dpp.EnableAutoDepthStencil			= TRUE;
     d3dpp.AutoDepthStencilFormat			= D3DFMT_D16;
     d3dpp.SwapEffect						= D3DSWAPEFFECT_DISCARD;
 	d3dpp.Flags								= D3DPRESENTFLAG_INTERLACED; 
-    d3dpp.FullScreen_PresentationInterval	= D3DPRESENT_INTERVAL_DEFAULT;
+    d3dpp.FullScreen_PresentationInterval	= D3DPRESENT_INTERVAL_IMMEDIATE;
 	d3dpp.FullScreen_RefreshRateInHz		= 60;
 
 	//TESTME! HDTV Modes (Launcher only!), Skins should be modified accordingly
@@ -72,21 +73,22 @@ bool D3D::Create()
 			d3dpp.FullScreen_RefreshRateInHz = 50;
 	}
 
-/*
+
     if(XGetAVPack() == XC_AV_PACK_HDTV)
-        {
+        {/*
                 if(videoFlags & XC_VIDEO_FLAGS_HDTV_1080i)
                 {
                         d3dpp.Flags            = D3DPRESENTFLAG_WIDESCREEN | D3DPRESENTFLAG_INTERLACED;
                         d3dpp.BackBufferWidth  = 1920;
                         d3dpp.BackBufferHeight = 1080;
-                }
-                else if(videoFlags & XC_VIDEO_FLAGS_HDTV_720p)
+                }*/
+                if(videoFlags & XC_VIDEO_FLAGS_HDTV_720p)
                 {
                         d3dpp.Flags            = D3DPRESENTFLAG_PROGRESSIVE | D3DPRESENTFLAG_WIDESCREEN;
                         d3dpp.BackBufferFormat = D3DFMT_A8R8G8B8;
                         d3dpp.BackBufferWidth  = 1280;
                         d3dpp.BackBufferHeight = 720;
+						fontcenter = 640;
                 }
 				 else if(videoFlags & XC_VIDEO_FLAGS_HDTV_480p)
                 {
@@ -94,17 +96,18 @@ bool D3D::Create()
                         d3dpp.BackBufferFormat = D3DFMT_A8R8G8B8;
                         d3dpp.BackBufferWidth  = 640;
                         d3dpp.BackBufferHeight = 480;
+						fontcenter = 320;
                 }
 		}
-*/
+
 	
 		//480p 1.6 needs 32 bit backbuffer format
-	 if(XGetAVPack() == XC_AV_PACK_HDTV){
+	 /*if(XGetAVPack() == XC_AV_PACK_HDTV){
 		if( videoFlags & XC_VIDEO_FLAGS_HDTV_480p){
 			d3dpp.Flags = D3DPRESENTFLAG_PROGRESSIVE;
 			d3dpp.BackBufferFormat = D3DFMT_A8R8G8B8;
 		}
-	 }
+	 }*/
 
 
 
@@ -112,30 +115,29 @@ bool D3D::Create()
     D3DXMATRIX mat;
 	g_Width = 640;
 	g_Height = 480;
-	D3DXMatrixOrthoOffCenterLH(&mat, 0, g_Width, g_Height, 0, 0.0f, 1.0f);
+	D3DXMatrixOrthoOffCenterLH(&mat, (float)0, (float)g_Width, (float)g_Height, (float)0, 0.0f, 1.0f);
 	
-/*
+
 	if(XGetAVPack() == XC_AV_PACK_HDTV)
-	{
+	{/*
           if(videoFlags & XC_VIDEO_FLAGS_HDTV_1080i)
 		  {
-			    g_Width = 1920;
+			  g_Width = 1920;
 				g_Height = 1080;
 				D3DXMatrixOrthoOffCenterLH(&mat, 0, g_Width, g_Height, 0, 0.0f, 1.0f);
-		  }
-		  else
+		  }*/
 		  if(videoFlags & XC_VIDEO_FLAGS_HDTV_720p)
 		  {
 				g_Width = 1280;
 				g_Height = 720;
-				D3DXMatrixOrthoOffCenterLH(&mat, 0, g_Width, g_Height, 0, 0.0f, 1.0f);
+				D3DXMatrixOrthoOffCenterLH(&mat, (float)0, (float)g_Width, (float)g_Height, (float)0, 0.0f, 1.0f);
 		  }
 		  else
 		  if(videoFlags & XC_VIDEO_FLAGS_HDTV_480p)
 		  {
 				g_Width = 640;
 				g_Height = 480;
-				D3DXMatrixOrthoOffCenterLH(&mat, 0, g_Width, g_Height, 0, 0.0f, 1.0f);
+				D3DXMatrixOrthoOffCenterLH(&mat, (float)0, (float)g_Width, (float)g_Height, (float)0, 0.0f, 1.0f);
 		  }
 	}
 	else
@@ -143,9 +145,9 @@ bool D3D::Create()
     //if HDTV is not supported
 				g_Width = 640;
 				g_Height = 480;
-				D3DXMatrixOrthoOffCenterLH(&mat, 0, g_Width, g_Height, 0, 0.0f, 1.0f);
+				D3DXMatrixOrthoOffCenterLH(&mat, (float)0, (float)g_Width, (float)g_Height, (float)0, 0.0f, 1.0f);
 	}
-	*/
+	
 	m_pd3dDevice = g_pd3dDevice;
 
 	m_pd3dDevice->SetTransform(D3DTS_PROJECTION, &mat);
@@ -183,8 +185,8 @@ void D3D::BeginRender()
 	m_pd3dDevice->SetViewport(&viewport);
 
     m_pd3dDevice->BeginScene();
-	m_pd3dDevice->SetFlickerFilter(FlickerFilter);
-	m_pd3dDevice->SetSoftDisplayFilter(SoftDisplayFilter);
+	m_pd3dDevice->SetFlickerFilter(1);
+	m_pd3dDevice->SetSoftDisplayFilter(false);
 }
 
 void D3D::EndRender()

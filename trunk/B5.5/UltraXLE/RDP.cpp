@@ -1,4 +1,5 @@
-
+#include <xtl.h>
+#include <xgraphics.h>
 //#include "Menu/Texture.h"
 //#include "Menu/IngameMenu.h"
 //#include "Menu/MenuMain.h"
@@ -6,14 +7,11 @@
 #include "ultra.h"
 #include "x.h"
 #include "ultrahle.h"
-#include <xfont.h>
-#include <xtl.h>
 //#include <SDL.h>
 #include "../config.h"
-#include <xgraphics.h>
-#include <xbfont.h>
-extern DWORD dwTitleColor;
-extern CXBFont m_Font;
+
+extern void XboxDrawOSD();
+
 HRESULT g_hr;					// Variable to hold function call results
 
 D3DBLEND		g_srcBlendMap[8], g_destBlendMap[8];
@@ -22,13 +20,18 @@ DWORD			g_combineArg1Map[15], g_combineArg2Map[15];
 
 INT g_txtLoadCount = 0, g_txtFreeCount = 0, g_txtCacheHits = 0, g_txtCacheMiss = 0;
 
-XFONT *g_defaultTrueTypeFont = NULL;
-
+extern int AntiAliasMode;
 BOOL g_bTempMessage = FALSE;
 DWORD g_dwTempMessageStart = 0;
 char g_szTempMessage[100];
 
 extern BOOL _INPUT_IsIngameMenuWaiting();
+extern void _INPUT_RumblePause(bool bPause);
+
+//fd - more debug output
+extern bool FrameSkip;
+extern int VSync;
+extern int DefaultPak;
 
 #include <xgraphics.h>
 
@@ -5811,13 +5814,20 @@ extern BOOL _INPUT_UpdatePaks();//added by freakdave
 extern BOOL _INPUT_UpdateControllerStates();//added by freakdave
 extern bool showdebug;
 
+extern void ReInitVirtualDynaMemory(bool charge);
+
 void rdp_frameend(void)
 {
+	
+	MEMORYSTATUS memstat;
+
     if(!rst.frameopen) return;
     rst.frameopen=0;
 
     st2.gfxdpsyncpending=1;
     flushprims();
+
+	XboxDrawOSD();
 
 	BOOL menuWait = FALSE;
 	
@@ -5826,41 +5836,6 @@ void rdp_frameend(void)
     // show buffer on screen
     if(rst.tris>0)
     {
-		
-		static DWORD lastTick = GetTickCount() / 1000;
-		static int lastTickFPS = 0;
-		static int frameCount = 0;
-
-		if (lastTick != GetTickCount() / 1000)
-		{
-			lastTickFPS = frameCount;
-			frameCount = 0;
-			lastTick = GetTickCount() / 1000;
-		}
-frameCount++;
-WCHAR str[10];
-swprintf(str,L"%i fps", lastTickFPS);
-MEMORYSTATUS memStat;
-WCHAR szMemStatus[128];
-//Check memory, Warn user, return to Launcher
-GlobalMemoryStatus(&memStat);
-if (memStat.dwAvailPhys / 1024 / 1024 < 1)
-	{
-		swprintf(szMemStatus,L"Out of Memory! Returning to Launcher...");
-		m_Font.Begin();
-		m_Font.DrawText(320, 240, dwTitleColor, szMemStatus, XBFONT_CENTER_X);
-		m_Font.End();
-		XLaunchNewImage("D:\\default.xbe", NULL);
-	}
-		if (showdebug)
-		{
-			swprintf(szMemStatus,L"%d Mb Free",(memStat.dwAvailPhys /1024 /1024));
-			m_Font.Begin();
-			m_Font.DrawText(60, 35, dwTitleColor, szMemStatus, XBFONT_LEFT);
-			m_Font.DrawText(60, 50, dwTitleColor, str, XBFONT_LEFT);
-			m_Font.DrawText(60, 65, dwTitleColor, L"UltraHLE", XBFONT_LEFT);
-			m_Font.End();
-		}
 		g_pDevice->EndScene();
 		g_pDevice->Present(NULL, NULL, NULL, NULL);
 		
@@ -5869,10 +5844,8 @@ if (memStat.dwAvailPhys / 1024 / 1024 < 1)
 		realdrawmode();
     }
 
-	MEMORYSTATUS stat;
-	GlobalMemoryStatus(&stat);
-
-	if (stat.dwAvailPhys / 1024 / 1024 < 4)
+	GlobalMemoryStatus(&memstat);
+	if (memstat.dwAvailPhys / 1024 / 1024 < 4)
 	{
 		rdp_freetexmem();
 	}
@@ -5901,11 +5874,20 @@ if (memStat.dwAvailPhys / 1024 / 1024 < 1)
 
 	if (menuWait)
 	{
-	sound_stop();
-	MenuMain();
-	_INPUT_UpdatePaks();//added by freakdave
-	_INPUT_UpdateControllerStates();//added by freakdave
-	sound_start(st.audiorate);
+		sound_stop();
+		
+		_INPUT_RumblePause(true);
+		
+		ReInitVirtualDynaMemory(false);
+		MenuMain();
+		ReInitVirtualDynaMemory(true);
+		
+		_INPUT_UpdatePaks();//added by freakdave
+		_INPUT_UpdateControllerStates();//added by freakdave
+		
+		_INPUT_RumblePause(false);
+		
+		sound_start(st.audiorate);
 	}
 }
 

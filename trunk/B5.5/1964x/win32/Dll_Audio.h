@@ -52,6 +52,7 @@ extern BOOL	CoreDoingAIUpdate;
 // Ez0n3 - use iAudioPlugin instead to determine if basic audio is used
 //extern BOOL g_bUseBasicAudio;
 extern int g_iAudioPlugin;
+extern BOOL g_bAudioBoost;
 
 
 #endif

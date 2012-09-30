@@ -3,8 +3,8 @@
 #define PLUGIN_TYPE_GFX			2
 #define PLUGIN_TYPE_AUDIO		3
 #define PLUGIN_TYPE_CONTROLLER	4
-#define SYSTEM_NTSC					1
-#define SYSTEM_PAL					0
+#define SYSTEM_NTSC					0 //1
+#define SYSTEM_PAL					1 //0
 #define SYSTEM_MPAL					2
 
 

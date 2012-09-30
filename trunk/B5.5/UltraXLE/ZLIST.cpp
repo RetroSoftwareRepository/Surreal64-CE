@@ -94,7 +94,7 @@ void dctdump(int *in,char *text)
     static FILE *f1;
     int x,y;
 
-	if(!f1) f1=fopen("T:\\dct.log","wt");
+	if(!f1) f1=fopen("T:\\Misc\\dct.log","wt");
     fprintf(f1,"%s\n",text);
     for(y=0;y<8;y++)
     {

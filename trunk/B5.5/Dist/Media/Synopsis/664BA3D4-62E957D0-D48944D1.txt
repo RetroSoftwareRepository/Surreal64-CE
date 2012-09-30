@@ -1,0 +1,21 @@
+Mario Golf
+Platform: Nintendo 64
+Media: Cartridge
+Genre: Sports > Golf
+Release Year: 1999
+Developer: Camelot Software Planning
+Publisher: Nintendo
+Players: Single-player, multiplayer
+_________________________
+
+Gameplay
+
+Players can play as a variety of characters including Mario, Luigi, Princess Peach, Yoshi, and Wario. The game also introduces Plum, Sonny, Harry, Maple, and Charlie, new characters created by Camelot specifically for the game. Players can then select from a number of courses which have features adapted to the Nintendo world. Mario Golf is also very easy to play (also known as a "pick up and play" game) as it makes golf very simple, because it does away with many of the complicated real-life aspects of the sport that are found in games like Tiger Woods PGA Tour 2006. Although the game is easy to play and simple in appearance, the game's engine is very deep and there are a multitude of variables that can affect a shot, such as wind strength and direction (indicated by a Boo), rain, characters' individual attributes, spin on the ball, and relief of the land. There is a variety of gameplay modes, including speed golf, ring shot, mini golf and skins match. Every character in the game has recorded voice samples which can be used to comment on opponent's shots.
+
+Transfer Pak
+
+This game features Transfer Pak compatibility with the Game Boy Color version of Mario Golf. Players can upload characters and data found on the Game Boy version to the Nintendo 64 version. That way, you can play as these characters in full 3D. Additionally, data from the Nintendo 64 version is saved onto the Game Boy Color version of the game. However, the characters imported onto the Nintendo 64 version are not saved onto the cartridge; you must upload the characters again to play as them on the Nintendo 64. After playing a round with a GBC Character, that character will earn experience points. Transfer Pak functionality is not included in the Virtual Console version
+
+Reception
+
+GameSpot describes the game as easy to play, by having simple features and by "removing the guesswork for gamers who are not familiar with the subtle nuances of golf" that may put off many players

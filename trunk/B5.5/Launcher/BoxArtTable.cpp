@@ -1,6 +1,10 @@
 #include "BoxArtTable.h"
 #include "IniFile.h"
 
+extern int BoxartType;
+extern char BoxartName[32];
+extern char szPathMedia[256];
+
 BoxArtTable g_boxArtTable;
 
 BoxArtTable::BoxArtTable(void)
@@ -11,18 +15,43 @@ BoxArtTable::BoxArtTable(void)
 	{
 		m_entryTable[i] = NULL;
 	}
+	
+	m_bBoxartLoaded = false;
 }
 
 BoxArtTable::~BoxArtTable(void)
 {
+	for (dword i = 0; i < 0x10000; i++)
+	{
+		if (m_entryTable[i] != NULL)
+		{
+			BoxArtEntry *delEntry = m_entryTable[i];
+			BoxArtEntry *nextEntry = delEntry->pNextEntry;
+			delete delEntry;
+
+			while (nextEntry != NULL)
+			{
+				delEntry = nextEntry;
+				nextEntry = delEntry->pNextEntry;
+				delete delEntry;
+			}
+		}
+	}
+
+	delete [] m_entryTable;
+	
+	m_bBoxartLoaded = false;
 }
 
 void BoxArtTable::Build()
 {
 	WIN32_FIND_DATA fd;
-
-	HANDLE hFF = FindFirstFile((g_iniFile.GetMediaPath() + "\\boxart\\*.png").c_str(), &fd);
-
+	
+	char BoxPath[256];
+	char pathmedia[256];
+	sprintf(pathmedia, "%s%s\\*.png", szPathMedia, BoxartName);
+	
+	HANDLE hFF = FindFirstFile(pathmedia, &fd);
 	do
 	{
 		string szFilename(fd.cFileName);
@@ -30,11 +59,44 @@ void BoxArtTable::Build()
 		for (dword i = 0; i < (szFilename.length() - 4); i += 9)
 		{
 			dword crc1 = strtoul(szFilename.substr(i, 8).c_str(), NULL, 16);
-			
-			CreateBoxArtEntry(crc1, "boxart\\" + szFilename);
+
+			sprintf(BoxPath, "%s\\%s", BoxartName, szFilename.c_str());
+			CreateBoxArtEntry(crc1, BoxPath);
 		}
 	}
 	while (FindNextFile(hFF, &fd));
+	
+	m_bBoxartLoaded = true;
+}
+
+void BoxArtTable::Destroy()
+{
+	for (dword i = 0; i < 0x10000; i++)
+	{
+		if (m_entryTable[i] != NULL)
+		{
+			BoxArtEntry *delEntry = m_entryTable[i];
+			BoxArtEntry *nextEntry = delEntry->pNextEntry;
+			delete delEntry;
+
+			while (nextEntry != NULL)
+			{
+				delEntry = nextEntry;
+				nextEntry = delEntry->pNextEntry;
+				delete delEntry;
+			}
+			
+			m_entryTable[i] = NULL;
+		}
+	}
+
+	m_bBoxartLoaded = false;
+}
+
+void BoxArtTable::Refresh()
+{
+	Destroy();
+	Build();
 }
 
 BoxArtEntry *BoxArtTable::CreateBoxArtEntry(dword crc1, const string &pathName)
@@ -73,8 +135,10 @@ BoxArtEntry *BoxArtTable::CreateBoxArtEntry(dword crc1, const string &pathName)
 	return newEntry;
 }
 
+
 string BoxArtTable::GetBoxArtFilename(dword crc1)
 {
+	
 	// look up the table using the first 16 bits of crc1
 	word tableLocation = static_cast<word>(crc1 >> 16);
 
@@ -93,5 +157,8 @@ string BoxArtTable::GetBoxArtFilename(dword crc1)
 	}
 
 	// no entry was found that matches
-	return string("boxart\\default.png");
+	
+		//return string("%s\\default.png", BoxartName);
+		return string(string(BoxartName) + "\\default.png");
+
 }

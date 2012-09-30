@@ -81,7 +81,7 @@ void CGraphicsContext::InitWindowInfo()
 
 bool CGraphicsContext::Initialize(HWND hWnd, HWND hWndStatus, DWORD dwWidth, DWORD dwHeight, BOOL bWindowed )
 {
- 	if( windowSetting.bDisplayFullscreen )
+ 	/*if( windowSetting.bDisplayFullscreen )
 	{
 		windowSetting.uDisplayWidth = windowSetting.uFullScreenDisplayWidth;
 		windowSetting.uDisplayHeight = windowSetting.uFullScreenDisplayHeight;
@@ -90,7 +90,9 @@ bool CGraphicsContext::Initialize(HWND hWnd, HWND hWndStatus, DWORD dwWidth, DWO
 	{
 		windowSetting.uDisplayWidth = windowSetting.uWindowDisplayWidth;
 		windowSetting.uDisplayHeight= windowSetting.uWindowDisplayHeight;
-	}
+	}*/
+	windowSetting.uDisplayWidth = (unsigned short)dwWidth;
+	windowSetting.uDisplayHeight = (unsigned short)dwHeight;
  
 	
 	return true;

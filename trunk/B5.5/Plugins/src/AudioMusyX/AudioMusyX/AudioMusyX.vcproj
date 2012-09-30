@@ -4,6 +4,7 @@
 	Version="7.10"
 	Name="AudioMusyX"
 	ProjectGUID="{5AA63184-8488-4760-8A8F-2784090D5A77}"
+	RootNamespace="AudioMusyX"
 	Keyword="XboxProj">
 	<Platforms>
 		<Platform
@@ -12,29 +13,34 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Xbox"
-			OutputDirectory="Debug"
-			IntermediateDirectory="Debug"
+			OutputDirectory="obj\Debug"
+			IntermediateDirectory="obj\Debug"
 			ConfigurationType="4"
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				OptimizeForProcessor="2"
-				PreprocessorDefinitions="_DEBUG;_XBOX;_LIB"
-				MinimalRebuild="TRUE"
-				BasicRuntimeChecks="3"
-				RuntimeLibrary="1"
+				PreprocessorDefinitions="DEBUG;_DEBUG;_XBOX;_LIB;WIN32;_WINDOWS;BASICAUDIOPLUGIN_EXPORTS"
+				MinimalRebuild="FALSE"
+				BasicRuntimeChecks="0"
+				RuntimeLibrary="0"
+				BufferSecurityCheck="FALSE"
+				EnableFunctionLevelLinking="TRUE"
 				EnableEnhancedInstructionSet="1"
 				UsePrecompiledHeader="0"
-				PrecompiledHeaderFile="$(OutDir)/$(ProjectName).pch"
+				PrecompiledHeaderFile="$(IntDir)\$(ProjectName).pch"
+				BrowseInformation="1"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
-				DebugInformationFormat="4"/>
+				DebugInformationFormat="4"
+				CallingConvention="1"
+				CompileAs="1"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)/$(ProjectName).lib"/>
+				OutputFile="../../../lib/AudioMusyX.lib"/>
 			<Tool
 				Name="VCPostBuildEventTool"/>
 			<Tool
@@ -44,8 +50,8 @@
 		</Configuration>
 		<Configuration
 			Name="Profile|Xbox"
-			OutputDirectory="Profile"
-			IntermediateDirectory="Profile"
+			OutputDirectory="obj\Profile"
+			IntermediateDirectory="obj\Profile"
 			ConfigurationType="4"
 			CharacterSet="2">
 			<Tool
@@ -53,41 +59,7 @@
 				Optimization="3"
 				OmitFramePointers="TRUE"
 				OptimizeForProcessor="2"
-				PreprocessorDefinitions="NDEBUG;_XBOX;PROFILE;_LIB"
-				StringPooling="TRUE"
-				RuntimeLibrary="0"
-				BufferSecurityCheck="TRUE"
-				EnableFunctionLevelLinking="TRUE"
-				EnableEnhancedInstructionSet="1"
-				UsePrecompiledHeader="0"
-				PrecompiledHeaderFile="$(OutDir)/$(ProjectName).pch"
-				WarningLevel="3"
-				Detect64BitPortabilityProblems="FALSE"
-				DebugInformationFormat="3"/>
-			<Tool
-				Name="VCCustomBuildTool"/>
-			<Tool
-				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)/$(ProjectName).lib"/>
-			<Tool
-				Name="VCPostBuildEventTool"/>
-			<Tool
-				Name="VCPreBuildEventTool"/>
-			<Tool
-				Name="VCPreLinkEventTool"/>
-		</Configuration>
-		<Configuration
-			Name="Profile_FastCap|Xbox"
-			OutputDirectory="Profile_FastCap"
-			IntermediateDirectory="Profile_FastCap"
-			ConfigurationType="4"
-			CharacterSet="2">
-			<Tool
-				Name="VCCLCompilerTool"
-				Optimization="3"
-				OmitFramePointers="TRUE"
-				OptimizeForProcessor="2"
-				PreprocessorDefinitions="NDEBUG;_XBOX;PROFILE;FASTCAP;_LIB"
+				PreprocessorDefinitions="NDEBUG;_XBOX;PROFILE;_LIB;WIN32;_WINDOWS"
 				StringPooling="TRUE"
 				RuntimeLibrary="0"
 				BufferSecurityCheck="TRUE"
@@ -98,12 +70,48 @@
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
 				DebugInformationFormat="3"
+				CallingConvention="1"/>
+			<Tool
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCLibrarianTool"
+				OutputFile="../../../lib/AudioMusyX.lib"/>
+			<Tool
+				Name="VCPostBuildEventTool"/>
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+		</Configuration>
+		<Configuration
+			Name="Profile_FastCap|Xbox"
+			OutputDirectory="obj\Profile_FastCap"
+			IntermediateDirectory="obj\Profile_FastCap"
+			ConfigurationType="4"
+			CharacterSet="2">
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="3"
+				OmitFramePointers="TRUE"
+				OptimizeForProcessor="2"
+				PreprocessorDefinitions="NDEBUG;_XBOX;PROFILE;FASTCAP;_LIB;WIN32;_WINDOWS"
+				StringPooling="TRUE"
+				RuntimeLibrary="0"
+				BufferSecurityCheck="TRUE"
+				EnableFunctionLevelLinking="TRUE"
+				EnableEnhancedInstructionSet="1"
+				UsePrecompiledHeader="0"
+				PrecompiledHeaderFile="$(OutDir)/$(ProjectName).pch"
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="FALSE"
+				DebugInformationFormat="3"
+				CallingConvention="1"
 				FastCAP="TRUE"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)/$(ProjectName).lib"/>
+				OutputFile="../../../lib/AudioMusyX.lib"/>
 			<Tool
 				Name="VCPostBuildEventTool"/>
 			<Tool
@@ -116,7 +124,8 @@
 			OutputDirectory="obj\Release"
 			IntermediateDirectory="obj\Release"
 			ConfigurationType="4"
-			CharacterSet="2">
+			CharacterSet="2"
+			WholeProgramOptimization="FALSE">
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="2"
@@ -128,22 +137,21 @@
 				OmitFramePointers="TRUE"
 				EnableFiberSafeOptimizations="TRUE"
 				OptimizeForProcessor="2"
-				PreprocessorDefinitions="NDEBUG;_XBOX;_LIB;WIN32;NDEBUG;_WINDOWS;BASICAUDIOPLUGIN_EXPORTS"
+				PreprocessorDefinitions="NDEBUG;_XBOX;_LIB;WIN32;_WINDOWS;BASICAUDIOPLUGIN_EXPORTS"
 				StringPooling="TRUE"
 				RuntimeLibrary="0"
 				BufferSecurityCheck="FALSE"
 				EnableFunctionLevelLinking="TRUE"
-				EnableEnhancedInstructionSet="0"
+				EnableEnhancedInstructionSet="1"
 				UsePrecompiledHeader="0"
-				PrecompiledHeaderFile="$(OutDir)/$(ProjectName).pch"
+				PrecompiledHeaderFile="$(IntDir)\$(ProjectName).pch"
 				AssemblerOutput="0"
-				BrowseInformation="0"
-				WarningLevel="0"
+				BrowseInformation="1"
+				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
-				DebugInformationFormat="0"
+				DebugInformationFormat="3"
 				CallingConvention="1"
-				CompileAs="1"
-				DisableSpecificWarnings="4102, 4189, 4047, 4057, 4100, 4133"/>
+				CompileAs="1"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -158,32 +166,41 @@
 		</Configuration>
 		<Configuration
 			Name="Release_LTCG|Xbox"
-			OutputDirectory="Release_LTCG"
-			IntermediateDirectory="Release_LTCG"
+			OutputDirectory="obj\Release_LTCG"
+			IntermediateDirectory="obj\Release_LTCG"
 			ConfigurationType="4"
 			CharacterSet="2"
 			WholeProgramOptimization="TRUE">
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="3"
+				GlobalOptimizations="TRUE"
+				InlineFunctionExpansion="2"
+				EnableIntrinsicFunctions="FALSE"
+				ImproveFloatingPointConsistency="FALSE"
+				FavorSizeOrSpeed="1"
 				OmitFramePointers="TRUE"
+				EnableFiberSafeOptimizations="TRUE"
 				OptimizeForProcessor="2"
-				PreprocessorDefinitions="NDEBUG;_XBOX;LTCG;_LIB"
+				PreprocessorDefinitions="NDEBUG;_XBOX;_LIB;LTCG"
 				StringPooling="TRUE"
 				RuntimeLibrary="0"
-				BufferSecurityCheck="TRUE"
+				BufferSecurityCheck="FALSE"
 				EnableFunctionLevelLinking="TRUE"
 				EnableEnhancedInstructionSet="1"
 				UsePrecompiledHeader="0"
-				PrecompiledHeaderFile="$(OutDir)/$(ProjectName).pch"
+				PrecompiledHeaderFile="$(IntDir)\$(ProjectName).pch"
+				BrowseInformation="1"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
-				DebugInformationFormat="3"/>
+				DebugInformationFormat="3"
+				CallingConvention="1"
+				CompileAs="1"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)/$(ProjectName).lib"/>
+				OutputFile="../../../lib/AudioMusyX.lib"/>
 			<Tool
 				Name="VCPostBuildEventTool"/>
 			<Tool

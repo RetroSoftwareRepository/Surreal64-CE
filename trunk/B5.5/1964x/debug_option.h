@@ -36,11 +36,28 @@ extern char tracemessage[256];
 		RefreshOpList(tracemessage); \
 	}
 #else*/
+
+//#define DEBUG_PAKS 1
+
+#ifdef DEBUG
+extern char tracemessage[256];
+#define TRACE0(str)						{ DisplayError(str); }
+#define TRACE1(str, arg1)				{ sprintf(tracemessage, str, arg1); DisplayError(tracemessage); }
+#define TRACE2(str, arg1, arg2)			{ sprintf(tracemessage, str, arg1, arg2); DisplayError(tracemessage); }
+#define TRACE3(str, arg1, arg2, arg3)	{ sprintf(tracemessage, str, arg1, arg2, arg3); DisplayError(tracemessage); }
+#define TRACE4(str, arg1, arg2, arg3, arg4) \
+	{ \
+		sprintf(tracemessage, str, arg1, arg2, arg3, arg4); \
+		DisplayError(tracemessage); \
+	}
+#else
 #define TRACE0(str)
 #define TRACE1(str, arg1)
 #define TRACE2(str, arg1, arg2)
 #define TRACE3(str, arg1, arg2, arg3)
 #define TRACE4(str, arg1, arg2, arg3, arg4)
+#endif
+
 //#endif
 /*#ifdef DEBUG_COMMON
 #define DEBUG_RANGE_ERROR
