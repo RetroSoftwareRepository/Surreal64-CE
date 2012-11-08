@@ -1,0 +1,119 @@
+International Superstar Soccer '98
+Platform: Nintendo 64
+Genre: Sports > Soccer
+Release Year: 1998
+Developer: KCEO
+Publisher: Konami
+Players: Single-player, multiplayer
+_________________________
+
+International Superstar Soccer 98 (officially abbreviated as ISS 98 and known as Jikkyou World Soccer: World Cup France 1998 in Japan) is an football video game developed by Konami Computer Entertainment Osaka which was released exclusively for the Nintendo 64. Alongside the KCET developed International Superstar Soccer Pro 98, the games were released at the same time.
+
+Although it lacked FIFPro licence, it featured Italian striker Fabrizio Ravanelli along with German goalkeeper Andreas Koepke (on German release) and Paul Ince (on British release) on the cover. The cover of the Nintendo 64 version featured Colombian player Carlos Valderrama, and the game featured license from Reebok to use their logos in adboards and the Chilean kits.
+
+The Playstation version was called International Superstar Soccer Pro 98 and was developed by KCET and is a completely different game.
+
+Features
+
+The list of teams has been extendend to 52.
+The number of players in each team has been extended to 20.
+Formation mode can be entered in any time during the match.
+Player Name Editor has been implemented in Game Options.
+Three new stadiums and five difficulty levels.
+Player creation mode allowing the creation of up to 60 individual players.
+
+Content
+
+Due to the date of release, the game focuses on 1998 FIFA World Cup and includes each qualifed team plus more. Every team which participated in tournament has home, away and goalkeeper World Cup official kits featuring manufacturer logos and national emblems and the rest has those used in qualifications. The squads are in accordance with official 1998 FIFA World Cup squads as well. Teams that did not qualify have line-ups from the qualifiers. However the players' names are misspelled, though they have their actual numbers, appearance, age, weight, height and abilities. Bold indicates that they're new to the game.
+
+Germany
+Spain
+Romania
+England
+France
+Denmark
+Italy
+Netherlands
+Norway
+Sweden
+Croatia
+Yugoslavia
+Bulgaria
+
+Austria
+Switzerland
+Portugal
+Scotland
+Greece
+Belgium
+Turkey
+Republic of Ireland
+Northern Ireland
+Wales
+Russia
+Morocco
+Tunisia
+
+South Africa
+Ghana
+Cameroon
+Nigeria
+Egypt
+Liberia
+Mexico
+Canada
+United States
+Jamaica
+Brazil
+Colombia
+Chile
+
+Argentina
+Paraguay
+Bolivia
+Peru
+Uruguay
+Japan
+South Korea
+Saudi Arabia
+Iran
+Australia
+United Arab Emirates
+Kazakhstan
+Uzbekistan
+
+Game modes
+
+International Superstar Soccer Pro '98 featured 6 different game modes. Modes existing in previous version have been developed and the two new have been added.
+
+Open Game: a friendly match game against computer or another player with a choice of difficulty, stadium, weather and match length and time of a match. It was also possible to play with another player or with computer against computer. Computer versus computer option was available as well.
+League Mode: 16 international teams participate in league playing either half or full season with a free choice of teams.
+International Cup Mode: This mode is where the player selects a team from one region and attempts to get them to the International Cup 98.
+Penalty Kick Mode: two teams take a five penalty kicks to select the winner. In case of a draw, they undergo sudden death round.
+Training: practice of shooting free kicks and corner kicks with a selected team.
+
+Trivia
+
+Although line-ups were to reflect 1998 FIFA World Cup squads, there are some inconsistencies. For example, players named "Revameli" (representing Fabrizio Ravanelli for Italy), "Lomalio" (representing Romario for Brazil), "Leos" (representing Adolfo Rios for Mexico) or "Bu" (representing Ibrahim Ba for France) did not participate in the final tournament.
+During the International Cup mode ball turns colour to blue which resembles the ball used in the 1998 FIFA World Cup - Tricolore
+It is impossible to lose the match by accumulating too many red cards in the PS1 version. After the third red card only yellows are shown. This does not apply to the N64 version, where having five red cards in a single match (and thus, less than seven players on pitch, per rule) results in an automatic loss.
+Some players in the game of both qualified and non-qualified teams had initially retired for their team one year before the 1998 World Cup. For example, Colin Miller (Biller), Randy Samuel (Zamual) of Canada and Carlos Hermosillo (Hermosio) of Mexico had retired from international football in 1997.
+Unlike it's PlayStation 1 counterpart, the edit mode is limited to only typing 8 characters.
+Winning the International Cup competition allows the player to use unusual hairstyles in the create player mode.
+Winning the International League competition unlocks European, African, Asian, American and World 'Elite' teams that can be played in the exhibition match mode.
+Due to a number of programming flaws, goal scoring becomes highly probable in certain situations. If the direction of the ball can be changed after the goalkeeper has started his 'save' animation, he will be forced to complete that animation before producing a save that will prevent a goal.
+The goalkeeper will never move closer to his posts. He always stays in the centre of the goal.
+The C-left button is used to trap the ball, but by holding the button down the on-field player will juggle the ball endlessly.
+Commentary on the English version is provided by Tony Gubba. Like its predecessor, the commentary on ISS 98 is (perhaps intentionally) comical, with Gubba providing questionable analysis of the action, for instance exclaiming "surely that had to be a penalty!" for an infringement nowhere near the penalty area, or "good tackle!", when a player is recklessly barged to the floor using the 'hack' (A+B) move.
+
+Stadia
+
+South America Stadium (Estadio Metropolitano)
+Tokyo Stadium (Olympic Stadium (Tokyo))
+Euro Central Stadium (Old Wembley Stadium)
+Euro International Stadium (Windsor Park)
+Africa Stadium
+Asia Stadium (Sydney Football Stadium)
+Saint-Denis Stadium (Stade de France)
+Paris Stadium (Parc des Princes)
+Lyon Stadium (Stade de Gerland)

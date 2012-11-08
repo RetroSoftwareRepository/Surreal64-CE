@@ -1,0 +1,34 @@
+Mario Party 2
+Platform: Nintendo 64
+Media: Cartridge
+Genre: Party
+Release Year: 2000
+Developer: Hudson Soft
+Publisher: Nintendo
+Players: Single-player, multiplayer
+_________________________
+
+Game boards
+
+Horror Land - The characters dress as wizards while exploring a spooky and magical land that alternates between day and night, full of ghosts, tombstones, magic eyeballs, and disembodied laughter.
+Mystery Land - The characters dress up as archaeologists to explore ancient ruins.
+Pirate Land - The characters dress up as pirates as they search for treasure, facing sharks and the sword blades of their opponents.
+Western Land - The characters journey to the stereotypical "Old West" of the USA, where they face cactus, quicksand, and gun-slinging duels at high noon.
+Space Land - The characters blast off to outer space.
+Bowser Land - This board is only unlocked after the player has played each of the other boards at least once. The characters face off against Bowser on his own turf.
+
+Mini-games
+
+There are 65 mini-games in Mario Party 2. They are divided into four-player, one vs. three, two vs. two, and battle games. The type of mini game is selected by what space the players land on. If all 4 players have the same color panel, whether it's red or blue, a four player mini game begins. If 2 players have a blue panel, and the other 2 have a red panel, then it's a two versus two mini game. If one player has a blue panel, and the others have a red panel, or vice versa, then a one versus 3 mini game begins. If a player lands on a battle space, a battle mini game begins. The mini games have varied objectives. For example the objective of "Mecha Marathon" is to get your nudge wind up toy the furthest by repeatedly tapping A+B at the same time. Some mini games(such as "Face Lift" using the main characters instead of Bowser) have been edited and transferred and/or also retitled from the first Mario Party to this Mario Party, however some mini-games have different things in order to win the game and/or change appearance in some way. An example is slot car derby, which has a new background. Although, mini-games that involve rotating the control stick that were in the original Mario Party were not transferred because of injuries, such as blisters, from rotating the control stick too quickly.
+
+Items
+
+A character comes across several opportunities to either buy, win, or steal items. Such items include mushrooms, skeleton keys, treasure chests, and others. The red mushroom allows a player to hit the dice block twice and move the sum of the numbers in spaces. If a player rolls the same number twice, he or she gets a bonus of 10 coins. Accordingly, rolling 3 of the same number with the golden mushroom results in a 20 coin increase.
+
+New features
+
+All of the playable characters from the original game are still available, but this time, they are all dressed in costumes unique to the board players are playing on (except for Bowser Land, on which they wear their usual attire). Board characters include Toad, Baby Bowser, and Boo, with the notable absence of Bowser and Koopa Troopa (although both have roles in the game). Another new feature of the game is the introduction of buildings on the boards: the Item Shop and the Koopa Bank, as well as power ups such as the "Red" and "Gold" mushrooms which allows players to roll up to 2 or 3 dices at once. All the board titles end with "land", (ex. "Bowser Land", "Space Land", etc.) and unlike in the original, the winner is announced during a cutscene in which the winner thwarts Bowser who harasses Koopa during certain scenarios appropriate to the board's theme. Baby Bowser also appears and accompanies the space where the location of the previous star was and takes 5 coins from the player who passes by, although every once in awhile, he'll sometimes reward the player 5 coins instead. Boo can still take coins and stars from other players like he did in the first game but unlike in the first game where stealing coins was free, it now costs 5 coins but unlike in the first game he can steal twice as many coins where in the original he could only steal anywhere from 1-20 coins, stealing stars still costs 50 coins like it did in the first game. In the first game, all eight game boards featured Koopa giving the players 10 coins every time they overlapped the board (20 coins within the last five turns) however this feature was omitted in this game, with the exception where it still occurs on the Mini-Game Stadium board.
+
+Mario Party 2 also features several new spaces, with the "1-Player Mini Game" and "Mushroom" spaces from the first game absent; the Battle, Item, and Bank spaces are introduced. The Item space activates mini-games specific to the board that allows someone a chance to collect an item, which is now used to further players' board strategy (as opposed to items being used to toggle universal settings in the first game where certain items appeared randomly during the board gameplay mode). The Battle space triggers the newly introduced Battle mini-games, which puts players against each other for a giant pot of coins with a 70/30 percent ratio share for the 1st and 2nd place winners. The Bank space gives players who land on it all deposits made in the Koopa Bank by others, who must deposit a minimum of 5 coins (1-4 coins if they have less than 5 coins) if they pass the space. One exception however occurs on Bowser's board, where the rules are reversed: players passing the bank get 5 coins while the player landing on the "Bank" space must pay back the total balance.
+
+The game also features six brand new boards and modes (including Mini-Game Coaster, akin to the original Mario Party's Mini-Game Island where the player must beat several mini-games across 3, 6, or even 9 worlds depending on which difficulty is chosen) The return of Mini-Game Stadium. Forty-three new mini-games were introduced in Mario Party 2, while old Mario Party mini-games were updated and some were retitled. Three new types of mini-games are also introduced: Battle mini-games, Item mini-games, and Duel mini-games. Also unlike in the first game, players no longer lose coins if they lose in a mini-game. Once all of the chosen amount of rounds on the selected board are used up (Which always consists of 20, 35, or 50 turns like in the original) the total number of coins and stars both the human and computer players collected during the board and mini-games are rewarded and added to the coin bank. Unlike in the original where only the human player(s)' coins and stars were added. Also unlike in the original, each star collected both by the human and computer players is worth an additional 50 coins, where in the original the player had to collect 100 stars to unlock the final board "Eternal Star".

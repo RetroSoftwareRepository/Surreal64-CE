@@ -1,0 +1,33 @@
+Mission Impossible
+Platform: Nintendo 64
+Media: Cartridge
+Genre: Action > Third Person > Shooter
+Release Year: 1998
+Developer: Ocean Software, Infogrames Entertainment
+Publisher: Ocean Software
+Players: Single-player
+_________________________
+
+Gameplay
+
+The player controls Ethan Hunt in most of the missions, and the majority of the game centers around completing tasks undetected or disguised. The player can choose from a wide variety of weapons and gadgets, including pistols and automatic weapons. On select missions they are given the explosive gum and the Facemaker from the movie. They are also given explosives to set on targets. Other equipment Ethan is provided with includes smoke generators, infra-red contacts, gas injectors, fingerprint scanners, and computer disks.
+
+Unlike most other shooters of the time, the gameplay often required the player to exercise caution and restraint in carrying out mission objectives. In many missions, outright use of violence is discouraged or even penalized, and it is easy to fail a mission by accidentally shooting the wrong person. Most of the missions require the player to stealthily infiltrate or sneak out of areas, such as CIA Headquarters in Langley. They can infiltrate some facilities only using the Facemaker, which disguises themselves as one of the enemy. Sometimes the player is required to do this multiple times.
+
+Missions
+
+The levels roughly follow the storyline of the movie, though there is a subplot based in Russia that is entirely original. There are five missions comprising 20 levels
+
+Plot
+
+The game starts with Jim Phelps in a park outside the CIA, getting a message about a terrorist plot in northwestern Russia planning to send missiles to a rival country. Phelps sends IMF agents Ethan Hunt, John Clutter and Andrew Dowey to stop the terrorists' plans by infiltrating the submarine pen where the missiles are being stored, then destroying the submarine holding the missiles.
+
+While this is happening, Alexander Golystine, a worker at the Embassy of Russia in Prague, kidnaps the female IMF agent Candice Parker and steals one half of the Non-Official Cover (NOC) list, a list that gives the real and false names of all IMF agents. Though useless on its own, the Embassy possess a powerful supercomputer that may be capable of breaking the code to open the document, and after IMF agent Robert Barnes goes missing after an attempted rescue mission, Phelps sends in Hunt to find the list, rescue Candice Parker, and discover the fate of Robert Barnes.
+
+Hunt successfully begins the mission by entering the Embassy unarmed, using inside contacts Sarah Davies and Dieter Harmon to procure equipment. He then knocks out the Ambassador's aide, assuming his identity using a Facemaker, and makes his way through an underground warehouse to find the KGB headquarters. Still in disguise, he is able to discover the fate of Barnes, who has been tortured to death, and rescues a sickened and injured Parker. In spite of her handicap, however, they are able to recover the NOC list and escape using the cover of a fake fire (set off by Hunt using smoke generators in the ventilation).
+
+Despite his work in recovering the NOC list as well as agent Parker, Hunt is taken to interrogation at the CIA, where he is accused of being a mole for a person known as Max. He manages to escape his captors and, after secretly making his way through the building, is able to reach the rooftop. After doing so, he is able to infiltrate the security atop the building, prevent backup from arriving by helicopter, and freeze another helicopter to ensure he has a way out. He then reaches the top of the building, where he uses fiber optic cable to descend into the famous laser-filled terminal room from the movie. Here, he steals the NOC list, leaves a computer virus in the terminal to shut off the lasers, and escapes in the helicopter to his next mission as a rogue agent.
+
+Hunt reaches Waterloo Station in London, having secured the support of two ex-agents, (Luther Stickell and Franz Krueger) and meets with the secretive Max. Max, however, steals the NOC list and leaves her henchmen to execute Hunt, though Stickell and Krueger successfully protect him with sniper fire as he awaits further details from Parker. When they finally discover where Max has escaped to, Hunt infiltrates her train (which is well-protected by more of her henchmen) and successfully kills her, taking back the NOC list. As he makes his way to the cargo area where Max has set up a bomb, he discovers that his former mentor, Jim Phelps, is the real mole. Hunt chases Phelps onto the roof of the train and manages to kill him, destroying his helicopter as he tries to escape. Afterwards, Hunt returns to the CIA, where he is cleared of all suspicion.
+
+Shortly afterwards, Hunt, now IMF team leader, (having replaced the traitorous Phelps) recruits John Clutter and Andrew Dowey for one final mission. The terrorist group from the first mission has returned, and the old team must go back to stop their plans once and for all by destroying their base entirely. The three manage to infiltrate the base by destroying key security features, and eventually manage to stop the terrorist group by killing their leader, Basil Prokosh. They escape by stealing a gunboat from the base, and manage to take out more key buildings, ensuring that they can't be used again. They finally escape their pursuers and meet Parker on top of a submarine, where she waits to take them back to IMF headquarters.

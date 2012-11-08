@@ -1,0 +1,193 @@
+Extreme-G XG2
+Platform: Nintendo 64
+Media: Cartridge
+Genre: Racing > Fantasy
+Release Year: 1998
+Developer: Probe Entertainment
+Publisher: Acclaim Entertainment
+Players: Single-player, multiplayer
+_________________________
+
+Gameplay
+
+This iteration, as with all Extreme-G games, is about futuristic racing: pilots race plasma-powered Tron-like bikes in an intergalactic Grand Prix at speeds that are over 999 mph. It is possible to break the sound barrier in this game, creating a sonic boom. While travelling at supersonic speeds, all game sounds are muted except the sound of the vehicle travelling. If the bike slows down to below supersonic speeds, another sonic boom can be heard and all game sounds will resume. The emphasis is on speed and creative racetrack design, with tracks looping through all three dimensions like roller coasters.
+
+The game's controls are fairly sensitive, so players may have to practice with a given machine before diving right into the Grand Prix. Visuals as well as the level layouts contribute to the immense speed of the game.
+
+Each of the machines have their own handling characteristics, with varying top speeds, armor values and traction values. All of the machines in the game have an energy meter - with two separate energy stores for protective shields and a basic primary weapon. If a machine loses all of its shield energy, it will explode on contact, causing the player to lose a life or the match. It is also possible for players to fall off the tracks when driving through jumps or similar obstacles. In this case, the player is simply teleported back to the track. Players are given three "Nitro" boosts per race.
+
+Extreme-G has a championship mode ranging from novice to expert, shoot-em-up mode (named "Arcade Mode" in XG2), multiplayer racing, and deathmatch. In shoot-em-up/arcade mode, computer drones follow a lunar path while the player attempts to destroy them with Extreme-G's arsenal of weapons. The idea came from Tron and Atari's Tempest 2000.
+
+Tracks
+
+Every race of the game takes place in one of 12 environment, each gathering 6 tracks (3 actual circuits plus a mirror version of each).
+
+The list below contains every environment, with the six tracks it includes.
+
+Aquanor :
+
+- The Harbour
+
+- Submarine Bay
+
+- Clifftops
+
+- ruobraH ehT
+
+- yaB enirambuS
+
+- spotffilC
+
+Sensara :
+
+- Skyline Drop
+
+- Crybridge Pass
+
+- Tubeway
+
+- porD enilykS
+
+- ssaP egdirbyrC
+
+- yawebuT
+
+Farron :
+
+- Fire Hazard
+
+- Mushroom Chicane
+
+- Corkscrew
+
+- drazaH eriF
+
+- enacihC moorhsuM
+
+- wercskroC
+
+Lumania :
+
+- Fountains
+
+- Pyramid
+
+- Landing Bay
+
+- sniatnuoF
+
+- dimaryP
+
+- yaB gnidnaL
+
+Mesa Virs :
+
+- Wind Farm
+
+- Harvest
+
+- Gleams
+
+- mraF dniW
+
+- tsevraH
+
+- smaelG
+
+Canous :
+
+- Mountain Pass
+
+- Lower Village
+
+- Chasm Crossing
+
+- ssaP niatnuoM
+
+- egalliV rewoL
+
+- gnissorC msahC
+
+Tethra :
+
+- G-Plains
+
+- Fault
+
+- Nocturne
+
+- snialP-G
+
+- tluaF
+
+- enrutcoN
+
+Anville :
+
+- Outlet 360
+
+- Hangar
+
+- Breakers
+
+- 063 teltuO
+
+- ragnaH
+
+- srekaerB
+
+Hydra Prime :
+
+- Underwater Base
+
+- Volcano
+
+- The Abyss
+
+- esaB retawrednU
+
+- onacloV
+
+- ssybA ehT
+
+Tox City :
+
+- Ventilator
+
+- Pulsar
+
+- Apex
+
+- rotalitneV
+
+- rasluP
+
+- xepA
+
+Cordilon :
+
+- Sulphur Lakes
+
+- The Mire
+
+- Crystal Forest
+
+- sekaL ruhpluS
+
+- eriM ehT
+
+- tseroF latsyrC
+
+Eschaton :
+
+- Glass Highway
+
+- Infernus
+
+- Burnout
+
+- yawhgiH ssalG
+
+- sunrefnI
+
+- tuonruB

@@ -1,0 +1,29 @@
+New Tetris, The
+Platform: Nintendo 64
+Media: Cartridge
+Genre: Puzzle > Block Pusher
+Release Year: 1999
+Developer: H2O Entertainment
+Publisher: Nintendo
+Players: Single-player, multiplayer
+Alternate Title: NEW TETRIS, THE
+_________________________
+
+The New Tetris is a puzzle video game for the Nintendo 64. The game was developed by H2O Entertainment and published by Nintendo, based on the latter's popular Tetris series. The game was originally released on July 31, 1999 in North America.
+
+The game is notable for showing scenic fly-bys of famous structures (for examples the Sphinx, the Pantheon, Saint Basil's Cathedral, a Mayan temple, and others) rendered in realtime. This is relatively difficult for the Nintendo 64 hardware to accomplish at the quality that is achieved. The New Tetris also features a multiplayer mode with up to four players and an ethnically themed electronic dance music soundtrack by Neil D. Voss, who also composed the award-winning music for Tetrisphere.
+
+Game differences
+
+There are several key differences in gameplay from the original Tetris. First, in addition to clearing lines, one can also form 4x4 large squares of four pieces to form 'blocks'. When a block is created, it turns solid gold or silver, depending on the makeup of the block-a block built from all the same kind of piece becomes a golden block or "monosquare", while any other combination becomes a silver block or "multisquare". Blocks can only be constructed from whole pieces: if any part of a piece has been cleared, then it cannot be used to form a block. When a line that has pieces from a block is cleared, it earns more points.[1]
+
+Second, in order to aid in the planning of building blocks, the game shows three upcoming pieces and has a "storage area" where a spare piece can be stored. If the piece in the storage area is more desirable than the currently falling piece, the player can press the L button to swap the currently falling piece with the stored piece.
+Screenshot of The New Tetris, demonstrating a strategy for building 4x4 squares.
+
+One other feature is that the rotation is much more flexible than in traditional Tetris games, trying several slight nudges, which players have called "wall kicks",[2] before finding one where the tetromino fits. Some of these compensations move the pieces away from walls even "over" other pieces. In fact, the game rewards players for performing these seemingly impossible "spin moves": If a line is cleared by doing a spin move, all the pieces above or below the spin move break apart into individual blocks and fall down, possibly clearing many lines and filling in empty spaces in the bottom portion of the play area. Unfortunately, the spin move process causes golden and silver blocks to become ordinary pieces again and so they no longer carry their multiplier when cleared.
+
+Tetris Worlds includes the rules of The New Tetris under the name "Square Tetris", with even more flexible wall kick rules, although the rule for what constitutes a spin move differs
+
+Trivia:
+
+The Lead programmer on The New Tetris, David Pridie, placed a secret hidden rant within the code which was dumped by hackers soon after the release of the game.

@@ -1,0 +1,30 @@
+Daikatana
+Platform: Nintendo 64
+Media: Cartridge
+Genre: Shooter > First Person
+Release Year: 2000
+Developer: Kemco
+Publisher: Kemco
+Players: Single-player, multiplayer
+Alternate Title: John Romero's Daikatana
+_________________________
+
+Plot
+
+Daikatana takes place during the year 2455 AD, in a world suffering from a major pandemic caused by a man named Kage Mishima. Through the use of a magical sword called the Daikatana, Mishima travelled back in time and prevented the disease from being cured, allowing him to take control of the world. The protagonist takes the form of a martial arts instructor named Hiro Miyamoto. Hiro, along with minor characters "Superfly Johnson" and Mikiko Ebihara, attempts to recover the Daikatana, travelling to an ancient Greece, medieval Norway, near future Los Angeles and futuristic Tokyo in the process.
+
+Gameplay
+
+Daikatana is composed of twenty-four levels divided into four episodes. The number of maps per level varies, but is generally about three. Each episode represents a different location and time period: futuristic Japan, ancient Greece, the Dark Ages in Norway and near-future San Francisco. Gameplay tends towards fast-paced combat, although an attempt at introducing problem-solving elements was also included.
+
+One element that Daikatana stressed was the important role of the protagonist's two "sidekicks". The death of these sidekicks resulted in the failure of the mission, and their assistance was sometimes required for the completion of puzzles. Due to poor AI implementation, the sidekicks, who were one of the game's selling points, became a focus of criticism
+
+Nintendo 64 version
+
+The Nintendo 64 version of Daikatana has received particularly harsh criticism. Since it was rushed through development (it was released about 3 months after the PC version), significant concessions were made, and many of the flaws of the PC version were retained.
+
+For one, the quality of the graphics was significantly lowered. In order to keep the frame-rate up, large amounts of fog were added to certain levels, particularly in Greece. The graphics were also blurred tremendously, possibly to hide low resolution textures. The level of blurriness increases yet further in the multiplayer mode as well, making it nearly unplayable.
+
+The characters Superfly Johnson and Mikiko Ebihara were completely removed from gameplay, yet they were retained in all of the cut scenes.
+
+The Daikatana sword of the title cannot, in this version, actually be used as a weapon.
