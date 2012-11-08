@@ -1,0 +1,19 @@
+Fighter's Destiny
+Platform: Nintendo 64
+Media: Cartridge
+Genre: VS Fighter
+Release Year: 1998
+Developer: Imagineer/Genki
+Publisher: Ocean Software Ltd.
+Players: Single-player, multiplayer
+_________________________
+
+Gameplay
+
+In Fighters Destiny, the player controls a polygon-based character in a three dimensional battle arena. The game features typical hand to hand combat fighting: using a variety of punches, kicks, locks, and throws, players attempt to pummel their opponents into submission. Each character also has a large list of special commands (called "moves") that can be accessed during battle. These different moves range from simply pressing the "B" button to inputting highly complicated button combinations.
+
+In most versus fighting games, the objective is to deplete the opponent's health gauge. Fighters Destiny follows the same concept but also relies on a customizable point scoring system to determine the winner. These points, which are displayed as yellow stars under the character's health gauge, can be earned in a variety of ways. By default, knocking the character off the fighting platform (a "Ring Out") is worth one point, taking down an opponent with a throw nets the player two points, while a typical K.O. is worth three points, as well as taking the opponent down with a counterattack, and executing a "special" is worth four points. Finally, if the adjustable time counter runs out, then the winner is awarded one point by virtue of judge's decision. By default setting, the first fighter to score seven points wins the match.
+
+K.O.'s can be achieved with instant-K.O. hits (referred to as "1-shot") or counterattack moves, or can be executed with a finishing blow when the player's opponent is in "Piyori condition," a brief spell of dizziness in which opponent's life bar has been drained completely and the fighter is allowed only limited control. "Specials" can only be executed when the opponent is in Piyori condition. If players are able to survive until Piyori condition passes, their health gauge refills completely. The health bar also refills continuously (albeit slowly) throughout the fight.
+
+Fighters Destiny offers five different gameplay modes. By playing the traditional versus computer mode, players can earn a new character (Boro) and learn new skills for their character. They can also select to fight against a second player, challenge their skills and gain new characters in "Record Attack," play through the "Master Challenge" to expand their character's command list, and train against a robot character. When players learn new skills playing the computer or the Master Challenge, they can save their character's expanded command list to the Controller Pak; afterwards, the new command list can be accessed in any mode to aid the player.

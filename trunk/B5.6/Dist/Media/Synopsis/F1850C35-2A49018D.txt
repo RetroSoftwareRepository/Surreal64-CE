@@ -1,0 +1,13 @@
+Micro Machines 64 Turbo
+Platform: Nintendo 64
+Media: Cartridge
+Genre: Racing
+Release Year: 1999
+Developer: Codemasters
+Publisher: Midway
+Players: Single-player, multiplayer
+_________________________
+
+Micro Machines 64 Turbo is a port of Micro Machines V3 for the Nintendo 64, with added extras.
+
+Up to 8 people can play simultaneously using what is called Pad Share, where one person uses one side of the controller, steering with the Directional pad, while the other player uses the four C-buttons. The vehicles accelerate automatically in these modes.
