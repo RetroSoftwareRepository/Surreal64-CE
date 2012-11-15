@@ -24,7 +24,7 @@
  *
  */
 #include <xtl.h>
-#include "Language.h"
+//#include "Language.h"
 
 /********************* Win32 Thread Timer ********************/
 
