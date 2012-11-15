@@ -293,13 +293,31 @@ output:   Values are return in the FrameBufferInfo structure
 /************************************************************************/
 void _VIDEO_FBGetFrameBufferInfo(void *pinfo);
 
+/******************************************************************
+  Function: ShowCFB
+  Purpose:  Useally once Dlists are started being displayed, cfb is
+            ignored. This function tells the dll to start displaying
+			them again.
+  input:    none
+  output:   none
+*******************************************************************/ 
+EXPORT void CALL _VIDEO_ShowCFB (void);
+
+/******************************************************************
+  Function: CaptureScreen
+  Purpose:  This function dumps the current frame to a file
+  input:    pointer to the directory to save the file to
+  output:   none
+*******************************************************************/ 
+EXPORT void CALL _VIDEO_CaptureScreen ( char * Directory );
+
 //void InitGraphicsPlugin(HINSTANCE hInstance);
 //void DestroyGraphicsPlugin();
 
 // Ez0n3 - reinstate max video mem until freakdave finishes this
 void	_VIDEO_SetMaxTextureMem(DWORD mem);
 
+
 #if defined(__cplusplus)
 }
 #endif
-

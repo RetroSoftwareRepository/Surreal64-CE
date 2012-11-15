@@ -271,6 +271,24 @@ typedef struct
 // not in 510? code from 531
 //void _VIDEO_FBGetFrameBufferInfo(void *pinfo);
 
+ /******************************************************************
+  Function: ShowCFB
+  Purpose:  Useally once Dlists are started being displayed, cfb is
+            ignored. This function tells the dll to start displaying
+			them again.
+  input:    none
+  output:   none
+*******************************************************************/ 
+void _VIDEO_ShowCFB (void);
+
+/******************************************************************
+  Function: CaptureScreen
+  Purpose:  This function dumps the current frame to a file
+  input:    pointer to the directory to save the file to
+  output:   none
+*******************************************************************/ 
+void _VIDEO_CaptureScreen ( char * Directory );
+
  void	_VIDEO_SetMaxTextureMem(DWORD mem);
 
 //void InitGraphicsPlugin(HINSTANCE hInstance);
