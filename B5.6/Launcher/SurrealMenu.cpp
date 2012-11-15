@@ -447,8 +447,8 @@ void ToggleCredits()
 	while(!bquit)
 	{
 		DrawCredits();
-		if(g_Gamepads->bLastAnalogButtons[XINPUT_GAMEPAD_A]) FSTxtPos = FSTxtPos - 1.5;
-		else FSTxtPos = FSTxtPos - 0.5;
+		if(g_Gamepads->bLastAnalogButtons[XINPUT_GAMEPAD_A]) FSTxtPos = FSTxtPos - 1.5f;
+		else FSTxtPos = FSTxtPos - 0.5f;
 		if(g_Gamepads->bPressedAnalogButtons[XINPUT_GAMEPAD_B]) bquit = true;
 		XBInput_GetInput();
 		g_pd3dDevice->Present( NULL, NULL, NULL, NULL );
