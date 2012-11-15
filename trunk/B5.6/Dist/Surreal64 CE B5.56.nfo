@@ -1,9 +1,8 @@
-Surreal64 CE B5.52
-by: Ez0n3, freakdave, & weinerschnitzel
-surreal64ce.wikidot.com
+Surreal64 CE B5.6 SVN
+by: Ez0n3, freakdave & weinerschnitzel
+surreal64ce.sf.net
 
-Surreal64 CE is a continuation of the Surreal64 project where Team XXX left off. Originally developed by oDD and Lantus, Surreal64 included ports of three Win32 based Nintendo64 emulators including 1964, Project64 and UltraHLE. Our goal is to improve Nintendo64 emulation on the XBOX 
-with the addition of:
+Surreal64 CE is a continuation of the Surreal64 project where Team XXX left off. Originally developed by oDD and Lantus, Surreal64 included ports of three Win32 based Nintendo64 emulators including 1964, Project64 and UltraHLE. Our goal is to improve Nintendo64 emulation on the XBOX with the addition of:
 
 - New or updated N64 emulators 
 - New or updated video, audio and RSP plugins
@@ -75,3 +74,6 @@ Other:
 B5.52 Additions:
 * Trigonometric analog sensitivity
 * Software Vertex Clipper for Rice 6.11 & Rice 6.12
+
+B5.6 Additions
+* Project64 1.6 core update

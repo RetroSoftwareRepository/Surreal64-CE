@@ -980,9 +980,47 @@ EXPORT void CALL _VIDEO_FBGetFrameBufferInfo(void *p)
 //}
 
 // Plugin spec 1.3 functions
-void CALL _VIDEO_ShowCFB (void)
+EXPORT void CALL _VIDEO_ShowCFB (void)
 {
 	status.toShowCFB = true;
+}
+
+EXPORT void CALL _VIDEO_CaptureScreen ( char * Directory )
+{
+#ifndef _XBOX
+	if( status.bGameIsRunning && status.gDlistCount > 0 )
+	{
+		if( !PathFileExists(Directory) )
+		{
+			if( !CreateDirectory(Directory, NULL) )
+			{
+				//DisplayError("Can not create new folder: %s", pathname);
+				return;
+			}
+		}
+
+		strcpy(status.screenCaptureFilename, Directory);
+		if( Directory[strlen(Directory)-1] != '\\' && Directory[strlen(Directory)-1] != '/'  )
+		{
+			strcat(status.screenCaptureFilename,"\\");
+		}
+		
+		strcat(status.screenCaptureFilename, g_curRomInfo.szGameName);
+
+		char tempname[MAX_PATH];
+		for( int i=0; ; i++)
+		{
+			sprintf(tempname, "%s-%d.bmp", status.screenCaptureFilename, i);
+			if( !PathFileExists(tempname) )
+			{
+				break;
+			}
+		}
+
+		strcpy(status.screenCaptureFilename, tempname);
+		status.toCaptureScreen = true;
+	}
+#endif
 }
 
 void _VIDEO_SetMaxTextureMem(DWORD mem)
