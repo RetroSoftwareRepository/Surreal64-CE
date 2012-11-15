@@ -290,7 +290,7 @@ unsigned char *codepnt;
 unsigned codeseg;
 long codeoff;
 
-static percent(char c, char t);
+static void percent(char c, char t);
 
 void uprintf(char *s,...)
 {
@@ -610,7 +610,7 @@ void do_modrm(char t)
   uprintf("%c",']');
 }
 
-static floating_point(int e1)
+static void floating_point(int e1)
 {
   int esc = e1*8 + reg(modrm());
   if (mod(modrm()) == 3)
@@ -639,7 +639,7 @@ static floating_point(int e1)
   }
 }
 
-static percent(char c, char t)
+static void percent(char c, char t)
 {
   word32 vofs;
   long l;

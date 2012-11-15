@@ -5942,7 +5942,7 @@ void rdp_copybackground(dword base,int wid,int hig)
                     buf[x+y*256][0]=FIELD(d,11,5)*8;
                     buf[x+y*256][1]=FIELD(d, 6,5)*8;
                     buf[x+y*256][2]=FIELD(d, 1,5)*8;
-                    buf[x+y*256][3]=0xFF;
+                    buf[x+y*256][3]=(char)0xFF;
                 }
             }
 

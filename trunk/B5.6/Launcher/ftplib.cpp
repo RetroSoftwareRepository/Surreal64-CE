@@ -438,9 +438,9 @@ int ftplib::Connect(const char *host)
 	int sControl;
 	struct sockaddr_in sin;
 	struct hostent *phe;
-	struct servent *pse;
+//	struct servent *pse;
 	int on=1;
-	int ret;
+//	int ret;
 	char *lhost;
 	char *pnum;
 	
@@ -658,7 +658,8 @@ int ftplib::FtpAcceptConnection(ftphandle *nData, ftphandle *nControl)
 int ftplib::FtpAccess(const char *path, accesstype type, transfermode mode, ftphandle *nControl, ftphandle **nData)
 {
 	char buf[256];
-	int dir, ret;
+	int dir;
+   //int ret;
 
 	if ((path == NULL) && ((type == ftplib::filewrite)
 		|| (type == ftplib::fileread)
