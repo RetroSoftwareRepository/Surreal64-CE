@@ -234,7 +234,7 @@ void TakeScreenshot()
 	//This is broken - freakdave
 	
 	//Ez0n3 - remove invalid chars from romname for screenshot path - fixes problem with ss dir using ftp (exists, but not accessible)
-	char romnamess[42];
+	short romnamess[42];
 	for (int i=0;i<=42;i++){
 		if (romname[i]=='<' || romname[i]=='>' || romname[i]=='=' || romname[i]=='?' || romname[i]==':' || romname[i]==';' || romname[i]=='*' || romname[i]=='+' || romname[i]==',' || romname[i]=='/' || romname[i]=='|') romnamess[i] = '_';
 		else if (romname[i]=='\0' || romname[i]=='\t' || romname[i]=='\n' || i>=42) { romnamess[i]='\0'; break; }
