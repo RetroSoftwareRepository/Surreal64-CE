@@ -33,7 +33,8 @@
 #include "cheats.h"
 #include "debugger.h"
 #include "plugin.h"
-#include "resource.h" 
+#include "resource.h"
+extern void GameSpecificHackSetup();
 
 #define uint8  unsigned __int8
 
@@ -1145,6 +1146,7 @@ void RefreshScreen (void ){
 	//if (Profiling) { StartTimer("RefreshScreen: Cheats"); }
 	//if ((STATUS_REGISTER & STATUS_IE) != 0 ) { ApplyCheats(); }
 	//if (Profiling || ShowCPUPer) { StartTimer(Label); }
+	GetGameSpecificHack();
 }
 
 void RunRsp (void) {
@@ -1266,6 +1268,7 @@ void StartEmulation ( void ) {
 	Timer_Start();
 	LoadRomOptions();
 	LoadCheats();
+	GameSpecificHackSetup();
 	if (Profiling) { ResetTimerList(); }
 	strcpy(ProfilingLabel,"");
 	strcpy(LoadFileName,"");

@@ -45,6 +45,7 @@ int InitalizeApplication ( HINSTANCE hInstance );
 // XBOX - Surreal64 linked functions
 extern void _VIDEO_SetMaxTextureMem(DWORD mem);
 extern void _INPUT_LoadButtonMap(int *cfgData);
+extern void *GetGameSpecificHack();
 void Enable128MegCaching( void );
 
 LARGE_INTEGER Frequency, Frames[NoOfFrames], LastFrame;
