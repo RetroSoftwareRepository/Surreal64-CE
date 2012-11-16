@@ -368,6 +368,9 @@
 					RelativePath="FlashRam.c">
 				</File>
 				<File
+					RelativePath=".\gamehacks.c">
+				</File>
+				<File
 					RelativePath="Mapping.c">
 				</File>
 				<File

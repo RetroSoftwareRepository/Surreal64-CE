@@ -68,8 +68,8 @@
 				Name="XboxImageTool"
 				FileName="$(TargetDir)/PJ64-510M.xbe"
 				StackSize="131072"
-				DontMountUD="FALSE"
 				IncludeDebugInfo="TRUE"
+				DontMountUD="FALSE"
 				NoLibWarn="TRUE"
 				TitleID="0x64CE64CE"
 				TitleName="Surreal 64 CE - PJ64x ($(ConfigurationName))"/>
@@ -366,6 +366,9 @@
 				</File>
 				<File
 					RelativePath="FlashRam.c">
+				</File>
+				<File
+					RelativePath=".\gamehacks.c">
 				</File>
 				<File
 					RelativePath="Mapping.c">
