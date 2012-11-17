@@ -1146,7 +1146,7 @@ void RefreshScreen (void ){
 	//if (Profiling) { StartTimer("RefreshScreen: Cheats"); }
 	//if ((STATUS_REGISTER & STATUS_IE) != 0 ) { ApplyCheats(); }
 	//if (Profiling || ShowCPUPer) { StartTimer(Label); }
-	GetGameSpecificHack(); //fd: C4013
+	GetGameSpecificHack(); //fd: C4013 ??
 }
 
 void RunRsp (void) {
