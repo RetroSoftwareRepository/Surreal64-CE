@@ -79,6 +79,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Video5.60", "Plugins\src\Vi
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Mupen64PlusX", "Mupen64PlusX\Mupen64PlusX 5.60.vcproj", "{EDE752AF-198B-4D78-BFE4-5CFA4AF86997}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfiguration) = preSolution
 		Debug = Debug
@@ -218,6 +222,16 @@ Global
 		{287AC49D-8C32-4187-A7DA-F2273AF2C4F5}.Release.Build.0 = Release|Xbox
 		{287AC49D-8C32-4187-A7DA-F2273AF2C4F5}.Release_LTCG.ActiveCfg = Release|Xbox
 		{287AC49D-8C32-4187-A7DA-F2273AF2C4F5}.Release_LTCG.Build.0 = Release|Xbox
+		{EDE752AF-198B-4D78-BFE4-5CFA4AF86997}.Debug.ActiveCfg = Debug|Xbox
+		{EDE752AF-198B-4D78-BFE4-5CFA4AF86997}.Debug.Build.0 = Debug|Xbox
+		{EDE752AF-198B-4D78-BFE4-5CFA4AF86997}.Profile.ActiveCfg = Profile|Xbox
+		{EDE752AF-198B-4D78-BFE4-5CFA4AF86997}.Profile.Build.0 = Profile|Xbox
+		{EDE752AF-198B-4D78-BFE4-5CFA4AF86997}.Profile_FastCap.ActiveCfg = Profile_FastCap|Xbox
+		{EDE752AF-198B-4D78-BFE4-5CFA4AF86997}.Profile_FastCap.Build.0 = Profile_FastCap|Xbox
+		{EDE752AF-198B-4D78-BFE4-5CFA4AF86997}.Release.ActiveCfg = Release|Xbox
+		{EDE752AF-198B-4D78-BFE4-5CFA4AF86997}.Release.Build.0 = Release|Xbox
+		{EDE752AF-198B-4D78-BFE4-5CFA4AF86997}.Release_LTCG.ActiveCfg = Release_LTCG|Xbox
+		{EDE752AF-198B-4D78-BFE4-5CFA4AF86997}.Release_LTCG.Build.0 = Release_LTCG|Xbox
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection

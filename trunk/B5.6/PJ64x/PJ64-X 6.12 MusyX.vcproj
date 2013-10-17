@@ -291,12 +291,12 @@
 			WholeProgramOptimization="TRUE">
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="3"
-				GlobalOptimizations="TRUE"
-				InlineFunctionExpansion="2"
+				Optimization="0"
+				GlobalOptimizations="FALSE"
+				InlineFunctionExpansion="0"
 				EnableIntrinsicFunctions="FALSE"
 				ImproveFloatingPointConsistency="FALSE"
-				FavorSizeOrSpeed="1"
+				FavorSizeOrSpeed="0"
 				OmitFramePointers="TRUE"
 				EnableFiberSafeOptimizations="TRUE"
 				OptimizeForProcessor="2"
