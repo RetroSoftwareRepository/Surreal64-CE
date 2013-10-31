@@ -404,7 +404,7 @@ void ReadConfiguration(void)
 		options.bUseFullTMEM = TRUE;
 
 		options.bForceSoftwareTnL = FALSE; //FALSE;
-		options.bForceSoftwareClipper = FALSE;
+		options.bForceSoftwareClipper = bUseLinFog;
 
 		options.bEnableVertexShader = FALSE;
 		options.RenderBufferSetting=0;

@@ -118,6 +118,7 @@ void VideoSettingsMenu();
 void ToggleTextureFilter(bool inc);
 void ToggleSoftDisplayFilter();
 void ToggleFrameSkip();
+void ToggleFogMode();
 void ToggleSensitivity(bool inc);
 void ToggleDeadzone(bool inc);
 void ControllerSettingsMenu();
@@ -865,7 +866,7 @@ void VideoSettingsMenu(void)
 
     WCHAR currentname[120];
 
-	m_pSettingsMenu = XLMenu_Init((float)iIGMMenuTxtPosX,(float)iIGMMenuTxtPosY,5, GetMenuFontAlign(iIGMMenuTxtAlign)|MENU_WRAP, NULL);
+	m_pSettingsMenu = XLMenu_Init((float)iIGMMenuTxtPosX,(float)iIGMMenuTxtPosY,6, GetMenuFontAlign(iIGMMenuTxtAlign)|MENU_WRAP, NULL);
 
 	m_pSettingsMenu->itemcolor = dwMenuItemColor;
 	m_pSettingsMenu->parent = m_pMainMenu;
@@ -903,6 +904,13 @@ void VideoSettingsMenu(void)
 	else 
 	swprintf(currentname,L"Skip Frames : Yes");
 	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,currentname,ToggleFrameSkip);
+
+	//Fog Mode
+	if (!bUseLinFog)
+	swprintf(currentname,L"Fog Mode : Range");
+	else 
+	swprintf(currentname,L"Fog Mode : Linear");
+	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,currentname,ToggleFogMode);
 
 	XLMenu_Activate(m_pSettingsMenu);
 
@@ -979,6 +987,23 @@ void ToggleFrameSkip()
 	swprintf(currentname,L"Skip Frames : No");
 	else 
 	swprintf(currentname,L"Skip Frames : Yes");
+	XLMenu_SetItemText(&m_pSettingsMenu->items[currentItem], currentname);
+
+	ConfigAppSave2();
+}
+
+void ToggleFogMode()
+{
+    WCHAR currentname[120];
+	currentItem = m_pSettingsMenu->curitem;
+	bUseLinFog =! bUseLinFog;
+	
+	XLMenu_CurRoutine = NULL;
+	
+  	if (!bUseLinFog)
+	swprintf(currentname,L"Fog Mode : Range");
+	else 
+	swprintf(currentname,L"Fog Mode : Linear");
 	XLMenu_SetItemText(&m_pSettingsMenu->items[currentItem], currentname);
 
 	ConfigAppSave2();

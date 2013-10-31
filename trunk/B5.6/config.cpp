@@ -108,6 +108,7 @@ int AntiAliasMode = 0;
 int VertexMode = 2; // default hardware
 bool FrameSkip = FALSE;
 int VSync = INTERVAL_IMMEDIATE; //see D3D_PresentParameters (PresentationIntervals)
+bool bUseLinFog = FALSE;
 //int RefreshRateInHz = 60;
 float XBOX_CONTROLLER_DEAD_ZONE = 8600; // also change in SurrealMenu.cpp
 float Deadzone = 26;
@@ -367,6 +368,7 @@ void ResetDefaults()
 	FrameSkip = FALSE;
 	bEnableHDTV = false;
 	bFullScreen = false;
+	bUseLinFog = false;
 	EnableController1 = true;
 	EnableController2 = true;
 	EnableController3 = true; // this was false in launcher config
@@ -530,6 +532,7 @@ int ConfigAppSave2()
 	ini.SetLongValue("Settings", "AntiAliasMode", AntiAliasMode);
 	ini.SetBoolValue("Settings", "SoftDisplayFilter", SoftDisplayFilter);
 	ini.SetBoolValue("Settings", "FrameSkip", FrameSkip);
+	ini.SetBoolValue("Settings", "LinearFog", bUseLinFog);
 	ini.SetBoolValue("Settings", "EnableController1", EnableController1);
 	ini.SetBoolValue("Settings", "EnableController2", EnableController2);
 	ini.SetBoolValue("Settings", "EnableController3", EnableController3);
@@ -645,6 +648,7 @@ int ConfigAppLoad2()
 	AntiAliasMode = ini.GetLongValue("Settings", "AntiAliasMode", AntiAliasMode );
 	SoftDisplayFilter = ini.GetBoolValue("Settings", "SoftDisplayFilter", SoftDisplayFilter );
 	FrameSkip = ini.GetBoolValue("Settings", "FrameSkip", FrameSkip );
+	bUseLinFog = ini.GetBoolValue("Settings", "LinearFog", bUseLinFog );
 	EnableController1 = ini.GetBoolValue("Settings", "EnableController1", EnableController1 );
 	EnableController2 = ini.GetBoolValue("Settings", "EnableController2", EnableController2 );
 	EnableController3 = ini.GetBoolValue("Settings", "EnableController3", EnableController3 );

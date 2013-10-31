@@ -197,7 +197,7 @@
 				EnableFiberSafeOptimizations="TRUE"
 				OptimizeForProcessor="2"
 				AdditionalIncludeDirectories="..\..\..\Include"
-				PreprocessorDefinitions="NDEBUG;_XBOX;_LIB;LTCG"
+				PreprocessorDefinitions="NDEBUG;_XBOX;_LIB;LTCG;_OLDCLIPPER"
 				StringPooling="TRUE"
 				RuntimeLibrary="0"
 				BufferSecurityCheck="FALSE"

@@ -163,15 +163,17 @@ bool D3DRender::InitDeviceObjects()
 	gD3DDevWrapper.SetRenderState( D3DRS_TEXTUREFACTOR, 0xFFFFFFFF );
 
 	gD3DDevWrapper.SetRenderState( D3DRS_FOGENABLE, FALSE);
-	gD3DDevWrapper.SetRenderState( D3DRS_FOGCOLOR, gRDP.fogColor );
-	//float density = 1.0f;
-	//gD3DDevWrapper.SetRenderState(D3DRS_FOGDENSITY,   *(uint32 *)(&density));
-	//gD3DDevWrapper.SetRenderState(D3DRS_RANGEFOGENABLE, TRUE);
-//#ifdef _XBOX
-	//gD3DDevWrapper.SetRenderState( D3DRS_FOGTABLEMODE, D3DFOG_NONE );
-//#else
-	//gD3DDevWrapper.SetRenderState( D3DRS_FOGTABLEMODE, D3DFOG_LINEAR );
-//#endif
+	//gD3DDevWrapper.SetRenderState( D3DRS_FOGCOLOR, gRDP.fogColor );
+	float density = 1.0f;
+	gD3DDevWrapper.SetRenderState(D3DRS_FOGDENSITY,   *(uint32 *)(&density));
+#ifdef _XBOX
+	if(bUseLinFog)
+		gD3DDevWrapper.SetRenderState( D3DRS_FOGTABLEMODE, D3DFOG_LINEAR );
+	else
+		gD3DDevWrapper.SetRenderState(D3DRS_RANGEFOGENABLE, TRUE);
+#else
+	gD3DDevWrapper.SetRenderState( D3DRS_FOGTABLEMODE, D3DFOG_LINEAR );
+#endif
 
 	// Dafault is ZBuffer disabled
 	gD3DDevWrapper.SetRenderState(D3DRS_ZENABLE, m_dwrsZEnable );
@@ -718,7 +720,7 @@ void D3DRender::SetAlphaTestEnable(BOOL bAlphaTestEnable)
 extern float HackZ(float z);
 void D3DRender::SetFogMinMax(float fMin, float fMax)
 {
-	float fmin = fMin/1000;
+	/*float fmin = fMin/1000;
 	float fmax = fMax/1000;
 	g_pD3DDev->SetRenderState(D3DRS_FOGSTART, *(DWORD *)(&fmin));
 	g_pD3DDev->SetRenderState(D3DRS_FOGEND,   *(DWORD *)(&fmax));
@@ -726,7 +728,7 @@ void D3DRender::SetFogMinMax(float fMin, float fMax)
 
 	//g_pD3DDev->SetRenderState(D3DRS_FOGSTART, *(DWORD *)(&gRSPfFogMin));
 	//g_pD3DDev->SetRenderState(D3DRS_FOGEND,   *(DWORD *)(&gRSPfFogMax));
-	/*
+	*/
 	if( g_curRomInfo.bZHack )
 	{
 		float minf = HackZ(gRSPfFogMin);
@@ -739,7 +741,7 @@ void D3DRender::SetFogMinMax(float fMin, float fMax)
 		gD3DDevWrapper.SetRenderState(D3DRS_FOGSTART, *(uint32 *)(&gRSPfFogMin));
 		gD3DDevWrapper.SetRenderState(D3DRS_FOGEND,   *(uint32 *)(&gRSPfFogMax));
 	}
-	*/
+	
 	FOG_DUMP(TRACE2("D3D Set Fog: min = %f, max = %f", gRSPfFogMin, gRSPfFogMax));
 }
 
@@ -771,9 +773,10 @@ void D3DRender::SetFogEnable(bool bEnable)
 		gD3DDevWrapper.SetRenderState( D3DRS_FOGENABLE, TRUE);
 		gD3DDevWrapper.SetRenderState(D3DRS_FOGCOLOR, gRDP.fogColor);
 #ifdef _XBOX
-		gD3DDevWrapper.SetRenderState(D3DRS_RANGEFOGENABLE, TRUE);
+		if(!bUseLinFog)
+			gD3DDevWrapper.SetRenderState(D3DRS_RANGEFOGENABLE, TRUE);
 #endif
-		/*
+		
 		if( g_curRomInfo.bZHack )
 		{
 			float minf = HackZ(gRSPfFogMin);
@@ -785,7 +788,7 @@ void D3DRender::SetFogEnable(bool bEnable)
 		{
 			gD3DDevWrapper.SetRenderState(D3DRS_FOGSTART, *(uint32 *)(&gRSPfFogMin));
 			gD3DDevWrapper.SetRenderState(D3DRS_FOGEND,   *(uint32 *)(&gRSPfFogMax));
-		}*/
+		}
 	}
 	else
 	{
