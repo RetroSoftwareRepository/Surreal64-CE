@@ -174,7 +174,7 @@ void ChangeWindowStep2()
 	g_CritialSection.Lock();
 	windowSetting.bDisplayFullscreen = CGraphicsContext::Get()->ToggleFullscreen();
 
-	if( windowSetting.bDisplayFullscreen )
+	/*if( windowSetting.bDisplayFullscreen )
 	{
 		if( g_GraphicsInfo.hStatusBar != NULL )
 		{
@@ -189,7 +189,7 @@ void ChangeWindowStep2()
 			ShowWindow(g_GraphicsInfo.hStatusBar, SW_SHOW);
 		}
 		ShowCursor(TRUE);
-	}
+	}*/
 
 	CGraphicsContext::Get()->Clear(CLEAR_COLOR_AND_DEPTH_BUFFER);
 	CGraphicsContext::Get()->UpdateFrame();

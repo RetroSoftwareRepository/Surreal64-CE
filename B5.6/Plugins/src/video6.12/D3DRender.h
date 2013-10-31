@@ -83,7 +83,11 @@ public:
 
 	inline void SetTextureFactor(uint32 dwCol)
 	{
+	if (m_dwTextureFactor != dwCol)
+		{
+			m_dwTextureFactor = dwCol;
 		gD3DDevWrapper.SetRenderState(D3DRS_TEXTUREFACTOR, dwCol);
+		}
 	}
 
 
@@ -118,6 +122,8 @@ public:
 
 
 protected:
+	D3DCombinerStage m_D3DCombStages[8];
+	DWORD m_dwTextureFactor;
 	uint32 m_dwrsZEnable;
 	uint32 m_dwrsZWriteEnable;
 	uint32 m_dwrsSrcBlend;

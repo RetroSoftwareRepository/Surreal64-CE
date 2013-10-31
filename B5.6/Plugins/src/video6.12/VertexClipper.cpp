@@ -27,7 +27,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 //////////////////////////////////////////////////////////////////////////
 
-#ifndef _XBOX
+#ifndef _OLDCLIPPER
 
 void CopyVertexData(int oriidx, TLITVERTEX *oribuf, int dstidx, TLITVERTEX *dstbuf)
 {
@@ -985,9 +985,9 @@ void ClipVertexes()
 		if( g_clippedVtxBuffer[m].z < 0 ) g_clippedVtxBuffer[m].z = 0;
 	}
 }
+#endif
 
-
-//#ifndef _XBOX
+#ifndef _XBOX
 void ClipVertexesOpenGL()
 {
 	ClipVertexes();
@@ -1005,8 +1005,9 @@ void ClipVertexesOpenGL()
 		g_vtxProjected5Clipped[i][4] = v.z;
 	}
 }
-//#endif
+#endif
 
+#ifndef _OLDCLIPPER
 void ClipVertexesForRect()
 {
 	if( options.bForceSoftwareTnL && (windowSetting.clipping.left > 0 || windowSetting.clipping.top > 0) )

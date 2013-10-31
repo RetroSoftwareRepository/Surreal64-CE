@@ -25,6 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // Constructors / Deconstructors
 
 // Probably shouldn't need more than 4096 * 4096
+BYTE g_ucTempBuffer[1024*1024*4];
 
 CTexture::CTexture(uint32 dwWidth, uint32 dwHeight, TextureUsage usage) :
 	m_pTexture(NULL),
@@ -77,7 +78,7 @@ uint32 CTexture::GetPixelSize()
 // limition
 void CTexture::ScaleImageToSurface(bool scaleS, bool scaleT)
 {
-	uint8 g_ucTempBuffer[1024*1024*4];
+	//uint8 g_ucTempBuffer[1024*1024*4];
 
 	if( scaleS==false && scaleT==false)	return;
 

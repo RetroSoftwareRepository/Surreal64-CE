@@ -41,10 +41,9 @@ void myVec3Transform(float *vecout, float *vecin, float* m);
 // All these arrays are moved out of the class CRender
 // to be accessed in faster speed
 extern D3DXVECTOR4	g_vecProjected[MAX_VERTS];
-#ifndef _XBOX
+
 extern FLOAT		g_vtxProjected5[1000][5];
 extern float		g_vtxProjected5Clipped[2000][5];
-#endif
 extern VECTOR2		g_fVtxTxtCoords[MAX_VERTS];
 extern uint32		g_dwVtxDifColor[MAX_VERTS];
 //extern uint32		g_dwVtxFlags[MAX_VERTS];			// Z_POS Z_NEG etc
@@ -130,6 +129,9 @@ typedef struct
 
 	uint32	ambientLightColor;
 	uint32	ambientLightIndex;
+
+	float	fFogMul;
+	float	fFogOffset;
 
 	uint32	projectionMtxTop;
 	uint32	modelViewMtxTop;
@@ -256,7 +258,7 @@ void SetVertexXYZ(uint32 vertex, float x, float y, float z);
 void ModifyVertexInfo(uint32 where, uint32 vertex, uint32 val);
 void ProcessVertexDataDKR(uint32 dwAddr, uint32 dwV0, uint32 dwNum);
 void SetLightCol(uint32 dwLight, uint32 dwCol);
-void SetLightDirection(uint32 dwLight, float x, float y, float z, float range);
+void SetLightDirection(uint32 dwLight, float x, float y, float z);
 void ForceMainTextureIndex(int dwTile); 
 void UpdateCombinedMatrix();
 

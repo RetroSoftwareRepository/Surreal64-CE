@@ -48,6 +48,30 @@ D3DRender::D3DRender()
 	m_dwrsZEnable=D3DZB_FALSE;
 	m_dwrsZWriteEnable=FALSE;
 
+	memset(&m_D3DCombStages, 0, sizeof(D3DCombinerStage)*8);
+
+	for (int i = 0; i < 8; i++)
+	{
+		m_D3DCombStages[i].dwColorOp = D3DTOP_DISABLE;
+		m_D3DCombStages[i].dwColorArg1 = D3DTA_CURRENT;
+		m_D3DCombStages[i].dwColorArg2 = D3DTA_CURRENT;
+		m_D3DCombStages[i].dwColorArg0 = D3DTA_CURRENT;
+		m_D3DCombStages[i].dwAlphaOp = D3DTOP_DISABLE;
+		m_D3DCombStages[i].dwAlphaArg1 = D3DTA_CURRENT;
+		m_D3DCombStages[i].dwAlphaArg2 = D3DTA_CURRENT;
+		m_D3DCombStages[i].dwAlphaArg0 = D3DTA_CURRENT;
+
+		m_D3DCombStages[i].dwMinFilter = D3DTEXF_NONE;
+		m_D3DCombStages[i].dwMagFilter = D3DTEXF_NONE;
+
+		m_D3DCombStages[i].dwAddressUMode = 0;
+		m_D3DCombStages[i].dwAddressVMode = 0;
+		m_D3DCombStages[i].dwAddressW = 0xFFFF;
+
+		m_D3DCombStages[i].dwTexCoordIndex = 0xFFFF;
+		m_D3DCombStages[i].pTexture = NULL;
+	}
+
 	m_Mux = 0;
 	memset(&m_curCombineInfo, 0, sizeof( m_curCombineInfo) );
 
@@ -139,11 +163,12 @@ bool D3DRender::InitDeviceObjects()
 	gD3DDevWrapper.SetRenderState( D3DRS_TEXTUREFACTOR, 0xFFFFFFFF );
 
 	gD3DDevWrapper.SetRenderState( D3DRS_FOGENABLE, FALSE);
-	float density = 1.0f;
-	gD3DDevWrapper.SetRenderState(D3DRS_FOGDENSITY,   *(uint32 *)(&density));
-	gD3DDevWrapper.SetRenderState(D3DRS_RANGEFOGENABLE, TRUE);
+	gD3DDevWrapper.SetRenderState( D3DRS_FOGCOLOR, gRDP.fogColor );
+	//float density = 1.0f;
+	//gD3DDevWrapper.SetRenderState(D3DRS_FOGDENSITY,   *(uint32 *)(&density));
+	//gD3DDevWrapper.SetRenderState(D3DRS_RANGEFOGENABLE, TRUE);
 //#ifdef _XBOX
-	gD3DDevWrapper.SetRenderState( D3DRS_FOGTABLEMODE, D3DFOG_NONE );
+	//gD3DDevWrapper.SetRenderState( D3DRS_FOGTABLEMODE, D3DFOG_NONE );
 //#else
 	//gD3DDevWrapper.SetRenderState( D3DRS_FOGTABLEMODE, D3DFOG_LINEAR );
 //#endif
@@ -157,6 +182,29 @@ bool D3DRender::InitDeviceObjects()
 
 	m_dwrsZEnable=D3DZB_FALSE;
 	m_dwrsZWriteEnable=FALSE;
+
+	memset(&m_D3DCombStages, 0, sizeof(D3DCombinerStage)*8);
+
+	for (int i = 0; i < 8; i++)
+	{
+		m_D3DCombStages[i].dwColorOp = D3DTOP_DISABLE;
+		m_D3DCombStages[i].dwColorArg1 = D3DTA_CURRENT;
+		m_D3DCombStages[i].dwColorArg2 = D3DTA_CURRENT;
+		m_D3DCombStages[i].dwColorArg0 = D3DTA_CURRENT;
+		m_D3DCombStages[i].dwAlphaOp = D3DTOP_DISABLE;
+		m_D3DCombStages[i].dwAlphaArg1 = D3DTA_CURRENT;
+		m_D3DCombStages[i].dwAlphaArg2 = D3DTA_CURRENT;
+		m_D3DCombStages[i].dwAlphaArg0 = D3DTA_CURRENT;
+
+		m_D3DCombStages[i].dwMinFilter = D3DTEXF_NONE;
+		m_D3DCombStages[i].dwMagFilter = D3DTEXF_NONE;
+
+		m_D3DCombStages[i].dwAddressUMode = 0xFFFF;
+		m_D3DCombStages[i].dwAddressVMode = 0xFFFF;
+		m_D3DCombStages[i].dwAddressW = 0xFFFF;
+
+		m_D3DCombStages[i].dwTexCoordIndex = 0xFFFF;
+	}
 
 	m_Mux = 0;
 	memset(&m_curCombineInfo, 0, sizeof( m_curCombineInfo) );
@@ -200,7 +248,7 @@ bool D3DRender::InitDeviceObjects()
 	
 	((CDirectXColorCombiner*)m_pColorCombiner)->Initialize();
 	
-	status.curScissor = UNKNOWN_SCISSOR;
+	//status.curScissor = UNKNOWN_SCISSOR;
 
 	if( gVertexShader != NULL )
 	{
@@ -670,6 +718,15 @@ void D3DRender::SetAlphaTestEnable(BOOL bAlphaTestEnable)
 extern float HackZ(float z);
 void D3DRender::SetFogMinMax(float fMin, float fMax)
 {
+	float fmin = fMin/1000;
+	float fmax = fMax/1000;
+	g_pD3DDev->SetRenderState(D3DRS_FOGSTART, *(DWORD *)(&fmin));
+	g_pD3DDev->SetRenderState(D3DRS_FOGEND,   *(DWORD *)(&fmax));
+	
+
+	//g_pD3DDev->SetRenderState(D3DRS_FOGSTART, *(DWORD *)(&gRSPfFogMin));
+	//g_pD3DDev->SetRenderState(D3DRS_FOGEND,   *(DWORD *)(&gRSPfFogMax));
+	/*
 	if( g_curRomInfo.bZHack )
 	{
 		float minf = HackZ(gRSPfFogMin);
@@ -682,6 +739,7 @@ void D3DRender::SetFogMinMax(float fMin, float fMax)
 		gD3DDevWrapper.SetRenderState(D3DRS_FOGSTART, *(uint32 *)(&gRSPfFogMin));
 		gD3DDevWrapper.SetRenderState(D3DRS_FOGEND,   *(uint32 *)(&gRSPfFogMax));
 	}
+	*/
 	FOG_DUMP(TRACE2("D3D Set Fog: min = %f, max = %f", gRSPfFogMin, gRSPfFogMax));
 }
 
@@ -715,6 +773,7 @@ void D3DRender::SetFogEnable(bool bEnable)
 #ifdef _XBOX
 		gD3DDevWrapper.SetRenderState(D3DRS_RANGEFOGENABLE, TRUE);
 #endif
+		/*
 		if( g_curRomInfo.bZHack )
 		{
 			float minf = HackZ(gRSPfFogMin);
@@ -726,7 +785,7 @@ void D3DRender::SetFogEnable(bool bEnable)
 		{
 			gD3DDevWrapper.SetRenderState(D3DRS_FOGSTART, *(uint32 *)(&gRSPfFogMin));
 			gD3DDevWrapper.SetRenderState(D3DRS_FOGEND,   *(uint32 *)(&gRSPfFogMax));
-		}
+		}*/
 	}
 	else
 	{
@@ -768,11 +827,11 @@ void D3DRender::UpdateScissor()
 		uint32 width = *g_GraphicsInfo.VI_WIDTH_REG & 0xFFF;
 		uint32 height = (gRDP.scissor.right*gRDP.scissor.bottom)/width;
 		MYD3DVIEWPORT vp = {0, 0, (uint32)(width*windowSetting.fMultX), (uint32)(height*windowSetting.fMultY), 0, 1};
-		//if( !gRSP.bNearClip )
-		//	vp.MinZ = -10000;
+		if( !gRSP.bNearClip )
+			vp.MinZ = -10000;
 
-		if( vp.Width+vp.X > (DWORD)windowSetting.uDisplayWidth-1) vp.Width = windowSetting.uDisplayWidth-1-vp.X;
-		if( vp.Height+vp.Y > (DWORD)windowSetting.uDisplayHeight-1) vp.Height = windowSetting.uDisplayHeight-1-vp.Y;
+		//if( vp.Width+vp.X > (DWORD)windowSetting.uDisplayWidth-1) vp.Width = windowSetting.uDisplayWidth-1-vp.X;
+		//if( vp.Height+vp.Y > (DWORD)windowSetting.uDisplayHeight-1) vp.Height = windowSetting.uDisplayHeight-1-vp.Y;
 
 		gD3DDevWrapper.SetViewport(&vp);
 	}
@@ -784,7 +843,7 @@ void D3DRender::UpdateScissor()
 
 void D3DRender::ApplyRDPScissor(bool force)
 {
-	if( !force && status.curScissor == RDP_SCISSOR )	return;
+	//if( !force && status.curScissor == RDP_SCISSOR )	return;
 
 	if( options.bEnableHacks && g_CI.dwWidth == 0x200 && gRDP.scissor.right == 0x200 && g_CI.dwWidth>(*g_GraphicsInfo.VI_WIDTH_REG & 0xFFF) )
 	{
@@ -792,11 +851,11 @@ void D3DRender::ApplyRDPScissor(bool force)
 		uint32 width = *g_GraphicsInfo.VI_WIDTH_REG & 0xFFF;
 		uint32 height = (gRDP.scissor.right*gRDP.scissor.bottom)/width;
 		MYD3DVIEWPORT vp = {0, 0, (uint32)(width*windowSetting.fMultX), (uint32)(height*windowSetting.fMultY), 0, 1};
-		//if( !gRSP.bNearClip )
-		//	vp.MinZ = -10000;
+		if( !gRSP.bNearClip )
+			vp.MinZ = -10000;
 
-		if( vp.Width+vp.X > (DWORD)windowSetting.uDisplayWidth-1) vp.Width = windowSetting.uDisplayWidth-1-vp.X;
-		if( vp.Height+vp.Y > (DWORD)windowSetting.uDisplayHeight-1) vp.Height = windowSetting.uDisplayHeight-1-vp.Y;
+		//if( vp.Width+vp.X > (DWORD)windowSetting.uDisplayWidth-1) vp.Width = windowSetting.uDisplayWidth-1-vp.X;
+		//if( vp.Height+vp.Y > (DWORD)windowSetting.uDisplayHeight-1) vp.Height = windowSetting.uDisplayHeight-1-vp.Y;
 
 		gD3DDevWrapper.SetViewport(&vp);
 	}
@@ -809,31 +868,38 @@ void D3DRender::ApplyRDPScissor(bool force)
 				(uint32)((gRDP.scissor.bottom-gRDP.scissor.top+1)*windowSetting.fMultY), 0, 1
 		};
 
-		if( vp.Width+vp.X > (DWORD)windowSetting.uDisplayWidth-1) vp.Width = windowSetting.uDisplayWidth-1-vp.X;
-		if( vp.Height+vp.Y > (DWORD)windowSetting.uDisplayHeight-1) vp.Height = windowSetting.uDisplayHeight-1-vp.Y;
+		//if( vp.Width+vp.X > (DWORD)windowSetting.uDisplayWidth-1) vp.Width = windowSetting.uDisplayWidth-1-vp.X;
+		//if( vp.Height+vp.Y > (DWORD)windowSetting.uDisplayHeight-1) vp.Height = windowSetting.uDisplayHeight-1-vp.Y;
 
-		//if( !gRSP.bNearClip )
-		//	vp.MinZ = -10000;
+		if( !gRSP.bNearClip )
+			vp.MinZ = -10000;
 		gD3DDevWrapper.SetViewport(&vp);
 	}
 
-	status.curScissor = RDP_SCISSOR;
+	//status.curScissor = RDP_SCISSOR;
 }
 
 void D3DRender::ApplyScissorWithClipRatio(bool force)
 {
-	if( !force && status.curScissor == RSP_SCISSOR )	return;
+	//if( !force && status.curScissor == RSP_SCISSOR )	return;
 
-	WindowSettingStruct &w = windowSetting;
-	MYD3DVIEWPORT vp = { w.clipping.left, w.clipping.top, w.clipping.width, w.clipping.height, 0, 1};
-	//if( !gRSP.bNearClip )
-		//	vp.MinZ = -10000;
+	D3DVIEWPORT8 vp = {
+		(DWORD)(gRSP.real_clip_scissor_left*windowSetting.fMultX), 
+			(DWORD)(gRSP.real_clip_scissor_top*windowSetting.fMultY), 
+			(DWORD)((gRSP.real_clip_scissor_right-gRSP.real_clip_scissor_left+1)*windowSetting.fMultX), 
+			(DWORD)((gRSP.real_clip_scissor_bottom-gRSP.real_clip_scissor_top+1)*windowSetting.fMultY), 0, 1
+	};
+	//WindowSettingStruct &w = windowSetting;
+	//MYD3DVIEWPORT vp = { w.clipping.left, w.clipping.top, w.clipping.width, w.clipping.height, 0, 1};
+	
+	if( !gRSP.bNearClip )
+			vp.MinZ = -10000;
 
-	if( vp.Width+vp.X > (DWORD)windowSetting.uDisplayWidth-1) vp.Width = windowSetting.uDisplayWidth-1-vp.X;
-	if( vp.Height+vp.Y > (DWORD)windowSetting.uDisplayHeight-1) vp.Height = windowSetting.uDisplayHeight-1-vp.Y;
+	//if( vp.Width+vp.X > (DWORD)windowSetting.uDisplayWidth-1) vp.Width = windowSetting.uDisplayWidth-1-vp.X;
+	//if( vp.Height+vp.Y > (DWORD)windowSetting.uDisplayHeight-1) vp.Height = windowSetting.uDisplayHeight-1-vp.Y;
 
 	gD3DDevWrapper.SetViewport(&vp);
-	status.curScissor = RSP_SCISSOR;
+	//status.curScissor = RSP_SCISSOR;
 }
 
 void D3DRender::BeginRendering(void) 

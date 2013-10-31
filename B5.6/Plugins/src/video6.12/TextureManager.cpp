@@ -119,8 +119,27 @@ CTextureManager::~CTextureManager()
 {
 	CleanUp();
 
+	
+#ifdef OLDTXTCACHE
+	if (!g_bUseSetTextureMem)
+	{
+		while (m_pHead)
+		{
+			TxtrCacheEntry * pVictim = m_pHead;
+			m_pHead = pVictim->pNext;
+			
+			delete pVictim;
+		}
+	}
+#endif
 	delete []m_pCacheTxtrList;
-	m_pCacheTxtrList = NULL;	
+	m_pCacheTxtrList = NULL;
+
+	if( m_blackTextureEntry.pTexture )		delete m_blackTextureEntry.pTexture;
+	if( m_PrimColorTextureEntry.pTexture )	delete m_PrimColorTextureEntry.pTexture;
+	if( m_EnvColorTextureEntry.pTexture )	delete m_EnvColorTextureEntry.pTexture;
+	if( m_LODFracTextureEntry.pTexture )	delete m_LODFracTextureEntry.pTexture;
+	if( m_PrimLODFracTextureEntry.pTexture )	delete m_PrimLODFracTextureEntry.pTexture;
 }
 
 
@@ -130,19 +149,6 @@ CTextureManager::~CTextureManager()
 bool CTextureManager::CleanUp()
 {
 	RecycleAllTextures();
-
-#ifndef OLDTXTCACHE
-	if (!g_bUseSetTextureMem)
-	{
-		while (m_pHead)
-		{
-			TxtrCacheEntry * pVictim = m_pHead;
-			m_pHead = pVictim->pNext;
-
-			delete pVictim;
-		}
-	}
-#endif
 
 	if( m_blackTextureEntry.pTexture )		delete m_blackTextureEntry.pTexture;	
 	if( m_PrimColorTextureEntry.pTexture )	delete m_PrimColorTextureEntry.pTexture;
@@ -154,6 +160,19 @@ bool CTextureManager::CleanUp()
 	memset(&m_EnvColorTextureEntry, 0, sizeof(TxtrCacheEntry));
 	memset(&m_LODFracTextureEntry, 0, sizeof(TxtrCacheEntry));
 	memset(&m_PrimLODFracTextureEntry, 0, sizeof(TxtrCacheEntry));
+
+#ifdef OLDTXTCACHE
+	if (!g_bUseSetTextureMem)
+	{
+		while (m_pHead)
+		{
+			TxtrCacheEntry * pVictim = m_pHead;
+			m_pHead = pVictim->pNext;
+
+			delete pVictim;
+		}
+	}
+#endif
 
 	return true;
 }
@@ -537,10 +556,7 @@ TxtrCacheEntry * CTextureManager::CreateNewCacheEntry(uint32 dwAddr, uint32 dwWi
 	{
 		uint32 widthToCreate = dwWidth;
 		uint32 heightToCreate = dwHeight;
-#ifdef _XBOX
-		D3DFORMAT pf = D3DFMT_A8R8G8B8;
-		D3DXCheckTextureRequirements(g_pD3DDev, &widthToCreate, &heightToCreate, NULL, 0, &pf, D3DPOOL_MANAGED);
-#endif
+
 		DWORD freeUpSize = (widthToCreate * heightToCreate * 4) + g_amountToFree;
 
 		// make sure there is enough room for the new texture by deleting old textures
@@ -565,7 +581,7 @@ TxtrCacheEntry * CTextureManager::CreateNewCacheEntry(uint32 dwAddr, uint32 dwWi
 #else
 		FreeTextures();
 #endif
-    }
+  }
 	m_currentTextureMemUsage += (dwWidth * dwHeight * 4);
 	
 
@@ -736,7 +752,7 @@ TxtrCacheEntry * CTextureManager::GetTexture(TxtrInfo * pgti, bool fromTMEM, boo
 		//uint32 y;
 		//for (y = 0; y < dwPalSize*2; y+=4)
 		//{
-		//	dwPalCRC = (dwPalCRC + *(uint32*)&pStart[y]);
+		// dwPalCRC = (dwPalCRC + *(uint32*)&pStart[y]);
 		//}
 
 		uint32 dwAsmCRCSave = dwAsmCRC;

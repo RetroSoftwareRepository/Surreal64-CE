@@ -458,10 +458,10 @@ bool InitVertexShader()
 	DWORD decl[] =
 	{
 		D3DVSD_STREAM(0),
-		D3DVSD_REG(0, D3DVSDT_FLOAT3 ), // D3DVSDE_POSITION
-		D3DVSD_REG(1, D3DVSDT_FLOAT3 ), // D3DVSDE_NORMAL 
-		D3DVSD_REG(2, D3DVSDT_D3DCOLOR ), // D3DVSDE_DIFFUSE 
-		D3DVSD_REG(3, D3DVSDT_FLOAT2 ), // D3DVSDE_TEXCOORD0 
+		D3DVSD_REG( 0 , D3DVSDT_FLOAT3 ), // D3DVSDE_POSITION
+		D3DVSD_REG( 1 , D3DVSDT_FLOAT3 ), // D3DVSDE_NORMAL 
+		D3DVSD_REG( 2 , D3DVSDT_D3DCOLOR ), // D3DVSDE_DIFFUSE 
+		D3DVSD_REG( 3 , D3DVSDT_FLOAT2 ), // D3DVSDE_TEXCOORD0 
 		D3DVSD_END()
 	};
 #else
@@ -492,7 +492,7 @@ bool InitVertexShader()
 #if DIRECTX_VERSION == 8
 	/*LPD3DXBUFFER*/LPXGBUFFER ppConstants;
 	//res = D3DXAssembleShader(shaderstr, strlen(shaderstr), 0, &ppConstants, &pCode, &ppCompilationErrors);
-	res = XGAssembleShader(NULL,shaderstr, strlen(shaderstr),0, &ppConstants, &pCode, &ppCompilationErrors,NULL,NULL,NULL,NULL);
+	res = XGAssembleShader(NULL,shaderstr, strlen(shaderstr2),0, &ppConstants, &pCode, &ppCompilationErrors,NULL,NULL,NULL,NULL);
 #else
 	res = D3DXAssembleShader(shaderstr2, strlen(shaderstr2), NULL, NULL, D3DXSHADER_DEBUG, &pCode, &ppCompilationErrors);
 #endif
@@ -502,7 +502,7 @@ bool InitVertexShader()
 	if( CDXGraphicsContext::IsResultGood(res,true) )
 	{
 #if DIRECTX_VERSION == 8
-		res = g_pD3DDev->CreateVertexShader( decl, (DWORD*)pCode->GetBufferPointer(), &gVertexShader, 0 );
+		res = g_pD3DDev->CreateVertexShader( decl, (DWORD*)&pCode->pData, &gVertexShader, 0 );
 #else
 		res = g_pD3DDev->CreateVertexShader( (DWORD*)pCode->GetBufferPointer(), &gVertexShader );
 		//FILE *fp = fopen("D:\\n64developing\\RiceVideo\\shaderdx9.vso","rb");

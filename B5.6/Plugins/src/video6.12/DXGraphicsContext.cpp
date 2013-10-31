@@ -273,8 +273,9 @@ __forceinline void CDXGraphicsContext::UpdateFrame(bool swaponly)
 #endif
 
 	XboxDrawOSD();
-/*
-	Lock();
+
+	/*Lock();
+	
 	if (m_pd3dDevice == NULL)
 	{
 		hr = E_FAIL;
