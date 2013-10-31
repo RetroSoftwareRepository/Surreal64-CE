@@ -647,8 +647,8 @@ int	CGeneralCombiner::GenCI_Type_A_ADD_B_MOD_C(int curN64Stage, int curStage, Ge
 int	CGeneralCombiner::GenCI_Type_A_B_C_A(int curN64Stage, int curStage, GeneralCombinerInfo &gci)
 {
 	// We can not do too much with this type, it is not a bad idea to use LERP to simplify it.
-	//return GenCI_Type_A_LERP_B_C(curN64Stage, curStage, gci);
-	return GenCI_Type_A_B_C_D(curN64Stage, curStage, gci);
+	return GenCI_Type_A_LERP_B_C(curN64Stage, curStage, gci);
+	//return GenCI_Type_A_B_C_D(curN64Stage, curStage, gci);
 }
 
 int	CGeneralCombiner::GenCI_Type_A_SUB_B_MOD_C(int curN64Stage, int curStage, GeneralCombinerInfo &gci)
@@ -907,7 +907,7 @@ int CGeneralCombiner::ParseDecodedMux()
 		gci.stages[i].bTextureUsed = IsTextureUsedInStage(gci.stages[i]);
 	}
 
-#ifndef _XBOX
+//#ifndef _XBOX
 	if( !resultIsGood && gci.nStages >= m_dwGeneralMaxStages )
 	{
 		extern int noOfTwoStages;
@@ -928,7 +928,7 @@ int CGeneralCombiner::ParseDecodedMux()
 			}
 		}
 	}
-#endif
+//#endif
 
 #ifdef _DEBUG
 	if( !resultIsGood )
@@ -950,7 +950,7 @@ int CGeneralCombiner::ParseDecodedMux()
 		DebuggerAppendMsg("\t\t{MOD(T0,DIF), SKIP, 1, true},	// Stage 1\n\t}\n},");
 	}
 #else
-#ifndef _XBOX
+//#ifndef _XBOX
 	if( !resultIsGood )
 	{
 		FILE *fp=NULL;
@@ -979,7 +979,7 @@ int CGeneralCombiner::ParseDecodedMux()
 		}
 	}
 #endif
-#endif
+//#endif
 
 	return SaveParserResult(gci);
 }

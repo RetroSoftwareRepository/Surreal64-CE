@@ -43,7 +43,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // Modifier ALPHAREPLICATE works
 // Combined modifier of COMPLEMENT and ALPHAREPLICATE also works
 
-#ifndef _XBOX
+//#ifndef _XBOX
 #define MUX_T0	MUX_TEXEL0
 #define MUX_T1	MUX_TEXEL1
 #define MUX_DIF	MUX_SHADE
@@ -5127,4 +5127,4 @@ GeneralCombinerInfo twostages[]=
 int noOfTwoStages = sizeof(twostages)/sizeof(GeneralCombinerInfo);
 
 
-#endif
+//#endif

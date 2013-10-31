@@ -377,6 +377,7 @@ bool CRender::FillRect(LONG nX0, LONG nY0, LONG nX1, LONG nY1, uint32 dwColor)
 		TurnFogOnOff(false);
 		res = RenderFillRect(dwColor, depth);
 		TurnFogOnOff(gRSP.bFogEnabled);
+		ApplyScissorWithClipRatio();// Rice 5.60
 
 		if( gRDP.otherMode.cycle_type  >= CYCLE_TYPE_COPY )
 		{
@@ -779,6 +780,7 @@ bool CRender::TexRect(LONG nX0, LONG nY0, LONG nX1, LONG nY1, float fS0, float f
 		ApplyTextureFilter();
 		ApplyRDPScissor();
 		res = RenderTexRect();
+	ApplyScissorWithClipRatio(); //Rice 5.60
 		m_dwMagFilter = m_dwMinFilter = dwFilter;
 		ApplyTextureFilter();
 	}
@@ -789,6 +791,7 @@ bool CRender::TexRect(LONG nX0, LONG nY0, LONG nX1, LONG nY1, float fS0, float f
 		ApplyTextureFilter();
 		ApplyRDPScissor();
 		res = RenderTexRect();
+	ApplyScissorWithClipRatio(); //Rice 5.60
 		m_dwMagFilter = m_dwMinFilter = dwFilter;
 		ApplyTextureFilter();
 	}
@@ -796,6 +799,7 @@ bool CRender::TexRect(LONG nX0, LONG nY0, LONG nX1, LONG nY1, float fS0, float f
 	{
 		ApplyRDPScissor();
 		res = RenderTexRect();
+	ApplyScissorWithClipRatio(); //Rice 5.60
 	}
 	TurnFogOnOff(gRSP.bFogEnabled);
 
@@ -890,7 +894,7 @@ bool CRender::TexRectFlip(LONG nX0, LONG nY0, LONG nX1, LONG nY1, float fS0, flo
 	SetVertexTextureUVCoord(g_texRectTVtx[3], t0u1, t0v0);
 
 	TurnFogOnOff(false);
-	ApplyRDPScissor();
+	//ApplyRDPScissor(); //Rice 5.60
 	bool res = RenderTexRect();
 
 	TurnFogOnOff(gRSP.bFogEnabled);
@@ -1257,7 +1261,7 @@ bool CRender::DrawTriangles()
 				}
 			}
 
-			/*
+			
 			// The code here is disabled because it could cause incorrect texture repeating flag 
 			// for later DrawTriangles
 			bool clampS=true;
@@ -1265,8 +1269,7 @@ bool CRender::DrawTriangles()
 
 			for( i=0; i<gRSP.numVertices; i++ )
 			{
-				float w = CDeviceBuilder::GetGeneralDeviceType() == OGL_DEVICE ? g_vtxProjected5[i][3] : g_vtxBuffer[i].rhw; 
-				if( w < 0 || g_vtxBuffer[i].tcord[t].u > 1.0 || g_vtxBuffer[i].tcord[t].u < 0.0  )
+				if( g_vtxBuffer[i].tcord[t].u > 1.0 || g_vtxBuffer[i].tcord[t].u < 0.0  )
 				{
 					clampS = false;
 					break;
@@ -1275,8 +1278,7 @@ bool CRender::DrawTriangles()
 
 			for( i=0; i<gRSP.numVertices; i++ )
 			{
-				float w = CDeviceBuilder::GetGeneralDeviceType() == OGL_DEVICE ? g_vtxProjected5[i][3] : g_vtxBuffer[i].rhw; 
-				if( w < 0 || g_vtxBuffer[i].tcord[t].v > 1.0 || g_vtxBuffer[i].tcord[t].v < 0.0  )
+				if( g_vtxBuffer[i].tcord[t].v > 1.0 || g_vtxBuffer[i].tcord[t].v < 0.0  )
 				{
 					clampT = false;
 					break;
@@ -1291,7 +1293,7 @@ bool CRender::DrawTriangles()
 			{
 				SetTextureVFlag(TEXTURE_UV_FLAG_CLAMP, gRSP.curTile+t);
 			}
-			*/
+			
 		}
 	}
 
@@ -1300,7 +1302,7 @@ bool CRender::DrawTriangles()
 		ZBufferEnable(FALSE);
 	}
 
-	ApplyScissorWithClipRatio();
+	//ApplyScissorWithClipRatio(); //Rice 5.60
 
 	if( g_curRomInfo.bZHack )
 	{
@@ -1864,7 +1866,7 @@ void CRender::UpdateScissorWithClipRatio()
 	gRSP.real_clip_scissor_right = min(gRSP.real_clip_scissor_right,windowSetting.uViWidth-1);
 	gRSP.real_clip_scissor_bottom = min(gRSP.real_clip_scissor_bottom, windowSetting.uViHeight-1);
 
-	WindowSettingStruct &w = windowSetting;
+	/*WindowSettingStruct &w = windowSetting;
 	w.clipping.left = (uint32)(gRSP.real_clip_scissor_left*windowSetting.fMultX);
 	w.clipping.top	= (uint32)(gRSP.real_clip_scissor_top*windowSetting.fMultY);
 	w.clipping.bottom = (uint32)(gRSP.real_clip_scissor_bottom*windowSetting.fMultY);
@@ -1880,7 +1882,7 @@ void CRender::UpdateScissorWithClipRatio()
 	}
 	w.clipping.width = (uint32)((gRSP.real_clip_scissor_right-gRSP.real_clip_scissor_left+1)*windowSetting.fMultX);
 	w.clipping.height = (uint32)((gRSP.real_clip_scissor_bottom-gRSP.real_clip_scissor_top+1)*windowSetting.fMultY);
-
+*/
 	float halfx = gRSP.nVPWidthN/2.0f;
 	float halfy = gRSP.nVPHeightN/2.0f;
 	float centerx = gRSP.nVPLeftN+halfx;

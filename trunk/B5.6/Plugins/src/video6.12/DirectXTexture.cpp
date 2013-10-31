@@ -21,13 +21,30 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include <xgraphics.h>
 #endif
 
+extern BYTE g_ucTempBuffer[1024*1024*4];
+
 CDirectXTexture::CDirectXTexture(uint32 dwWidth, uint32 dwHeight, TextureUsage usage) :
 	CTexture(dwWidth,dwHeight,usage)
 {
 	MYLPDIRECT3DTEXTURE pTxt;
 
-	if (dwWidth < 1)	dwWidth = 1;
-	if (dwHeight < 1)	dwHeight = 1;
+	/*if (dwWidth < 1)	dwWidth = 1;
+	if (dwHeight < 1)	dwHeight = 1;*/
+
+	if (dwWidth < 1)
+		dwWidth = 1;
+	else if (dwWidth > 1024)
+		dwWidth = 1024;
+
+	if (dwHeight < 1)
+		dwHeight = 1;
+	else if (dwHeight > 1024)
+		dwHeight = 1024;
+
+	if (dwWidth < m_dwWidth)
+		TRACE2("New width (%d) < Old Width (%d)", dwWidth, m_dwWidth)
+	if (dwHeight < m_dwHeight)
+		TRACE2("New height (%d) < Old height (%d)", dwHeight, m_dwHeight)
 
 	if (dwWidth*dwHeight > 256*256 && usage == AS_NORMAL )
 		TRACE2("Large texture: width (%d) , height (%d)", dwWidth, dwHeight);
@@ -72,6 +89,7 @@ bool CDirectXTexture::StartUpdate(DrawInfo *di)
 		return false;
 
 #ifdef _XBOX
+/*
 	if( pTempbuffer )
 	{
 		delete [] pTempbuffer;
@@ -80,9 +98,9 @@ bool CDirectXTexture::StartUpdate(DrawInfo *di)
 
 	pTempbuffer = new BYTE[m_dwCreatedTextureHeight*m_dwCreatedTextureWidth*GetPixelSize()];
 	if( !pTempbuffer )
-		return false;
+		return false;*/
 
-	di->lpSurface = pTempbuffer;
+	di->lpSurface = g_ucTempBuffer; //pTempBuffer
 	di->dwHeight = (uint16)m_dwHeight;
 	di->dwWidth = (uint16)m_dwWidth;
 	di->dwCreatedHeight = m_dwCreatedTextureHeight;
@@ -125,11 +143,12 @@ void CDirectXTexture::EndUpdate(DrawInfo *di)
 	hr = MYLPDIRECT3DTEXTURE(m_pTexture)->LockRect(0, &d3d_lr, NULL, 0);
 	if (SUCCEEDED(hr))
 	{
-		XGSwizzleRect( pTempbuffer, 0, NULL, d3d_lr.pBits,
+		XGSwizzleRect( g_ucTempBuffer, 0, NULL, d3d_lr.pBits,
 			di->dwCreatedWidth, di->dwCreatedHeight, 
 			NULL, GetPixelSize() );
-		delete [] pTempbuffer;
-		pTempbuffer = NULL;
+		//delete [] pTempbuffer;
+		//pTempbuffer = NULL;
+	MYLPDIRECT3DTEXTURE(m_pTexture)->UnlockRect( 0 );
 	}
 #else
 	MYLPDIRECT3DTEXTURE(m_pTexture)->UnlockRect( 0 );
@@ -144,7 +163,7 @@ LPRICETEXTURE CDirectXTexture::CreateTexture(uint32 dwWidth, uint32 dwHeight, Te
 	unsigned int dwNumMaps = 1;
 
 #ifdef _XBOX
-	D3DFORMAT pf = D3DFMT_A8R8G8B8;
+		D3DFORMAT pf = D3DFMT_A4R4G4B4;
 #else
 	D3DFORMAT pf = ((CDXGraphicsContext*)(CGraphicsContext::g_pGraphicsContext))->GetFormat();
 #endif
@@ -167,7 +186,7 @@ LPRICETEXTURE CDirectXTexture::CreateTexture(uint32 dwWidth, uint32 dwHeight, Te
 #endif
 			break;
 		case AS_RENDER_TARGET:
-			pf = D3DFMT_A4R4G4B4;
+			pf = D3DFMT_LIN_X1R5G5B5;
 			break;
 		default:
 			if( options.textureQuality == TXT_QUALITY_32BIT )
@@ -184,7 +203,7 @@ LPRICETEXTURE CDirectXTexture::CreateTexture(uint32 dwWidth, uint32 dwHeight, Te
 			pf = D3DFMT_X8R8G8B8;
 			break;
 		case AS_RENDER_TARGET:
-			pf = D3DFMT_A8R8G8B8;
+			pf = D3DFMT_LIN_X8R8G8B8;
 			break;
 		default:
 			if( options.textureQuality == TXT_QUALITY_16BIT )
@@ -204,8 +223,20 @@ LPRICETEXTURE CDirectXTexture::CreateTexture(uint32 dwWidth, uint32 dwHeight, Te
 
 	if( m_Usage == AS_RENDER_TARGET)
 	{
-		D3DXCheckTextureRequirements(g_pD3DDev, &m_dwCreatedTextureWidth, &m_dwCreatedTextureHeight, &dwNumMaps, D3DUSAGE_RENDERTARGET, &pf, D3DPOOL_DEFAULT);
-		hr = D3DXCreateTexture(g_pD3DDev, m_dwCreatedTextureWidth, m_dwCreatedTextureHeight, 1, D3DUSAGE_RENDERTARGET, pf, D3DPOOL_DEFAULT  , &lpSurf);
+		IDirect3D8 *d3d;
+		g_pD3DDev->GetDirect3D(&d3d);
+		hr = d3d->CheckDeviceFormat(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, D3DFMT_X8R8G8B8, D3DUSAGE_RENDERTARGET, D3DRTYPE_SURFACE, pf);
+
+		if (SUCCEEDED(hr))
+		{
+			D3DXCheckTextureRequirements(g_pD3DDev, &m_dwCreatedTextureWidth, &m_dwCreatedTextureHeight, &dwNumMaps, D3DUSAGE_RENDERTARGET, &pf, D3DPOOL_DEFAULT);
+			hr = D3DXCreateTexture(g_pD3DDev, m_dwCreatedTextureWidth, m_dwCreatedTextureHeight, 1, D3DUSAGE_RENDERTARGET, pf, D3DPOOL_DEFAULT  , &lpSurf);
+		}
+	}
+	else if (m_Usage == AS_BACK_BUFFER_SAVE)
+	{
+		D3DXCheckTextureRequirements(g_pD3DDev, &m_dwCreatedTextureWidth, &m_dwCreatedTextureHeight, &dwNumMaps, 0, &pf, D3DPOOL_MANAGED);
+		hr = D3DXCreateTexture(g_pD3DDev, m_dwCreatedTextureWidth, m_dwCreatedTextureHeight, 1, 0, pf, D3DPOOL_MANAGED  , &lpSurf);
 	}
 	else
 	{
@@ -243,7 +274,7 @@ LPRICETEXTURE CDirectXTexture::CreateTexture(uint32 dwWidth, uint32 dwHeight, Te
 
 	// HACK - we should only assign this when m_pTexture is assigned!
 	
-	if( pf == D3DFMT_A8R8G8B8 || pf == D3DFMT_X8R8G8B8  )
+	if( pf == D3DFMT_A8R8G8B8 || pf == D3DFMT_X8R8G8B8 || pf == D3DFMT_LIN_X8R8G8B8 || pf == D3DFMT_LIN_A8R8G8B8)
 		m_dwTextureFmt = TEXTURE_FMT_A8R8G8B8;
 	else
 		m_dwTextureFmt = TEXTURE_FMT_A4R4G4B4;
