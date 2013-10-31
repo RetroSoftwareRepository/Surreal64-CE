@@ -31,6 +31,7 @@ extern FiddledVtx * g_pVtxBase;
 #define Z_CLIP_MAX	0x10
 #define Z_CLIP_MIN	0x20
 
+#define ENABLE_CLIP_TRI
 #ifdef ENABLE_CLIP_TRI
 
 inline void RSP_Vtx_Clipping(int i)
@@ -650,7 +651,7 @@ void InitRenderBase()
 
 void SetFogMinMax(float fMin, float fMax, float fMul, float fOffset)
 {
-/*
+
 	if( fMin > fMax )
 	{
 		float temp = fMin;
@@ -665,7 +666,7 @@ void SetFogMinMax(float fMin, float fMax, float fMul, float fOffset)
 
 	gRSPfFogDivider = 255/(gRSPfFogMax-gRSPfFogMin);
 	CRender::g_pRender->SetFogMinMax(fMin, fMax);
-*/
+/*
 	gRSPfFogMin = max(0,-gRSP.fFogOffset/gRSP.fFogMul);
 	//gRSPfFogMax = min(1,(255.0f-gRSP.fFogOffset)/gRSP.fFogMul);
 	gRSPfFogMax = (255.0f-gRSP.fFogOffset)/gRSP.fFogMul;
@@ -674,6 +675,7 @@ void SetFogMinMax(float fMin, float fMax, float fMul, float fOffset)
 	gRSP.fFogOffset = fOffset;
 
 	gRSPfFogDivider = 255/(gRSPfFogMax-gRSPfFogMin);
+*/
 }
 
 void InitVertexColors()
@@ -1224,15 +1226,15 @@ void ProcessVertexDataSSE(uint32 dwAddr, uint32 dwV0, uint32 dwNum)
 
 		SSEVec3Transform(i);
 
-		/*if( gRSP.bFogEnabled )
+		if( gRSP.bFogEnabled )
 		{
 			g_fFogCoord[i] = g_vecProjected[i].z;
 			if( g_vecProjected[i].w < 0 || g_vecProjected[i].z < 0 || g_fFogCoord[i] < gRSPfFogMin )
 				g_fFogCoord[i] = gRSPfFogMin;
 		}
-		ReplaceAlphaWithFogFactor(i);*/
+		ReplaceAlphaWithFogFactor(i);
 
-		if( gRSP.bFogEnabled ) // Rice 5.10
+		/*if( gRSP.bFogEnabled ) // Rice 5.10
 		{
 			__asm {
 				mov			eax, i;
@@ -1255,7 +1257,7 @@ step3:
 				cvtss2si	ecx,xmm0;	// move the 1st DWORD to ecx
 				mov			byte ptr g_dwVtxDifColor[eax][3], cl; // Change to dwVtxDifColor to follow Rice 5.60
 			}
-		}
+		}*/
 
 
 		VTX_DUMP( 
@@ -1423,7 +1425,7 @@ void ProcessVertexDataNoSSE(uint32 dwAddr, uint32 dwV0, uint32 dwNum)
 			g_dwVtxDifColor[i] = COLOR_RGBA(vert.rgba.r, vert.rgba.g, vert.rgba.b, vert.rgba.a);
 		}
 
-		//ReplaceAlphaWithFogFactor(i);
+		ReplaceAlphaWithFogFactor(i);
 
 		// Update texture coords n.b. need to divide tu/tv by bogus scale on addition to buffer
 
@@ -1726,12 +1728,12 @@ void ProcessVertexDataDKR(uint32 dwAddr, uint32 dwV0, uint32 dwNum)
 		VTX_DUMP(TRACE5("vtx %d: %f, %f, %f, %f", i, 
 			g_vtxTransformed[i].x,g_vtxTransformed[i].y,g_vtxTransformed[i].z,g_vtxTransformed[i].w));
 
-		/*if( gRSP.bFogEnabled )
+		if( gRSP.bFogEnabled )
 		{
 			g_fFogCoord[i] = g_vecProjected[i].z;
 			if( g_vecProjected[i].w < 0 || g_vecProjected[i].z < 0 || g_fFogCoord[i] < gRSPfFogMin )
 				g_fFogCoord[i] = gRSPfFogMin;
-		}*/
+		}
 
 		RSP_Vtx_Clipping(i);
 
@@ -1805,10 +1807,10 @@ void ProcessVertexDataPD(uint32 dwAddr, uint32 dwV0, uint32 dwNum)
 			g_vecProjected[i].z = g_vtxTransformed[i].z * g_vecProjected[i].w;
 		}
 
-		/*g_fFogCoord[i] = g_vecProjected[i].z;
+		g_fFogCoord[i] = g_vecProjected[i].z;
 		if( g_vecProjected[i].w < 0 || g_vecProjected[i].z < 0 || g_fFogCoord[i] < gRSPfFogMin )
 			g_fFogCoord[i] = gRSPfFogMin;
-*/
+
 
 		RSP_Vtx_Clipping(i);
 
@@ -1917,9 +1919,9 @@ void ProcessVertexDataConker(uint32 dwAddr, uint32 dwV0, uint32 dwNum)
 			g_vecProjected[i].z = g_vtxTransformed[i].z * g_vecProjected[i].w;
 		}
 
-		/*g_fFogCoord[i] = g_vecProjected[i].z;
+		g_fFogCoord[i] = g_vecProjected[i].z;
 		if( g_vecProjected[i].w < 0 || g_vecProjected[i].z < 0 || g_fFogCoord[i] < gRSPfFogMin )
-			g_fFogCoord[i] = gRSPfFogMin;*/
+			g_fFogCoord[i] = gRSPfFogMin;
 
 		VTX_DUMP( 
 		{
@@ -2069,9 +2071,9 @@ void ProcessVertexData_Rogue_Squadron(uint32 dwXYZAddr, uint32 dwColorAddr, uint
 				g_vecProjected[i].x,g_vecProjected[i].y,g_vecProjected[i].z,g_vecProjected[i].w);
 		});
 
-		/*g_fFogCoord[i] = g_vecProjected[i].z;
+		g_fFogCoord[i] = g_vecProjected[i].z;
 		if( g_vecProjected[i].w < 0 || g_vecProjected[i].z < 0 || g_fFogCoord[i] < gRSPfFogMin )
-			g_fFogCoord[i] = gRSPfFogMin;*/
+			g_fFogCoord[i] = gRSPfFogMin;
 
 		RSP_Vtx_Clipping(i);
 

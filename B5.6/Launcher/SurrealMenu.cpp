@@ -104,6 +104,7 @@ void ToggleTextureFilter(bool inc);
 void ToggleAAMode(bool inc);
 void ToggleSoftDisplayFilter();
 void ToggleFrameSkip();
+void ToggleFogMode();
 void ToggleVSync(bool inc);
 void ToggleHDTV();
 void ToggleFullScreen();
@@ -1441,7 +1442,7 @@ void VideoSettingsMenu(void)
 
 	// Ez0n3 - more items
 	//m_pSettingsMenu = XLMenu_Init(60,80,4, MENU_LEFT|MENU_WRAP, NULL);
-	m_pSettingsMenu = XLMenu_Init((float)iMainMenuTxtPosX, (float)iMainMenuTxtPosY,8, GetMenuFontAlign(iMainMenuTxtAlign)|MENU_WRAP, NULL);
+	m_pSettingsMenu = XLMenu_Init((float)iMainMenuTxtPosX, (float)iMainMenuTxtPosY,9, GetMenuFontAlign(iMainMenuTxtAlign)|MENU_WRAP, NULL);
 
 	
 	m_pSettingsMenu->itemcolor = dwMenuItemColor;
@@ -1558,6 +1559,13 @@ void VideoSettingsMenu(void)
 	}
 
 	XLMenu_AddItem2(m_pSettingsMenu,MITEM_ROUTINE,currentname,incAAMode,decAAMode);
+
+	//Fog Mode
+	if (bUseLinFog && (videoplugin ==_VideoPluginRice612))
+	swprintf(currentname,L"Fog Mode : Linear");
+	else 
+	swprintf(currentname,L"Fog Mode : Range");
+	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,currentname,ToggleFogMode);
 
 	XLMenu_Activate(m_pSettingsMenu);
 
@@ -1982,6 +1990,23 @@ void ToggleFrameSkip()
 	ConfigAppSave2();
 }
 
+void ToggleFogMode()
+{
+    WCHAR currentname[120];
+	currentItem = m_pSettingsMenu->curitem;
+	if(videoplugin == _VideoPluginRice612)
+	bUseLinFog =! bUseLinFog;
+	
+	XLMenu_CurRoutine = NULL;
+	
+  	if (bUseLinFog && (videoplugin == _VideoPluginRice612))
+	swprintf(currentname,L"Fog Mode : Linear");
+	else 
+	swprintf(currentname,L"Fog Mode : Range");
+	XLMenu_SetItemText(&m_pSettingsMenu->items[currentItem], currentname);
+
+	ConfigAppSave2();
+}
 
 void ToggleVSync(bool inc)
 {

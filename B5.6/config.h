@@ -74,6 +74,7 @@ extern int preferedemu;
 extern int videoplugin;
 extern bool bEnableHDTV;
 extern bool bFullScreen;
+extern bool bUseLinFog;
 
 extern char szPathRoms[MAX_FILE_PATH];
 extern char szPathMedia[MAX_FILE_PATH];
