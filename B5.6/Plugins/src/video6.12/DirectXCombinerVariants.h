@@ -28,10 +28,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 typedef struct {
 	uint64  mux64;
 #ifdef _XBOX
+//#define _XBOX_PS
 	bool   bPrimLOD;
 	bool   bFog;
-#else
-	ID3DXBuffer* pVS;
+#endif
+#ifndef _XBOX_PS
+	D3DPIXELSHADERDEF *pVS;
 #endif
 	uint32 dwShaderID;
 	char *pShaderText;
@@ -44,7 +46,9 @@ class CDirectXPixelShaderCombiner : public CDirectXColorCombiner
 {
 public:
 	void CleanUp(void);
-
+#ifdef _XBOX_PS
+	bool Initialize();
+#endif
 protected:
 	friend class DirectXDeviceBuilder;
 	CDirectXPixelShaderCombiner(CRender *pRender);
@@ -54,9 +58,7 @@ protected:
 	int GeneratePixelShaderFromMux(void);
 	int FindCompiledShader(void);
 
-#ifdef _XBOX
-	bool Initialize();
-#endif
+
 
 	std::vector<PixelShaderEntry> m_pixelShaderList;
 #ifdef _DEBUG

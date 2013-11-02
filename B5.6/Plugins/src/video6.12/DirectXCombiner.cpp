@@ -317,8 +317,8 @@ CDirectXColorCombiner::CDirectXColorCombiner(CRender *pRender)
 	m_bTxtOpMulAdd = m_bCapsTxtOpMulAdd;			
 
 	///m_supportedStages = m_dwCapsMaxStages = 3;
-	///m_bCapsTxtOpMulAdd = false;
-	///m_bCapsTxtOpLerp = false;
+	//m_bCapsTxtOpMulAdd = false;
+	//m_bCapsTxtOpLerp = false;
 
 	m_dwGeneralMaxStages = m_supportedStages;
 
