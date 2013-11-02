@@ -958,7 +958,7 @@ void ProcessDListStep2(void)
 	{
 		TRACE0("Unknown Error in ProcessDList");
 		TriggerDPInterrupt();
-		TriggerSPInterrupt();
+		//TriggerSPInterrupt();
 	}
 
 	g_CritialSection.Unlock();
@@ -985,7 +985,7 @@ FUNC_TYPE(uint32) NAME_DEFINE(ProcessDListCountCycles)(void)
 	{
 		TRACE0("Unknown Error in ProcessDListCountCycles");
 		TriggerDPInterrupt();
-		TriggerSPInterrupt();
+		//TriggerSPInterrupt();
 	}
 	status.SPCycleCount *= 6;
 	//status.DPCycleCount += status.SPCycleCount;
@@ -1017,7 +1017,7 @@ FUNC_TYPE(void) NAME_DEFINE(ProcessRDPList)(void)
 	{
 		TRACE0("Unknown Error in ProcessRDPList");
 		TriggerDPInterrupt();
-		TriggerSPInterrupt();
+		//TriggerSPInterrupt();
 	}
 #endif
 }	

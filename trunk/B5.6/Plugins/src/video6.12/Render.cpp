@@ -687,6 +687,12 @@ bool CRender::TexRect(LONG nX0, LONG nY0, LONG nX1, LONG nY1, float fS0, float f
 		//difColor = PostProcessDiffuseColor(0);
 		difColor = PostProcessDiffuseColor(gRDP.primitiveColor);
 
+	if( g_curRomInfo.bIncTexRectEdge )
+	{
+		nX1++;
+		nY1++;
+	}
+
 	g_texRectTVtx[0].x = ViewPortTranslatei_x(nX0);
 	g_texRectTVtx[0].y = ViewPortTranslatei_y(nY0);
 	g_texRectTVtx[0].dcDiffuse = difColor;
@@ -1049,11 +1055,14 @@ void myVec3Transform(float *vecout, float *vecin, float* m)
 	vecout[2] = (m[2]*vecin[0]+m[6]*vecin[1]+m[10]*vecin[2]+m[14])/w;
 }
 
-void CRender::SetTextureEnableAndScale(int dwTile, bool bEnable, float fScaleX, float fScaleY)
+void CRender::SetTextureEnable(bool bEnable)
 {
 	gRSP.bTextureEnabled = bEnable;
+}
 
-	if( bEnable )
+void CRender::SetTextureScale(int dwTile,  float fScaleX, float fScaleY)
+{
+	if( gRSP.bTextureEnabled )
 	{
 		if( gRSP.curTile != dwTile )
 			gRDP.textureIsChanged = true;

@@ -419,6 +419,9 @@
 				RelativePath=".\IColor.h">
 			</File>
 			<File
+				RelativePath=".\interp.h">
+			</File>
+			<File
 				RelativePath=".\RDP_Texture.h">
 			</File>
 			<File
@@ -432,6 +435,12 @@
 			</File>
 			<File
 				RelativePath=".\resource.h">
+			</File>
+			<File
+				RelativePath=".\RSP_Conker.h">
+			</File>
+			<File
+				RelativePath=".\RSP_DKR.h">
 			</File>
 			<File
 				RelativePath=".\RSP_GBI0.h">
@@ -452,10 +461,31 @@
 				RelativePath=".\RSP_GBI_Sprite2D.h">
 			</File>
 			<File
+				RelativePath=".\RSP_GE.h">
+			</File>
+			<File
+				RelativePath=".\RSP_LL.h">
+			</File>
+			<File
 				RelativePath=".\RSP_Parser.h">
 			</File>
 			<File
+				RelativePath=".\RSP_PD.h">
+			</File>
+			<File
+				RelativePath=".\RSP_RS.h">
+			</File>
+			<File
 				RelativePath=".\RSP_S2DEX.h">
+			</File>
+			<File
+				RelativePath=".\RSP_SOTE.h">
+			</File>
+			<File
+				RelativePath=".\RSP_Turbo3D.h">
+			</File>
+			<File
+				RelativePath=".\RSP_WRUS.h">
 			</File>
 			<File
 				RelativePath=".\shaderdx9_include.h">

@@ -155,11 +155,6 @@ typedef struct
 
 	uint32		segments[16];
 
-	int		DKRCMatrixIndex;
-	int		DKRVtxCount;
-	bool	DKRBillBoard;
-	uint32	dwDKRVtxAddr;
-	uint32	dwDKRMatrixAddr;
 	Matrix	DKRMatrixes[4];
 	D3DXVECTOR4		DKRBaseVec;
 
@@ -246,6 +241,7 @@ void InitRenderBase();
 void SetFogMinMax(float fMin, float fMax, float fMul, float fOffset);
 void InitVertex(uint32 dwV, uint32 vtxIndex, bool bTexture, bool openGL = true );
 void InitVertexTextureConstants();
+bool AddTri(u32 v0, u32 v1, u32 v2);
 bool PrepareTriangle(uint32 dwV0, uint32 dwV1, uint32 dwV2);
 bool IsTriangleVisible(uint32 dwV0, uint32 dwV1, uint32 dwV2);
 extern void (*ProcessVertexData)(uint32 dwAddr, uint32 dwV0, uint32 dwNum);

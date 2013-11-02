@@ -59,7 +59,7 @@ UcodeMap *ucodeMaps[] =
 {
 	&ucodeMap0,				// ucode 0 - Mario
 	&ucodeMap1,				// ucode 1 - GBI1
-	NULL,					// ucode 2 - Golden Eye
+	&ucodeMap2,				// ucode 2 - Golden Eye
 	&ucodeMap3,				// ucode 3 - S2DEX GBI2
 	&ucodeMap4,				// ucode 4 - Wave Racer
 	&ucodeMap5,				// ucode 5 - BGI2
@@ -67,7 +67,7 @@ UcodeMap *ucodeMaps[] =
 	&ucodeMap7,				// ucode 7 - S2DEX
 	NULL,					// ucode 8 - ucode 0 with sprite2D, for Demo Puzzle Master 64
 	&ucodeMap9,				// ucode 9 - Perfect Dark
-	NULL,					// ucode 10 - Conker
+	&ucodeMap10,					// ucode 10 - Conker
 	&ucodeMap11,			// ucode 11 - Gemini
 	NULL,					// ucode 12 - Silicon Valley, Spacestation
 	NULL,					// ucode 13 - modified ucode S2DEX
@@ -270,6 +270,15 @@ uint32	g_dwRDPPalCrc[16];
 #include "RSP_GBI_Others.h"
 #include "RSP_GBI_Sprite2D.h"
 #include "RDP_Texture.h"
+//Custom ucodes
+#include "RSP_WRUS.h" //Wave Race 64
+#include "RSP_LL.h" //Last Legion
+#include "RSP_DKR.h" //Diddy Kong Racing
+#include "RSP_SOTE.h" //Shadow Of The Empire
+#include "RSP_Conker.h" //Conkers Bad Fur Day
+#include "RSP_GE.h" //Golden Eye
+#include "RSP_PD.h" //Perfect Dark
+#include "RSP_RS.h" //Rouge Squadron
 
 //////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////
@@ -303,7 +312,7 @@ void DLParser_Init()
 
 	status.lastPurgeTimeTime = 0;		// Time textures were last purged
 
-	status.UseLargerTile[0] = status.UseLargerTile[0] = false;
+	status.UseLargerTile[0] = false;
 	status.LargerTileRealLeft[0] = status.LargerTileRealLeft[1] = 0;
 	memset(&g_ZI_saves, 0, sizeof(RenderTextureInfo)*2);
 
@@ -371,20 +380,20 @@ void RDP_SetUcodeMap(int ucode)
 		//LoadedUcodeMap[9]=RSP_GBI1_Sprite2DBase;
 		//LoadedUcodeMap[0xaf]=RSP_GBI1_LoadUCode;
 		//LoadedUcodeMap[0xb0]=RSP_GBI1_BranchZ;
-		LoadedUcodeMap[0xb4]=DLParser_RDPHalf_1_0xb4_GoldenEye;
+		LoadedUcodeMap[0xb4]=DLParser_RDPHalf1_GoldenEye;
 		status.bUseModifiedUcodeMap = true;
 		break;
 	case 3:	// S2DEX GBI2
 		break;
-	case 4: //Wave Race
-		/*memcpy( &LoadedUcodeMap, &ucodeMap0, sizeof(UcodeMap));
+	case 4:
+		memcpy( &LoadedUcodeMap, &ucodeMap0, sizeof(UcodeMap));
 		LoadedUcodeMap[4]=RSP_Vtx_WRUS;
 		LoadedUcodeMap[0xb1]=RSP_GBI1_Tri2;
 		//LoadedUcodeMap[9]=RSP_GBI1_Sprite2DBase;
 		//LoadedUcodeMap[0xaf]=RSP_GBI1_LoadUCode;
 		//LoadedUcodeMap[0xb0]=RSP_GBI1_BranchZ;
 		//LoadedUcodeMap[0xb2]=RSP_GBI1_ModifyVtx;
-		status.bUseModifiedUcodeMap = true;*/
+		status.bUseModifiedUcodeMap = true;
 		break;
 	case 5:	// F3DEX GBI2
 		break;
@@ -577,12 +586,12 @@ static uint32 DLParser_IdentifyUcodeFromString( const CHAR * str_ucode )
 	const CHAR str_ucode0[] = "RSP SW Version: 2.0";
 	const CHAR str_ucode1[] = "RSP Gfx ucode ";
 
-	if ( strnicmp( str_ucode, str_ucode0, strlen(str_ucode0) ) == 0 )
+	if ( _strnicmp( str_ucode, str_ucode0, strlen(str_ucode0) ) == 0 )
 	{
 		return 0;
 	}
 
-	if ( strnicmp( str_ucode, str_ucode1, strlen(str_ucode1) ) == 0 )
+	if ( _strnicmp( str_ucode, str_ucode1, strlen(str_ucode1) ) == 0 )
 	{
 		if( strstr(str_ucode,"1.") != 0 )
 		{
@@ -902,10 +911,10 @@ void DLParser_Process(OSTask * pTask)
 			Gfx *pgfx = (Gfx*)&g_pRDRAMu32[(gDlistStack[gDlistStackPointer].pc>>2)];
 #ifdef _DEBUG
 			LOG_UCODE("0x%08x: %08x %08x %-10s", 
-				gDlistStack[gDlistStackPointer].pc, pgfx->words.w0, pgfx->words.w1, (gRSP.ucode!=5&&gRSP.ucode!=10)?ucodeNames_GBI1[(pgfx->words.w0>>24)]:ucodeNames_GBI2[(pgfx->words.w0>>24)]);
+				gDlistStack[gDlistStackPointer].pc, pgfx->words.cmd0, pgfx->words.cmd1, (gRSP.ucode!=5&&gRSP.ucode!=10)?ucodeNames_GBI1[(pgfx->words.cmd0>>24)]:ucodeNames_GBI2[(pgfx->words.cmd0>>24)]);
 #endif
 			gDlistStack[gDlistStackPointer].pc += 8;
-			currentUcodeMap[pgfx->words.w0 >>24](pgfx);
+			currentUcodeMap[pgfx->words.cmd0 >>24](pgfx);
 
 			if ( gDlistStackPointer >= 0 && --gDlistStack[gDlistStackPointer].countdown < 0 )
 			{
@@ -1039,8 +1048,8 @@ void DLParser_SetKeyGB(Gfx *gfx)
 {
 	DP_Timing(DLParser_SetKeyGB);
 
-	gRDP.keyB = ((gfx->words.w1)>>8)&0xFF;
-	gRDP.keyG = ((gfx->words.w1)>>24)&0xFF;
+	gRDP.keyB = ((gfx->words.cmd1)>>8)&0xFF;
+	gRDP.keyG = ((gfx->words.cmd1)>>24)&0xFF;
 	gRDP.keyA = (gRDP.keyR+gRDP.keyG+gRDP.keyB)/3;
 	gRDP.fKeyA = gRDP.keyA/255.0f;
 }
@@ -1048,7 +1057,7 @@ void DLParser_SetKeyR(Gfx *gfx)
 {
 	DP_Timing(DLParser_SetKeyR);
 
-	gRDP.keyR = ((gfx->words.w1)>>8)&0xFF;
+	gRDP.keyR = ((gfx->words.cmd1)>>8)&0xFF;
 	gRDP.keyA = (gRDP.keyR+gRDP.keyG+gRDP.keyB)/3;
 	gRDP.fKeyA = gRDP.keyA/255.0f;
 }
@@ -1061,23 +1070,23 @@ void DLParser_SetConvert(Gfx *gfx)
 
 	int temp;
 
-	temp = ((gfx->words.w0)>>13)&0x1FF;
+	temp = ((gfx->words.cmd0)>>13)&0x1FF;
 	g_convk0 = temp>0xFF ? -(temp-0x100) : temp;
 
-	temp = ((gfx->words.w0)>>4)&0x1FF;
+	temp = ((gfx->words.cmd0)>>4)&0x1FF;
 	g_convk1 = temp>0xFF ? -(temp-0x100) : temp;
 
-	temp = (gfx->words.w0)&0xF;
-	temp = (temp<<5)|(((gfx->words.w1)>>27)&0x1F);
+	temp = (gfx->words.cmd0)&0xF;
+	temp = (temp<<5)|(((gfx->words.cmd1)>>27)&0x1F);
 	g_convk2 = temp>0xFF ? -(temp-0x100) : temp;
 
-	temp = ((gfx->words.w1)>>18)&0x1FF;
+	temp = ((gfx->words.cmd1)>>18)&0x1FF;
 	g_convk3 = temp>0xFF ? -(temp-0x100) : temp;
 
-	temp = ((gfx->words.w1)>>9)&0x1FF;
+	temp = ((gfx->words.cmd1)>>9)&0x1FF;
 	g_convk4 = temp>0xFF ? -(temp-0x100) : temp;
 
-	temp = (gfx->words.w1)&0x1FF;
+	temp = (gfx->words.cmd1)&0x1FF;
 	g_convk5 = temp>0xFF ? -(temp-0x100) : temp;
 
 	g_convc0 = g_convk5/255.0f+1.0f;
@@ -1089,11 +1098,11 @@ void DLParser_SetConvert(Gfx *gfx)
 void DLParser_SetPrimDepth(Gfx *gfx)
 {
 	DP_Timing(DLParser_SetPrimDepth);
-	uint32 dwZ  = ((gfx->words.w1) >> 16) & 0xFFFF;
-	uint32 dwDZ = ((gfx->words.w1)      ) & 0xFFFF;
+	uint32 dwZ  = ((gfx->words.cmd1) >> 16) & 0xFFFF;
+	uint32 dwDZ = ((gfx->words.cmd1)      ) & 0xFFFF;
 
 	LOG_UCODE("SetPrimDepth: 0x%08x 0x%08x - z: 0x%04x dz: 0x%04x",
-		gfx->words.w0, gfx->words.w1, dwZ, dwDZ);
+		gfx->words.cmd0, gfx->words.cmd1, dwZ, dwDZ);
 	
 	SetPrimitiveDepth(dwZ, dwDZ);
 	DEBUGGER_PAUSE(NEXT_SET_PRIM_COLOR);
@@ -1102,28 +1111,28 @@ void DLParser_SetPrimDepth(Gfx *gfx)
 void DLParser_RDPSetOtherMode(Gfx *gfx)
 {
 	DP_Timing(DLParser_RDPSetOtherMode);
-	gRDP.otherMode._u32[1] = (gfx->words.w0);	// High
-	gRDP.otherMode._u32[0] = (gfx->words.w1);	// Low
+	gRDP.otherMode._u32[1] = (gfx->words.cmd0);	// High
+	gRDP.otherMode._u32[0] = (gfx->words.cmd1);	// Low
 
-	if( gRDP.otherModeH != ((gfx->words.w0) & 0x0FFFFFFF) )
+	if( gRDP.otherModeH != ((gfx->words.cmd0) & 0x0FFFFFFF) )
 	{
-		gRDP.otherModeH = ((gfx->words.w0) & 0x0FFFFFFF);
+		gRDP.otherModeH = ((gfx->words.cmd0) & 0x0FFFFFFF);
 
 		uint32 dwTextFilt  = (gRDP.otherModeH>>RSP_SETOTHERMODE_SHIFT_TEXTFILT)&0x3;
 		CRender::g_pRender->SetTextureFilter(dwTextFilt<<RSP_SETOTHERMODE_SHIFT_TEXTFILT);
 	}
 
-	if( gRDP.otherModeL != (gfx->words.w1) )
+	if( gRDP.otherModeL != (gfx->words.cmd1) )
 	{
-		if( (gRDP.otherModeL&ZMODE_DEC) != ((gfx->words.w1)&ZMODE_DEC) )
+		if( (gRDP.otherModeL&ZMODE_DEC) != ((gfx->words.cmd1)&ZMODE_DEC) )
 		{
-			if( ((gfx->words.w1)&ZMODE_DEC) == ZMODE_DEC )
+			if( ((gfx->words.cmd1)&ZMODE_DEC) == ZMODE_DEC )
 				CRender::g_pRender->SetZBias( 2 );
 			else
 				CRender::g_pRender->SetZBias( 0 );
 		}
 
-		gRDP.otherModeL = (gfx->words.w1);
+		gRDP.otherModeL = (gfx->words.cmd1);
 
 		BOOL bZCompare		= (gRDP.otherModeL & Z_COMPARE)			? TRUE : FALSE;
 		BOOL bZUpdate		= (gRDP.otherModeL & Z_UPDATE)			? TRUE : FALSE;
@@ -1182,11 +1191,11 @@ void DLParser_SetScissor(Gfx *gfx)
 
 	ScissorType tempScissor;
 	// The coords are all in 8:2 fixed point
-	tempScissor.x0   = ((gfx->words.w0)>>12)&0xFFF;
-	tempScissor.y0   = ((gfx->words.w0)>>0 )&0xFFF;
-	tempScissor.mode = ((gfx->words.w1)>>24)&0x03;
-	tempScissor.x1   = ((gfx->words.w1)>>12)&0xFFF;
-	tempScissor.y1   = ((gfx->words.w1)>>0 )&0xFFF;
+	tempScissor.x0   = ((gfx->words.cmd0)>>12)&0xFFF;
+	tempScissor.y0   = ((gfx->words.cmd0)>>0 )&0xFFF;
+	tempScissor.mode = ((gfx->words.cmd1)>>24)&0x03;
+	tempScissor.x1   = ((gfx->words.cmd1)>>12)&0xFFF;
+	tempScissor.y1   = ((gfx->words.cmd1)>>0 )&0xFFF;
 
 	tempScissor.left	= tempScissor.x0/4;
 	tempScissor.top		= tempScissor.y0/4;
@@ -1269,10 +1278,10 @@ void DLParser_FillRect(Gfx *gfx)
 		}
 	}
 
-	uint32 x0   = (((gfx->words.w1)>>12)&0xFFF)/4;
-	uint32 y0   = (((gfx->words.w1)>>0 )&0xFFF)/4;
-	uint32 x1   = (((gfx->words.w0)>>12)&0xFFF)/4;
-	uint32 y1   = (((gfx->words.w0)>>0 )&0xFFF)/4;
+	uint32 x0   = (((gfx->words.cmd1)>>12)&0xFFF)/4;
+	uint32 y0   = (((gfx->words.cmd1)>>0 )&0xFFF)/4;
+	uint32 x1   = (((gfx->words.cmd0)>>12)&0xFFF)/4;
+	uint32 y1   = (((gfx->words.cmd0)>>0 )&0xFFF)/4;
 
 	// Note, in some modes, the right/bottom lines aren't drawn
 
@@ -1456,15 +1465,99 @@ void DLParser_FillRect(Gfx *gfx)
 	}
 }
 
+//Nintro64 uses Sprite2d 
+void RSP_RDP_Nothing(Gfx *gfx)
+{
+	SP_Timing(RSP_RDP_Nothing);
+
+#ifdef _DEBUG
+	if( logWarning )
+	{
+		TRACE0("Stack Trace");
+		for( int i=0; i<gDlistStackPointer; i++ )
+		{
+			DebuggerAppendMsg("  %08X", gDlistStack[i].pc);
+		}
+
+		uint32 dwPC = gDlistStack[gDlistStackPointer].pc-8;
+		DebuggerAppendMsg("PC=%08X",dwPC);
+		DebuggerAppendMsg("Warning, unknown ucode PC=%08X: 0x%08x 0x%08x\n", dwPC, gfx->words.cmd0, gfx->words.cmd1);
+	}
+	DEBUGGER_PAUSE_AND_DUMP_COUNT_N(NEXT_UNKNOWN_OP, {TRACE0("Paused at unknown ucode\n");})
+	if( debuggerContinueWithUnknown )
+	{
+		return;
+	}
+#endif
+		
+	if( options.bEnableHacks )
+		return;
+	
+	gDlistStackPointer=-1;
+}
+
+
+void RSP_RDP_InsertMatrix(Gfx *gfx)
+{
+	float fraction;
+
+	UpdateCombinedMatrix();
+
+	if ((gfx->words.cmd0) & 0x20)
+	{
+		int x = ((gfx->words.cmd0) & 0x1F) >> 1;
+		int y = x >> 2;
+		x &= 3;
+
+		fraction = ((gfx->words.cmd1)>>16)/65536.0f;
+		gRSPworldProject.m[y][x] = (float)(int)gRSPworldProject.m[y][x];
+		gRSPworldProject.m[y][x] += fraction;
+
+		fraction = ((gfx->words.cmd1)&0xFFFF)/65536.0f;
+		gRSPworldProject.m[y][x+1] = (float)(int)gRSPworldProject.m[y][x+1];
+		gRSPworldProject.m[y][x+1] += fraction;
+	}
+	else
+	{
+		int x = ((gfx->words.cmd0) & 0x1F) >> 1;
+		int y = x >> 2;
+		x &= 3;
+
+		fraction = (float)fabs(gRSPworldProject.m[y][x] - (int)gRSPworldProject.m[y][x]);
+		gRSPworldProject.m[y][x] = (short)((gfx->words.cmd1)>>16) + fraction;
+
+		fraction = (float)fabs(gRSPworldProject.m[y][x+1] - (int)gRSPworldProject.m[y][x+1]);
+		gRSPworldProject.m[y][x+1] = (short)((gfx->words.cmd1)&0xFFFF) + fraction;
+	}
+
+	gRSP.bMatrixIsUpdated = false;
+	gRSP.bCombinedMatrixIsUpdated = true;
+
+#ifdef _DEBUG
+	if( pauseAtNext && eventToPause == NEXT_MATRIX_CMD )
+	{
+		pauseAtNext = false;
+		debuggerPause = true;
+		DebuggerAppendMsg("Pause after insert matrix: %08X, %08X", gfx->words.cmd0, gfx->words.cmd1);
+	}
+	else
+	{
+		if( pauseAtNext && logMatrix ) 
+		{
+			DebuggerAppendMsg("insert matrix: %08X, %08X", gfx->words.cmd0, gfx->words.cmd1);
+		}
+	}
+#endif
+}
 
 #define STORE_CI	{g_CI.dwAddr = dwNewAddr;g_CI.dwFormat = dwFmt;g_CI.dwSize = dwSiz;g_CI.dwWidth = dwWidth;g_CI.bpl=dwBpl;}
 
 void DLParser_SetCImg(Gfx *gfx)
 {
-	uint32 dwFmt		= gfx->setimg.fmt;
-	uint32 dwSiz		= gfx->setimg.siz;
-	uint32 dwWidth		= gfx->setimg.width + 1;
-	uint32 dwNewAddr	= RSPSegmentAddr((gfx->setimg.addr)) & 0x00FFFFFF ;
+	uint32 dwFmt		= gfx->img.fmt;
+	uint32 dwSiz		= gfx->img.siz;
+	uint32 dwWidth		= gfx->img.width + 1;
+	uint32 dwNewAddr	= RSPSegmentAddr((gfx->img.addr)) & 0x00FFFFFF ;
 	uint32 dwBpl		= dwWidth << dwSiz >> 1;
 
 	TXTRBUF_DETAIL_DUMP(DebuggerAppendMsg("SetCImg: Addr=0x%08X, Fmt:%s-%sb, Width=%d\n", dwNewAddr, pszImgFormat[dwFmt], pszImgSize[dwSiz], dwWidth););
@@ -1475,7 +1568,7 @@ void DLParser_SetCImg(Gfx *gfx)
 			g_CI.dwAddr, pszImgFormat[dwFmt], pszImgSize[dwSiz], dwWidth));
 	}
 
-	LOG_UCODE("    Image: 0x%08x", RSPSegmentAddr(gfx->words.w1));
+	LOG_UCODE("    Image: 0x%08x", RSPSegmentAddr(gfx->words.cmd1));
 	LOG_UCODE("    Fmt: %s Size: %s Width: %d",
 		pszImgFormat[dwFmt], pszImgSize[dwSiz], dwWidth);
 
@@ -1563,12 +1656,12 @@ void DLParser_SetCImg(Gfx *gfx)
 void DLParser_SetZImg(Gfx *gfx)
 {
 	DP_Timing(DLParser_SetZImg);
-	LOG_UCODE("    Image: 0x%08x", RSPSegmentAddr(gfx->words.w1));
+	LOG_UCODE("    Image: 0x%08x", RSPSegmentAddr(gfx->words.cmd1));
 
-	uint32 dwFmt   = gfx->setimg.fmt;
-	uint32 dwSiz   = gfx->setimg.siz;
-	uint32 dwWidth = gfx->setimg.width + 1;
-	uint32 dwAddr = RSPSegmentAddr((gfx->setimg.addr));
+	uint32 dwFmt   = gfx->img.fmt;
+	uint32 dwSiz   = gfx->img.siz;
+	uint32 dwWidth = gfx->img.width + 1;
+	uint32 dwAddr = RSPSegmentAddr((gfx->img.addr));
 
 	if( dwAddr != g_ZI_saves[0].CI_Info.dwAddr )
 	{
@@ -1619,8 +1712,8 @@ bool IsUsedAsDI(uint32 addr)
 void DLParser_SetCombine(Gfx *gfx)
 {
 	DP_Timing(DLParser_SetCombine);
-	uint32 dwMux0 = (gfx->words.w0)&0x00FFFFFF;
-	uint32 dwMux1 = (gfx->words.w1);
+	uint32 dwMux0 = (gfx->words.cmd0)&0x00FFFFFF;
+	uint32 dwMux1 = (gfx->words.cmd1);
 	CRender::g_pRender->SetMux(dwMux0, dwMux1);
 }
 
@@ -1630,7 +1723,7 @@ void DLParser_SetFillColor(Gfx *gfx)
 	gRDP.fillColor = Convert555ToRGBA(gfx->setcolor.fillcolor);
 	gRDP.originalFillColor = (gfx->setcolor.color);
 
-	LOG_UCODE("    Color5551=0x%04x = 0x%08x", (uint16)gfx->words.w1, gRDP.fillColor);
+	LOG_UCODE("    Color5551=0x%04x = 0x%08x", (uint16)gfx->words.cmd1, gRDP.fillColor);
 
 }
 
@@ -1694,7 +1787,7 @@ void RDP_DLParser_Process(void)
 	{
 		Gfx *pgfx = (Gfx*)&g_pRDRAMu32[(gDlistStack[gDlistStackPointer].pc>>2)];
 		gDlistStack[gDlistStackPointer].pc += 8;
-		currentUcodeMap[pgfx->words.w0 >>24](pgfx);
+		currentUcodeMap[pgfx->words.cmd0 >>24](pgfx);
 	}
 
 	CRender::g_pRender->EndRendering();

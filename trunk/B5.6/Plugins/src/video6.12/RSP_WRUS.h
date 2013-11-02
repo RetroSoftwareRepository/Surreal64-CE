@@ -16,37 +16,31 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 */
+#ifndef RSP_WRUS_H__
+#define RSP_WRUS_H__
 
-// Some new GBI2 extension ucodes
-void RSP_GBI2_DL_Count(Gfx *gfx)
+void RSP_Vtx_WRUS(Gfx *gfx)
 {
-	SP_Timing(DP_Minimal);
-	DP_Timing(DP_Minimal);
+	u32 dwAddr	 = RSPSegmentAddr(gfx->words.cmd1);
+	u32 dwV0	 = ((gfx->words.cmd0 >>16 ) & 0xff) / 5;
+	u32 dwN		 =  (gfx->words.cmd0 >>9  ) & 0x7f;
+	u32 dwLength =  (gfx->words.cmd0      ) & 0x1ff;
 
-	// This cmd is likely to execute number of ucode at the given address
-	uint32 dwAddr = RSPSegmentAddr((gfx->words.cmd1));
+	LOG_UCODE("    Address [0x%08x], v0: [%d], Num: [%d], Length: [0x%04x]", dwAddr, dwV0, dwN, dwLength);
+
+	if (dwV0 >= 32)
+		dwV0 = 31;
+	
+	if ((dwV0 + dwN) > 32)
 	{
-		gDlistStackPointer++;
-		gDlistStack[gDlistStackPointer].pc = dwAddr;
-		gDlistStack[gDlistStackPointer].countdown = ((gfx->words.cmd0)&0xFFFF);
+		TRACE0("Warning, attempting to load into invalid vertex positions");
+		dwN = 32 - dwV0;
 	}
+
+	ProcessVertexData(dwAddr, dwV0, dwN);
+
+	status.dwNumVertices += dwN;
+	DisplayVertexInfo(dwAddr, dwV0, dwN);
 }
 
-
-void RSP_GBI2_0x8(Gfx *gfx)
-{
-	
-	
-
-	if( ((gfx->words.cmd0)&0x00FFFFFF) == 0x2F && ((gfx->words.cmd1)&0xFF000000) == 0x80000000 )
-	{
-		// V-Rally 64
-		RSP_S2DEX_SPObjLoadTxRectR(gfx);
-	}
-	else
-	{
-		RSP_RDP_Nothing(gfx);
-	}
-}
-
-
+#endif //RSP_WRUS_H__

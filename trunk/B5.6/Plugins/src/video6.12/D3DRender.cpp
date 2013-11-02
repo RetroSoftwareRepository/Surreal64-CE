@@ -43,7 +43,8 @@ UVFlagMap DirectXUVFlagMaps[] =
 //*****************************************************************************
 // Creator function for singleton
 //*****************************************************************************
-D3DRender::D3DRender()
+D3DRender::D3DRender() :
+	m_dwTextureFactor(COLOR_RGBA(255,255,255,255))
 {
 	m_dwrsZEnable=D3DZB_FALSE;
 	m_dwrsZWriteEnable=FALSE;
@@ -211,7 +212,7 @@ bool D3DRender::InitDeviceObjects()
 	m_Mux = 0;
 	memset(&m_curCombineInfo, 0, sizeof( m_curCombineInfo) );
 
-	gD3DDevWrapper.Initalize();
+	//gD3DDevWrapper.Initalize();
 
 	m_dwrsZEnable = 0xEEEE;
 	m_dwrsZWriteEnable = 0xEEEE;
@@ -222,7 +223,7 @@ bool D3DRender::InitDeviceObjects()
 	m_dwrsAlphaRef = 0xEEEE;
 	m_dwrsZBias = 0xEEEE;
 
-	for(int i = 0; i < 8; i++) 
+	for(int i = 0; i < 4; i++) 
 	{ 
 		// Texturing stuff 
 		D3DSetMinFilter( i, D3DTEXF_LINEAR ); 

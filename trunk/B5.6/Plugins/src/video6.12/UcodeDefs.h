@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2003 Rice1964
+Copyright (C) 2003-2009 Rice1964
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -20,262 +20,400 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #ifndef _UCODE_DEFS_H_
 #define _UCODE_DEFS_H_
 
-typedef struct {
-	union {
-		unsigned int w0;
-		struct {
-			unsigned int arg0:24;
-			unsigned int cmd:8;
+struct Instruction
+{
+	union 
+	{
+		u32 cmd0;
+		struct 
+		{
+			u32 arg0:24;
+			u32 cmd:8;
 		};
 	};
-	unsigned int w1;
-} Gwords;
-
-typedef struct {
-	unsigned int w0;
-	unsigned int v2:8;
-	unsigned int v1:8;
-	unsigned int v0:8;
-	unsigned int flag:8;
-} GGBI0_Tri1;
-
-typedef struct {
-	unsigned int v0:8;
-	unsigned int v1:8;
-	unsigned int v2:8;
-	unsigned int cmd:8;
-	unsigned int pad:24;
-	unsigned int flag:8;
-} GGBI2_Tri1;
-
-typedef struct {
-	unsigned int :1;
-	unsigned int v3:7;
-	unsigned int :1;
-	unsigned int v4:7;
-	unsigned int :1;
-	unsigned int v5:7;
-	unsigned int cmd:8;
-	unsigned int :1;
-	unsigned int v0:7;
-	unsigned int :1;
-	unsigned int v1:7;
-	unsigned int :1;
-	unsigned int v2:7;
-	unsigned int flag:8;
-} GGBI2_Tri2;
-
-typedef struct {
-	unsigned int w0;
-	unsigned int v2:8;
-	unsigned int v1:8;
-	unsigned int v0:8;
-	unsigned int v3:8;
-} GGBI0_Ln3DTri2;
-
-typedef struct {
-	unsigned int v5:8;
-	unsigned int v4:8;
-	unsigned int v3:8;
-	unsigned int cmd:8;
-
-	unsigned int v2:8;
-	unsigned int v1:8;
-	unsigned int v0:8;
-	unsigned int flag:8;
-} GGBI1_Tri2;
-
-typedef struct {
-	unsigned int v3:8;
-	unsigned int v4:8;
-	unsigned int v5:8;
-	unsigned int cmd:8;
-
-	unsigned int v0:8;
-	unsigned int v1:8;
-	unsigned int v2:8;
-	unsigned int flag:8;
-} GGBI2_Line3D;
-
-typedef struct {
-	unsigned int len:16;
-	unsigned int v0:4;
-	unsigned int n:4;
-	unsigned int cmd:8;
-	unsigned int addr;
-} GGBI0_Vtx;
-
-typedef struct {
-	unsigned int len:10;
-	unsigned int n:6;
-	unsigned int :1;
-	unsigned int v0:7;
-	unsigned int cmd:8;
-	unsigned int addr;
-} GGBI1_Vtx;
-
-typedef struct {
-	unsigned int vend:8;
-	unsigned int :4;
-	unsigned int n:8;
-	unsigned int :4;
-	unsigned int cmd:8;
-	unsigned int addr;
-} GGBI2_Vtx;
-
-typedef struct {
-	unsigned int    width:12;
-	unsigned int    :7;
-	unsigned int    siz:2;
-	unsigned int    fmt:3;
-	unsigned int	cmd:8;
-	unsigned int    addr;
-} GSetImg;
-
-typedef struct {
-	unsigned int	prim_level:8;
-	unsigned int	prim_min_level:8;
-	unsigned int	pad:8;
-	unsigned int	cmd:8;
-
-	union {
-		unsigned int	color;
-		struct {
-			unsigned int fillcolor:16;
-			unsigned int fillcolor2:16;
-		};
-		struct {
-			unsigned int a:8;
-			unsigned int b:8;
-			unsigned int g:8;
-			unsigned int r:8;
+	union 
+	{
+		u32 cmd1;
+		struct 
+		{
+			u32 arg1:24;
+			u32 pad:8;
 		};
 	};
-} GSetColor;
+} ;
 
-typedef struct {
-	unsigned int	:16;
-	unsigned int	param:8;
-	unsigned int	cmd:8;
-	unsigned int    addr;
-} GGBI0_Dlist;
+struct GGBI1_Matrix
+{
+	u32	len:16;
+	u32	projection:1;
+	u32	load:1;
+	u32	push:1;
+	u32	:5;
+	u32	cmd:8;
+	u32    addr;
+};
 
-typedef struct {
-	unsigned int	len:16;
-	unsigned int	projection:1;
-	unsigned int	load:1;
-	unsigned int	push:1;
-	unsigned int	:5;
-	unsigned int	cmd:8;
-	unsigned int    addr;
-} GGBI0_Matrix;
+struct GGBI1_PopMatrix
+{
+	u32	:24;
+	u32	cmd:8;
+	u32	projection:1;
+	u32	:31;
+};
 
-typedef struct {
-	unsigned int	:24;
-	unsigned int	cmd:8;
-	unsigned int	projection:1;
-	unsigned int	:31;
-} GGBI0_PopMatrix;
-
-typedef struct {
-	union {
-		struct {
-			unsigned int	param:8;
-			unsigned int	len:16;
-			unsigned int	cmd:8;
+struct GGBI2_Matrix
+{
+	union 
+	{
+		struct 
+		{
+			u32	param:8;
+			u32	len:16;
+			u32	cmd:8;
 		};
-		struct {
-			unsigned int	nopush:1;
-			unsigned int	load:1;
-			unsigned int	projection:1;
-			unsigned int	:5;
-			unsigned int	len2:16;
-			unsigned int	cmd2:8;
+		struct 
+		{
+			u32	nopush:1;
+			u32	load:1;
+			u32	projection:1;
+			u32	:5;
+			u32	len2:16;
+			u32	cmd2:8;
 		};
 	};
-	unsigned int    addr;
-} GGBI2_Matrix;
+	u32 addr;
+};
 
-typedef struct {
-	unsigned int	type:8;
-	unsigned int	offset:16;
-	unsigned int	cmd:8;
-	unsigned int	value;
-} GGBI0_MoveWord;
 
-typedef struct {
-	unsigned int	offset:16;
-	unsigned int	type:8;
-	unsigned int	cmd:8;
-	unsigned int	value;
-} GGBI2_MoveWord;
+struct GGBI0_Vtx
+{
+	u32 len:16;
+	u32 v0:4;
+	u32 n:4;
+	u32 cmd:8;
+	u32 addr;
+};
 
-typedef struct {
-	unsigned int	enable_gbi0:1;
-	unsigned int	enable_gbi2:1;
-	unsigned int	:6;
-	unsigned int	tile:3;
-	unsigned int	level:3;
-	unsigned int	:10;
-	unsigned int	cmd:8;
-	unsigned int	scaleT:16;
-	unsigned int	scaleS:16;
-} GTexture;
+struct GGBI1_Vtx
+{
+	u32 len:10;
+	u32 n:6;
+	u32 :1;
+	u32 v0:7;
+	u32 cmd:8;
+	u32 addr;
+};
 
-typedef struct {
-	unsigned int	tl:12;
-	unsigned int	sl:12;
-	unsigned int	cmd:8;
+struct GGBI2_Vtx
+{
+	u32 vend:8;
+	u32 :4;
+	u32 n:8;
+	u32 :4;
+	u32 cmd:8;
+	u32 addr;
+};
 
-	unsigned int	th:12;
-	unsigned int	sh:12;
-	unsigned int	tile:3;
-	unsigned int	pad:5;
-} Gloadtile;
+struct GGBI1_BranchZ
+{
+    u32 pad0:1;      
+    u32 vtx:11;     
+    u32 pad1:12;       
+    u32 cmd:8;         
+    u32 value:32;     
+}; 
 
-typedef struct {
-	unsigned int	tmem:9;
-	unsigned int	line:9;
-	unsigned int	pad0:1;
-	unsigned int	siz:2;
-	unsigned int	fmt:3;
-	unsigned int	cmd:8;
+struct GGBI1_ModifyVtx
+{
+	u32 pad0:1;          
+	u32 vtx:15;  
+	u32 offset:8;    
+	u32 cmd:8;           
+	u32 value;
+};
 
-	unsigned int	shifts:4;
-	unsigned int	masks:4;
-	unsigned int	ms:1;
-	unsigned int	cs:1;
-	unsigned int	shiftt:4;
-	unsigned int	maskt:4;
-	unsigned int	mt:1;
-	unsigned int	ct:1;
-	unsigned int	palette:4;
-	unsigned int	tile:3;
-	unsigned int	pad1:5;
-} Gsettile;
+struct GBI_Texture{
+	u32	enable_gbi0:1;
+	u32	enable_gbi2:1;
+	u32	:6;
+	u32	tile:3;
+	u32	level:3;
+	u32	:10;
+	u32	cmd:8;
+	u32	scaleT:16;
+	u32	scaleS:16;
+};
 
-typedef union {
-	Gwords			words;
-	GGBI0_Tri1		tri1;
-	GGBI0_Ln3DTri2	ln3dtri2;
+struct SetCullDL
+{
+    u32 pad0:1;             
+    u32 first:15;   
+    u32 pad2:8;            
+    u32 cmd:8;             
+    u32 pad3:1;            
+    u32 end:15;    
+    u32 pad4:8;             
+};
+
+struct SetTImg
+{
+	u32 width:12;
+	u32 :7;
+	u32 siz:2;
+	u32 fmt:3;
+	u32	cmd:8;
+	u32 addr;
+};
+
+struct LoadTile
+{
+	u32	tl:12; //Top
+	u32	sl:12; //Left
+	u32	cmd:8;
+
+	u32	th:12; //Bottom
+	u32	sh:12; //Right
+	u32	tile:3;
+	u32	pad:5;
+};
+
+
+struct GGBI1_MoveWord
+{
+	u32	type:8;
+	u32	offset:16;
+	u32	cmd:8;
+	u32	value;
+};
+
+struct GGBI2_MoveWord
+{
+	u32	offset:16;
+	u32	type:8;
+	u32	cmd:8;
+	u32	value;
+};
+
+struct GGBI2_Tri1
+{
+	u32 v0:8;
+	u32 v1:8;
+	u32 v2:8;
+	u32 cmd:8;
+	u32 pad:24;
+	u32 flag:8;
+};
+
+struct GGBI2_Tri2
+{
+	u32 :1;
+	u32 v3:7;
+	u32 :1;
+	u32 v4:7;
+	u32 :1;
+	u32 v5:7;
+	u32 cmd:8;
+	u32 :1;
+	u32 v0:7;
+	u32 :1;
+	u32 v1:7;
+	u32 :1;
+	u32 v2:7;
+	u32 flag:8;
+};
+
+struct GGBI2_Line3D
+{
+	u32 v3:8;
+	u32 v4:8;
+	u32 v5:8;
+	u32 cmd:8;
+
+	u32 v0:8;
+	u32 v1:8;
+	u32 v2:8;
+	u32 flag:8;
+};
+
+struct GGBI1_Line3D
+{
+	u32 w0;
+	u32 v2:8;
+	u32 v1:8;
+	u32 v0:8;
+	u32 v3:8;
+};
+
+struct GGBI1_Tri1
+{
+	u32 w0;
+	u32 v2:8;
+	u32 v1:8;
+	u32 v0:8;
+	u32 flag:8;
+};
+
+struct GGBI1_Tri2
+{
+	u32 v5:8;
+	u32 v4:8;
+	u32 v3:8;
+	u32 cmd:8;
+
+	u32 v2:8;
+	u32 v1:8;
+	u32 v0:8;
+	u32 flag:8;
+};
+
+struct GGBI0_Tri4
+{
+	u32 v0:4;
+	u32 v3:4;
+	u32 v6:4;
+	u32 v9:4;
+	u32 pad:8;
+	u32 cmd:8;
+	u32 v1:4;
+	u32 v2:4;
+	u32 v4:4;
+	u32 v5:4;
+	u32 v7:4;
+	u32 v8:4;
+	u32 v10:4;
+	u32 v11:4;
+};
+
+struct GSetColor
+{
+	u32	prim_level:8;
+	u32	prim_min_level:8;
+	u32	pad:8;
+	u32	cmd:8;
+
+	union 
+	{
+		u32	color;
+		struct 
+		{
+			u32 fillcolor:16;
+			u32 fillcolor2:16;
+		};
+		struct 
+		{
+			u32 a:8;
+			u32 b:8;
+			u32 g:8;
+			u32 r:8;
+		};
+	};
+};
+
+struct GGBI1_Dlist {
+	u32	:16;
+	u32	param:8;
+	u32	cmd:8;
+	u32 addr;
+};
+
+struct Gsettile
+{
+	u32	tmem:9;
+	u32	line:9;
+	u32	pad0:1;
+	u32	siz:2;
+	u32	fmt:3;
+	u32	cmd:8;
+
+	u32	shifts:4;
+	u32	masks:4;
+	u32	ms:1;
+	u32	cs:1;
+	u32	shiftt:4;
+	u32	maskt:4;
+	u32	mt:1;
+	u32	ct:1;
+	u32	palette:4;
+	u32	tile:3;
+	u32	pad1:5;
+};
+
+struct SetFillRect
+{
+	u32 pad1	: 2;
+	u32 y1		: 10;
+	u32 pad0	: 2;
+	u32 x1		: 10;
+	u32 cmd		: 8;
+
+	u32 pad3	: 2;
+	u32 y0		: 10;
+	u32 pad4	: 2;
+	u32 x0		: 10;
+	u32 pad2	: 8;
+};
+
+struct SetPrimDepth
+{
+	u32 pad0:24;
+	u32 cmd:8; 
+    u32 dz:16;   
+    u32 z:15;   
+	u32 pad:1;
+};
+
+struct SetOthermode
+{
+	u32	len:8;
+	u32	sft:8;
+	u32	cmd:8;
+	u32	data;
+};
+
+struct TriDKR
+{
+    u8	v2, v1, v0, flag;
+    signed short	t0, s0;
+    signed short	t1, s1;
+    signed short	t2, s2;
+};
+
+union Gfx
+{
+	Instruction		words;
+	GGBI0_Vtx		vtx0;
+	GGBI1_Vtx		vtx1;
+	GGBI2_Vtx		vtx2;
+	
+	GGBI1_ModifyVtx	modifyvtx;
+	GGBI1_BranchZ	branchz;
+	GGBI1_Matrix	mtx1;
+	GGBI2_Matrix	mtx2;
+	GGBI1_PopMatrix	popmtx;
+
+	GGBI1_Line3D	gbi1line3d;
+	GGBI1_Tri1		gbi1tri1;
 	GGBI1_Tri2		gbi1tri2;
+	GGBI2_Line3D	gbi2line3d;
 	GGBI2_Tri1		gbi2tri1;
 	GGBI2_Tri2		gbi2tri2;
-	GGBI2_Line3D	gbi2line3d;
-	GGBI0_Vtx		gbi0vtx;
-	GGBI1_Vtx		gbi1vtx;
-	GGBI2_Vtx		gbi2vtx;
-	GSetImg			setimg;
+	GGBI0_Tri4		tri4;
+
+	GGBI1_MoveWord	mw1;
+	GGBI2_MoveWord	mw2;
+	GBI_Texture		texture;
+	GGBI1_Dlist		dlist;
+
+	SetCullDL		culldl;	
+	SetTImg			img;
 	GSetColor		setcolor;
-	GGBI0_Dlist		gbi0dlist;
-	GGBI0_Matrix	gbi0matrix;
-	GGBI0_PopMatrix	gbi0popmatrix;
-	GGBI2_Matrix	gbi2matrix;
-	GGBI0_MoveWord	gbi0moveword;
-	GGBI2_MoveWord	gbi2moveword;
-	GTexture		texture;
-	Gloadtile		loadtile;
+
+	LoadTile		loadtile;
+	SetFillRect		fillrect;
+	SetPrimDepth	primdepth;
+	SetOthermode	othermode;
 	Gsettile		settile;
+	
 	/*
 	Gdma		dma;
 	Gsegment	segment;
@@ -290,31 +428,31 @@ typedef union {
 	Gsettilesize	settilesize;
 	Gloadtlut	loadtlut;
 	*/
-	long long int	force_structure_alignment;
-} Gfx;
+	__int64	force_structure_alignment;
+};
 
 typedef union {
 	struct {
-		unsigned int	w0;
-		unsigned int	w1;
-		unsigned int	w2;
-		unsigned int	w3;
+		u32	w0;
+		u32	w1;
+		u32	w2;
+		u32	w3;
 	};
 	struct {
-		unsigned int	yl:12;	/* Y coordinate of upper left	*/
-		unsigned int	xl:12;	/* X coordinate of upper left	*/
-		unsigned int	cmd:8;	/* command			*/
+		u32	yl:12;	/* Y coordinate of upper left	*/
+		u32	xl:12;	/* X coordinate of upper left	*/
+		u32	cmd:8;	/* command			*/
 
-		unsigned int	yh:12;	/* Y coordinate of lower right	*/
-		unsigned int	xh:12;	/* X coordinate of lower right	*/
-		unsigned int	tile:3;	/* Tile descriptor index	*/
-		unsigned int	pad1:5;	/* Padding			*/
+		u32	yh:12;	/* Y coordinate of lower right	*/
+		u32	xh:12;	/* X coordinate of lower right	*/
+		u32	tile:3;	/* Tile descriptor index	*/
+		u32	pad1:5;	/* Padding			*/
 
-		unsigned int	t:16;	/* T texture coord at top left	*/
-		unsigned int	s:16;	/* S texture coord at top left	*/
+		u32	t:16;	/* T texture coord at top left	*/
+		u32	s:16;	/* S texture coord at top left	*/
 
-		unsigned int	dtdy:16;/* Change in T per change in Y	*/
-		unsigned int	dsdx:16;/* Change in S per change in X	*/
+		u32	dtdy:16;/* Change in T per change in Y	*/
+		u32	dsdx:16;/* Change in S per change in X	*/
 	};
 } Gtexrect;
 

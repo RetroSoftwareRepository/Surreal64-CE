@@ -421,7 +421,7 @@ void ReadConfiguration(void)
 		options.bSkipFrame = FrameSkip;
 		options.DirectXAntiAliasingValue = 0;
 		options.DirectXCombiner = DX_PIXEL_SHADER;
-		options.DirectXDevice = DIRECTX_DEVICE;	// HAL device
+		options.DirectXDevice = XBOX_DIRECTX_DEVICE;	// HAL device
 		options.DirectXAnisotropyValue = 0;
 		options.DirectXMaxFSAA = 4;
 		options.FPSColor = 0xFFFFFFFF;
@@ -435,7 +435,7 @@ void ReadConfiguration(void)
 		defaultRomOptions.N64RenderToTextureEmuType = TXT_BUF_NORMAL;//TXT_BUF_NONE;
 
 		defaultRomOptions.bNormalBlender = FALSE;
-		defaultRomOptions.bFastTexCRC=FALSE; //TRUE;
+		defaultRomOptions.bFastTexCRC=TRUE; //FALSE;
 		defaultRomOptions.bNormalCombiner = FALSE;
 		defaultRomOptions.bAccurateTextureMapping = TRUE;
 		defaultRomOptions.bInN64Resolution = TRUE; //FALSE;
