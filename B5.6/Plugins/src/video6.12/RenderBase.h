@@ -254,7 +254,7 @@ void SetVertexXYZ(uint32 vertex, float x, float y, float z);
 void ModifyVertexInfo(uint32 where, uint32 vertex, uint32 val);
 void ProcessVertexDataDKR(uint32 dwAddr, uint32 dwV0, uint32 dwNum);
 void SetLightCol(uint32 dwLight, uint32 dwCol);
-void SetLightDirection(uint32 dwLight, float x, float y, float z);
+void SetLightDirection(uint32 dwLight, float x, float y, float z, float range);
 void ForceMainTextureIndex(int dwTile); 
 void UpdateCombinedMatrix();
 
