@@ -432,7 +432,7 @@ void ReadConfiguration(void)
 
 		defaultRomOptions.N64FrameBufferEmuType = FRM_BUF_NONE;
 		defaultRomOptions.N64FrameBufferWriteBackControl = FRM_BUF_WRITEBACK_NORMAL;
-		defaultRomOptions.N64RenderToTextureEmuType = TXT_BUF_NORMAL;//TXT_BUF_NONE;
+		defaultRomOptions.N64RenderToTextureEmuType = TXT_BUF_NONE;//TXT_BUF_NONE;
 
 		defaultRomOptions.bNormalBlender = FALSE;
 		defaultRomOptions.bFastTexCRC=TRUE; //FALSE;

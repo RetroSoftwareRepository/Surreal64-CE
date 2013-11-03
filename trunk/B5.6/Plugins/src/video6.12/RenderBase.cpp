@@ -31,7 +31,7 @@ extern FiddledVtx * g_pVtxBase;
 #define Z_CLIP_MAX	0x10
 #define Z_CLIP_MIN	0x20
 
-#define ENABLE_CLIP_TRI
+//#define ENABLE_CLIP_TRI
 #ifdef ENABLE_CLIP_TRI
 
 inline void RSP_Vtx_Clipping(int i)
@@ -917,7 +917,7 @@ void InitVertex(uint32 dwV, uint32 vtxIndex, bool bTexture, bool openGL)
 	VTX_DUMP(TRACE0(""));
 }
 
-uint32 LightVertNew(D3DXVECTOR4 & norm, int vidx)
+uint32 LightVert(D3DXVECTOR4 & norm, int vidx)
 {
 	float fCosT;
 
@@ -999,7 +999,7 @@ uint32 LightVertNew(D3DXVECTOR4 & norm, int vidx)
 	return ((0xff000000)|(((uint32)r)<<16)|(((uint32)g)<<8)|((uint32)b));
 }
 
-uint32 LightVert(D3DXVECTOR4 & norm)
+uint32 LightVertNew(D3DXVECTOR4 & norm)
 {
 	float fCosT;
 
@@ -1037,7 +1037,7 @@ __m64 icolor64;
 __m128 icolor128;
 #endif
 
-__declspec( naked ) uint32  __fastcall SSELightVertNew()
+__declspec( naked ) uint32  __fastcall SSELightVert()
 {
 #if _MSC_VER > 1200
 	__asm
@@ -1096,7 +1096,7 @@ breakout:
 }
 
 
-__declspec( naked ) uint32  __fastcall SSELightVert()
+__declspec( naked ) uint32  __fastcall SSELightVertNew()
 {
 #if _MSC_VER > 1200
 	__asm
@@ -1273,7 +1273,7 @@ step3:
 			if( options.enableHackForGames != HACK_FOR_ZELDA_MM )
 				g_dwVtxDifColor[i] = SSELightVert();
 			else
-				g_dwVtxDifColor[i] = LightVert(g_normal);
+				g_dwVtxDifColor[i] = LightVert(g_normal,i);
 			*(((uint8*)&(g_dwVtxDifColor[i]))+3) = vert.rgba.a;	// still use alpha from the vertex
 		}
 		else
@@ -1391,7 +1391,7 @@ void ProcessVertexDataNoSSE(uint32 dwAddr, uint32 dwV0, uint32 dwNum)
 			g_normal.z = (float)vert.norma.nz;
 
 			Vec3TransformNormal(g_normal, gRSPmodelViewTop);
-			g_dwVtxDifColor[i] = LightVert(g_normal);
+			g_dwVtxDifColor[i] = LightVert(g_normal,i);
 			*(((uint8*)&(g_dwVtxDifColor[i]))+3) = vert.rgba.a;	// still use alpha from the vertex
 		}
 		else
@@ -1621,6 +1621,15 @@ void ModifyVertexInfo(uint32 where, uint32 vertex, uint32 val)
 		{
 			uint16 x = (uint16)((val>>16) / 4.0f);
 			uint16 y = (uint16)((val & 0xFFFF) / 4.0f);
+/*
+			uint16 nX = (uint16)(val>>16);
+			short x = *((short*)&nX);
+			x /= 4;
+
+			uint16 nY = uint16(val&0xFFFF);
+			short y = *((short*)&nY);
+			y /= 4;
+*/
 			// Should do viewport transform
 
 			x -= windowSetting.uViWidth/2;
@@ -1765,7 +1774,7 @@ void ProcessVertexDataDKR(uint32 dwAddr, uint32 dwV0, uint32 dwNum)
 			if( status.isSSEEnabled )
 				g_dwVtxDifColor[i] = SSELightVert();
 			else
-				g_dwVtxDifColor[i] = LightVert(g_normal);
+				g_dwVtxDifColor[i] = LightVert(g_normal,i);
 		}
 		else
 		{
@@ -1844,7 +1853,7 @@ void ProcessVertexDataPD(uint32 dwAddr, uint32 dwV0, uint32 dwNum)
 			else
 			{
 				Vec3TransformNormal(g_normal, gRSPmodelViewTop);
-				g_dwVtxDifColor[i] = LightVert(g_normal);
+				g_dwVtxDifColor[i] = LightVert(g_normal,i);
 			}
 			*(((uint8*)&(g_dwVtxDifColor[i]))+3) = (uint8)a;	// still use alpha from the vertex
 		}
@@ -2101,7 +2110,7 @@ void ProcessVertexData_Rogue_Squadron(uint32 dwXYZAddr, uint32 dwColorAddr, uint
 			else
 			{
 				Vec3TransformNormal(g_normal, gRSPmodelViewTop);
-				g_dwVtxDifColor[i] = LightVert(g_normal);
+				g_dwVtxDifColor[i] = LightVert(g_normal,i);
 			}
 			*(((uint8*)&(g_dwVtxDifColor[i]))+3) = vertcolors.a;	// still use alpha from the vertex
 		}
@@ -2168,7 +2177,7 @@ void SetLightCol(uint32 dwLight, uint32 dwCol)
 	LIGHT_DUMP(TRACE2("Set Light %d color: %08X", dwLight, dwCol));
 }
 
-void SetLightDirection(uint32 dwLight, float x, float y, float z)
+void SetLightDirection(uint32 dwLight, float x, float y, float z, float range)
 {
 	//gRSP.bLightIsUpdated = true;
 
@@ -2181,7 +2190,7 @@ void SetLightDirection(uint32 dwLight, float x, float y, float z)
 	gRSPlights[dwLight].x = x/w;
 	gRSPlights[dwLight].y = y/w;
 	gRSPlights[dwLight].z = z/w;
-	//gRSPlights[dwLight].range = range;
+	gRSPlights[dwLight].range = range;
 	
 	if( status.isVertexShaderEnabled && dwLight>0 )
 	{
