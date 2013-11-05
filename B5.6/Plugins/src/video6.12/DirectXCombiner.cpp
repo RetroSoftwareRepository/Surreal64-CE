@@ -516,7 +516,7 @@ void CDirectXColorCombiner::InitCombinerCycleCopy(void)
 	gD3DDevWrapper.SetRenderState(D3DRS_ALPHABLENDENABLE,FALSE);
 	gD3DDevWrapper.SetRenderState(D3DRS_ALPHATESTENABLE,TRUE);
 	
-	SetNumStages(0);
+	//SetNumStages(0);
 	m_pD3DRender->m_curCombineInfo.stages[0].bTextureUsed = true;
 	m_pD3DRender->m_curCombineInfo.nStages = 1;
 
@@ -805,7 +805,7 @@ void CDirectXColorCombiner::InitCombinerBlenderForSimpleTextureDraw(uint32 tile)
 	gD3DDevWrapper.SetRenderState(D3DRS_ALPHATESTENABLE,TRUE);
 	//gD3DDevWrapper.SetRenderState(D3DRS_ALPHATESTENABLE,FALSE);
 	
-	SetNumStages(0);
+	//SetNumStages(0);
 	m_pD3DRender->m_curCombineInfo.stages[0].bTextureUsed = true;
 
 	gD3DDevWrapper.SetTexture( 0, MYLPDIRECT3DTEXTURE(g_textures[tile].m_lpsTexturePtr) );
