@@ -753,10 +753,12 @@ void ComputeLOD(bool openGL)
 	dt = sqrtf((s0-s1)*(s0-s1)+(t0-t1)*(t0-t1));
 
 	float lod = dt/d;
+	int ilod = (int)lod;
+	double intptr;
 	float frac = log10f(lod)/log10f(2.0f);
 	//DEBUGGER_IF_DUMP(pauseAtNext,{DebuggerAppendMsg("LOD frac = %f", frac);});
-	frac = (lod / powf(2.0f,floorf(frac)));
-	frac = frac - floorf(frac);
+	int lod_tile = min((int)(log10f((float)ilod)/log10f(2.0f)), gRSP.curTile + floorf(frac));
+ 	frac = max((float)modf(lod / pow(2.,lod_tile),&intptr), gRDP.primLODMin / 255.0f);
 	//DEBUGGER_IF_DUMP(pauseAtNext,{DebuggerAppendMsg("LOD = %f, frac = %f", lod, frac);});
 	gRDP.LODFrac = (uint32)(frac*255);
 	CRender::g_pRender->SetCombinerAndBlender();
@@ -805,8 +807,9 @@ void InitVertex(uint32 dwV, uint32 vtxIndex, bool bTexture, bool openGL)
 		}
 		else if( gRSP.bFogEnabled )
 		{
+			v.dcSpecular &= 0x00FFFFFF;
 			uint32	fogFct = 0xFF-(uint8)((g_fFogCoord[dwV]-gRSPfFogMin)*gRSPfFogDivider);
-			v.dcSpecular = (fogFct<<24);
+			v.dcSpecular |= (fogFct<<24);
 		}
 	}
 	VTX_DUMP(TRACE2("  (U,V): %f, %f",  g_fVtxTxtCoords[dwV].x,g_fVtxTxtCoords[dwV].y));
@@ -1109,8 +1112,10 @@ loopback:
 		cmp			ecx, DWORD PTR gRSPnumLights;
 		jae			breakout;
 		mov			eax,ecx;
-		imul		eax,0x28;
-		movups		xmm5, DWORD PTR gRSPlights[eax];	// Light Dir
+		//imul		eax,0x28;
+		//movups		xmm5, DWORD PTR gRSPlights[eax];	// Light Dir
+		imul		eax,0x48;
+		movups		xmm5, DWORD PTR gRSPlights[0x28][eax];	// Light Dir (transformed)
 		movups		xmm1, DWORD PTR gRSPlights[0x18][eax];	// Light color
 		mulps       xmm5, xmm4;					// Lightdir * normals
 
@@ -2185,7 +2190,8 @@ void SetLightDirection(uint32 dwLight, float x, float y, float z, float range)
 	//gRSPlights[dwLight].oy = y;
 	//gRSPlights[dwLight].oz = z;
 
-	register float w = (float)sqrt(x*x+y*y+z*z);
+	register float w = range == 0 ? (float)sqrt(x*x+y*y+z*z) : 1;
+	//register float w = (float)sqrt(x*x+y*y+z*z);
 
 	gRSPlights[dwLight].x = x/w;
 	gRSPlights[dwLight].y = y/w;
@@ -2323,15 +2329,18 @@ void UpdateCombinedMatrix()
 		if( options.enableHackForGames == HACK_REVERSE_XY_COOR )
 		{
 			gRSPworldProject = gRSPworldProject * reverseXY;
+			gRSPmodelViewTop = gRSPmodelViewTop * reverseXY;
 		}
 		if( options.enableHackForGames == HACK_REVERSE_Y_COOR )
 		{
 			gRSPworldProject = gRSPworldProject * reverseY;
+			gRSPmodelViewTop = gRSPmodelViewTop * reverseY;
 		}
 
 		if( status.isSSEEnabled )
 		{
 			D3DXMatrixTranspose(&gRSPworldProjectTransported, &gRSPworldProject);
+			D3DXMatrixTranspose(&gRSPmodelViewTopTranspose, &gRSPmodelViewTop);
 		}
 
 		gRSP.bCombinedMatrixIsUpdated = false;

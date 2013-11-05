@@ -192,7 +192,7 @@ LPD3DXSPRITE D3DRender::InitSpriteDraw(void)
 	gD3DDevWrapper.SetTextureStageState( 1, D3DTSS_COLOROP, D3DTOP_DISABLE );
 	gD3DDevWrapper.SetTextureStageState( 1, D3DTSS_ALPHAOP, D3DTOP_DISABLE );
 
-	((CDirectXColorCombiner*)m_pColorCombiner)->SetNumStages(0);
+	//((CDirectXColorCombiner*)m_pColorCombiner)->SetNumStages(0);
 
 	gD3DDevWrapper.SetTexture( 0, MYLPDIRECT3DTEXTURE(g_textures[gRSP.curTile].m_lpsTexturePtr) );
 	gD3DDevWrapper.SetTextureStageState( 0, D3DTSS_COLOROP, D3DTOP_SELECTARG1 );

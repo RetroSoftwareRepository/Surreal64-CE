@@ -41,6 +41,7 @@ static void EmptyFunc(void)
 }
 
 /* local data structures and functions */
+#if !defined(_STATIC_PLUGINS_)
 #define DEFINE_GFX(X) \
     EXPORT m64p_error CALL X##PluginGetVersion(m64p_plugin_type *, int *, int *, const char **, int *); \
     EXPORT void CALL X##ChangeWindow(void); \
@@ -81,9 +82,48 @@ static void EmptyFunc(void)
         X##FBGetFrameBufferInfo \
     }
 
-//DEFINE_GFX(rice);
-//DEFINE_GFX(gln64);
-//DEFINE_GFX(glide64);
+DEFINE_GFX(rice);
+DEFINE_GFX(gln64);
+DEFINE_GFX(glide64);
+#else
+    //extern m64p_error CALL X##PluginGetVersion(m64p_plugin_type *, int *, int *, const char **, int *); // Not in RiceXDK
+    extern void _VIDEO_ChangeWindow(void); \
+    extern BOOL _VIDEO_InitiateGFX(GFX_INFO Gfx_Info); \
+    extern void _VIDEO_MoveScreen(int x, int y); \
+    extern void _VIDEO_ProcessDList(void); \
+    extern void _VIDEO_ProcessRDPList(void); \
+    extern void _VIDEO_RomClosed(void); \
+    extern void _VIDEO_RomOpen(void); \
+    extern void _VIDEO_ShowCFB(void); \
+    extern void _VIDEO_UpdateScreen(void); \
+    extern void _VIDEO_ViStatusChanged(void); \
+    extern void _VIDEO_ViWidthChanged(void); \
+    extern void _VIDEO_ReadScreen2(void *dest, int *width, int *height, int front); \
+    extern void _VIDEO_SetRenderingCallback(void (*callback)(int)); \
+    extern void _VIDEO_ResizeVideoOutput(int width, int height); \
+    extern void _VIDEO_FBRead(unsigned int addr); \
+    extern void _VIDEO_FBWrite(unsigned int addr, unsigned int size); \
+    extern void _VIDEO_FBGetFrameBufferInfo(void *p); \
+
+	static const gfx_plugin_functions gfx_VIDEO = { \
+        //_VIDEO_PluginGetVersion, 
+        _VIDEO_ChangeWindow, \
+        _VIDEO_InitiateGFX, \
+        _VIDEO_MoveScreen, \
+        _VIDEO_ProcessDList, \
+        _VIDEO_ProcessRDPList, \
+        _VIDEO_RomClosed, \
+        _VIDEO_RomOpen, \
+        _VIDEO_ShowCFB, \
+        _VIDEO_UpdateScreen, \
+        _VIDEO_ViStatusChanged, \
+        _VIDEO_ViWidthChanged, \
+        _VIDEO_ReadScreen2, \
+        _VIDEO_SetRenderingCallback, \
+        _VIDEO_FBRead, \
+        _VIDEO_FBWrite, \
+        _VIDEO_FBGetFrameBufferInfo \
+#endif
 
 gfx_plugin_functions gfx;
 static GFX_INFO gfx_info;
@@ -128,19 +168,7 @@ static m64p_error plugin_start_gfx(void)
 }
 
 /* AUDIO */
-	AiDacrateChanged = (void *)(int)_AUDIO_LINK_AiDacrateChanged;
-	if (AiDacrateChanged == NULL) { return FALSE; }
-	AiLenChanged = (void *)_AUDIO_LINK_AiLenChanged;
-	if (AiLenChanged == NULL) { return FALSE; }
-	AiReadLength = (DWORD ( *)(void))_AUDIO_LINK_AiReadLength;
-	if (AiReadLength == NULL) { return FALSE; }
-	InitiateAudio = (BOOL ( *)(AUDIO_INFO))_AUDIO_LINK_InitiateAudio;
-	if (InitiateAudio == NULL) { return FALSE; }
-	AiRomClosed = (void ( *)(void))_AUDIO_LINK_RomClosed;
-	if (AiRomClosed == NULL) { return FALSE; }
-	ProcessAList = (void ( *)(void))_AUDIO_LINK_ProcessAList;	
-	if (ProcessAList == NULL) { return FALSE; }
-extern void audioAiDacrateChanged(int SystemType);
+extern void _AUDIO_AiDacrateChanged(int SystemType);
 extern void audioAiLenChanged(void);
 extern int  audioInitiateAudio(AUDIO_INFO Audio_Info);
 extern void audioProcessAList(void);
@@ -306,8 +334,8 @@ static m64p_error plugin_start_rsp(void)
 /* global functions */
 void plugin_connect_all(enum gfx_plugin_type gfx_plugin)
 {
-#if defined(_XBOX)
-
+#if defined(_STATIC_PLUGINS_)
+	gfx = gfx_VIDEO
 #else
     switch (gfx_plugin)
     {

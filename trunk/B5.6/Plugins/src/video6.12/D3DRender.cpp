@@ -43,8 +43,7 @@ UVFlagMap DirectXUVFlagMaps[] =
 //*****************************************************************************
 // Creator function for singleton
 //*****************************************************************************
-D3DRender::D3DRender() :
-	m_dwTextureFactor(COLOR_RGBA(255,255,255,255))
+D3DRender::D3DRender() 
 {
 	m_dwrsZEnable=D3DZB_FALSE;
 	m_dwrsZWriteEnable=FALSE;
