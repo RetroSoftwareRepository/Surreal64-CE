@@ -27,7 +27,7 @@
 //#define NormalCompileBufferSize	0x01400000
 extern DWORD g_dwNormalCompileBufferSize; // 14MB default
 
-#define ROM_IN_MAPSPACE
+//#define ROM_IN_MAPSPACE
 
 extern DWORD *TLB_ReadMap, *TLB_WriteMap, RdramSize, SystemRdramSize;
 extern BYTE *N64MEM, *RDRAM, *DMEM, *IMEM, *ROM;

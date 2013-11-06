@@ -20,6 +20,10 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
+				GlobalOptimizations="FALSE"
+				InlineFunctionExpansion="0"
+				EnableIntrinsicFunctions="FALSE"
+				FavorSizeOrSpeed="0"
 				OptimizeForProcessor="2"
 				AdditionalIncludeDirectories=""
 				PreprocessorDefinitions="DEBUG;_XBOX;EXTERNAL_RELEASE;WIN32;_WIN32;_WINDOWS;__WIN32__"
@@ -222,12 +226,12 @@
 			WholeProgramOptimization="FALSE">
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="0"
-				GlobalOptimizations="FALSE"
+				Optimization="2"
+				GlobalOptimizations="TRUE"
 				InlineFunctionExpansion="2"
-				EnableIntrinsicFunctions="TRUE"
+				EnableIntrinsicFunctions="FALSE"
 				ImproveFloatingPointConsistency="FALSE"
-				FavorSizeOrSpeed="0"
+				FavorSizeOrSpeed="1"
 				OmitFramePointers="TRUE"
 				EnableFiberSafeOptimizations="TRUE"
 				OptimizeForProcessor="2"
