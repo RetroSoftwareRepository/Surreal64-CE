@@ -24,7 +24,7 @@
  *
  */
 
-#include <xtl.h>
+#include <windows.h>
 #include <stdio.h>
 #include <float.h>
 #include "breakpoint.h"
@@ -34,8 +34,9 @@
 #include "Interpreter CPU.h"
 #include "RSP registers.h"
 #include "RSP Command.h"
-#include "rspmemory.h"
+#include "memory.h"
 #include "opcode.h"
+#include "log.h"
 
 DWORD RSP_NextInstruction, RSP_JumpTo;
 
@@ -404,11 +405,11 @@ void BuildInterpreterCPU(void) {
 DWORD RunInterpreterCPU(DWORD Cycles) {
 	DWORD CycleCount;
 	RSP_Running = TRUE;
-	//Enable_RSP_Commands_Window();
+	Enable_RSP_Commands_Window();
 	CycleCount = 0;
 
 	while (RSP_Running) {
-	/*	if (NoOfBpoints != 0) {
+		if (NoOfBpoints != 0) {
 			if (CheckForRSPBPoint(*PrgCount)) {
 				if (InRSPCommandsWindow) {
 					Enter_RSP_Commands_Window();
@@ -436,7 +437,10 @@ DWORD RunInterpreterCPU(DWORD Cycles) {
 					WaitingForStep = FALSE;
 				}
 			}
-		} */
+		}
+
+
+		RDP_LogLoc(*PrgCount);
 
 		RSP_LW_IMEM(*PrgCount, &RSPOpC.Hex);
 		((void (*)()) RSP_Opcode[ RSPOpC.op ])();
@@ -453,10 +457,17 @@ DWORD RunInterpreterCPU(DWORD Cycles) {
 			RSP_NextInstruction = NORMAL;
 			*PrgCount  = RSP_JumpTo;
 			break;
+		case SINGLE_STEP: 
+			*PrgCount = (*PrgCount + 4) & 0xFFC; 
+			RSP_NextInstruction = SINGLE_STEP_DONE;
+			break;
+		case SINGLE_STEP_DONE:
+			*PrgCount = (*PrgCount + 4) & 0xFFC; 
+			*RSPInfo.SP_STATUS_REG |= SP_STATUS_HALT;
+			RSP_Running = FALSE;
+			break;
 		}
 	}
-	*PrgCount -= 4;
-
 	return Cycles;
 }
 

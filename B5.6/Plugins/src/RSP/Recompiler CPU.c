@@ -24,17 +24,21 @@
  *
  */
 
-#include <xtl.h>
+#include <windows.h>
 #include <stdio.h>
 #include <float.h>
+#include <stdlib.h>
 #include "RSP.h"
 #include "Cpu.h"
+#include "Interpreter CPU.h"
 #include "Recompiler CPU.h"
 #include "Recompiler Ops.h"
 #include "RSP registers.h"
 #include "RSP Command.h"
-#include "rspmemory.h"
+#include "memory.h"
 #include "opcode.h"
+#include "log.h"
+#include "Profiling.h"
 #include "x86.h"
 
 /* #define REORDER_BLOCK_VERBOSE */
@@ -42,10 +46,9 @@
 #define X86_RECOMP_VERBOSE
 #define BUILD_BRANCHLABELS_VERBOSE
 
- 
-
-DWORD CompilePC, BlockID = 0;
+DWORD CompilePC, JumpTableSize, BlockID = 0;
 DWORD dwBuffer = MainBuffer;
+BOOL ChangedPC;
 
 RSP_BLOCK CurrentBlock;
 RSP_CODE RspCode;
@@ -85,10 +88,10 @@ void BuildRecompilerCPU ( void ) {
 	RSP_Opcode[29] = Compile_UnknownOpcode;
 	RSP_Opcode[30] = Compile_UnknownOpcode;
 	RSP_Opcode[31] = Compile_UnknownOpcode;
-	RSP_Opcode[32] = RSP_Compile_LB;
-	RSP_Opcode[33] = RSP_Compile_LH;
+	RSP_Opcode[32] = Compile_LB;
+	RSP_Opcode[33] = Compile_LH;
 	RSP_Opcode[34] = Compile_UnknownOpcode;
-	RSP_Opcode[35] = RSP_Compile_LW;
+	RSP_Opcode[35] = Compile_LW;
 	RSP_Opcode[36] = Compile_LBU;
 	RSP_Opcode[37] = Compile_LHU;
 	RSP_Opcode[38] = Compile_UnknownOpcode;
@@ -355,8 +358,8 @@ void BuildRecompilerCPU ( void ) {
 	RSP_Lc2[ 5] = Compile_Opcode_LRV;
 	RSP_Lc2[ 6] = Compile_Opcode_LPV;
 	RSP_Lc2[ 7] = Compile_Opcode_LUV;
-	RSP_Lc2[ 8] = Compile_UnknownOpcode;
-	RSP_Lc2[ 9] = Compile_UnknownOpcode;
+	RSP_Lc2[ 8] = Compile_Opcode_LHV;
+	RSP_Lc2[ 9] = Compile_Opcode_LFV;
 	RSP_Lc2[10] = Compile_UnknownOpcode;
 	RSP_Lc2[11] = Compile_Opcode_LTV;
 	RSP_Lc2[12] = Compile_UnknownOpcode;
@@ -388,9 +391,9 @@ void BuildRecompilerCPU ( void ) {
 	RSP_Sc2[ 5] = Compile_Opcode_SRV;
 	RSP_Sc2[ 6] = Compile_Opcode_SPV;
 	RSP_Sc2[ 7] = Compile_Opcode_SUV;
-	RSP_Sc2[ 8] = Compile_UnknownOpcode;
-	RSP_Sc2[ 9] = Compile_UnknownOpcode;
-	RSP_Sc2[10] = Compile_UnknownOpcode;
+	RSP_Sc2[ 8] = Compile_Opcode_SHV;
+	RSP_Sc2[ 9] = Compile_Opcode_SFV;
+	RSP_Sc2[10] = Compile_Opcode_SWV;
 	RSP_Sc2[11] = Compile_Opcode_STV;
 	RSP_Sc2[12] = Compile_UnknownOpcode;
 	RSP_Sc2[13] = Compile_UnknownOpcode;
@@ -414,6 +417,7 @@ void BuildRecompilerCPU ( void ) {
 	RSP_Sc2[31] = Compile_UnknownOpcode;
 	
 	BlockID = 0;
+	ChangedPC = FALSE;
 	#ifdef Log_x86Code
 	Start_x86_Log();
 	#endif
@@ -446,15 +450,15 @@ void ReOrderInstructions(DWORD StartPC, DWORD EndPC) {
 		return;
 	}
 
-	//CPU_Message("***** Doing reorder (%X to %X) *****", StartPC, EndPC);
+	CPU_Message("***** Doing reorder (%X to %X) *****", StartPC, EndPC);
 
 	if (InstructionCount < 0x0010) { return; }
 	if (InstructionCount > 0x0A00) { return; }
 	
-	//CPU_Message(" Before:");
+	CPU_Message(" Before:");
 	for (Count = StartPC; Count < EndPC; Count += 4) {
 		RSP_LW_IMEM(Count, &RspOp.Hex);
-		////CPU_Message("  %X %s",Count,RSPOpcodeName(RspOp.Hex,Count));
+		CPU_Message("  %X %s",Count,RSPOpcodeName(RspOp.Hex,Count));
 	}
 
 	for (Count = 0; Count < InstructionCount; Count += 4) {
@@ -473,9 +477,10 @@ void ReOrderInstructions(DWORD StartPC, DWORD EndPC) {
 			 	*(DWORD*)(RSPInfo.IMEM + CurrentPC) = PreviousOp.Hex;
 
 				ReorderedOps++;
-				#ifdef REORDER_BLOCK_VERBOSE
-				//CPU_Message("Swapped %X and %X", CurrentPC - 4, CurrentPC);
-				#endif
+
+#ifdef REORDER_BLOCK_VERBOSE
+				CPU_Message("Swapped %X and %X", CurrentPC - 4, CurrentPC);
+#endif
 			}
 			PreviousOp.Hex = *(DWORD*)(RSPInfo.IMEM + CurrentPC);
 
@@ -489,12 +494,12 @@ void ReOrderInstructions(DWORD StartPC, DWORD EndPC) {
 		}
 	}
 
-	//CPU_Message(" After:");
+	CPU_Message(" After:");
 	for (Count = StartPC; Count < EndPC; Count += 4) {
 		RSP_LW_IMEM(Count, &RspOp.Hex);
-		////CPU_Message("  %X %s",Count,RSPOpcodeName(RspOp.Hex,Count));
+		CPU_Message("  %X %s",Count,RSPOpcodeName(RspOp.Hex,Count));
 	}
-	//CPU_Message("");
+	CPU_Message("");
 }
 
 void ReOrderSubBlock(RSP_BLOCK * Block) {
@@ -511,21 +516,18 @@ void ReOrderSubBlock(RSP_BLOCK * Block) {
 	/* find the label or jump closest to us */
 	if (RspCode.LabelCount) {
 		for (count = 0; count < RspCode.LabelCount; count++) {
-			if (RspCode.BranchLabels[count] < end && 
-				  RspCode.BranchLabels[count] > Block->CurrPC) { 
+			if (RspCode.BranchLabels[count] < end && RspCode.BranchLabels[count] > Block->CurrPC) { 
 				end = RspCode.BranchLabels[count];
 			}
 		}
 	}
 	if (RspCode.BranchCount) {
 		for (count = 0; count < RspCode.BranchCount; count++) {
-			if (RspCode.BranchLocations[count] < end && 
-				  RspCode.BranchLocations[count] > Block->CurrPC) { 
+			if (RspCode.BranchLocations[count] < end && RspCode.BranchLocations[count] > Block->CurrPC) { 
 				end = RspCode.BranchLocations[count];
 			}
 		}
 	}
-
 	/* it wont actually re-order the op at the end */
 	ReOrderInstructions(Block->CurrPC, end);
 }
@@ -548,21 +550,21 @@ void DetectGPRConstants(RSP_CODE * code) {
 	if (!Compiler.bGPRConstants) { 
 		return; 
 	}
-	//CPU_Message("***** Detecting constants *****");
+	CPU_Message("***** Detecting constants *****");
 
-	/*** Setup R0 ***/
+	/* R0 is constant zero, R31 or RA is not constant */
 	code->bIsRegConst[0] = TRUE;
 	code->MipsRegConst[0] = 0;
 
 	/* Do your global search for them */
-	for (Count = 1; Count < 32; Count++) {
+	for (Count = 1; Count < 31; Count++) {
 		if (IsRegisterConstant(Count, &Constant) == TRUE) {
-			//CPU_Message("Global: %s is a constant of: %08X", GPR_Name(Count), Constant);
+			CPU_Message("Global: %s is a constant of: %08X", GPR_Name(Count), Constant);
 			code->bIsRegConst[Count] = TRUE;
 			code->MipsRegConst[Count] = Constant;
 		}
 	}
-	//CPU_Message("");
+	CPU_Message("");
 }
 
 /******************************************************
@@ -586,7 +588,7 @@ void CompilerToggleBuffer(void) {
 		}
 
 		RecompPos = pLastSecondary;
-		//CPU_Message("   (Secondary Buffer Active 0x%08X)", pLastSecondary);
+		CPU_Message("   (Secondary Buffer Active 0x%08X)", pLastSecondary);
 	} else {
 		dwBuffer = MainBuffer;
 		pLastSecondary = RecompPos;
@@ -596,7 +598,7 @@ void CompilerToggleBuffer(void) {
 		}
 	
 		RecompPos = pLastPrimary;
-		//CPU_Message("   (Primary Buffer Active 0x%08X)", pLastPrimary);
+		CPU_Message("   (Primary Buffer Active 0x%08X)", pLastPrimary);
 	}
 }
 
@@ -623,6 +625,7 @@ void ClearAllx86Code (void) {
 ********************************************************/
 
 void LinkBranches(RSP_BLOCK * Block) {
+	DWORD OrigPrgCount = *PrgCount;
 	DWORD Count, Target;
 	DWORD * JumpWord;
 	BYTE * X86Code;
@@ -631,7 +634,7 @@ void LinkBranches(RSP_BLOCK * Block) {
 	if (!CurrentBlock.ResolveCount) { 
 		return; 
 	}
-	//CPU_Message("***** Linking branches (%i) *****", CurrentBlock.ResolveCount);
+	CPU_Message("***** Linking branches (%i) *****", CurrentBlock.ResolveCount);
 
 	for (Count = 0; Count < CurrentBlock.ResolveCount; Count++) {
 		Target = CurrentBlock.BranchesToResolve[Count].TargetPC;
@@ -639,8 +642,8 @@ void LinkBranches(RSP_BLOCK * Block) {
 
 		if (!X86Code) {
 			*PrgCount = Target;
-			//CPU_Message("");
-			//CPU_Message("===== (Generate Code: %04X) =====", Target);
+			CPU_Message("");
+			CPU_Message("===== (Generate Code: %04X) =====", Target);
 			Save = *Block;
 
 			/* compile this block and link */
@@ -648,19 +651,20 @@ void LinkBranches(RSP_BLOCK * Block) {
 			LinkBranches(Block);
 
 			*Block = Save;
-			//CPU_Message("===== (End Generate Code: %04X) =====", Target);
-			//CPU_Message("");
+			CPU_Message("===== (End Generate Code: %04X) =====", Target);
+			CPU_Message("");
 			X86Code = *(JumpTable + (Target >> 2));
 		}
 
 		JumpWord = CurrentBlock.BranchesToResolve[Count].X86JumpLoc;
 		x86_SetBranch32b(JumpWord, (DWORD*)X86Code);
 
-		//CPU_Message("Linked RSP branch from x86: %08X, to RSP: %X / x86: %08X",
-		//	JumpWord, Target, X86Code);
+		CPU_Message("Linked RSP branch from x86: %08X, to RSP: %X / x86: %08X",
+			JumpWord, Target, X86Code);
 	}
-	//CPU_Message("***** Done Linking Branches *****");
-	//CPU_Message("");
+	*PrgCount = OrigPrgCount;
+	CPU_Message("***** Done Linking Branches *****");
+	CPU_Message("");
 }
 
 /******************************************************
@@ -677,19 +681,23 @@ void BuildBranchLabels(void) {
 	OPCODE RspOp;
 	DWORD i, Dest;
 
-	#ifdef BUILD_BRANCHLABELS_VERBOSE
-	//CPU_Message("***** Building branch labels *****");
-	#endif
+#ifdef BUILD_BRANCHLABELS_VERBOSE
+	CPU_Message("***** Building branch labels *****");
+#endif
 
 	for (i = 0; i < 0x1000; i += 4) {
 		RspOp.Hex = *(DWORD*)(RSPInfo.IMEM + i);
 
 		if (TRUE == IsOpcodeBranch(i, RspOp)) {
-			if (RspCode.LabelCount >= 175) {
+			if (RspCode.LabelCount >= (sizeof(RspCode.BranchLabels) / sizeof(RspCode.BranchLabels[0])) - 1) {
 				CompilerWarning("Out of space for Branch Labels");
 				return;
 			}
 
+			if (RspCode.BranchCount >= (sizeof(RspCode.BranchLocations) / sizeof(RspCode.BranchLocations[0])) - 1) {
+				CompilerWarning("Out of space for Branch Locations");
+				return;
+			}
 			RspCode.BranchLocations[RspCode.BranchCount++] = i;
 			if (RspOp.op == RSP_SPECIAL) {
 				/* register jump not predictable */
@@ -698,24 +706,24 @@ void BuildBranchLabels(void) {
 				Dest = (RspOp.target << 2) & 0xFFC;
 				RspCode.BranchLabels[RspCode.LabelCount] = Dest;
 				RspCode.LabelCount += 1;
-				#ifdef BUILD_BRANCHLABELS_VERBOSE
-				//CPU_Message("[%02i] Added branch at %X to %X", RspCode.LabelCount, i, Dest);
-				#endif
+#ifdef BUILD_BRANCHLABELS_VERBOSE
+				CPU_Message("[%02i] Added branch at %X to %X", RspCode.LabelCount, i, Dest);
+#endif
 			} else {
 				Dest = (i + ((short)RspOp.offset << 2) + 4) & 0xFFC;
 				RspCode.BranchLabels[RspCode.LabelCount] = Dest;
 				RspCode.LabelCount += 1;
-				#ifdef BUILD_BRANCHLABELS_VERBOSE
-				//CPU_Message("[%02i] Added branch at %X to %X", RspCode.LabelCount, i, Dest);
-				#endif
+#ifdef BUILD_BRANCHLABELS_VERBOSE
+				CPU_Message("[%02i] Added branch at %X to %X", RspCode.LabelCount, i, Dest);
+#endif
 			}
 		}
 	}
 
-	#ifdef BUILD_BRANCHLABELS_VERBOSE
-	//CPU_Message("***** End branch labels *****");
-	//CPU_Message("");
-	#endif
+#ifdef BUILD_BRANCHLABELS_VERBOSE
+	CPU_Message("***** End branch labels *****");
+	CPU_Message("");
+#endif
 }
 
 BOOL IsJumpLabel(DWORD PC) {
@@ -736,16 +744,17 @@ BOOL IsJumpLabel(DWORD PC) {
 void CompilerLinkBlocks(void) {
 	BYTE * KnownCode = *(JumpTable + (CompilePC >> 2));
 
-	//CPU_Message("***** Linking block to X86: %08X *****", KnownCode);
+	CPU_Message("***** Linking block to X86: %08X *****", KnownCode);
 	NextInstruction = FINISH_BLOCK;
 
 	/* block linking scenario */				
-	RSP_JmpLabel32("Linked block", 0);
+	JmpLabel32("Linked block", 0);
 	x86_SetBranch32b(RecompPos - 4, KnownCode);
 }
 
 void CompilerRSPBlock ( void ) {
 	DWORD Count, Padding, X86BaseAddress = (DWORD)RecompPos;
+	BYTE * IMEM_SAVE = (BYTE *)malloc(0x1000);
 
 	NextInstruction = NORMAL;
 	CompilePC = *PrgCount;
@@ -758,19 +767,19 @@ void CompilerRSPBlock ( void ) {
 	if (X86BaseAddress & 7) {
 		Padding = (8 - (X86BaseAddress & 7)) & 7;
 		for (Count = 0; Count < Padding; Count++) {
-			//CPU_Message("%08X: nop", RecompPos);
+			CPU_Message("%08X: nop", RecompPos);
 			*(RecompPos++) = 0x90;
 		}
 	}
 
-	//CPU_Message("====== block %d ======", BlockID++);
-	//CPU_Message("x86 code at: %X",RecompPos);
-	//CPU_Message("Jumpt Table: %X",Table );
-	//CPU_Message("Start of Block: %X",CurrentBlock.StartPC );
-	//CPU_Message("====== recompiled code ======");
+	CPU_Message("====== block %d ======", BlockID++);
+	CPU_Message("x86 code at: %X",RecompPos);
+	CPU_Message("Jumpt Table: %X",Table );
+	CPU_Message("Start of Block: %X",CurrentBlock.StartPC );
+	CPU_Message("====== recompiled code ======");
 
 	if (Compiler.bReOrdering == TRUE) {
-		memcpy(&CurrentBlock.IMEM[0], RSPInfo.IMEM, 0x1000);
+		memcpy(IMEM_SAVE, RSPInfo.IMEM, 0x1000);
 		ReOrderSubBlock(&CurrentBlock);
 	}
 
@@ -779,15 +788,14 @@ void CompilerRSPBlock ( void ) {
 
 	do {
 		/*
-		** Re-Ordering is setup to allow us to have loop labels
-		** so here we see if this is one and put it in the jump table
-		**/
-	
+		 * Re-Ordering is setup to allow us to have loop labels
+		 * so here we see if this is one and put it in the jump table
+		 */
 		if (NextInstruction == NORMAL && IsJumpLabel(CompilePC)) {
 			/* jumps come around twice */
 			if (NULL == *(JumpTable + (CompilePC >> 2))) {
-				//CPU_Message("***** Adding Jump Table Entry for PC: %04X at X86: %08X *****", CompilePC, RecompPos);
-				//CPU_Message("");
+				CPU_Message("***** Adding Jump Table Entry for PC: %04X at X86: %08X *****", CompilePC, RecompPos);
+				CPU_Message("");
 				*(JumpTable + (CompilePC >> 2)) = RecompPos;
 
 				/* reorder from here to next label or branch */
@@ -807,13 +815,21 @@ void CompilerRSPBlock ( void ) {
 			}
 		}
 
-		#ifdef X86_RECOMP_VERBOSE
+#ifdef X86_RECOMP_VERBOSE
 		if (FALSE == IsOpcodeNop(CompilePC)) {
-			//CPU_Message("X86 Address: %08X", RecompPos);
+			CPU_Message("X86 Address: %08X", RecompPos);
 		}
-		#endif
+#endif
 
 		RSP_LW_IMEM(CompilePC, &RSPOpC.Hex);
+
+		if (LogRDP && NextInstruction != DELAY_SLOT_DONE){
+			char str[40];
+			sprintf(str,"%X",CompilePC);		
+			PushImm32(str,CompilePC);
+			Call_Direct(RDP_LogLoc,"RDP_LogLoc");
+			AddConstToX86Reg(x86_ESP, 4);
+		}
 
 		if (RSPOpC.Hex == 0xFFFFFFFF) {
 			/* i think this pops up an unknown op dialog */
@@ -824,7 +840,7 @@ void CompilerRSPBlock ( void ) {
 
 		switch (NextInstruction) {
 		case NORMAL: 
-			CompilePC += 4; 
+			CompilePC += 4;
 			break;
 		case DO_DELAY_SLOT:
 			NextInstruction = DELAY_SLOT;
@@ -834,6 +850,10 @@ void CompilerRSPBlock ( void ) {
 			NextInstruction = DELAY_SLOT_DONE;
 			CompilePC -= 4;
 			break;
+		case DELAY_SLOT_EXIT:
+			NextInstruction = DELAY_SLOT_EXIT_DONE;
+			CompilePC -= 4;
+			break;
 		case FINISH_SUB_BLOCK:
 			NextInstruction = NORMAL;
 			CompilePC += 8;
@@ -841,7 +861,7 @@ void CompilerRSPBlock ( void ) {
 				NextInstruction = FINISH_BLOCK;				
 			} else if (NULL == *(JumpTable + (CompilePC >> 2))) {
 				/* this is for the new block being compiled now */
-				//CPU_Message("**** Continuing static SubBlock (jump table entry added for PC: %04X at X86: %08X) *****", CompilePC, RecompPos);
+				CPU_Message("**** Continuing static SubBlock (jump table entry added for PC: %04X at X86: %08X) *****", CompilePC, RecompPos);
 				*(JumpTable + (CompilePC >> 2)) = RecompPos;
 
 				CurrentBlock.CurrPC = CompilePC;
@@ -859,23 +879,29 @@ void CompilerRSPBlock ( void ) {
 			break;
 		}
 	} while ( NextInstruction != FINISH_BLOCK && CompilePC < 0x1000);
-	//CPU_Message("==== end of recompiled code ====");
+	CPU_Message("==== end of recompiled code ====");
 
 	if (Compiler.bReOrdering == TRUE) {
-		memcpy(RSPInfo.IMEM, &CurrentBlock.IMEM[0], 0x1000);
+		memcpy(RSPInfo.IMEM, IMEM_SAVE, 0x1000);
 	}
+	free(IMEM_SAVE);
 }
 
 DWORD RunRecompilerCPU ( DWORD Cycles ) {
 	BYTE * Block;
 
 	RSP_Running = TRUE;
-	SetJumpTable();
+	SetJumpTable(JumpTableSize);
 
-	while (RSP_Running) {
+	while (RSP_Running) 
+	{
 		Block = *(JumpTable + (*PrgCount >> 2));
 
 		if (Block == NULL) {
+			if (Profiling && !IndvidualBlock) {
+				StartTimer(Timer_Compiling);
+			}
+
 			__try {
 				memset(&RspCode, 0, sizeof(RspCode));
 				BuildBranchLabels();
@@ -896,26 +922,27 @@ DWORD RunRecompilerCPU ( DWORD Cycles ) {
 			**/
 
 			LinkBranches(&CurrentBlock);			
+			if (Profiling && !IndvidualBlock) {
+				StopTimer();
+			}
 		}
 
-	#if !defined(EXTERNAL_RELEASE)
 		if (Profiling && IndvidualBlock) {
-			char Label[100];
-			sprintf(Label,"RSP PC: %03X",*PrgCount);
-			StartTimer(Label);
+			StartTimer(*PrgCount);
 		}
-	#endif
+
 		_asm {
 			pushad
 			call Block
 			popad
 		}		
-	#if !defined(EXTERNAL_RELEASE)
 		if (Profiling && IndvidualBlock) {
 			StopTimer();
 		}
-	#endif
-
+		if (RSP_NextInstruction == SINGLE_STEP)
+		{
+			RSP_Running = FALSE;
+		}
 	}
 
 	if (IsMmxEnabled == TRUE) {

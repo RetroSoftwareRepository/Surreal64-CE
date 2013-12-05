@@ -600,13 +600,15 @@ void InitRenderBase()
 	gRSP.real_clip_scissor_top = 0;
 	gRSP.real_clip_scissor_right = 640;
 	gRSP.real_clip_scissor_bottom = 480;
-	/*windowSetting.clipping.left = 0;
+#ifndef _OLDCLIPPER
+	windowSetting.clipping.left = 0;
 	windowSetting.clipping.top = 0;
 	windowSetting.clipping.right = 640;
 	windowSetting.clipping.bottom = 480;
 	windowSetting.clipping.width = 640;
 	windowSetting.clipping.height = 480;
-	windowSetting.clipping.needToClip = false;*/
+	windowSetting.clipping.needToClip = false;
+#endif
 	gRSP.real_clip_ratio_negx = 1;
 	gRSP.real_clip_ratio_negy = 1;
 	gRSP.real_clip_ratio_posx = 1;
@@ -933,7 +935,7 @@ uint32 LightVert(D3DXVECTOR4 & norm, int vidx)
 	{
 		for (register unsigned int l=0; l < gRSPnumLights; l++)
 		{
-			fCosT = norm.x*gRSPlights[l].x + norm.y*gRSPlights[l].y + norm.z*gRSPlights[l].z; 
+			fCosT = norm.x*gRSPlights[l].tx + norm.y*gRSPlights[l].ty + norm.z*gRSPlights[l].tz; 
 
 			if (fCosT > 0 )
 			{
@@ -2882,9 +2884,9 @@ bool Clip1TriangleForNegW(TLITVERTEX &v1, TLITVERTEX &v2, TLITVERTEX &v3, int &d
 		ClipFor1LineZ(pts[lno%2], pts[(lno+1)%2], true);	// Clip for near plane
 		if( pts[(lno+1)%2].size() < 3 )
 			return false;
-		ClipFor1LineZ(pts[(lno+1)%2], pts[lno%2], false);	// clip for far plane
-		if( pts[lno%2].size() < 3 )
-			return false;
+		//ClipFor1LineZ(pts[(lno+1)%2], pts[lno%2], false);	// clip for far plane
+		//if( pts[lno%2].size() < 3 )
+		//	return false;
 
 		size = ps.size();
 	}

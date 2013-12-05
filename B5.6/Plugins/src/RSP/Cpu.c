@@ -24,21 +24,24 @@
  *
  */
 
-#include <xtl.h>
+#include <windows.h>
 #include <stdio.h>
 #include <float.h>
 #include "RSP.h"
 #include "Cpu.h"
 #include "RSP registers.h"
 #include "RSP Command.h"
-#include "RSPmemory.h"
+#include "Recompiler CPU.h"
+#include "memory.h"
 #include "opcode.h"
+#include "log.h"
+#include "Profiling.h"
 #include "breakpoint.h"
 #include "x86.h"
 
 UDWORD EleSpec[32], Indx[32];
 OPCODE RSPOpC;
-DWORD *PrgCount, NextInstruction, RSP_Running;
+DWORD *PrgCount, NextInstruction, RSP_Running, RSP_MfStatusCount;
 
 void * RSP_Opcode[64];
 void * RSP_RegImm[32];
@@ -49,30 +52,36 @@ void * RSP_Vector[64];
 void * RSP_Lc2[32];
 void * RSP_Sc2[32];
 
-//void BuildInterpreterCPU(void);
+void BuildInterpreterCPU(void);
 void BuildRecompilerCPU(void);
 
 extern HANDLE hMutex;
 
 void SetCPU(DWORD core) {
-	WaitForSingleObjectEx(hMutex, INFINITE, FALSE);
+	WaitForSingleObjectEx(hMutex, 1000 * 100, FALSE);
 	CPUCore = core;
 	switch (core) {
 	case RecompilerCPU:
 		BuildRecompilerCPU();
 		break;
-	//case InterpreterCPU:
-	//	BuildInterpreterCPU();
-	//	break;
+	case InterpreterCPU:
+		BuildInterpreterCPU();
+		break;
 	}
 	ReleaseMutex(hMutex);
 }
 
 void Build_RSP ( void ) {
 	int i;
+	extern UWORD32 Recp, RecpResult, SQroot, SQrootResult;
+
+	Recp.UW = 0;
+	RecpResult.UW = 0;
+	SQroot.UW = 0;
+	SQrootResult.UW = 0;
 
 	SetCPU(CPUCore);
-	//ResetTimerList();
+	ResetTimerList();
 
 	EleSpec[ 0].DW = 0;
 	EleSpec[ 1].DW = 0;
@@ -175,11 +184,20 @@ void Build_RSP ( void ) {
 DWORD RunInterpreterCPU(DWORD Cycles);
 DWORD RunRecompilerCPU ( DWORD Cycles );
 
-DWORD _RSP_DoRspCycles ( DWORD Cycles ) {
+#define MI_INTR_SP				0x01		/* Bit 0: SP intr */
+
+__declspec(dllexport) DWORD DoRspCycles ( DWORD Cycles ) {
 	extern BOOL AudioHle, GraphicsHle;
 	DWORD TaskType = *(DWORD*)(RSPInfo.DMEM + 0xFC0);
-	
-	if (TaskType == 1 && GraphicsHle) {
+		
+/*	if (*RSPInfo.SP_STATUS_REG & SP_STATUS_SIG0) { 
+		*RSPInfo.SP_STATUS_REG &= ~SP_STATUS_SIG0;
+		*RSPInfo.MI_INTR_REG |= MI_INTR_SP; 
+		RSPInfo.CheckInterrupts();
+		return Cycles;
+	}
+*/
+	if (TaskType == 1 && GraphicsHle && *(DWORD*)(RSPInfo.DMEM + 0x0ff0) != 0) {
 		if (RSPInfo.ProcessDList != NULL) {
 			RSPInfo.ProcessDList();
 		}
@@ -202,42 +220,45 @@ DWORD _RSP_DoRspCycles ( DWORD Cycles ) {
 		}
 		return Cycles;
 	} else if (TaskType == 7) {
-		RSPInfo.ShowCFB();		
+		RSPInfo.ShowCFB();
 	}
 
-	/* 
+	Compiler.bAudioUcode = (TaskType == 2) ? TRUE : FALSE;
+
+/*
 	*RSPInfo.SP_STATUS_REG |= (0x0203 );
 	if ((*RSPInfo.SP_STATUS_REG & SP_STATUS_INTR_BREAK) != 0 ) {
 		*RSPInfo.MI_INTR_REG |= R4300i_SP_Intr;
 		RSPInfo.CheckInterrupts();
 	}
-	return Cycles;
-	*/
+	//return Cycles;
+*/	
 
-#if !defined(EXTERNAL_RELEASE)
-	if (Profiling) {
-		StopTimer();
-		if (!IndvidualBlock) { StartTimer("RSP Running"); }
+	if (Profiling && !IndvidualBlock) {
+		StartTimer(Timer_RSP_Running);
 	}
-#endif
 
-	WaitForSingleObjectEx(hMutex, INFINITE, FALSE);
+	WaitForSingleObjectEx(hMutex, 1000 * 100, FALSE);
+
+	if (BreakOnStart)
+	{
+		Enter_RSP_Commands_Window();
+	}
+	RSP_MfStatusCount = 0;
+
 	switch (CPUCore) {
 	case RecompilerCPU:
 		RunRecompilerCPU(Cycles);
 		break;
-	//case InterpreterCPU:
-	//	RunInterpreterCPU(Cycles);
-	//	break;
+	case InterpreterCPU:
+		RunInterpreterCPU(Cycles);
+		break;
 	}
 	ReleaseMutex(hMutex);
 
-#if !defined(EXTERNAL_RELEASE)
-	if (Profiling) {
-		StopTimer();
-		StartTimer("r4300i code");
+	if (Profiling && !IndvidualBlock) {
+		StartTimer(Timer_R4300_Running);
 	}
-#endif
 
 	return Cycles;
 }

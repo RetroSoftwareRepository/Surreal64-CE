@@ -249,8 +249,9 @@ bool D3DRender::InitDeviceObjects()
 	} 
 	
 	((CDirectXColorCombiner*)m_pColorCombiner)->Initialize();
-	
-	//status.curScissor = UNKNOWN_SCISSOR;
+#ifndef _OLDCLIPPER
+	status.curScissor = UNKNOWN_SCISSOR;
+#endif
 
 	if( gVertexShader != NULL )
 	{
@@ -830,11 +831,13 @@ void D3DRender::UpdateScissor()
 		uint32 width = *g_GraphicsInfo.VI_WIDTH_REG & 0xFFF;
 		uint32 height = (gRDP.scissor.right*gRDP.scissor.bottom)/width;
 		MYD3DVIEWPORT vp = {0, 0, (uint32)(width*windowSetting.fMultX), (uint32)(height*windowSetting.fMultY), 0, 1};
+#ifdef _OLDCLIPPER
 		if( !gRSP.bNearClip )
 			vp.MinZ = -10000;
-
-		//if( vp.Width+vp.X > (DWORD)windowSetting.uDisplayWidth-1) vp.Width = windowSetting.uDisplayWidth-1-vp.X;
-		//if( vp.Height+vp.Y > (DWORD)windowSetting.uDisplayHeight-1) vp.Height = windowSetting.uDisplayHeight-1-vp.Y;
+#else
+		if( vp.Width+vp.X > (DWORD)windowSetting.uDisplayWidth-1) vp.Width = windowSetting.uDisplayWidth-1-vp.X;
+		if( vp.Height+vp.Y > (DWORD)windowSetting.uDisplayHeight-1) vp.Height = windowSetting.uDisplayHeight-1-vp.Y;
+#endif
 
 		gD3DDevWrapper.SetViewport(&vp);
 	}
@@ -846,7 +849,9 @@ void D3DRender::UpdateScissor()
 
 void D3DRender::ApplyRDPScissor(bool force)
 {
-	//if( !force && status.curScissor == RDP_SCISSOR )	return;
+#ifndef _OLDCLIPPER
+	if( !force && status.curScissor == RDP_SCISSOR )	return;
+#endif
 
 	if( options.bEnableHacks && g_CI.dwWidth == 0x200 && gRDP.scissor.right == 0x200 && g_CI.dwWidth>(*g_GraphicsInfo.VI_WIDTH_REG & 0xFFF) )
 	{
@@ -854,37 +859,49 @@ void D3DRender::ApplyRDPScissor(bool force)
 		uint32 width = *g_GraphicsInfo.VI_WIDTH_REG & 0xFFF;
 		uint32 height = (gRDP.scissor.right*gRDP.scissor.bottom)/width;
 		MYD3DVIEWPORT vp = {0, 0, (uint32)(width*windowSetting.fMultX), (uint32)(height*windowSetting.fMultY), 0, 1};
+#ifdef _OLDCLIPPER
 		if( !gRSP.bNearClip )
 			vp.MinZ = -10000;
-
-		//if( vp.Width+vp.X > (DWORD)windowSetting.uDisplayWidth-1) vp.Width = windowSetting.uDisplayWidth-1-vp.X;
-		//if( vp.Height+vp.Y > (DWORD)windowSetting.uDisplayHeight-1) vp.Height = windowSetting.uDisplayHeight-1-vp.Y;
+#else
+		if( vp.Width+vp.X > (DWORD)windowSetting.uDisplayWidth-1) vp.Width = windowSetting.uDisplayWidth-1-vp.X;
+		if( vp.Height+vp.Y > (DWORD)windowSetting.uDisplayHeight-1) vp.Height = windowSetting.uDisplayHeight-1-vp.Y;
+#endif
 
 		gD3DDevWrapper.SetViewport(&vp);
 	}
 	else
-	{
+	{	
 		MYD3DVIEWPORT vp = {
 			(uint32)(gRDP.scissor.left*windowSetting.fMultX), 
 				(uint32)(gRDP.scissor.top*windowSetting.fMultY), 
 				(uint32)((gRDP.scissor.right-gRDP.scissor.left+1)*windowSetting.fMultX), 
 				(uint32)((gRDP.scissor.bottom-gRDP.scissor.top+1)*windowSetting.fMultY), 0, 1
 		};
-
-		//if( vp.Width+vp.X > (DWORD)windowSetting.uDisplayWidth-1) vp.Width = windowSetting.uDisplayWidth-1-vp.X;
-		//if( vp.Height+vp.Y > (DWORD)windowSetting.uDisplayHeight-1) vp.Height = windowSetting.uDisplayHeight-1-vp.Y;
-
+#ifdef _OLDCLIPPER
 		if( !gRSP.bNearClip )
 			vp.MinZ = -10000;
+#else
+		if( vp.Width+vp.X > (DWORD)windowSetting.uDisplayWidth-1) vp.Width = windowSetting.uDisplayWidth-1-vp.X;
+		if( vp.Height+vp.Y > (DWORD)windowSetting.uDisplayHeight-1) vp.Height = windowSetting.uDisplayHeight-1-vp.Y;
+#endif
 		gD3DDevWrapper.SetViewport(&vp);
 	}
-
-	//status.curScissor = RDP_SCISSOR;
+#ifndef _OLDCLIPPER
+	status.curScissor = RDP_SCISSOR;
+#endif
 }
 
 void D3DRender::ApplyScissorWithClipRatio(bool force)
 {
-	//if( !force && status.curScissor == RSP_SCISSOR )	return;
+#ifndef _OLDCLIPPER
+	if( !force && status.curScissor == RSP_SCISSOR )	return;
+	
+	WindowSettingStruct &w = windowSetting;
+	MYD3DVIEWPORT vp = { w.clipping.left, w.clipping.top, w.clipping.width, w.clipping.height, 0, 1};
+	
+	if( vp.Width+vp.X > (DWORD)windowSetting.uDisplayWidth-1) vp.Width = windowSetting.uDisplayWidth-1-vp.X;
+	if( vp.Height+vp.Y > (DWORD)windowSetting.uDisplayHeight-1) vp.Height = windowSetting.uDisplayHeight-1-vp.Y;
+#else
 
 	D3DVIEWPORT8 vp = {
 		(DWORD)(gRSP.real_clip_scissor_left*windowSetting.fMultX), 
@@ -892,17 +909,18 @@ void D3DRender::ApplyScissorWithClipRatio(bool force)
 			(DWORD)((gRSP.real_clip_scissor_right-gRSP.real_clip_scissor_left+1)*windowSetting.fMultX), 
 			(DWORD)((gRSP.real_clip_scissor_bottom-gRSP.real_clip_scissor_top+1)*windowSetting.fMultY), 0, 1
 	};
-	//WindowSettingStruct &w = windowSetting;
-	//MYD3DVIEWPORT vp = { w.clipping.left, w.clipping.top, w.clipping.width, w.clipping.height, 0, 1};
-	
+
 	if( !gRSP.bNearClip )
 			vp.MinZ = -10000;
+#endif
 
-	//if( vp.Width+vp.X > (DWORD)windowSetting.uDisplayWidth-1) vp.Width = windowSetting.uDisplayWidth-1-vp.X;
-	//if( vp.Height+vp.Y > (DWORD)windowSetting.uDisplayHeight-1) vp.Height = windowSetting.uDisplayHeight-1-vp.Y;
+	
 
 	gD3DDevWrapper.SetViewport(&vp);
-	//status.curScissor = RSP_SCISSOR;
+	
+#ifndef _OLDCLIPPER
+	status.curScissor = RSP_SCISSOR;
+#endif
 }
 
 void D3DRender::BeginRendering(void) 

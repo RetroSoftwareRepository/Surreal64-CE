@@ -108,7 +108,7 @@ typedef struct {
 	uint32	curRenderBuffer;
 	uint32	curDisplayBuffer;
 	uint32	curVIOriginReg;
-	//CurScissorType  curScissor;
+	CurScissorType  curScissor;
 
 	PrimitiveType primitiveType;
 

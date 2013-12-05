@@ -377,7 +377,9 @@ bool CRender::FillRect(LONG nX0, LONG nY0, LONG nX1, LONG nY1, uint32 dwColor)
 		TurnFogOnOff(false);
 		res = RenderFillRect(dwColor, depth);
 		TurnFogOnOff(gRSP.bFogEnabled);
+#ifdef _OLDCLIPPER
 		ApplyScissorWithClipRatio();// Rice 5.60
+#endif
 
 		if( gRDP.otherMode.cycle_type  >= CYCLE_TYPE_COPY )
 		{
@@ -786,7 +788,9 @@ bool CRender::TexRect(LONG nX0, LONG nY0, LONG nX1, LONG nY1, float fS0, float f
 		ApplyTextureFilter();
 		ApplyRDPScissor();
 		res = RenderTexRect();
+#ifdef _OLDCLIPPER
 	ApplyScissorWithClipRatio(); //Rice 5.60
+#endif
 		m_dwMagFilter = m_dwMinFilter = dwFilter;
 		ApplyTextureFilter();
 	}
@@ -797,7 +801,9 @@ bool CRender::TexRect(LONG nX0, LONG nY0, LONG nX1, LONG nY1, float fS0, float f
 		ApplyTextureFilter();
 		ApplyRDPScissor();
 		res = RenderTexRect();
+#ifdef _OLDCLIPPER
 	ApplyScissorWithClipRatio(); //Rice 5.60
+#endif
 		m_dwMagFilter = m_dwMinFilter = dwFilter;
 		ApplyTextureFilter();
 	}
@@ -805,7 +811,9 @@ bool CRender::TexRect(LONG nX0, LONG nY0, LONG nX1, LONG nY1, float fS0, float f
 	{
 		ApplyRDPScissor();
 		res = RenderTexRect();
+#ifdef _OLDCLIPPER
 	ApplyScissorWithClipRatio(); //Rice 5.60
+#endif
 	}
 	TurnFogOnOff(gRSP.bFogEnabled);
 
@@ -900,7 +908,9 @@ bool CRender::TexRectFlip(LONG nX0, LONG nY0, LONG nX1, LONG nY1, float fS0, flo
 	SetVertexTextureUVCoord(g_texRectTVtx[3], t0u1, t0v0);
 
 	TurnFogOnOff(false);
-	//ApplyRDPScissor(); //Rice 5.60
+#ifndef _OLDCLIPPER
+	ApplyRDPScissor(); //Rice 6
+#endif
 	bool res = RenderTexRect();
 
 	TurnFogOnOff(gRSP.bFogEnabled);
@@ -1270,7 +1280,7 @@ bool CRender::DrawTriangles()
 				}
 			}
 
-			
+#ifdef _OLDCLIPPER //check2
 			// The code here is disabled because it could cause incorrect texture repeating flag 
 			// for later DrawTriangles
 			bool clampS=true;
@@ -1302,6 +1312,7 @@ bool CRender::DrawTriangles()
 			{
 				SetTextureVFlag(TEXTURE_UV_FLAG_CLAMP, gRSP.curTile+t);
 			}
+#endif
 			
 		}
 	}
@@ -1310,8 +1321,9 @@ bool CRender::DrawTriangles()
 	{
 		ZBufferEnable(FALSE);
 	}
-
-	//ApplyScissorWithClipRatio(); //Rice 5.60
+#ifdef _OLDCLIPPER
+	ApplyScissorWithClipRatio(); //Rice 5.60
+#endif
 
 	if( g_curRomInfo.bZHack )
 	{
@@ -1875,7 +1887,8 @@ void CRender::UpdateScissorWithClipRatio()
 	gRSP.real_clip_scissor_right = min(gRSP.real_clip_scissor_right,windowSetting.uViWidth-1);
 	gRSP.real_clip_scissor_bottom = min(gRSP.real_clip_scissor_bottom, windowSetting.uViHeight-1);
 
-	/*WindowSettingStruct &w = windowSetting;
+#ifndef _OLDCLIPPER
+	WindowSettingStruct &w = windowSetting;
 	w.clipping.left = (uint32)(gRSP.real_clip_scissor_left*windowSetting.fMultX);
 	w.clipping.top	= (uint32)(gRSP.real_clip_scissor_top*windowSetting.fMultY);
 	w.clipping.bottom = (uint32)(gRSP.real_clip_scissor_bottom*windowSetting.fMultY);
@@ -1891,7 +1904,7 @@ void CRender::UpdateScissorWithClipRatio()
 	}
 	w.clipping.width = (uint32)((gRSP.real_clip_scissor_right-gRSP.real_clip_scissor_left+1)*windowSetting.fMultX);
 	w.clipping.height = (uint32)((gRSP.real_clip_scissor_bottom-gRSP.real_clip_scissor_top+1)*windowSetting.fMultY);
-*/
+#endif
 	float halfx = gRSP.nVPWidthN/2.0f;
 	float halfy = gRSP.nVPHeightN/2.0f;
 	float centerx = gRSP.nVPLeftN+halfx;
