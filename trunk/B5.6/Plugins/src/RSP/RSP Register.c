@@ -24,12 +24,12 @@
  *
  */
 
-#include <xtl.h>
+#include <windows.h>
+#include <commctrl.h>
 #include <stdio.h>
 #include "rsp.h"
 #include "types.h"
 
-/*
 #define GeneralPurpose			1
 #define ControlProcessor0		2
 #define HiddenRegisters		    3
@@ -60,10 +60,10 @@ LRESULT CALLBACK RSP_Registers_Proc ( HWND, UINT, WPARAM, LPARAM );
 HWND RSP_Registers_hDlg, hTab, hStatic, hGPR[32], hCP0[16], hHIDDEN[12],
 	hVECT1[16], hVECT2[16];
 int InRSPRegisterWindow = FALSE;
-FARPROC RefreshProc; */
+FARPROC RefreshProc;
 
-/*** RSP Registers ***/ 
-UWORD   RSP_GPR[32], RSP_Flags[4];
+/*** RSP Registers ***/
+UWORD32   RSP_GPR[32], RSP_Flags[4];
 UDWORD  RSP_ACCUM[8];
 VECTOR  RSP_Vect[32];
 
@@ -75,28 +75,28 @@ char * GPR_Strings[32] = {
 };
 
 void Create_RSP_Register_Window ( int Child ) {
-	/*DWORD ThreadID;
+	DWORD ThreadID;
 	if ( Child ) {
 		InRSPRegisterWindow = TRUE;
-		//DialogBox( hinstDLL, "RSPREGISTERS", NULL,(DLGPROC) RSP_Registers_Proc );
+		DialogBox( hinstDLL, "RSPREGISTERS", NULL,(DLGPROC) RSP_Registers_Proc );
 		InRSPRegisterWindow = FALSE;
 	} else {
 		if (!InRSPRegisterWindow) {
 			CreateThread(NULL,0,(LPTHREAD_START_ROUTINE)Create_RSP_Register_Window,
 				(LPVOID)TRUE,0, &ThreadID);	
 		} else {
-		//	SetForegroundWindow(RSP_Registers_hDlg);
+			SetForegroundWindow(RSP_Registers_hDlg);
 		}	
-	} */
+	}
 }
 
 void Enter_RSP_Register_Window ( void ) {
-    //Create_RSP_Register_Window ( FALSE );
+    Create_RSP_Register_Window ( FALSE );
 }
 
 void HideRSP_RegisterPanel ( int Panel) {
-/*	
 	int count;
+
 	switch( Panel ) {
 	case GeneralPurpose:
 		for (count = 0; count < 32;count ++) { ShowWindow(hGPR[count], FALSE ); }
@@ -113,7 +113,7 @@ void HideRSP_RegisterPanel ( int Panel) {
 	case Vector2:
 		for (count = 0; count < 16;count ++) { ShowWindow(hVECT2[count], FALSE ); }
 		break;		
-	} */
+	}
 }
 
 void InitilizeRSPRegisters (void) {
@@ -122,7 +122,7 @@ void InitilizeRSPRegisters (void) {
 }
 
 void PaintRSP_HiddenPanel (HWND hWnd) {	
-/*	PAINTSTRUCT ps;
+	PAINTSTRUCT ps;
 	RECT rcBox;
 	HFONT hOldFont;
 	int OldBkMode;
@@ -166,12 +166,10 @@ void PaintRSP_HiddenPanel (HWND hWnd) {
 
 	SelectObject( ps.hdc,hOldFont );
 	SetBkMode( ps.hdc, OldBkMode );
-	EndPaint( hWnd, &ps ); */
+	EndPaint( hWnd, &ps );
 }
 
 void PaintRSP_CP0Panel (HWND hWnd) {	
-
-/*
 	PAINTSTRUCT ps;
 	RECT rcBox;
 	HFONT hOldFont;
@@ -207,12 +205,10 @@ void PaintRSP_CP0Panel (HWND hWnd) {
 	
 	SelectObject( ps.hdc,hOldFont );
 	SetBkMode( ps.hdc, OldBkMode );
-	EndPaint( hWnd, &ps );  */
+	EndPaint( hWnd, &ps );
 }
 
 void PaintRSP_GPRPanel (HWND hWnd) {
-
-/*
 	PAINTSTRUCT ps;
 	RECT rcBox;
 	HFONT hOldFont;
@@ -264,12 +260,10 @@ void PaintRSP_GPRPanel (HWND hWnd) {
 		
 	SelectObject( ps.hdc,hOldFont );
 	SetBkMode( ps.hdc, OldBkMode );
-	EndPaint( hWnd, &ps ); */
+	EndPaint( hWnd, &ps );
 }
 
 void PaintRSP_Vector1_Panel (HWND hWnd) {
-
-/*
 	PAINTSTRUCT ps;
 	RECT rcBox;
 	HFONT hOldFont;
@@ -305,12 +299,10 @@ void PaintRSP_Vector1_Panel (HWND hWnd) {
 	
 	SelectObject( ps.hdc,hOldFont );
 	SetBkMode( ps.hdc, OldBkMode );
-	EndPaint( hWnd, &ps ); */
+	EndPaint( hWnd, &ps );
 }
 
 void PaintRSP_Vector2_Panel (HWND hWnd) {
-
-/*
 	PAINTSTRUCT ps;
 	RECT rcBox;
 	HFONT hOldFont;
@@ -346,12 +338,10 @@ void PaintRSP_Vector2_Panel (HWND hWnd) {
 	
 	SelectObject( ps.hdc,hOldFont );
 	SetBkMode( ps.hdc, OldBkMode );
-	EndPaint( hWnd, &ps ); */
+	EndPaint( hWnd, &ps );
 }
 
 LRESULT CALLBACK RefreshRSP_RegProc ( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam ) {
-
-/*
 	int nSel;
 	TC_ITEM item;
 
@@ -384,14 +374,10 @@ LRESULT CALLBACK RefreshRSP_RegProc ( HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 	default:
 		return( (*RefreshProc)(hWnd, uMsg, wParam, lParam) );
 	}
-	return( FALSE ); */
-
-	return TRUE;
+	return( FALSE );
 }
 
 LRESULT CALLBACK RSP_Registers_Proc (HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {	
-
-/*
 	static RECT rcDisp;
 	static int CurrentPanel = GeneralPurpose;
 	TC_ITEM item;
@@ -402,7 +388,7 @@ LRESULT CALLBACK RSP_Registers_Proc (HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM
 		SetupRSP_RegistersMain( hDlg );
 		break;
 	case WM_MOVE:
-		StoreCurrentWinPos("RSP Registers",hDlg);
+		//StoreCurrentWinPos("RSP Registers",hDlg);
 		break;
 	case WM_SIZE:
 		GetClientRect( hDlg, &rcDisp);
@@ -431,74 +417,68 @@ LRESULT CALLBACK RSP_Registers_Proc (HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM
 		}
 	default:
 		return FALSE;
-	} */
+	}
 	return TRUE;
 }
 
 void SetupRSP_HiddenPanel (HWND hDlg) {
-/*
 	int count;
 
 	for (count = 0; count < 8;count ++) {
 		hHIDDEN[count] = CreateWindowEx(WS_EX_CLIENTEDGE,"EDIT","", WS_CHILD | 
 			ES_READONLY | WS_BORDER | WS_TABSTOP,170,(count*25) + 60,140,19, 
 			hDlg,0,hinstDLL, NULL );
-		//SendMessage(hHIDDEN[count],WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT),0);
+		SendMessage(hHIDDEN[count],WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT),0);
 	}
 	for (count = 0; count < 4;count ++) {
 		hHIDDEN[count + 8] = CreateWindowEx(WS_EX_CLIENTEDGE,"EDIT","", WS_CHILD | 
 			ES_READONLY | WS_BORDER | WS_TABSTOP,425,(count*30) + 90,55,19, 
 			hDlg,0,hinstDLL, NULL );
-		//SendMessage(hHIDDEN[count + 8],WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT),0);
-	} */
+		SendMessage(hHIDDEN[count + 8],WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT),0);
+	}
 }
 
 void SetupRSP_CP0Panel (HWND hDlg) {
-
-/*
 	int count;
 
 	for (count = 0; count < 8;count ++) {
 		hCP0[count] = CreateWindowEx(WS_EX_CLIENTEDGE,"EDIT","", WS_CHILD | 
 			ES_READONLY | WS_BORDER | WS_TABSTOP,225,(count*28) + 53,75,19, 
 			hDlg,0,hinstDLL, NULL );
-		//SendMessage(hCP0[count],WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT),0);
+		SendMessage(hCP0[count],WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT),0);
 	}
 	for (count = 0; count < 8;count ++) {
 		hCP0[count + 8] = CreateWindowEx(WS_EX_CLIENTEDGE,"EDIT","", WS_CHILD | 
 			ES_READONLY | WS_BORDER | WS_TABSTOP,485,(count*28) + 53,75,19, 
 			hDlg,0,hinstDLL, NULL );
-		//SendMessage(hCP0[ count + 8 ],WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT),0);
-	} */
+		SendMessage(hCP0[ count + 8 ],WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT),0);
+	}
 }
 
 void SetupRSP_GPRPanel (HWND hDlg) {
-
-/*
 	int count;
 
 	for (count = 0; count < 11;count ++) {
 		hGPR[count] = CreateWindowEx(WS_EX_CLIENTEDGE,"EDIT","", WS_CHILD | 
 			ES_READONLY | WS_BORDER | WS_TABSTOP,135,(count*20) + 50,75,19, 
 			hDlg,0,hinstDLL, NULL );
-		//SendMessage(hGPR[count],WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT),0);
+		SendMessage(hGPR[count],WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT),0);
 	}
 	for (count = 0; count < 11;count ++) {
 		hGPR[count + 11] = CreateWindowEx(WS_EX_CLIENTEDGE,"EDIT","", WS_CHILD | 
 			ES_READONLY | WS_BORDER | WS_TABSTOP,315,(count*20) + 50,75,19, 
 			hDlg,0,hinstDLL, NULL );
-		//SendMessage(hGPR[ count + 11 ],WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT),0);
+		SendMessage(hGPR[ count + 11 ],WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT),0);
 	}
 	for (count = 0; count < 10;count ++) {
 		hGPR[count + 22] = CreateWindowEx(WS_EX_CLIENTEDGE,"EDIT","", WS_CHILD |  
 			ES_READONLY | WS_BORDER | WS_TABSTOP,485,(count*20) + 50,75,19, 
 			hDlg,0,hinstDLL, NULL );
-		//SendMessage(hGPR[ count + 22 ],WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT),0);
-	} */
+		SendMessage(hGPR[ count + 22 ],WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT),0);
+	}
 }
 
 void SetupRSP_RegistersMain (HWND hDlg) {
-/*
 #define WindowWidth  630
 #define WindowHeight 325
 	DWORD X, Y;
@@ -507,7 +487,7 @@ void SetupRSP_RegistersMain (HWND hDlg) {
 		hDlg,(HMENU)IDC_TAB_CONTROL,hinstDLL,NULL );
 	if ( hTab ) {
 		TC_ITEM item;
-		//SendMessage(hTab, WM_SETFONT, (WPARAM)GetStockObject( DEFAULT_GUI_FONT ), 0);
+		SendMessage(hTab, WM_SETFONT, (WPARAM)GetStockObject( DEFAULT_GUI_FONT ), 0);
 		item.mask    = TCIF_TEXT | TCIF_PARAM;
 		item.pszText = " General Purpose ";
 		item.lParam  = GeneralPurpose;
@@ -539,58 +519,48 @@ void SetupRSP_RegistersMain (HWND hDlg) {
 	ShowRSP_RegisterPanel ( GeneralPurpose );
 	SetWindowText(hDlg," RSP Registers");
 	
-	if ( !GetStoredWinPos( "RSP Registers", &X, &Y ) ) {
+	//if ( !GetStoredWinPos( "RSP Registers", &X, &Y ) ) {
 		X = (GetSystemMetrics( SM_CXSCREEN ) - WindowWidth) / 2;
 		Y = (GetSystemMetrics( SM_CYSCREEN ) - WindowHeight) / 2;
-	}
+	//}
 	SetWindowPos(hDlg,NULL,X,Y,WindowWidth,WindowHeight, SWP_NOZORDER | SWP_SHOWWINDOW);
-	*/
 }
 
 void SetupRSP_Vect1Panel (HWND hDlg) {
-
-/*
 	int count;
 
 	for (count = 0; count < 8;count ++) {
 		hVECT1[count] = CreateWindowEx(WS_EX_CLIENTEDGE,"EDIT","", WS_CHILD | 
 			ES_READONLY | WS_BORDER | WS_TABSTOP,55,(count*28) + 52,254,19, 
 			hDlg,0,hinstDLL, NULL );
-		//SendMessage(hVECT1[count],WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT),0);
+		SendMessage(hVECT1[count],WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT),0);
 	}
 	for (count = 0; count < 8;count ++) {
 		hVECT1[count + 8] = CreateWindowEx(WS_EX_CLIENTEDGE,"EDIT","", WS_CHILD | 
 			ES_READONLY | WS_BORDER | WS_TABSTOP,345,(count*28) + 52,254,19, 
 			hDlg,0,hinstDLL, NULL );
-		//SendMessage(hVECT1[count + 8],WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT),0);
+		SendMessage(hVECT1[count + 8],WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT),0);
 	}
-
-*/
 }
 
 void SetupRSP_Vect2Panel (HWND hDlg) {
-
-/*
 	int count;
 
 	for (count = 0; count < 8;count ++) {
 		hVECT2[count] = CreateWindowEx(WS_EX_CLIENTEDGE,"EDIT","", WS_CHILD | 
 			ES_READONLY | WS_BORDER | WS_TABSTOP,55,(count*28) + 52,254,19, 
 			hDlg,0,hinstDLL, NULL );
-		//SendMessage(hVECT2[count],WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT),0);
+		SendMessage(hVECT2[count],WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT),0);
 	}
 	for (count = 0; count < 8;count ++) {
 		hVECT2[count + 8] = CreateWindowEx(WS_EX_CLIENTEDGE,"EDIT","", WS_CHILD | 
 			ES_READONLY | WS_BORDER | WS_TABSTOP,345,(count*28) + 52,254,19, 
 			hDlg,0,hinstDLL, NULL );
-		//SendMessage(hVECT2[count + 8],WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT),0);
+		SendMessage(hVECT2[count + 8],WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT),0);
 	}
-
-*/
 }
 
 void ShowRSP_RegisterPanel ( int Panel) {
-/*
 	int count;
 
 	switch( Panel ) {
@@ -610,11 +580,9 @@ void ShowRSP_RegisterPanel ( int Panel) {
 		for (count = 0; count < 16;count ++) { ShowWindow(hVECT2[count], TRUE ); }
 		break;		
 	}
-	*/
 }
 
 void UpdateRSPRegistersScreen ( void ) {
-/*
 	char RegisterValue[100];
 	int count, nSel;
 	TC_ITEM item;
@@ -632,38 +600,41 @@ void UpdateRSPRegistersScreen ( void ) {
 			}
 			break;
 		case ControlProcessor0:
-			sprintf(RegisterValue," 0x%08X",*RSPInfo.SP_MEM_ADDR_REG);
-			SetWindowText(hCP0[0],RegisterValue);
-			sprintf(RegisterValue," 0x%08X",*RSPInfo.SP_DRAM_ADDR_REG);
-			SetWindowText(hCP0[1],RegisterValue);
-			sprintf(RegisterValue," 0x%08X",*RSPInfo.SP_RD_LEN_REG);
-			SetWindowText(hCP0[2],RegisterValue);
-			sprintf(RegisterValue," 0x%08X",*RSPInfo.SP_WR_LEN_REG);
-			SetWindowText(hCP0[3],RegisterValue);
-			sprintf(RegisterValue," 0x%08X",*RSPInfo.SP_STATUS_REG);
-			SetWindowText(hCP0[4],RegisterValue);
-			sprintf(RegisterValue," 0x%08X",*RSPInfo.SP_DMA_FULL_REG);
-			SetWindowText(hCP0[5],RegisterValue);
-			sprintf(RegisterValue," 0x%08X",*RSPInfo.SP_DMA_BUSY_REG);
-			SetWindowText(hCP0[6],RegisterValue);
-			sprintf(RegisterValue," 0x%08X",*RSPInfo.SP_SEMAPHORE_REG);
-			SetWindowText(hCP0[7],RegisterValue);			
-			sprintf(RegisterValue," 0x%08X",*RSPInfo.DPC_START_REG);
-			SetWindowText(hCP0[8],RegisterValue);
-			sprintf(RegisterValue," 0x%08X",*RSPInfo.DPC_END_REG);
-			SetWindowText(hCP0[9],RegisterValue);
-			sprintf(RegisterValue," 0x%08X",*RSPInfo.DPC_CURRENT_REG);
-			SetWindowText(hCP0[10],RegisterValue);
-			sprintf(RegisterValue," 0x%08X",*RSPInfo.DPC_STATUS_REG);
-			SetWindowText(hCP0[11],RegisterValue);
-			sprintf(RegisterValue," 0x%08X",*RSPInfo.DPC_CLOCK_REG);
-			SetWindowText(hCP0[12],RegisterValue);
-			sprintf(RegisterValue," 0x%08X",*RSPInfo.DPC_BUFBUSY_REG);
-			SetWindowText(hCP0[13],RegisterValue);
-			sprintf(RegisterValue," 0x%08X",*RSPInfo.DPC_PIPEBUSY_REG);
-			SetWindowText(hCP0[14],RegisterValue);
-			sprintf(RegisterValue," 0x%08X",*RSPInfo.DPC_TMEM_REG);
-			SetWindowText(hCP0[15],RegisterValue);
+			if (RSPInfo.SP_MEM_ADDR_REG)
+			{
+				sprintf(RegisterValue," 0x%08X",*RSPInfo.SP_MEM_ADDR_REG);
+				SetWindowText(hCP0[0],RegisterValue);
+				sprintf(RegisterValue," 0x%08X",*RSPInfo.SP_DRAM_ADDR_REG);
+				SetWindowText(hCP0[1],RegisterValue);
+				sprintf(RegisterValue," 0x%08X",*RSPInfo.SP_RD_LEN_REG);
+				SetWindowText(hCP0[2],RegisterValue);
+				sprintf(RegisterValue," 0x%08X",*RSPInfo.SP_WR_LEN_REG);
+				SetWindowText(hCP0[3],RegisterValue);
+				sprintf(RegisterValue," 0x%08X",*RSPInfo.SP_STATUS_REG);
+				SetWindowText(hCP0[4],RegisterValue);
+				sprintf(RegisterValue," 0x%08X",*RSPInfo.SP_DMA_FULL_REG);
+				SetWindowText(hCP0[5],RegisterValue);
+				sprintf(RegisterValue," 0x%08X",*RSPInfo.SP_DMA_BUSY_REG);
+				SetWindowText(hCP0[6],RegisterValue);
+				sprintf(RegisterValue," 0x%08X",*RSPInfo.SP_SEMAPHORE_REG);
+				SetWindowText(hCP0[7],RegisterValue);			
+				sprintf(RegisterValue," 0x%08X",*RSPInfo.DPC_START_REG);
+				SetWindowText(hCP0[8],RegisterValue);
+				sprintf(RegisterValue," 0x%08X",*RSPInfo.DPC_END_REG);
+				SetWindowText(hCP0[9],RegisterValue);
+				sprintf(RegisterValue," 0x%08X",*RSPInfo.DPC_CURRENT_REG);
+				SetWindowText(hCP0[10],RegisterValue);
+				sprintf(RegisterValue," 0x%08X",*RSPInfo.DPC_STATUS_REG);
+				SetWindowText(hCP0[11],RegisterValue);
+				sprintf(RegisterValue," 0x%08X",*RSPInfo.DPC_CLOCK_REG);
+				SetWindowText(hCP0[12],RegisterValue);
+				sprintf(RegisterValue," 0x%08X",*RSPInfo.DPC_BUFBUSY_REG);
+				SetWindowText(hCP0[13],RegisterValue);
+				sprintf(RegisterValue," 0x%08X",*RSPInfo.DPC_PIPEBUSY_REG);
+				SetWindowText(hCP0[14],RegisterValue);
+				sprintf(RegisterValue," 0x%08X",*RSPInfo.DPC_TMEM_REG);
+				SetWindowText(hCP0[15],RegisterValue);
+			}
 			break;
 		case HiddenRegisters:
 			for (count = 0; count < 8;count ++) { 
@@ -693,6 +664,4 @@ void UpdateRSPRegistersScreen ( void ) {
 			break;		
 		}
 	}
-
-*/
 }

@@ -26,14 +26,8 @@
 
 #include "opcode.h"
 
-#define NORMAL				0
-#define DO_DELAY_SLOT 		1
-#define DELAY_SLOT 			2
-#define DELAY_SLOT_DONE		3
-#define FINISH_BLOCK		4
-#define FINISH_SUB_BLOCK	5
-
-extern DWORD CompilePC, NextInstruction;
+extern DWORD CompilePC, NextInstruction, JumpTableSize;
+extern BOOL ChangedPC;
 
 #define CompilerWarning if (ShowErrors) DisplayError
 
@@ -76,7 +70,6 @@ typedef struct {
 	} BranchesToResolve[200];	/* Branches inside or outside block */
 	
 	DWORD ResolveCount;			/* Branches with NULL jump table */
-	BYTE IMEM[0x1000];			/* Saved off for re-order */
 } RSP_BLOCK;
 
 extern RSP_BLOCK CurrentBlock;
@@ -84,9 +77,9 @@ extern RSP_BLOCK CurrentBlock;
 typedef struct {
 	BOOL bIsRegConst[32];		/* BOOLean toggle for constant */
 	DWORD MipsRegConst[32];		/* Value of register 32-bit */
-	DWORD BranchLabels[200];
+	DWORD BranchLabels[250];
 	DWORD LabelCount;
-	DWORD BranchLocations[200];
+	DWORD BranchLocations[250];
 	DWORD BranchCount;
 } RSP_CODE;
 
@@ -104,7 +97,7 @@ typedef struct {
 	BOOL bAccum;			/* Accumulator toggle */
 	BOOL bGPRConstants;		/* Analyze GPR constants */
 	BOOL bAlignVector;		/* Align known vector loads */
-	BOOL bAlignGPR;			/* Align known gpr loads */
+	BOOL bAudioUcode;		/* Audio ucode analysis */
 } RSP_COMPILER;
 
 extern RSP_COMPILER Compiler;

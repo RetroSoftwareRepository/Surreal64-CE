@@ -36,5 +36,5 @@ void SetRSPCommandToRunning ( void );
 void SetRSPCommandToStepping ( void );
 void SetRSPCommandViewto ( UINT NewLocation );
 
-DWORD Stepping_Commands, WaitingForStep;
+extern DWORD Stepping_Commands, WaitingForStep;
 extern BOOL InRSPCommandsWindow;

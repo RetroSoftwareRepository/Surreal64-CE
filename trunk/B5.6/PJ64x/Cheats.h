@@ -23,6 +23,7 @@
  * should be forwarded to them so if they want them.
  *
  */
+
 #define MaxGSEntries	100
 
 typedef struct {
@@ -36,15 +37,15 @@ typedef struct {
 
 char * GetCheatIniFileName ( void );
 
-void ChangeRomCheats	( HWND hParent );
-void CloseCheatWindow	( void );
+//void ChangeRomCheats	( HWND hParent );
+//void CloseCheatWindow	( void );
 void DisableAllCheats   ( void );
 void ApplyCheats		( void );
 void LoadCheats			( void );
-void ManageCheats		( HWND hParent );
+//void ManageCheats		( HWND hParent );
 void ApplyGSButton		(void);
 
 LRESULT CALLBACK Cheat_Proc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 // *** Add in Build 53
-extern HWND hManageWindow;
+//extern HWND hManageWindow;

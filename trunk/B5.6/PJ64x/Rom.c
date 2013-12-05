@@ -1199,9 +1199,9 @@ void DisplayCPUPer (void) {
 }
 
 
-void LoadCheats (void) {
+/*void LoadCheats (void) {
 
-}
+}*/
 
 // Ez0n3 - launchdata isn't used anymore
 /*

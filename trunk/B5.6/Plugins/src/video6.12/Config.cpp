@@ -404,7 +404,7 @@ void ReadConfiguration(void)
 		options.bUseFullTMEM = TRUE;
 
 		options.bForceSoftwareTnL = FALSE; //FALSE;
-		options.bForceSoftwareClipper = bUseLinFog;
+		options.bForceSoftwareClipper = bUseLinFog;;
 
 		options.bEnableVertexShader = FALSE;
 		options.RenderBufferSetting=0;
@@ -435,7 +435,7 @@ void ReadConfiguration(void)
 		defaultRomOptions.N64RenderToTextureEmuType = TXT_BUF_NONE;//TXT_BUF_NONE;
 
 		defaultRomOptions.bNormalBlender = FALSE;
-		defaultRomOptions.bFastTexCRC=TRUE; //FALSE;
+		defaultRomOptions.bFastTexCRC=FALSE; //FALSE;
 		defaultRomOptions.bNormalCombiner = FALSE;
 		defaultRomOptions.bAccurateTextureMapping = TRUE;
 		defaultRomOptions.bInN64Resolution = TRUE; //FALSE;

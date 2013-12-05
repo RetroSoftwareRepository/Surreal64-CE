@@ -48,7 +48,7 @@ void RSP_Tri4_Conker(Gfx *gfx)
 
 	bool bTrisAdded = FALSE;
 
-	/*do {
+	do {
 		LOG_UCODE("    Conker Tri4: 0x%08x 0x%08x", w0, w1);
 		uint32 idx[12];
 		idx[0] = (w1      )&0x1F;
@@ -81,65 +81,6 @@ void RSP_Tri4_Conker(Gfx *gfx)
 
 #ifdef _DEBUG
 	} while (!(pauseAtNext && eventToPause==NEXT_TRIANGLE) && (w0>>28) == 1 );
-#else
-	} while ((w0>>28) == 1);
-#endif
-*/
-	do {
-		LOG_UCODE("    Conker Tri4: 0x%08x 0x%08x", w0, w1);
-		uint32 idx[12];
-		idx[0] = (w1   )&0x1F;
-		idx[1] = (w1>> 5)&0x1F;
-		idx[2] = (w1>>10)&0x1F;
-		idx[3] = (w1>>15)&0x1F;
-		idx[4] = (w1>>20)&0x1F;
-		idx[5] = (w1>>25)&0x1F;
-
-		idx[6] = (w0    )&0x1F;
-		idx[7] = (w0>> 5)&0x1F;
-		idx[8] = (w0>>10)&0x1F;
-
-		idx[ 9] = (((w0>>15)&0x7)<<2)|(w1>>30);
-		idx[10] = (w0>>18)&0x1F;
-		idx[11] = (w0>>23)&0x1F;
-
-		BOOL bVisible;
-		for( uint32 i=0; i<4; i++)
-		{
-			uint32 v0=idx[i*3  ];
-			uint32 v1=idx[i*3+1];
-			uint32 v2=idx[i*3+2];
-			bVisible = IsTriangleVisible(v0, v1, v2);
-			LOG_UCODE("       (%d, %d, %d) %s", v0, v1, v2, bVisible ? "": "(clipped)");
-			if (bVisible)
-			{
-				DEBUG_DUMP_VERTEXES("Tri4 Conker:", v0, v1, v2);
-				if (!bTrisAdded && CRender::g_pRender->IsTextureEnabled())
-				{
-					PrepareTextures();
-					InitVertexTextureConstants();
-				}
-
-				if( !bTrisAdded )
-				{
-					CRender::g_pRender->SetCombinerAndBlender();
-				}
-				bTrisAdded = TRUE;
-				AddTri(v0, v1, v2);
-			}
-		}
-
-		w0			= *(uint32 *)(g_pRDRAMu8 + dwPC+0);
-		w1			= *(uint32 *)(g_pRDRAMu8 + dwPC+4);
-		dwPC += 8;
-
-#ifdef _DEBUG
-	} while (!(pauseAtNext && eventToPause==NEXT_TRIANGLE) && (w0>>28) == 1 );
-	if(pauseAtNext && eventToPause==NEXT_TRIANGLE )
-	{
-		eventToPause = NEXT_FLUSH_TRI;
-	}
-
 #else
 	} while ((w0>>28) == 1);
 #endif
