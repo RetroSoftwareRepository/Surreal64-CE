@@ -200,6 +200,7 @@ void DestroyLogo()
 	m_RenderPanel.Destroy();
 	bgTexture->Release();
 	texture->Release();*/
+	//ClearIGM();
 }
 
 //weinerschnitzel - function to clear skin resources when returning to game

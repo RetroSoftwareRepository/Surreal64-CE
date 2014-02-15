@@ -1,5 +1,5 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *   Mupen64plus - nogui.h                                                 *
+ *   Mupen64plus-sdl-audio - volume.c                                      *
  *   Mupen64Plus homepage: http://code.google.com/p/mupen64plus/           *
  *   Copyright (C) 2007-2008 Richard42 Ebenblues                           *
  *   Copyright (C) 2002 Hacktarux                                          *
@@ -20,10 +20,10 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.          *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+#if defined(HAS_OSS_SUPPORT)
+
 /* Sound volume functions. */
-#if defined(__linux__)
 #include <sys/soundcard.h>
-#endif
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/ioctl.h>
@@ -33,7 +33,6 @@
 #include <errno.h>
 
 #include "volume.h"
-#include "../main/translate.h"
 
 /* volSet
  *  Sets volume of left and right PCM channels to given percentage (0-100) value.
@@ -45,7 +44,7 @@ void volSet(int percent)
 
     if(mixerfd < 0)
     {
-        perror("/dev/mixer: ");
+        perror("/dev/mixer");
         return;
     }
 
@@ -55,11 +54,9 @@ void volSet(int percent)
         percent = 0;
 
     vol = (percent << 8) + percent; // set both left/right channels to same vol
-#if defined(__linux__)
     ret = ioctl(mixerfd, MIXER_WRITE(SOUND_MIXER_PCM), &vol);
-#endif
     if(ret < 0)
-        perror("Setting PCM volume: ");
+        perror("Setting PCM volume");
 
     close(mixerfd);
 }
@@ -75,18 +72,17 @@ int volGet(void)
 
     if(mixerfd < 0)
     {
-        perror("/dev/mixer: ");
+        perror("/dev/mixer");
         return 0;
     }
 
-#if defined(__linux__)
     ret = ioctl(mixerfd, MIXER_READ(SOUND_MIXER_PCM), &vol);
-#endif
     if(ret < 0)
-        perror("Reading PCM volume: ");
+        perror("Reading PCM volume");
 
     close(mixerfd);
 
     return vol & 0xff; // just return the left channel
 }
 
+#endif /* defined(HAS_OSS_SUPPORT) */

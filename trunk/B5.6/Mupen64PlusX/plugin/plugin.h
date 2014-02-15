@@ -40,8 +40,11 @@ extern CONTROL Controls[4];
 /* video plugin function pointers */
 typedef struct _gfx_plugin_functions
 {
+#ifndef _XBOX
 	ptr_PluginGetVersion getVersion;
+
 	ptr_ChangeWindow     changeWindow;
+#endif
 	ptr_InitiateGFX      initiateGFX;
 	ptr_MoveScreen       moveScreen;
 	ptr_ProcessDList     processDList;
@@ -66,7 +69,9 @@ extern gfx_plugin_functions gfx;
 /* audio plugin function pointers */
 typedef struct _audio_plugin_functions
 {
+#ifndef _XBOX
 	ptr_PluginGetVersion  getVersion;
+#endif
 	ptr_AiDacrateChanged  aiDacrateChanged;
 	ptr_AiLenChanged      aiLenChanged;
 	ptr_InitiateAudio     initiateAudio;
@@ -87,7 +92,9 @@ extern audio_plugin_functions audio;
 /* input plugin function pointers */
 typedef struct _input_plugin_functions
 {
+#ifndef _XBOX
 	ptr_PluginGetVersion    getVersion;
+#endif
 	ptr_ControllerCommand   controllerCommand;
 	ptr_GetKeys             getKeys;
 	ptr_InitiateControllers initiateControllers;
@@ -101,7 +108,9 @@ extern input_plugin_functions input;
 /* RSP plugin function pointers */
 typedef struct _rsp_plugin_functions
 {
+#ifndef _XBOX
 	ptr_PluginGetVersion    getVersion;
+#endif
 	ptr_DoRspCycles         doRspCycles;
 	ptr_InitiateRSP         initiateRSP;
 	ptr_RomClosed           romClosed;

@@ -100,7 +100,7 @@ EXPORT m64p_error CALL CoreShutdown(void)
 EXPORT m64p_error CALL CoreDoCommand(m64p_command Command, int ParamInt, void *ParamPtr)
 {
     m64p_error rval;
-    int keysym, keymod;
+    //int keysym, keymod;
 
     if (!l_CoreInit)
         return M64ERR_NOT_INIT;

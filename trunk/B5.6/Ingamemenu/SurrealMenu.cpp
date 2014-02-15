@@ -107,6 +107,7 @@ extern CXBFont		m_Font;					// Font	for	text display
 
 extern void DrawLogo();
 extern void DestroyLogo();
+extern void ClearIGM();
 static int currentItem;
 
 void ExitToRomList(); 
@@ -302,6 +303,7 @@ void MainMenu(void)
 		XLMenu_Delete(m_pMainMenu);
 
 	DestroyLogo();
+	//ClearIGM();
 
 }
 
@@ -449,6 +451,7 @@ void CreateSaveStatePreview(unsigned int index)
 
 	//Clear the Artifacts
 	g_pd3dDevice->Present(0, 0, 0, 0);
+	
 
 	//get the backbuffer surface and its description
 	g_pd3dDevice->GetBackBuffer(-1, D3DBACKBUFFER_TYPE_MONO, &surf);
@@ -463,7 +466,7 @@ void CreateSaveStatePreview(unsigned int index)
 
 	//copy the backbuffer surface to the texture surface
 	D3DXLoadSurfaceFromSurface(texsurf, NULL, NULL, surf, NULL, NULL, D3DX_DEFAULT, 0);
-
+	m_RenderPanel.Destroy();
 	char filename[255];
 	__EMU_GetStateFilename((index+1), filename, 1);
 

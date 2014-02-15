@@ -36,7 +36,7 @@
 				Detect64BitPortabilityProblems="FALSE"
 				DebugInformationFormat="4"
 				CallingConvention="1"
-				CompileAs="2"/>
+				CompileAs="1"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -258,19 +258,22 @@
 			Name="Headers"
 			Filter="">
 			<File
+				RelativePath=".\m64p_common.h">
+			</File>
+			<File
+				RelativePath=".\m64p_config.h">
+			</File>
+			<File
+				RelativePath=".\m64p_plugin.h">
+			</File>
+			<File
+				RelativePath=".\m64p_types.h">
+			</File>
+			<File
 				RelativePath=".\main.h">
 			</File>
 			<File
-				RelativePath=".\stdint.h">
-			</File>
-			<File
-				RelativePath=".\version.h">
-			</File>
-			<File
-				RelativePath=".\unistd.h">
-			</File>
-			<File
-				RelativePath=".\winlnxdefs.h">
+				RelativePath=".\volume.h">
 			</File>
 		</Filter>
 		<Filter
@@ -278,6 +281,9 @@
 			Filter="">
 			<File
 				RelativePath=".\main.c">
+			</File>
+			<File
+				RelativePath=".\volume.c">
 			</File>
 		</Filter>
 	</Files>

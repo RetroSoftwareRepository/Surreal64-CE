@@ -154,7 +154,7 @@
 				EnableFiberSafeOptimizations="TRUE"
 				OptimizeForProcessor="2"
 				PreprocessorDefinitions="NDEBUG;_XBOX;_LIB;EXTERNAL_RELEASE"
-				StringPooling="TRUE"
+				StringPooling="FALSE"
 				RuntimeLibrary="0"
 				BufferSecurityCheck="FALSE"
 				EnableFunctionLevelLinking="TRUE"
@@ -166,7 +166,8 @@
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
 				DebugInformationFormat="3"
-				CallingConvention="1"/>
+				CallingConvention="1"
+				CompileAs="1"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
@@ -232,22 +233,34 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
+				RelativePath=".\alist.c">
+			</File>
+			<File
+				RelativePath=".\audio.c">
+			</File>
+			<File
+				RelativePath=".\cicx105.c">
+			</File>
+			<File
 				RelativePath=".\jpeg.c">
 			</File>
 			<File
 				RelativePath=".\main.c">
 			</File>
 			<File
-				RelativePath=".\ucode1.cpp">
+				RelativePath=".\musyx.c">
 			</File>
 			<File
-				RelativePath=".\ucode2.cpp">
+				RelativePath=".\ucode1.c">
 			</File>
 			<File
-				RelativePath=".\ucode3.cpp">
+				RelativePath=".\ucode2.c">
 			</File>
 			<File
-				RelativePath=".\ucode3mp3.cpp">
+				RelativePath=".\ucode3.c">
+			</File>
+			<File
+				RelativePath=".\ucode3mp3.c">
 			</File>
 		</Filter>
 		<Filter
@@ -255,13 +268,34 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
+				RelativePath=".\alist.h">
+			</File>
+			<File
+				RelativePath=".\alist_internal.h">
+			</File>
+			<File
+				RelativePath=".\audio.h">
+			</File>
+			<File
+				RelativePath=".\cicx105.h">
+			</File>
+			<File
 				RelativePath=".\Common.h">
 			</File>
 			<File
 				RelativePath=".\hle.h">
 			</File>
 			<File
+				RelativePath=".\jpeg.h">
+			</File>
+			<File
+				RelativePath=".\musyx.h">
+			</File>
+			<File
 				RelativePath=".\Rsp.h">
+			</File>
+			<File
+				RelativePath=".\stdint.h">
 			</File>
 		</Filter>
 	</Files>

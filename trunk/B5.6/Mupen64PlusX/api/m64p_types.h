@@ -39,8 +39,8 @@
 
 /* DLL handles and function declaration specifiers */
 #define IMPORT
-#define EXPORT
-#define CALL
+#define EXPORT 
+#define CALL 
 typedef void * m64p_dynlib_handle;
 
 /* ----------------------------------------- */

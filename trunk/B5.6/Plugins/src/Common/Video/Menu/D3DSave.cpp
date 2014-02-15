@@ -503,6 +503,68 @@ void D3DSave::PopRenderState()
 	g_pd3dDevice->SetViewport(&m_viewport);
 }
 
+void D3DSave::SaveRenderState()
+{
+	/*
+	HANDLE hStateFile;
+	char FileName[255];
+	DWORD dwWritten;
+	int n;
+
+	sprintf(FileName, "Z:\\%08X-%08X-%02X.tmp", *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x14)), *((BYTE *)(RomHeader + 0x3D)));
+
+	hStateFile = CreateFile(FileName,GENERIC_WRITE | GENERIC_READ, FILE_SHARE_READ,NULL,OPEN_ALWAYS,
+			FILE_ATTRIBUTE_NORMAL | FILE_FLAG_RANDOM_ACCESS, NULL);
+
+	SetFilePointer(hStateFile,0,NULL,FILE_BEGIN);
+	for (n=0 ; n<100 ; n++)
+	{
+		WriteFile( hStateFile,&m_renderState[n],sizeof(m_renderState[n]),&dwWritten,NULL);
+	}
+	for (n=0 ; n<150 ; n++)
+	{
+		WriteFile( hStateFile,&m_stageState[n],sizeof(m_stageState[n]),&dwWritten,NULL);
+	}
+	for (n=0 ; n<15 ; n++)
+	{
+		WriteFile( hStateFile,&m_transformState[n],sizeof(m_transformState[n]),&dwWritten,NULL);
+	}
+
+	CloseHandle(hStateFile);
+	*/
+}
+
+void D3DSave::LoadRenderState()
+{
+	/*
+	HANDLE hStateFile;
+	char FileName[255];
+	DWORD dwRead;
+	int n;
+	
+
+	sprintf(FileName, "Z:\\%08X-%08X-%02X.tmp", *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x14)), *((BYTE *)(RomHeader + 0x3D)));
+
+	hSaveFile = CreateFile(FileName,GENERIC_WRITE | GENERIC_READ, FILE_SHARE_READ,NULL,OPEN_EXISTING,
+			FILE_ATTRIBUTE_NORMAL | FILE_FLAG_RANDOM_ACCESS, NULL);
+
+	SetFilePointer(hSaveFile,0,NULL,FILE_BEGIN);
+	for (n=0 ; n<100 ; n++)
+	{
+		ReadFile( hStateFile,&m_renderState[n],sizeof(m_renderState[n]),&dwRead,NULL);
+	}
+	for (n=0 ; n<150 ; n++)
+	{
+		ReadFile( hStateFile,&m_stageState[n],sizeof(m_stageState[n]),&dwRead,NULL);
+	}
+	for (n=0 ; n<15 ; n++)
+	{
+		ReadFile( hStateFile,&m_transformState[n],sizeof(m_transformState[n]),&dwRead,NULL);
+	}
+
+	CloseHandle(hStateFile);
+	*/
+}
 
 void D3DSave::LoadDefaultRenderState()
 {
