@@ -8,6 +8,8 @@ public:
 
 	void PushRenderState();
 	void PopRenderState();
+	void SaveRenderState();
+	void LoadRenderState();
 
 private:
 	void LoadDefaultRenderState();

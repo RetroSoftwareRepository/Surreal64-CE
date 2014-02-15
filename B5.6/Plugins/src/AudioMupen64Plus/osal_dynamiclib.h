@@ -1,8 +1,7 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *   Mupen64plus - nogui.h                                                 *
+ *   Mupen64plus-core - osal/dynamiclib.h                                  *
  *   Mupen64Plus homepage: http://code.google.com/p/mupen64plus/           *
- *   Copyright (C) 2007-2008 Richard42 Ebenblues                           *
- *   Copyright (C) 2002 Hacktarux                                          *
+ *   Copyright (C) 2009 Richard Goedeken                                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,14 +19,12 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.          *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-/* Sound volume functions.
- */
+#if !defined(OSAL_DYNAMICLIB_H)
+#define OSAL_DYNAMICLIB_H
 
-#ifndef __VOLUME_H__
-#define __VOLUME_H__
+#include "m64p_types.h"
 
-void volSet(int);
-int volGet(void);
+void *     osal_dynlib_getproc(m64p_dynlib_handle LibHandle, const char *pccProcedureName);
 
-#endif // __VOLUME_H__
+#endif /* #define OSAL_DYNAMICLIB_H */
 

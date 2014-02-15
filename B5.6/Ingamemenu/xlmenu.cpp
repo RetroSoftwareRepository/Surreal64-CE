@@ -5,8 +5,9 @@
 #include "XLMenu.h"
 #include "Panel.h"
 #include <xbfont.h>
+//#include "..\Plugins\src\Common\Video\Menu\D3DSave.h"
 
-
+extern void ClearIGM();
 //weinerschnitzel - Skin Control
 extern DWORD dwMenuItemColor;
 extern DWORD dwNullItemColor;
@@ -493,6 +494,8 @@ DWORD XLMenu_Routine(DWORD command)
                     XLMenu_Activate(m->parent);
 				else{
                     XLMenu_Activate(NULL);
+					ClearIGM();
+					//g_d3dSave.PopRenderState();
 						/*m_MenuBgPanel.Destroy();
 						m_MenuBg2Panel.Destroy();
 

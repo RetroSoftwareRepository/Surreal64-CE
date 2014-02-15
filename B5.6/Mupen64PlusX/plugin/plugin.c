@@ -87,42 +87,44 @@ DEFINE_GFX(gln64);
 DEFINE_GFX(glide64);
 #else
     //extern m64p_error CALL X##PluginGetVersion(m64p_plugin_type *, int *, int *, const char **, int *); // Not in RiceXDK
-    extern void _VIDEO_ChangeWindow(void); \
-    extern BOOL _VIDEO_InitiateGFX(GFX_INFO Gfx_Info); \
-    extern void _VIDEO_MoveScreen(int x, int y); \
-    extern void _VIDEO_ProcessDList(void); \
-    extern void _VIDEO_ProcessRDPList(void); \
-    extern void _VIDEO_RomClosed(void); \
-    extern void _VIDEO_RomOpen(void); \
-    extern void _VIDEO_ShowCFB(void); \
-    extern void _VIDEO_UpdateScreen(void); \
-    extern void _VIDEO_ViStatusChanged(void); \
-    extern void _VIDEO_ViWidthChanged(void); \
-    extern void _VIDEO_ReadScreen2(void *dest, int *width, int *height, int front); \
-    extern void _VIDEO_SetRenderingCallback(void (*callback)(int)); \
-    extern void _VIDEO_ResizeVideoOutput(int width, int height); \
-    extern void _VIDEO_FBRead(unsigned int addr); \
-    extern void _VIDEO_FBWrite(unsigned int addr, unsigned int size); \
-    extern void _VIDEO_FBGetFrameBufferInfo(void *p); \
+    //extern void _VIDEO_ChangeWindow(void);
+    extern BOOL _VIDEO_InitiateGFX(GFX_INFO Gfx_Info);
+    extern void _VIDEO_MoveScreen(int x, int y);
+    extern void _VIDEO_ProcessDList(void);
+    extern void _VIDEO_ProcessRDPList(void);
+    extern void _VIDEO_RomClosed(void);
+    extern int  _VIDEO_RomOpen(void);
+    extern void _VIDEO_ShowCFB(void);
+    extern void _VIDEO_UpdateScreen(void);
+    extern void _VIDEO_ViStatusChanged(void);
+    extern void _VIDEO_ViWidthChanged(void);
+    extern void _VIDEO_ReadScreen2(void *dest, int *width, int *height, int front);
+    extern void _VIDEO_SetRenderingCallback(void (*callback)(int));
+    extern void _VIDEO_ResizeVideoOutput(int width, int height);
+    extern void _VIDEO_FBRead(unsigned int addr);
+    extern void _VIDEO_FBWrite(unsigned int addr, unsigned int size);
+    extern void _VIDEO_FBGetFrameBufferInfo(void *p);
 
-	static const gfx_plugin_functions gfx_VIDEO = { \
+	static const gfx_plugin_functions gfx_VIDEO = {
         //_VIDEO_PluginGetVersion, 
-        _VIDEO_ChangeWindow, \
-        _VIDEO_InitiateGFX, \
-        _VIDEO_MoveScreen, \
-        _VIDEO_ProcessDList, \
-        _VIDEO_ProcessRDPList, \
-        _VIDEO_RomClosed, \
-        _VIDEO_RomOpen, \
-        _VIDEO_ShowCFB, \
-        _VIDEO_UpdateScreen, \
-        _VIDEO_ViStatusChanged, \
-        _VIDEO_ViWidthChanged, \
-        _VIDEO_ReadScreen2, \
-        _VIDEO_SetRenderingCallback, \
-        _VIDEO_FBRead, \
-        _VIDEO_FBWrite, \
-        _VIDEO_FBGetFrameBufferInfo \
+        //_VIDEO_ChangeWindow,
+        *_VIDEO_InitiateGFX,
+        *_VIDEO_MoveScreen,
+        *_VIDEO_ProcessDList,
+        *_VIDEO_ProcessRDPList,
+        *_VIDEO_RomClosed,
+        *_VIDEO_RomOpen,
+        *_VIDEO_ShowCFB,
+        *_VIDEO_UpdateScreen,
+        *_VIDEO_ViStatusChanged,
+        *_VIDEO_ViWidthChanged,
+        *_VIDEO_ReadScreen2,
+        *_VIDEO_SetRenderingCallback,
+        *_VIDEO_FBRead,
+        *_VIDEO_FBWrite,
+		*_VIDEO_FBGetFrameBufferInfo,
+	};
+
 #endif
 
 gfx_plugin_functions gfx;
@@ -168,29 +170,35 @@ static m64p_error plugin_start_gfx(void)
 }
 
 /* AUDIO */
-extern void _AUDIO_AiDacrateChanged(int SystemType);
-extern void audioAiLenChanged(void);
-extern int  audioInitiateAudio(AUDIO_INFO Audio_Info);
-extern void audioProcessAList(void);
-extern int  audioRomOpen(void);
-extern void audioRomClosed(void);
-extern void audioSetSpeedFactor(int percent);
-extern void audioVolumeUp(void);
-extern void audioVolumeDown(void);
-extern int audioVolumeGetLevel(void);
-extern void audioVolumeSetLevel(int level);
-extern void audioVolumeMute(void);
-extern const char * audioVolumeGetString(void);
+extern void _AUDIO_M64P_AiDacrateChanged(int SystemType);
+extern void _AUDIO_M64P_AiLenChanged(void);
+extern int  _AUDIO_M64P_InitiateAudio(AUDIO_INFO Audio_Info);
+extern void _AUDIO_M64P_ProcessAList(void);
+extern int  _AUDIO_M64P_RomOpen(void);
+extern void _AUDIO_M64P_RomClosed(void);
+extern void _AUDIO_M64P_SetSpeedFactor(int percent);
+extern void _AUDIO_M64P_VolumeUp(void);
+extern void _AUDIO_M64P_VolumeDown(void);
+extern int _AUDIO_M64P_VolumeGetLevel(void);
+extern void _AUDIO_M64P_VolumeSetLevel(int level);
+extern void _AUDIO_M64P_VolumeMute(void);
+extern const char * _AUDIO_M64P_VolumeGetString(void);
 
 #if defined(_XBOX)
-audio_plugin_functions audio = {
-    AiDacrateChanged,
-    audioAiLenChanged,
-    audioInitiateAudio,
-    audioProcessAList,
-    audioRomClosed,
-    audioRomOpen,
-    audioSetSpeedFactor,
+static const audio_plugin_functions audio_M64P = {
+    _AUDIO_M64P_AiDacrateChanged,
+    _AUDIO_M64P_AiLenChanged,
+    _AUDIO_M64P_InitiateAudio,
+    _AUDIO_M64P_ProcessAList,
+    _AUDIO_M64P_RomClosed,
+    _AUDIO_M64P_RomOpen,
+    _AUDIO_M64P_SetSpeedFactor,
+	_AUDIO_M64P_VolumeUp,
+    _AUDIO_M64P_VolumeDown,
+    _AUDIO_M64P_VolumeGetLevel,
+    _AUDIO_M64P_VolumeSetLevel,
+    _AUDIO_M64P_VolumeMute,
+    _AUDIO_M64P_VolumeGetString
 };
 #else
 audio_plugin_functions audio = {
@@ -210,6 +218,8 @@ audio_plugin_functions audio = {
     audioVolumeGetString
 };
 #endif
+
+audio_plugin_functions audio;
 
 static AUDIO_INFO audio_info;
 
@@ -236,26 +246,28 @@ static m64p_error plugin_start_audio(void)
 }
 
 /* INPUT */
-extern m64p_error inputPluginGetVersion(m64p_plugin_type *PluginType, int *PluginVersion,
-                                              int *APIVersion, const char **PluginNamePtr, int *Capabilities);
-extern void inputInitiateControllers (CONTROL_INFO ControlInfo);
-extern void inputGetKeys(int Control, BUTTONS * Keys );
-extern void inputControllerCommand(int Control, unsigned char *Command);
-extern void inputGetKeys(int Control, BUTTONS * Keys);
-extern void inputInitiateControllers(CONTROL_INFO ControlInfo);
-extern void inputReadController(int Control, unsigned char *Command);
-extern int  inputRomOpen(void);
-extern void inputRomClosed(void);
+/*extern m64p_error inputPluginGetVersion(m64p_plugin_type *PluginType, int *PluginVersion,
+                                              int *APIVersion, const char **PluginNamePtr, int *Capabilities);*/
+extern void _INPUT_InitiateControllers (CONTROL_INFO ControlInfo);
+extern void _INPUT_GetKeys(int Control, BUTTONS * Keys );
+extern void _INPUT_ControllerCommand(int Control, unsigned char *Command);
+extern void _INPUT_GetKeys(int Control, BUTTONS * Keys);
+extern void _INPUT_InitiateControllers(CONTROL_INFO ControlInfo);
+extern void _INPUT_ReadController(int Control, unsigned char *Command);
+extern int  _INPUT_RomOpen(void);
+extern void _INPUT_RomClosed(void);
 
-input_plugin_functions input = {
-    inputPluginGetVersion,
-    inputControllerCommand,
-    inputGetKeys,
-    inputInitiateControllers,
-    inputReadController,
-    inputRomClosed,
-    inputRomOpen,
+static const input_plugin_functions input_INPUT = {
+   //_INPUT_PluginGetVersion,
+    _INPUT_ControllerCommand,
+    _INPUT_GetKeys,
+    _INPUT_InitiateControllers,
+    _INPUT_ReadController,
+    _INPUT_RomClosed,
+    _INPUT_RomOpen,
 };
+
+input_plugin_functions input;
 
 static CONTROL_INFO control_info;
 CONTROL Controls[4];
@@ -282,16 +294,18 @@ static m64p_error plugin_start_input(void)
 /* RSP */
 extern m64p_error rspPluginGetVersion(m64p_plugin_type *PluginType, int *PluginVersion,
                                             int *APIVersion, const char **PluginNamePtr, int *Capabilities);
-extern unsigned int rspDoRspCycles(unsigned int Cycles);
-extern void rspInitiateRSP(RSP_INFO Rsp_Info, unsigned int *CycleCount);
-extern void rspRomClosed(void);
+extern unsigned int _RSP_M64p_DoRspCycles(unsigned int Cycles);
+extern void _RSP_M64p_InitiateRSP(RSP_INFO Rsp_Info, unsigned int *CycleCount);
+extern void _RSP_M64p_RomClosed(void);
 
-rsp_plugin_functions rsp = {
-    rspPluginGetVersion,
-    rspDoRspCycles,
-    rspInitiateRSP,
-    rspRomClosed
+static const rsp_plugin_functions rsp_RSP_M64P = {
+    //_RSP_M64p_PluginGetVersion,
+    *_RSP_M64p_DoRspCycles,
+    *_RSP_M64p_InitiateRSP,
+    *_RSP_M64p_RomClosed
 };
+
+rsp_plugin_functions rsp;
 
 static RSP_INFO rsp_info;
 
@@ -334,9 +348,7 @@ static m64p_error plugin_start_rsp(void)
 /* global functions */
 void plugin_connect_all(enum gfx_plugin_type gfx_plugin)
 {
-#if defined(_STATIC_PLUGINS_)
-	gfx = gfx_VIDEO
-#else
+#if !defined(_STATIC_PLUGINS_)
     switch (gfx_plugin)
     {
         case GFX_RICE:  gfx = gfx_rice; break;

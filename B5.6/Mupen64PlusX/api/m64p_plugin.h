@@ -225,17 +225,17 @@ typedef void (*ptr_VolumeSetLevel)(int level);
 typedef void (*ptr_VolumeMute)(void);
 typedef const char * (*ptr_VolumeGetString)(void);
 #if defined(M64P_PLUGIN_PROTOTYPES)
-EXPORT void CALL AiDacrateChanged(int SystemType);
-EXPORT void CALL AiLenChanged(void);
-EXPORT int  CALL InitiateAudio(AUDIO_INFO Audio_Info);
-EXPORT void CALL ProcessAList(void);
-EXPORT void CALL SetSpeedFactor(int percent);
-EXPORT void CALL VolumeUp(void);
-EXPORT void CALL VolumeDown(void);
-EXPORT int  CALL VolumeGetLevel(void);
-EXPORT void CALL VolumeSetLevel(int level);
-EXPORT void CALL VolumeMute(void);
-EXPORT const char * CALL VolumeGetString(void);
+EXPORT void CALL *_AUDIO_AiDacrateChanged(int SystemType);
+EXPORT void CALL *_AUDIO_AiLenChanged(void);
+EXPORT int  CALL *_AUDIO_InitiateAudio(AUDIO_INFO Audio_Info);
+EXPORT void CALL *_AUDIO_ProcessAList(void);
+EXPORT void CALL *_AUDIO_SetSpeedFactor(int percent);
+EXPORT void CALL *_AUDIO_VolumeUp(void);
+EXPORT void CALL *_AUDIO_VolumeDown(void);
+EXPORT int  CALL *_AUDIO_VolumeGetLevel(void);
+EXPORT void CALL *_AUDIO_VolumeSetLevel(int level);
+EXPORT void CALL *_AUDIO_VolumeMute(void);
+EXPORT const char * CALL *_AUDIO_VolumeGetString(void);
 #endif
 
 /* input plugin function pointers */

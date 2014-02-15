@@ -29,7 +29,7 @@
 #include "m64p_types.h"
 #include "m64p_common.h"
 #include "../main/version.h"
-
+#ifndef _XBOX
 EXPORT m64p_error CALL PluginGetVersion(m64p_plugin_type *PluginType, int *PluginVersion, int *APIVersion, const char **PluginNamePtr, int *Capabilities)
 {
     /* set version info */
@@ -61,6 +61,7 @@ EXPORT m64p_error CALL PluginGetVersion(m64p_plugin_type *PluginType, int *Plugi
                     
     return M64ERR_SUCCESS;
 }
+#endif
 
 EXPORT m64p_error CALL CoreGetAPIVersions(int *ConfigVersion, int *DebugVersion, int *VidextVersion, int *ExtraVersion)
 {

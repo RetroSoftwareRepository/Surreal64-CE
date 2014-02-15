@@ -36,9 +36,10 @@ void RunIngameMenu()
 	g_d3dSave.PushRenderState();
 
 	SetupD3D();
-
+	ClearIGM();
 	MainMenu();
 	ClearIGM();
+	
 	
 	g_d3dSave.PopRenderState();
 
