@@ -121,7 +121,7 @@ void   _RSP_RomClosed (void);
 void   _RSP_DllConfig (HWND hWnd);
 
 DWORD AsciiToHex (char * HexValue);
-void DisplayError (char * Message, ...);
+//void DisplayErrorNULL (char * Message, ...);
 int  GetStoredWinPos( char * WinName, DWORD * X, DWORD * Y );
 void StoreCurrentWinPos (  char * WinName, HWND hWnd );
 

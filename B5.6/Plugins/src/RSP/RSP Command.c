@@ -24,14 +24,14 @@
  *
  */
 
-#include <windows.h>
+#include <xtl.h>
 #include <stdio.h>
 #include "opcode.h"
 #include "RSP.h"
 #include "CPU.h"
 #include "RSP Registers.h"
 #include "RSP Command.h"
-#include "memory.h"
+#include "rspmemory.h"
 #include "breakpoint.h"
 
 #define RSP_MaxCommandLines		30
@@ -78,7 +78,7 @@ void Create_RSP_Commands_Window ( int Child ) {
 
 	if ( Child ) {
 		InRSPCommandsWindow = TRUE;
-		DialogBox( hinstDLL, "RSPCOMMAND", NULL,(DLGPROC)RSP_Commands_Proc );
+		//DialogBox( hinstDLL, "RSPCOMMAND", NULL,(DLGPROC)RSP_Commands_Proc );
 
 		InRSPCommandsWindow = FALSE;
 		memset(RSPCommandLine,0,sizeof(RSPCommandLine));
@@ -89,13 +89,13 @@ void Create_RSP_Commands_Window ( int Child ) {
 			CreateThread(NULL,0,(LPTHREAD_START_ROUTINE)Create_RSP_Commands_Window,
 				(LPVOID)TRUE,0, &ThreadID);	
 		} else {
-			SetForegroundWindow(RSPCommandshWnd);
+			//SetForegroundWindow(RSPCommandshWnd);
 		}	
 	}
 }
 
 void Disable_RSP_Commands_Window ( void ) {
-	SCROLLINFO si;
+/*	SCROLLINFO si;
 
 	if (!InRSPCommandsWindow) { return; }
 	EnableWindow(hList,            FALSE);
@@ -116,9 +116,11 @@ void Disable_RSP_Commands_Window ( void ) {
 	si.nPos   = 1;
 	si.nPage  = 1;
 	SetScrollInfo(hScrlBar,SB_CTL,&si,TRUE);
+*/
 }
 
 int DisplayRSPCommand (DWORD location, int InsertPos) {
+	/*
 	DWORD OpCode, LinesUsed = 1, status;
 	BOOL Redraw = FALSE;	
 
@@ -145,9 +147,11 @@ int DisplayRSPCommand (DWORD location, int InsertPos) {
 		}
 	}
 	return LinesUsed;
+	*/
 }
 
 void DumpRSPCode (void) {
+/*
 	char string[100], LogFileName[255], *p ;
 	DWORD location, OpCode, dwWritten;
 	HANDLE hLogFile = NULL;
@@ -181,9 +185,11 @@ void DumpRSPCode (void) {
 		WriteFile( hLogFile,string,strlen(string),&dwWritten,NULL );
 	}
 	CloseHandle(hLogFile);
+*/
 }
 
 void DumpRSPData (void) {
+/*
 	char string[100], LogFileName[255], *p ;
 	DWORD location, value, dwWritten;
 	HANDLE hLogFile = NULL;
@@ -217,9 +223,11 @@ void DumpRSPData (void) {
 		WriteFile( hLogFile,string,strlen(string),&dwWritten,NULL );
 	}
 	CloseHandle(hLogFile);
+*/
 }
 
-void DrawRSPCommand ( LPARAM lParam ) {	
+void DrawRSPCommand ( LPARAM lParam ) {
+/*	
 	char Command[150], Offset[30], Instruction[30], Arguments[40];
 	LPDRAWITEMSTRUCT ditem;
 	COLORREF oldColor;
@@ -290,11 +298,12 @@ void DrawRSPCommand ( LPARAM lParam ) {
 	if (ResetColor == TRUE) {
 		SetTextColor( ditem->hDC, oldColor );
 	}
-
+*/
 }
 
 
 void Enable_RSP_Commands_Window ( void ) {
+/*
 	SCROLLINFO si;
 
 	if (!InRSPCommandsWindow) { return; }
@@ -324,6 +333,7 @@ void Enable_RSP_Commands_Window ( void ) {
 		SetRSPCommandViewto( *PrgCount );
 		SetForegroundWindow(RSPCommandshWnd);
 	}
+*/
 }
 
 void Enter_RSP_Commands_Window ( void ) {
@@ -331,6 +341,7 @@ void Enter_RSP_Commands_Window ( void ) {
 }
 
 void Paint_RSP_Commands (HWND hDlg) {
+/*
 	PAINTSTRUCT ps;
 	RECT rcBox;
 	HFONT hOldFont;
@@ -379,9 +390,11 @@ void Paint_RSP_Commands (HWND hDlg) {
 	SetBkMode( ps.hdc, OldBkMode );
 		
 	EndPaint( hDlg, &ps );
+*/
 }
 
 void RefreshRSPCommands ( void ) {
+/*
 	DWORD location, LinesUsed;
 	char AsciiAddress[20];
 	int count;
@@ -396,9 +409,11 @@ void RefreshRSPCommands ( void ) {
 		LinesUsed = DisplayRSPCommand ( location, count );
 		location += 4;
 	}
+*/
 }
 
 LRESULT CALLBACK RSP_Commands_Proc (HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {	
+/*
 	switch (uMsg) {
 	case WM_INITDIALOG:
 		RSPCommandshWnd = hDlg;
@@ -447,10 +462,10 @@ LRESULT CALLBACK RSP_Commands_Proc (HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM 
 		case IDC_STEP_BUTTON:			
 			WaitingForStep = FALSE;
 			break;
-		/*case IDC_SKIP_BUTTON:
-			SkipNextRSPOpCode = TRUE;
-			WaitingFor_RSPStep   = FALSE;
-			break;*/
+		//case IDC_SKIP_BUTTON:
+		//	SkipNextRSPOpCode = TRUE;
+		//	WaitingFor_RSPStep   = FALSE;
+		//	break;
 		case IDC_BP_BUTTON:	
 			if (DebugInfo.Enter_BPoint_Window != NULL) {
 				DebugInfo.Enter_BPoint_Window(); 
@@ -571,12 +586,14 @@ LRESULT CALLBACK RSP_Commands_Proc (HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM 
 	default:
 		return FALSE;
 	}
+*/
 	return TRUE;
 }
 
 void RSP_Commands_Setup ( HWND hDlg ) {
 #define WindowWidth  457
 #define WindowHeight 494
+/*
 	char Location[10];
 	DWORD X, Y, WndPos;
 	
@@ -701,7 +718,7 @@ void RSP_Commands_Setup ( HWND hDlg ) {
 
 	SetWindowPos(hDlg,NULL,X,Y,WindowWidth,WindowHeight, SWP_NOZORDER | 
 		SWP_SHOWWINDOW);
-
+*/
 }
 
 char * RSPSpecialName ( DWORD OpCode, DWORD PC ) {
@@ -1293,7 +1310,8 @@ char * RSPOpcodeName ( DWORD OpCode, DWORD PC ) {
 	return CommandName;
 }
 
-void SetRSPCommandToRunning ( void ) { 	
+void SetRSPCommandToRunning ( void ) {
+/* 	
 	Stepping_Commands = FALSE;
 	if (InRSPCommandsWindow == FALSE) { return; }
 	EnableWindow(hGoButton,    FALSE);
@@ -1304,9 +1322,11 @@ void SetRSPCommandToRunning ( void ) {
 	SendMessage(hGoButton, BM_SETSTYLE,BS_PUSHBUTTON,TRUE);
 	SendMessage(hBreakButton, BM_SETSTYLE,BS_DEFPUSHBUTTON,TRUE);
 	SetFocus(hBreakButton);
+*/
 }
 
 void SetRSPCommandToStepping ( void ) { 	
+/*
 	if (InRSPCommandsWindow == FALSE) { return; }
 	EnableWindow(hGoButton,    TRUE);
 	EnableWindow(hBreakButton, FALSE);
@@ -1317,6 +1337,7 @@ void SetRSPCommandToStepping ( void ) {
 	SendMessage(RSPCommandshWnd, DM_SETDEFID,IDC_STEP_BUTTON,0);
 	SetFocus(hStepButton);
 	Stepping_Commands = TRUE;
+*/
 }
 
 void SetRSPCommandViewto ( UINT NewLocation ) {
@@ -1325,12 +1346,12 @@ void SetRSPCommandViewto ( UINT NewLocation ) {
 
 	if (InRSPCommandsWindow == FALSE) { return; }
 
-	GetWindowText(hAddress,Value,sizeof(Value));
+	//GetWindowText(hAddress,Value,sizeof(Value));
 	location = AsciiToHex(Value) & ~3;
 
 	if ( NewLocation < location || NewLocation >= location + 120 ) {
 		sprintf(Value,"%03X",NewLocation);
-		SetWindowText(hAddress,Value);
+		//SetWindowText(hAddress,Value);
 	} else {
 		RefreshRSPCommands();
 	}

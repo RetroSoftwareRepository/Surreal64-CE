@@ -26,6 +26,7 @@
 
 #include <xtl.h>
 #include <stdio.h>
+
 #include "Rsp.h"
 #include "CPU.h"
 #include "Recompiler CPU.h"
@@ -34,15 +35,19 @@
 #include "rspmemory.h"
 #include "breakpoint.h"
 #include "resource.h"
- 
 
-UWORD   RSP_GPR[32], RSP_Flags[4];
-UDWORD  RSP_ACCUM[8];
-VECTOR  RSP_Vect[32];
- 
-BOOL GraphicsHle=1, AudioHle=0;
-BOOL ConditionalMove;
-BOOL Profiling, IndvidualBlock, ShowErrors;
+void ClearAllx86Code(void);
+//void ProcessMenuItem(int ID);
+//BOOL CALLBACK CompilerDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
+
+BOOL GraphicsHle = TRUE, AudioHle, ConditionalMove;
+/*BOOL DebuggingEnabled = FALSE, 
+	Profiling, 
+	IndvidualBlock, 
+	ShowErrors, 
+	BreakOnStart = FALSE,
+	LogRDP = FALSE,
+	LogX86Code = FALSE;*/
 DWORD CPUCore = RecompilerCPU;
 
 HANDLE hMutex = NULL;
@@ -52,6 +57,36 @@ RSP_INFO RSPInfo;
 HINSTANCE hinstDLL;
 HMENU hRSPMenu = NULL;
 
+extern BYTE * pLastSecondary;
+
+enum {
+	Set_BreakOnStart, Set_CPUCore, Set_LogRDP, Set_LogX86Code, Set_Profiling, Set_IndvidualBlock,
+	Set_ShowErrors, 
+
+	//Compiler settings
+	Set_CheckDest, Set_Accum, Set_Mmx, Set_Mmx2, Set_Sse, Set_Sections,
+	Set_ReOrdering, Set_GPRConstants, Set_Flags, Set_AlignVector,
+
+	//Game Settings
+	Set_JumpTableSize
+};
+
+short Set_AudioHle = 0, Set_GraphicsHle = 0;
+
+/************ DLL info **************/
+/*
+const char * AppName ( void ) 
+{
+	static stdstr_f Name("RSP %s",VersionInfo(VERSION_PRODUCT_VERSION,hinstDLL).c_str()); 
+	return Name.c_str();
+}
+const char * AboutMsg ( void ) 
+{
+	static stdstr_f Msg("RSP emulation Plugin\nMade for Project64 (c)\nVersion %s\n\nby Jabo & Zilmar",VersionInfo(VERSION_PRODUCT_VERSION,hinstDLL).c_str());
+	return Msg.c_str();
+}
+*/
+/************ Functions ***********/
 DWORD AsciiToHex (char * HexValue) {
 	DWORD Count, Finish, Value = 0;
 
@@ -90,7 +125,16 @@ DWORD AsciiToHex (char * HexValue) {
 	}
 	return Value;
 }
- 
+
+/*void DisplayError (char * Message, ...) {
+	char Msg[400];
+	va_list ap;
+
+	va_start( ap, Message );
+	vsprintf( Msg, Message, ap );
+	va_end( ap );
+	MessageBox(NULL,Msg,"Error",MB_OK|MB_ICONERROR);
+}*/
 
 /******************************************************************
   Function: CloseDLL
@@ -101,11 +145,9 @@ DWORD AsciiToHex (char * HexValue) {
 *******************************************************************/ 
 void _RSP_CloseDLL (void) 
 {
-	if (!AudioHle)
 		FreeMemory();
 }
- 
- 
+
 /******************************************************************
   Function: GetDllInfo
   Purpose:  This function allows the emulator to gather information
@@ -115,9 +157,15 @@ void _RSP_CloseDLL (void)
   output:   none
 *******************************************************************/ 
 void _RSP_GetDllInfo ( PLUGIN_INFO * PluginInfo ) {
-	PluginInfo->Version = 0x0101;
+	PluginInfo->Version = 0x0102;
 	PluginInfo->Type = PLUGIN_TYPE_RSP;
-	sprintf(PluginInfo->Name,"RSP emulation Plugin");
+	/*
+#ifdef _DEBUG
+	sprintf(PluginInfo->Name,"RSP Debug Plugin %s",VersionInfo(VERSION_PRODUCT_VERSION,hinstDLL).c_str());
+#else
+	sprintf(PluginInfo->Name,"RSP Plugin %s",VersionInfo(VERSION_PRODUCT_VERSION,hinstDLL).c_str());
+#endif
+	*/
 	PluginInfo->NormalMemory = FALSE;
 	PluginInfo->MemoryBswaped = TRUE;
 }
@@ -133,13 +181,13 @@ void _RSP_GetDllInfo ( PLUGIN_INFO * PluginInfo ) {
 *******************************************************************/ 
 
 #if !defined(EXTERNAL_RELEASE)
-
 void   GetRspDebugInfo ( RSPDEBUG_INFO * DebugInfo ) {
 	HKEY hKeyResults = 0;
 	char String[200];
 	long lResult;
 
 	hRSPMenu = LoadMenu(hinstDLL,"RspMenu");
+
 	DebugInfo->hRSPMenu = hRSPMenu;
 	DebugInfo->ProcessMenuItem = ProcessMenuItem;
 
@@ -155,42 +203,9 @@ void   GetRspDebugInfo ( RSPDEBUG_INFO * DebugInfo ) {
 	DebugInfo->ShowBPPanel = ShowBPPanel;
 	
 	DebugInfo->Enter_RSP_Commands_Window = Enter_RSP_Commands_Window;
-
-	sprintf(String,"Software\\N64 Emulation\\DLL\\%s",AppName);
-	lResult = RegOpenKeyEx( HKEY_CURRENT_USER,String,0,KEY_ALL_ACCESS,&hKeyResults);
-	if (lResult == ERROR_SUCCESS) {
-		DWORD Type, Bytes = 4;
-
-		lResult = RegQueryValueEx(hKeyResults,"Profiling On",0,&Type,(LPBYTE)(&Profiling),&Bytes);
-		if (Type != REG_DWORD || lResult != ERROR_SUCCESS) { 
-			Profiling = Default_ProfilingOn;
-		}
-		lResult = RegQueryValueEx(hKeyResults,"Log Indvidual Blocks",0,&Type,(LPBYTE)(&IndvidualBlock),&Bytes);
-		if (Type != REG_DWORD || lResult != ERROR_SUCCESS) { 
-			IndvidualBlock = Default_IndvidualBlock;
-		}		
-		lResult = RegQueryValueEx(hKeyResults,"Show Compiler Errors",0,&Type,(LPBYTE)(&ShowErrors),&Bytes);
-		if (Type != REG_DWORD || lResult != ERROR_SUCCESS) { 
-			ShowErrors = Default_ShowErrors;
-		}
-		RegCloseKey(hKeyResults);
-	}
-	if (Profiling) {
-		CheckMenuItem( hRSPMenu, ID_PROFILING_ON, MF_BYCOMMAND | MFS_CHECKED );
-	} else {
-		CheckMenuItem( hRSPMenu, ID_PROFILING_OFF, MF_BYCOMMAND | MFS_CHECKED );
-	}
-	if (IndvidualBlock) {
-		CheckMenuItem( hRSPMenu, ID_PROFILING_LOGINDIVIDUALBLOCKS, MF_BYCOMMAND | MFS_CHECKED );
-	}
-	if (ShowErrors) {
-		CheckMenuItem( hRSPMenu, ID_SHOWCOMPILERERRORS, MF_BYCOMMAND | MFS_CHECKED );
-	}
 }
 
 #endif
-
- 
 
 /******************************************************************
   Function: InitiateRSP
@@ -244,36 +259,13 @@ void DetectCpuSpecs(void) {
 }
 
 void _RSP_InitiateRSP ( RSP_INFO Rsp_Info, DWORD * CycleCount) {
-	//char RegPath[256];
-	HKEY hKey = NULL;
-	//DWORD dwSize, lResult, Disposition;
-
 	RSPInfo = Rsp_Info;
-
-	memset(&Compiler, 0, sizeof(Compiler));
+	AudioHle = 0;
+	GraphicsHle = 1;
 	
-	Compiler.bAlignGPR = TRUE;
-	Compiler.bAlignVector = TRUE;
-	Compiler.bFlags = TRUE;
-	Compiler.bReOrdering = TRUE;
-	Compiler.bSections = TRUE;
-	Compiler.bDest = TRUE;
-	Compiler.bAccum = TRUE;
-	Compiler.bGPRConstants = TRUE;
-	
-	DetectCpuSpecs();
-
-	if (RSPInfo.ProcessAList != NULL)
-		AudioHle = 1;
-
-	hMutex = CreateMutex(NULL, FALSE, NULL);
- 
 	*CycleCount = 0;
-
-	if (!AudioHle)
-		AllocateMemory();
-
-	//InitilizeRSPRegisters();
+	AllocateMemory();
+	InitilizeRSPRegisters();
 	Build_RSP();
 	#ifdef GenerateLog
 	Start_Log();
@@ -290,7 +282,6 @@ void _RSP_InitiateRSP ( RSP_INFO Rsp_Info, DWORD * CycleCount) {
             above.
   output:   none
 *******************************************************************/ 
-
 #if !defined(EXTERNAL_RELEASE)
 
 void InitiateRSPDebugger ( DEBUG_INFO Debug_Info) {
@@ -298,10 +289,6 @@ void InitiateRSPDebugger ( DEBUG_INFO Debug_Info) {
 }
 
 void ProcessMenuItem(int ID) {
-	DWORD Disposition;
-	HKEY hKeyResults;
-	char String[200];
-	long lResult;
 	UINT uState;
 
 	switch (ID) {
@@ -311,84 +298,154 @@ void ProcessMenuItem(int ID) {
 	case ID_DUMP_DMEM: DumpRSPData(); break;
 	case ID_PROFILING_ON:
 	case ID_PROFILING_OFF:
-		uState = GetMenuState( hRSPMenu, ID_PROFILING_ON, MF_BYCOMMAND);			
-		hKeyResults = 0;
-		Disposition = 0;
-
-		if ( uState & MFS_CHECKED ) {								
-			CheckMenuItem( hRSPMenu, ID_PROFILING_ON, MF_BYCOMMAND | MFS_UNCHECKED );
-			CheckMenuItem( hRSPMenu, ID_PROFILING_OFF, MF_BYCOMMAND | MFS_CHECKED );
-			GenerateTimerResults();
-			Profiling = FALSE;
-		} else {
-			CheckMenuItem( hRSPMenu, ID_PROFILING_ON, MF_BYCOMMAND | MFS_CHECKED );
-			CheckMenuItem( hRSPMenu, ID_PROFILING_OFF, MF_BYCOMMAND | MFS_UNCHECKED );
-			ResetTimerList();
-			Profiling = TRUE;
-		}
+		{
+			uState = GetMenuState(hRSPMenu, ID_PROFILING_ON, MF_BYCOMMAND);
 			
-		sprintf(String,"Software\\N64 Emulation\\DLL\\%s",AppName);
-		lResult = RegCreateKeyEx( HKEY_CURRENT_USER,String,0,"",
-			REG_OPTION_NON_VOLATILE,KEY_ALL_ACCESS,NULL,&hKeyResults,&Disposition);
-			
-		if (lResult == ERROR_SUCCESS) { 
-			RegSetValueEx(hKeyResults,"Profiling On",0,REG_DWORD,(BYTE *)&Profiling,sizeof(DWORD));
+			if (uState & MFS_CHECKED) {
+				CheckMenuItem( hRSPMenu, ID_PROFILING_ON, MF_BYCOMMAND | MFS_UNCHECKED );
+				CheckMenuItem( hRSPMenu, ID_PROFILING_OFF, MF_BYCOMMAND | MFS_CHECKED );
+				SetSetting(Set_Profiling,FALSE);
+				if (DebuggingEnabled) { Profiling = FALSE; }
+			} else {
+				CheckMenuItem( hRSPMenu, ID_PROFILING_ON, MF_BYCOMMAND | MFS_CHECKED );
+				CheckMenuItem( hRSPMenu, ID_PROFILING_OFF, MF_BYCOMMAND | MFS_UNCHECKED );
+				SetSetting(Set_Profiling,TRUE);
+				if (DebuggingEnabled) {  Profiling = TRUE; }
+			}
 		}
-		RegCloseKey(hKeyResults);
 		break;
 	case ID_PROFILING_RESETSTATS: ResetTimerList(); break;
 	case ID_PROFILING_GENERATELOG: GenerateTimerResults(); break;
 	case ID_PROFILING_LOGINDIVIDUALBLOCKS:
-		uState = GetMenuState( hRSPMenu, ID_PROFILING_LOGINDIVIDUALBLOCKS, MF_BYCOMMAND);
-		hKeyResults = 0;
-		Disposition = 0;
-
-		ResetTimerList();
-		if ( uState & MFS_CHECKED ) {								
-			CheckMenuItem( hRSPMenu, ID_PROFILING_LOGINDIVIDUALBLOCKS, MF_BYCOMMAND | MFS_UNCHECKED );
-			IndvidualBlock = FALSE;
-		} else {
-			CheckMenuItem( hRSPMenu, ID_PROFILING_LOGINDIVIDUALBLOCKS, MF_BYCOMMAND | MFS_CHECKED );
-			IndvidualBlock = TRUE;
-		}
+		{
+			uState = GetMenuState(hRSPMenu, ID_PROFILING_LOGINDIVIDUALBLOCKS, MF_BYCOMMAND);
 			
-		sprintf(String,"Software\\N64 Emulation\\DLL\\%s",AppName);
-		lResult = RegCreateKeyEx( HKEY_CURRENT_USER,String,0,"",
-		REG_OPTION_NON_VOLATILE,KEY_ALL_ACCESS,NULL,&hKeyResults,&Disposition);
-			
-		if (lResult == ERROR_SUCCESS) { 
-			RegSetValueEx(hKeyResults,"Log Indvidual Blocks",0,REG_DWORD,
-				(BYTE *)&IndvidualBlock,sizeof(DWORD));
+			if (uState & MFS_CHECKED) {
+				CheckMenuItem( hRSPMenu, ID_PROFILING_LOGINDIVIDUALBLOCKS, MF_BYCOMMAND | MFS_UNCHECKED );
+				SetSetting(Set_IndvidualBlock,FALSE);
+				if (DebuggingEnabled) { IndvidualBlock = FALSE; }
+			} else {
+				CheckMenuItem( hRSPMenu, ID_PROFILING_LOGINDIVIDUALBLOCKS, MF_BYCOMMAND | MFS_CHECKED );
+				SetSetting(Set_IndvidualBlock,TRUE);
+				if (DebuggingEnabled) {  IndvidualBlock = TRUE; }
+			}
 		}
-		RegCloseKey(hKeyResults);
 		break;
 	case ID_SHOWCOMPILERERRORS:
-		uState = GetMenuState(hRSPMenu, ID_SHOWCOMPILERERRORS, MF_BYCOMMAND);
-		
-		if (uState & MFS_CHECKED) {
-			CheckMenuItem( hRSPMenu, ID_SHOWCOMPILERERRORS, MF_BYCOMMAND | MFS_UNCHECKED );
-			ShowErrors = FALSE;
-		} else {
-			CheckMenuItem( hRSPMenu, ID_SHOWCOMPILERERRORS, MF_BYCOMMAND | MFS_CHECKED );
-			ShowErrors = TRUE;
-		}
-		sprintf(String,"Software\\N64 Emulation\\DLL\\%s",AppName);
-		lResult = RegCreateKeyEx( HKEY_CURRENT_USER,String,0,"",
-		REG_OPTION_NON_VOLATILE,KEY_ALL_ACCESS,NULL,&hKeyResults,&Disposition);
+		{
+			uState = GetMenuState(hRSPMenu, ID_SHOWCOMPILERERRORS, MF_BYCOMMAND);
 			
-		if (lResult == ERROR_SUCCESS) { 
-			RegSetValueEx(hKeyResults,"Show Compiler Errors",0,REG_DWORD,
-				(BYTE *)&ShowErrors, sizeof(DWORD));
+			if (uState & MFS_CHECKED) {
+				CheckMenuItem( hRSPMenu, ID_SHOWCOMPILERERRORS, MF_BYCOMMAND | MFS_UNCHECKED );
+				SetSetting(Set_ShowErrors,FALSE);
+				if (DebuggingEnabled) { ShowErrors = FALSE; }
+			} else {
+				CheckMenuItem( hRSPMenu, ID_SHOWCOMPILERERRORS, MF_BYCOMMAND | MFS_CHECKED );
+				SetSetting(Set_ShowErrors,TRUE);
+				if (DebuggingEnabled) {  ShowErrors = TRUE; }
+			}
 		}
-		RegCloseKey(hKeyResults);
 		break;
 	case ID_COMPILER:		
 		DialogBox(hinstDLL, "RSPCOMPILER", HWND_DESKTOP, CompilerDlgProc);
 		break;
+	case ID_BREAKONSTARTOFTASK:
+		{
+			uState = GetMenuState(hRSPMenu, ID_BREAKONSTARTOFTASK, MF_BYCOMMAND);
+			
+			if (uState & MFS_CHECKED) {
+				CheckMenuItem( hRSPMenu, ID_BREAKONSTARTOFTASK, MF_BYCOMMAND | MFS_UNCHECKED );
+				SetSetting(Set_BreakOnStart,FALSE);
+				if (DebuggingEnabled) { BreakOnStart = FALSE; }
+			} else {
+				CheckMenuItem( hRSPMenu, ID_BREAKONSTARTOFTASK, MF_BYCOMMAND | MFS_CHECKED );
+				SetSetting(Set_BreakOnStart,TRUE);
+				if (DebuggingEnabled) {  BreakOnStart = TRUE; }
+			}
+		}
+		break;
+	case ID_LOGRDPCOMMANDS:
+		{
+			uState = GetMenuState(hRSPMenu, ID_LOGRDPCOMMANDS, MF_BYCOMMAND);
+			
+			if (uState & MFS_CHECKED) {
+				CheckMenuItem( hRSPMenu, ID_LOGRDPCOMMANDS, MF_BYCOMMAND | MFS_UNCHECKED );
+				SetSetting(Set_LogRDP,FALSE);
+				if (DebuggingEnabled) 
+				{
+					LogRDP = FALSE; 
+					StopRDPLog();
+				}
+			} else {
+				CheckMenuItem( hRSPMenu, ID_LOGRDPCOMMANDS, MF_BYCOMMAND | MFS_CHECKED );
+				SetSetting(Set_LogRDP,TRUE);
+				if (DebuggingEnabled)
+				{
+					LogRDP = TRUE; 
+					StartRDPLog();
+				}
+			}
+		}
+		break;
+	case ID_SETTINGS_LOGX86CODE:
+		{
+			uState = GetMenuState(hRSPMenu, ID_SETTINGS_LOGX86CODE, MF_BYCOMMAND);
+			
+			if (uState & MFS_CHECKED) {
+				CheckMenuItem( hRSPMenu, ID_SETTINGS_LOGX86CODE, MF_BYCOMMAND | MFS_UNCHECKED );
+				SetSetting(Set_LogX86Code,FALSE);
+				if (DebuggingEnabled) 
+				{
+					LogX86Code = FALSE; 
+					StopCPULog();
+				}
+			} else {
+				CheckMenuItem( hRSPMenu, ID_SETTINGS_LOGX86CODE, MF_BYCOMMAND | MFS_CHECKED );
+				SetSetting(Set_LogX86Code,TRUE);
+				if (DebuggingEnabled)
+				{
+					LogX86Code = TRUE; 
+					StartCPULog();
+				}
+			}
+		}
+		break;
+	case ID_CPUMETHOD_RECOMPILER:
+		{
+			SetSetting(Set_CPUCore,RecompilerCPU);
+			CPUCore = RecompilerCPU;
+			FixMenuState();
+			SetCPU(RecompilerCPU);
+		}
+		break;
+	case ID_CPUMETHOD_INTERPT:
+		{
+			SetSetting(Set_CPUCore,InterpreterCPU);
+			CPUCore = InterpreterCPU;
+			FixMenuState();
+			SetCPU(InterpreterCPU);
+		}
+		break;
 	}
 }
-
 #endif
+/******************************************************************
+  Function: RomOpen
+  Purpose:  This function is called when a rom is opened.
+  input:    none
+  output:   none
+*******************************************************************/ 
+void _RSP_RomOpen (void) 
+{
+	ClearAllx86Code();
+	/*
+	if (DebuggingEnabled)
+	{
+		EnableDebugging(true);
+	}
+	*/
+	JumpTableSize = 0x800; 
+}
 
 /******************************************************************
   Function: RomClosed
@@ -397,37 +454,239 @@ void ProcessMenuItem(int ID) {
   output:   none
 *******************************************************************/ 
 void  _RSP_RomClosed (void) {
-	void ClearAllx86Code(void);
+	ClearAllx86Code();
 
- 
-	//InitilizeRSPRegisters();
-	if (!AudioHle)
-		ClearAllx86Code();
-
-	#ifdef GenerateLog
+#ifdef GenerateLog
 	Stop_Log();
-	#endif
-	#ifdef Log_x86Code
-	Stop_x86_Log();
-	#endif
+#endif
 }
 
-BOOL GetBooleanCheck(HWND hDlg, DWORD DialogID) {
-
-	return TRUE;
- 
+static BOOL GetBooleanCheck(HWND hDlg, DWORD DialogID) {
+return TRUE;	
+//return (IsDlgButtonChecked(hDlg, DialogID) == BST_CHECKED) ? TRUE : FALSE;
 }
 
 BOOL CALLBACK CompilerDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-	 
+	/*char Buffer[256];
+
+	switch (uMsg) {	
+	case WM_INITDIALOG:	
+		if (Compiler.bDest == TRUE)
+			CheckDlgButton(hDlg, IDC_COMPILER_DEST, BST_CHECKED);
+		if (Compiler.mmx == TRUE) 
+			CheckDlgButton(hDlg, IDC_CHECK_MMX, BST_CHECKED);
+		if (Compiler.mmx2 == TRUE)
+			CheckDlgButton(hDlg, IDC_CHECK_MMX2, BST_CHECKED);
+		if (Compiler.sse == TRUE) 
+			CheckDlgButton(hDlg, IDC_CHECK_SSE, BST_CHECKED);
+		
+		if (Compiler.bAlignVector == TRUE)
+			CheckDlgButton(hDlg, IDC_COMPILER_ALIGNVEC, BST_CHECKED);
+
+		if (Compiler.bSections == TRUE) 
+			CheckDlgButton(hDlg, IDC_COMPILER_SECTIONS, BST_CHECKED);
+		if (Compiler.bGPRConstants == TRUE)
+			CheckDlgButton(hDlg, IDC_COMPILER_GPRCONSTANTS, BST_CHECKED);
+		if (Compiler.bReOrdering == TRUE)
+			CheckDlgButton(hDlg, IDC_COMPILER_REORDER, BST_CHECKED);
+		if (Compiler.bFlags == TRUE)
+			CheckDlgButton(hDlg, IDC_COMPILER_FLAGS, BST_CHECKED);
+		if (Compiler.bAccum == TRUE)
+			CheckDlgButton(hDlg, IDC_COMPILER_ACCUM, BST_CHECKED);
+
+		SetTimer(hDlg, 1, 250, NULL);
+		break;
+
+	case WM_TIMER:
+		sprintf(Buffer, "x86: %2.2f KB / %2.2f KB", (float)(RecompPos - RecompCode) / 1024.0F,
+			pLastSecondary?(float)((pLastSecondary - RecompCodeSecondary) / 1024.0F):0);
+
+		SetDlgItemText(hDlg, IDC_COMPILER_BUFFERS, Buffer);
+		break;
+
+	case WM_COMMAND:
+		switch (GET_WM_COMMAND_ID(wParam, lParam)) {
+		case IDOK:
+			Compiler.bDest = GetBooleanCheck(hDlg, IDC_COMPILER_DEST);
+			Compiler.bAccum = GetBooleanCheck(hDlg, IDC_COMPILER_ACCUM);
+			Compiler.mmx = GetBooleanCheck(hDlg, IDC_CHECK_MMX);
+			Compiler.mmx2 = GetBooleanCheck(hDlg, IDC_CHECK_MMX2);
+			Compiler.sse = GetBooleanCheck(hDlg, IDC_CHECK_SSE);
+			Compiler.bSections = GetBooleanCheck(hDlg, IDC_COMPILER_SECTIONS);
+			Compiler.bReOrdering = GetBooleanCheck(hDlg, IDC_COMPILER_REORDER);
+			Compiler.bGPRConstants = GetBooleanCheck(hDlg, IDC_COMPILER_GPRCONSTANTS);
+			Compiler.bFlags = GetBooleanCheck(hDlg, IDC_COMPILER_FLAGS);
+			Compiler.bAlignVector = GetBooleanCheck(hDlg, IDC_COMPILER_ALIGNVEC);
+			SetSetting(Set_CheckDest,Compiler.bDest);
+			SetSetting(Set_Accum,Compiler.bAccum);
+			SetSetting(Set_Mmx,Compiler.mmx);
+			SetSetting(Set_Mmx2,Compiler.mmx2);
+			SetSetting(Set_Sse,Compiler.sse);
+			SetSetting(Set_Sections,Compiler.bSections);
+			SetSetting(Set_ReOrdering,Compiler.bReOrdering);
+			SetSetting(Set_GPRConstants,Compiler.bGPRConstants);
+			SetSetting(Set_Flags,Compiler.bFlags);
+			SetSetting(Set_AlignVector,Compiler.bAlignVector);
+
+			KillTimer(hDlg, 1);
+			EndDialog(hDlg, TRUE);
+			break;
+
+		case IDCANCEL:	
+			KillTimer(hDlg, 1);
+			EndDialog(hDlg, TRUE);
+			break;
+		}
+		break;
+
+	default:
+		return FALSE;
+	}*/
 	return TRUE;
 }
 
 BOOL CALLBACK ConfigDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-	 
+	/*HWND hWndItem;
+	DWORD value;
+
+	switch (uMsg) {	
+	case WM_INITDIALOG:	
+		if (AudioHle == TRUE) {
+			CheckDlgButton(hDlg, IDC_AUDIOHLE, BST_CHECKED);
+		}
+
+		if (GraphicsHle == TRUE) {
+			CheckDlgButton(hDlg, IDC_GRAPHICSHLE, BST_CHECKED);
+		}
+
+		hWndItem = GetDlgItem(hDlg, IDC_COMPILER_SELECT);
+		ComboBox_AddString(hWndItem, "Interpreter");
+		ComboBox_AddString(hWndItem, "Recompiler");
+		ComboBox_SetCurSel(hWndItem, CPUCore);
+		break;
+
+	case WM_COMMAND:
+		switch (GET_WM_COMMAND_ID(wParam, lParam)) {
+		case IDOK:
+			hWndItem = GetDlgItem(hDlg, IDC_COMPILER_SELECT);
+			value = ComboBox_GetCurSel(hWndItem);
+			SetCPU(value);
+
+			AudioHle = GetBooleanCheck(hDlg, IDC_AUDIOHLE);
+			GraphicsHle = GetBooleanCheck(hDlg, IDC_GRAPHICSHLE);
+
+			EndDialog(hDlg, TRUE);
+			break;
+		case IDCANCEL:	
+			EndDialog(hDlg, TRUE);
+			break;
+		}
+		break;
+
+	default:
+		return FALSE;
+	}*/
 	return TRUE;
 }
 
 void _RSP_DllConfig (HWND hWnd) {
-	 
+	// DialogBox(hinstDLL, "RSPCONFIG", hWnd, ConfigDlgProc);
+	//DialogBox(hinstDLL, "RSPCONFIG", GetForegroundWindow(), ConfigDlgProc);
 }
+/*
+__declspec(dllexport) void EnableDebugging (BOOL Enabled) {
+	DebuggingEnabled = Enabled;
+	if (DebuggingEnabled)
+	{
+		BreakOnStart   = GetSetting(Set_BreakOnStart);
+		CPUCore        = GetSetting(Set_CPUCore);
+		LogRDP         = GetSetting(Set_LogRDP);
+		LogX86Code     = GetSetting(Set_LogX86Code);
+		Profiling      = GetSetting(Set_Profiling);
+		IndvidualBlock = GetSetting(Set_IndvidualBlock);
+		ShowErrors     = GetSetting(Set_ShowErrors);
+	
+		Compiler.bDest         = GetSetting(Set_CheckDest);
+		Compiler.bAccum        = GetSetting(Set_Accum);
+		Compiler.mmx           = GetSetting(Set_Mmx);
+		Compiler.mmx2          = GetSetting(Set_Mmx2);
+		Compiler.sse           = GetSetting(Set_Sse);
+		Compiler.bSections     = GetSetting(Set_Sections);
+		Compiler.bReOrdering   = GetSetting(Set_ReOrdering);
+		Compiler.bGPRConstants = GetSetting(Set_GPRConstants);
+		Compiler.bFlags        = GetSetting(Set_Flags);
+		Compiler.bAlignVector  = GetSetting(Set_AlignVector);
+		SetCPU(CPUCore);
+	}
+	FixMenuState();
+	if (LogRDP)
+	{
+		StartRDPLog();
+	}
+	if (LogX86Code)
+	{
+		StartCPULog();
+	}
+}
+
+__declspec(dllexport) void PluginLoaded (void) 
+{
+	BreakOnStart   = false;
+	CPUCore        = RecompilerCPU;
+	LogRDP         = FALSE;
+	LogX86Code     = FALSE;
+	Profiling      = FALSE;
+	IndvidualBlock = FALSE;
+	ShowErrors     = FALSE;
+
+	memset(&Compiler, 0, sizeof(Compiler));
+	
+	Compiler.bDest         = TRUE;
+	Compiler.bAlignVector  = FALSE;
+	Compiler.bFlags        = TRUE;
+	Compiler.bReOrdering   = TRUE;
+	Compiler.bSections     = TRUE;
+	Compiler.bAccum        = TRUE;
+	Compiler.bGPRConstants = TRUE;
+	DetectCpuSpecs();
+
+
+	SetModuleName("RSP");
+	Set_GraphicsHle = FindSystemSettingId("HLE GFX");
+	Set_AudioHle = FindSystemSettingId("HLE Audio");
+	
+	RegisterSetting(Set_BreakOnStart,   Data_DWORD_General,"Break on Start", NULL,BreakOnStart,NULL);
+	RegisterSetting(Set_CPUCore,        Data_DWORD_General,"CPU Method",     NULL,CPUCore,NULL);
+	RegisterSetting(Set_LogRDP,         Data_DWORD_General,"Log RDP",        NULL,LogRDP,NULL);
+	RegisterSetting(Set_LogX86Code,     Data_DWORD_General,"Log X86 Code",   NULL,LogX86Code,NULL);
+	RegisterSetting(Set_Profiling,      Data_DWORD_General,"Profiling",      NULL,Profiling,NULL);
+	RegisterSetting(Set_IndvidualBlock, Data_DWORD_General,"Indvidual Block",NULL,IndvidualBlock,NULL);
+	RegisterSetting(Set_ShowErrors,     Data_DWORD_General,"Show Errors",    NULL,ShowErrors,NULL);
+
+	//Compiler settings
+	RegisterSetting(Set_CheckDest,      Data_DWORD_General,"Check Dest Vector", NULL,Compiler.bDest,NULL);
+	RegisterSetting(Set_Accum,          Data_DWORD_General,"Check Dest Accum", NULL,Compiler.bAccum,NULL);
+	RegisterSetting(Set_Mmx,            Data_DWORD_General,"Use MMX", NULL,Compiler.mmx,NULL);
+	RegisterSetting(Set_Mmx2,           Data_DWORD_General,"Use MMX2", NULL,Compiler.mmx2,NULL);
+	RegisterSetting(Set_Sse,            Data_DWORD_General,"Use SSE", NULL,Compiler.sse,NULL);
+	RegisterSetting(Set_Sections,       Data_DWORD_General,"Use precompiled sections", NULL,Compiler.bSections,NULL);
+	RegisterSetting(Set_ReOrdering,     Data_DWORD_General,"Reorder opcodes", NULL,Compiler.bReOrdering,NULL);
+	RegisterSetting(Set_GPRConstants,   Data_DWORD_General,"Detect GPR Constants", NULL,Compiler.bGPRConstants,NULL);
+	RegisterSetting(Set_Flags,          Data_DWORD_General,"Check Flag Usage", NULL,Compiler.bFlags,NULL);
+	RegisterSetting(Set_AlignVector,    Data_DWORD_General,"Assume Vector loads align", NULL,Compiler.bAlignVector,NULL);
+
+	RegisterSetting(Set_JumpTableSize,  Data_DWORD_Game,"JumpTableSize",NULL,0x800,NULL);
+
+	AudioHle       = Set_AudioHle != 0 ? GetSystemSetting(Set_AudioHle) : false;
+	GraphicsHle    = Set_GraphicsHle != 0 ? GetSystemSetting(Set_GraphicsHle) : true;
+	
+	hMutex = CreateMutex(NULL, FALSE, NULL);
+
+	SetCPU(CPUCore);
+}
+
+void UseUnregisteredSetting (int SettingID)
+{
+	_asm int 3
+}
+*/

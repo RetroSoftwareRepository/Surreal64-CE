@@ -26,10 +26,22 @@
 
 #include "opcode.h"
 
+#define NORMAL				    0
+#define DO_DELAY_SLOT 			1
+#define DELAY_SLOT 				2
+#define DELAY_SLOT_DONE			3
+#define DELAY_SLOT_EXIT			4
+#define DELAY_SLOT_EXIT_DONE	5
+#define JUMP	 				6
+#define SINGLE_STEP	 		    7
+#define SINGLE_STEP_DONE		8
+#define FINISH_BLOCK			9
+#define FINISH_SUB_BLOCK		10
+
 extern DWORD CompilePC, NextInstruction, JumpTableSize;
 extern BOOL ChangedPC;
-
-#define CompilerWarning if (ShowErrors) DisplayError
+//void DisplayErrorNULL(char* Message, ...){};
+//#define CompilerWarning if (ShowErrors) DisplayErrorNULL
 
 #define High16BitAccum		1
 #define Middle16BitAccum	2
@@ -70,6 +82,7 @@ typedef struct {
 	} BranchesToResolve[200];	/* Branches inside or outside block */
 	
 	DWORD ResolveCount;			/* Branches with NULL jump table */
+	BYTE IMEM[0x1000];			/* Saved off for re-order */
 } RSP_BLOCK;
 
 extern RSP_BLOCK CurrentBlock;
@@ -77,9 +90,9 @@ extern RSP_BLOCK CurrentBlock;
 typedef struct {
 	BOOL bIsRegConst[32];		/* BOOLean toggle for constant */
 	DWORD MipsRegConst[32];		/* Value of register 32-bit */
-	DWORD BranchLabels[250];
+	DWORD BranchLabels[200];
 	DWORD LabelCount;
-	DWORD BranchLocations[250];
+	DWORD BranchLocations[200];
 	DWORD BranchCount;
 } RSP_CODE;
 

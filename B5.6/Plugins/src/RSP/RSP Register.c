@@ -24,12 +24,13 @@
  *
  */
 
-#include <windows.h>
-#include <commctrl.h>
+#include <xtl.h>
+//#include <commctrl.h>
 #include <stdio.h>
 #include "rsp.h"
 #include "types.h"
 
+/*
 #define GeneralPurpose			1
 #define ControlProcessor0		2
 #define HiddenRegisters		    3
@@ -61,9 +62,10 @@ HWND RSP_Registers_hDlg, hTab, hStatic, hGPR[32], hCP0[16], hHIDDEN[12],
 	hVECT1[16], hVECT2[16];
 int InRSPRegisterWindow = FALSE;
 FARPROC RefreshProc;
+*/
 
 /*** RSP Registers ***/
-UWORD32   RSP_GPR[32], RSP_Flags[4];
+UWORD   RSP_GPR[32], RSP_Flags[4];
 UDWORD  RSP_ACCUM[8];
 VECTOR  RSP_Vect[32];
 
@@ -75,7 +77,7 @@ char * GPR_Strings[32] = {
 };
 
 void Create_RSP_Register_Window ( int Child ) {
-	DWORD ThreadID;
+	/*DWORD ThreadID;
 	if ( Child ) {
 		InRSPRegisterWindow = TRUE;
 		DialogBox( hinstDLL, "RSPREGISTERS", NULL,(DLGPROC) RSP_Registers_Proc );
@@ -87,14 +89,15 @@ void Create_RSP_Register_Window ( int Child ) {
 		} else {
 			SetForegroundWindow(RSP_Registers_hDlg);
 		}	
-	}
+	}*/
 }
 
 void Enter_RSP_Register_Window ( void ) {
-    Create_RSP_Register_Window ( FALSE );
+    //Create_RSP_Register_Window ( FALSE );
 }
 
 void HideRSP_RegisterPanel ( int Panel) {
+/*
 	int count;
 
 	switch( Panel ) {
@@ -114,6 +117,7 @@ void HideRSP_RegisterPanel ( int Panel) {
 		for (count = 0; count < 16;count ++) { ShowWindow(hVECT2[count], FALSE ); }
 		break;		
 	}
+*/
 }
 
 void InitilizeRSPRegisters (void) {
@@ -122,6 +126,7 @@ void InitilizeRSPRegisters (void) {
 }
 
 void PaintRSP_HiddenPanel (HWND hWnd) {	
+/*
 	PAINTSTRUCT ps;
 	RECT rcBox;
 	HFONT hOldFont;
@@ -167,9 +172,11 @@ void PaintRSP_HiddenPanel (HWND hWnd) {
 	SelectObject( ps.hdc,hOldFont );
 	SetBkMode( ps.hdc, OldBkMode );
 	EndPaint( hWnd, &ps );
+*/
 }
 
 void PaintRSP_CP0Panel (HWND hWnd) {	
+/*
 	PAINTSTRUCT ps;
 	RECT rcBox;
 	HFONT hOldFont;
@@ -206,9 +213,11 @@ void PaintRSP_CP0Panel (HWND hWnd) {
 	SelectObject( ps.hdc,hOldFont );
 	SetBkMode( ps.hdc, OldBkMode );
 	EndPaint( hWnd, &ps );
+*/
 }
 
 void PaintRSP_GPRPanel (HWND hWnd) {
+/*
 	PAINTSTRUCT ps;
 	RECT rcBox;
 	HFONT hOldFont;
@@ -261,9 +270,11 @@ void PaintRSP_GPRPanel (HWND hWnd) {
 	SelectObject( ps.hdc,hOldFont );
 	SetBkMode( ps.hdc, OldBkMode );
 	EndPaint( hWnd, &ps );
+*/
 }
 
 void PaintRSP_Vector1_Panel (HWND hWnd) {
+/*
 	PAINTSTRUCT ps;
 	RECT rcBox;
 	HFONT hOldFont;
@@ -300,9 +311,11 @@ void PaintRSP_Vector1_Panel (HWND hWnd) {
 	SelectObject( ps.hdc,hOldFont );
 	SetBkMode( ps.hdc, OldBkMode );
 	EndPaint( hWnd, &ps );
+*/
 }
 
 void PaintRSP_Vector2_Panel (HWND hWnd) {
+/*
 	PAINTSTRUCT ps;
 	RECT rcBox;
 	HFONT hOldFont;
@@ -339,9 +352,11 @@ void PaintRSP_Vector2_Panel (HWND hWnd) {
 	SelectObject( ps.hdc,hOldFont );
 	SetBkMode( ps.hdc, OldBkMode );
 	EndPaint( hWnd, &ps );
+*/
 }
 
 LRESULT CALLBACK RefreshRSP_RegProc ( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam ) {
+/*
 	int nSel;
 	TC_ITEM item;
 
@@ -375,9 +390,12 @@ LRESULT CALLBACK RefreshRSP_RegProc ( HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 		return( (*RefreshProc)(hWnd, uMsg, wParam, lParam) );
 	}
 	return( FALSE );
+*/
+	return TRUE;
 }
 
 LRESULT CALLBACK RSP_Registers_Proc (HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {	
+/*
 	static RECT rcDisp;
 	static int CurrentPanel = GeneralPurpose;
 	TC_ITEM item;
@@ -418,10 +436,12 @@ LRESULT CALLBACK RSP_Registers_Proc (HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM
 	default:
 		return FALSE;
 	}
+*/
 	return TRUE;
 }
 
 void SetupRSP_HiddenPanel (HWND hDlg) {
+/*
 	int count;
 
 	for (count = 0; count < 8;count ++) {
@@ -436,9 +456,11 @@ void SetupRSP_HiddenPanel (HWND hDlg) {
 			hDlg,0,hinstDLL, NULL );
 		SendMessage(hHIDDEN[count + 8],WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT),0);
 	}
+*/
 }
 
 void SetupRSP_CP0Panel (HWND hDlg) {
+/*
 	int count;
 
 	for (count = 0; count < 8;count ++) {
@@ -453,9 +475,11 @@ void SetupRSP_CP0Panel (HWND hDlg) {
 			hDlg,0,hinstDLL, NULL );
 		SendMessage(hCP0[ count + 8 ],WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT),0);
 	}
+*/
 }
 
 void SetupRSP_GPRPanel (HWND hDlg) {
+/*
 	int count;
 
 	for (count = 0; count < 11;count ++) {
@@ -476,9 +500,11 @@ void SetupRSP_GPRPanel (HWND hDlg) {
 			hDlg,0,hinstDLL, NULL );
 		SendMessage(hGPR[ count + 22 ],WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT),0);
 	}
+*/
 }
 
 void SetupRSP_RegistersMain (HWND hDlg) {
+/*
 #define WindowWidth  630
 #define WindowHeight 325
 	DWORD X, Y;
@@ -524,9 +550,11 @@ void SetupRSP_RegistersMain (HWND hDlg) {
 		Y = (GetSystemMetrics( SM_CYSCREEN ) - WindowHeight) / 2;
 	//}
 	SetWindowPos(hDlg,NULL,X,Y,WindowWidth,WindowHeight, SWP_NOZORDER | SWP_SHOWWINDOW);
+*/
 }
 
 void SetupRSP_Vect1Panel (HWND hDlg) {
+/*
 	int count;
 
 	for (count = 0; count < 8;count ++) {
@@ -541,9 +569,11 @@ void SetupRSP_Vect1Panel (HWND hDlg) {
 			hDlg,0,hinstDLL, NULL );
 		SendMessage(hVECT1[count + 8],WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT),0);
 	}
+*/
 }
 
 void SetupRSP_Vect2Panel (HWND hDlg) {
+/*
 	int count;
 
 	for (count = 0; count < 8;count ++) {
@@ -558,9 +588,11 @@ void SetupRSP_Vect2Panel (HWND hDlg) {
 			hDlg,0,hinstDLL, NULL );
 		SendMessage(hVECT2[count + 8],WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT),0);
 	}
+*/
 }
 
 void ShowRSP_RegisterPanel ( int Panel) {
+/*
 	int count;
 
 	switch( Panel ) {
@@ -580,9 +612,11 @@ void ShowRSP_RegisterPanel ( int Panel) {
 		for (count = 0; count < 16;count ++) { ShowWindow(hVECT2[count], TRUE ); }
 		break;		
 	}
+*/
 }
 
 void UpdateRSPRegistersScreen ( void ) {
+/*
 	char RegisterValue[100];
 	int count, nSel;
 	TC_ITEM item;
@@ -664,4 +698,5 @@ void UpdateRSPRegistersScreen ( void ) {
 			break;		
 		}
 	}
+*/
 }

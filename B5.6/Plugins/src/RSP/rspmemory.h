@@ -26,7 +26,7 @@
 
 int  AllocateMemory ( void );
 void FreeMemory     ( void );
-void SetJumpTable   ( void );
+void SetJumpTable   ( DWORD End );
 
 extern BYTE * RecompCode, * RecompCodeSecondary, * RecompPos;
 extern void ** JumpTable;

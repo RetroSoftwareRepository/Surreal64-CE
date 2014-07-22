@@ -24,7 +24,7 @@
  *
  */
 
-#include <windows.h>
+#include <xtl.h>
 #include <stdio.h>
 #include <float.h>
 #include "RSP.h"
@@ -32,10 +32,10 @@
 #include "RSP registers.h"
 #include "RSP Command.h"
 #include "Recompiler CPU.h"
-#include "memory.h"
+#include "RSPmemory.h"
 #include "opcode.h"
-#include "log.h"
-#include "Profiling.h"
+//#include "log.h"
+//#include "Profiling.h"
 #include "breakpoint.h"
 #include "x86.h"
 
@@ -52,7 +52,7 @@ void * RSP_Vector[64];
 void * RSP_Lc2[32];
 void * RSP_Sc2[32];
 
-void BuildInterpreterCPU(void);
+//void BuildInterpreterCPU(void);
 void BuildRecompilerCPU(void);
 
 extern HANDLE hMutex;
@@ -64,16 +64,16 @@ void SetCPU(DWORD core) {
 	case RecompilerCPU:
 		BuildRecompilerCPU();
 		break;
-	case InterpreterCPU:
-		BuildInterpreterCPU();
-		break;
+	//case InterpreterCPU:
+	//	BuildInterpreterCPU();
+	//	break;
 	}
 	ReleaseMutex(hMutex);
 }
 
 void Build_RSP ( void ) {
 	int i;
-	extern UWORD32 Recp, RecpResult, SQroot, SQrootResult;
+	extern UWORD Recp, RecpResult, SQroot, SQrootResult;
 
 	Recp.UW = 0;
 	RecpResult.UW = 0;
@@ -81,7 +81,7 @@ void Build_RSP ( void ) {
 	SQrootResult.UW = 0;
 
 	SetCPU(CPUCore);
-	ResetTimerList();
+	//ResetTimerList();
 
 	EleSpec[ 0].DW = 0;
 	EleSpec[ 1].DW = 0;
@@ -184,9 +184,7 @@ void Build_RSP ( void ) {
 DWORD RunInterpreterCPU(DWORD Cycles);
 DWORD RunRecompilerCPU ( DWORD Cycles );
 
-#define MI_INTR_SP				0x01		/* Bit 0: SP intr */
-
-__declspec(dllexport) DWORD DoRspCycles ( DWORD Cycles ) {
+DWORD _RSP_DoRspCycles ( DWORD Cycles ) {
 	extern BOOL AudioHle, GraphicsHle;
 	DWORD TaskType = *(DWORD*)(RSPInfo.DMEM + 0xFC0);
 		
@@ -234,16 +232,16 @@ __declspec(dllexport) DWORD DoRspCycles ( DWORD Cycles ) {
 	//return Cycles;
 */	
 
-	if (Profiling && !IndvidualBlock) {
+	/*if (Profiling && !IndvidualBlock) {
 		StartTimer(Timer_RSP_Running);
-	}
+	}*/
 
 	WaitForSingleObjectEx(hMutex, 1000 * 100, FALSE);
 
-	if (BreakOnStart)
+	/*if (BreakOnStart)
 	{
 		Enter_RSP_Commands_Window();
-	}
+	}*/
 	RSP_MfStatusCount = 0;
 
 	switch (CPUCore) {
@@ -256,9 +254,9 @@ __declspec(dllexport) DWORD DoRspCycles ( DWORD Cycles ) {
 	}
 	ReleaseMutex(hMutex);
 
-	if (Profiling && !IndvidualBlock) {
+	/*if (Profiling && !IndvidualBlock) {
 		StartTimer(Timer_R4300_Running);
-	}
+	}*/
 
 	return Cycles;
 }
