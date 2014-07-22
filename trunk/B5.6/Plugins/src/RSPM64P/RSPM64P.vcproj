@@ -236,31 +236,37 @@
 				RelativePath=".\alist.c">
 			</File>
 			<File
+				RelativePath=".\alist_audio.c">
+			</File>
+			<File
+				RelativePath=".\alist_naudio.c">
+			</File>
+			<File
+				RelativePath=".\alist_nead.c">
+			</File>
+			<File
 				RelativePath=".\audio.c">
 			</File>
 			<File
 				RelativePath=".\cicx105.c">
 			</File>
 			<File
+				RelativePath=".\hle.c">
+			</File>
+			<File
 				RelativePath=".\jpeg.c">
 			</File>
 			<File
-				RelativePath=".\main.c">
+				RelativePath=".\memory.c">
+			</File>
+			<File
+				RelativePath=".\mp3.c">
 			</File>
 			<File
 				RelativePath=".\musyx.c">
 			</File>
 			<File
-				RelativePath=".\ucode1.c">
-			</File>
-			<File
-				RelativePath=".\ucode2.c">
-			</File>
-			<File
-				RelativePath=".\ucode3.c">
-			</File>
-			<File
-				RelativePath=".\ucode3mp3.c">
+				RelativePath=".\plugin.c">
 			</File>
 		</Filter>
 		<Filter
@@ -271,7 +277,7 @@
 				RelativePath=".\alist.h">
 			</File>
 			<File
-				RelativePath=".\alist_internal.h">
+				RelativePath=".\arithmetics.h">
 			</File>
 			<File
 				RelativePath=".\audio.h">
@@ -286,16 +292,25 @@
 				RelativePath=".\hle.h">
 			</File>
 			<File
-				RelativePath=".\jpeg.h">
+				RelativePath=".\hle_external.h">
 			</File>
 			<File
-				RelativePath=".\musyx.h">
+				RelativePath=".\hle_internal.h">
+			</File>
+			<File
+				RelativePath=".\memory.h">
 			</File>
 			<File
 				RelativePath=".\Rsp.h">
 			</File>
 			<File
+				RelativePath=".\stdbool.h">
+			</File>
+			<File
 				RelativePath=".\stdint.h">
+			</File>
+			<File
+				RelativePath=".\ucodes.h">
 			</File>
 		</Filter>
 	</Files>
