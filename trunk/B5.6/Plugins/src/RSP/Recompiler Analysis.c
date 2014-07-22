@@ -24,16 +24,17 @@
  *
  */
 
-#include <windows.h>
+#include <xtl.h>
 #include "rsp.h"
 #include "CPU.h"
-#include "Interpreter CPU.h"
+//#include "Interpreter CPU.h"
 #include "Recompiler CPU.h"
 #include "RSP Command.h"
-#include "memory.h"
+#include "rspmemory.h"
 #include "opcode.h"
-#include "log.h"
+//#include "log.h"
 
+#define RSP_SAFE_ANALYSIS /* makes optimization less risky (dlist useful) */
 /************************************************************
 ** IsOpcodeNop
 **
@@ -154,7 +155,7 @@ DWORD WriteToAccum2 (int Location, int PC, BOOL RecursiveCall) {
 				Instruction_State = DO_DELAY_SLOT;
 				break;
 			default:
-				CompilerWarning("Unkown opcode in WriteToAccum\n%s",RSPOpcodeName(RspOp.Hex,PC));
+				//CompilerWarning("Unkown opcode in WriteToAccum\n%s",RSPOpcodeName(RspOp.Hex,PC));
 				return TRUE;
 			}
 			break;
@@ -184,7 +185,7 @@ DWORD WriteToAccum2 (int Location, int PC, BOOL RecursiveCall) {
 				break;
 
 			default:
-				CompilerWarning("Unkown opcode in WriteToAccum\n%s",RSPOpcodeName(RspOp.Hex,PC));
+				//CompilerWarning("Unkown opcode in WriteToAccum\n%s",RSPOpcodeName(RspOp.Hex,PC));
 				return TRUE;
 			}
 			break;
@@ -281,7 +282,7 @@ DWORD WriteToAccum2 (int Location, int PC, BOOL RecursiveCall) {
 				case RSP_VECTOR_VSAW:
 					return TRUE;
 				default:
-					CompilerWarning("Unkown opcode in WriteToVectorDest\n%s",RSPOpcodeName(RspOp.Hex,PC));
+					//CompilerWarning("Unkown opcode in WriteToVectorDest\n%s",RSPOpcodeName(RspOp.Hex,PC));
 					return TRUE;
 				}
 			} else {
@@ -292,7 +293,7 @@ DWORD WriteToAccum2 (int Location, int PC, BOOL RecursiveCall) {
 				case RSP_COP2_MF:
 					break;
 				default:
-					CompilerWarning("Unkown opcode in WriteToVectorDest\n%s",RSPOpcodeName(RspOp.Hex,PC));
+					//CompilerWarning("Unkown opcode in WriteToVectorDest\n%s",RSPOpcodeName(RspOp.Hex,PC));
 					return TRUE;
 				}
 			}
@@ -320,7 +321,7 @@ DWORD WriteToAccum2 (int Location, int PC, BOOL RecursiveCall) {
 			case RSP_LSC2_HV:
 				break;
 			default:
-				CompilerWarning("Unkown opcode in WriteToAccum\n%s",RSPOpcodeName(RspOp.Hex,PC));
+				//CompilerWarning("Unkown opcode in WriteToAccum\n%s",RSPOpcodeName(RspOp.Hex,PC));
 				return TRUE;
 			}
 			break;
@@ -340,12 +341,12 @@ DWORD WriteToAccum2 (int Location, int PC, BOOL RecursiveCall) {
 			case RSP_LSC2_TV:
 				break;
 			default:
-				CompilerWarning("Unkown opcode in WriteToAccum\n%s",RSPOpcodeName(RspOp.Hex,PC));
+				//CompilerWarning("Unkown opcode in WriteToAccum\n%s",RSPOpcodeName(RspOp.Hex,PC));
 				return TRUE;
 			}
 			break;
 		default:
-			CompilerWarning("Unkown opcode in WriteToAccum\n%s",RSPOpcodeName(RspOp.Hex,PC));
+			//CompilerWarning("Unkown opcode in WriteToAccum\n%s",RSPOpcodeName(RspOp.Hex,PC));
 			return TRUE;
 		}
 		switch (Instruction_State) {
@@ -451,7 +452,7 @@ BOOL WriteToVectorDest2 (DWORD DestReg, int PC, BOOL RecursiveCall) {
 				Instruction_State = DO_DELAY_SLOT;
 				break;
 			default:
-				CompilerWarning("Unkown opcode in WriteToVectorDest\n%s",RSPOpcodeName(RspOp.Hex,PC));
+				//CompilerWarning("Unkown opcode in WriteToVectorDest\n%s",RSPOpcodeName(RspOp.Hex,PC));
 				return TRUE;
 			}
 			break;
@@ -481,7 +482,7 @@ BOOL WriteToVectorDest2 (DWORD DestReg, int PC, BOOL RecursiveCall) {
 				break;
 
 			default:
-				CompilerWarning("Unkown opcode in WriteToVectorDest\n%s",RSPOpcodeName(RspOp.Hex,PC));
+				//CompilerWarning("Unkown opcode in WriteToVectorDest\n%s",RSPOpcodeName(RspOp.Hex,PC));
 				return TRUE;
 			}
 			break;
@@ -581,7 +582,7 @@ BOOL WriteToVectorDest2 (DWORD DestReg, int PC, BOOL RecursiveCall) {
 					if (DestReg == RspOp.sa) { return FALSE; }
 					break;
 				default:
-					CompilerWarning("Unkown opcode in WriteToVectorDest\n%s",RSPOpcodeName(RspOp.Hex,PC));
+					//CompilerWarning("Unkown opcode in WriteToVectorDest\n%s",RSPOpcodeName(RspOp.Hex,PC));
 					return TRUE;
 				}
 			} else {
@@ -596,7 +597,7 @@ BOOL WriteToVectorDest2 (DWORD DestReg, int PC, BOOL RecursiveCall) {
 					if (DestReg == RspOp.rd) { return TRUE; }
 					break;
 				default:
-					CompilerWarning("Unkown opcode in WriteToVectorDest\n%s",RSPOpcodeName(RspOp.Hex,PC));
+					//CompilerWarning("Unkown opcode in WriteToVectorDest\n%s",RSPOpcodeName(RspOp.Hex,PC));
 					return TRUE;
 				}
 			}
@@ -627,7 +628,7 @@ BOOL WriteToVectorDest2 (DWORD DestReg, int PC, BOOL RecursiveCall) {
 				break;
 
 			default:
-				CompilerWarning("Unkown opcode in WriteToVectorDest\n%s",RSPOpcodeName(RspOp.Hex,PC));
+				//CompilerWarning("Unkown opcode in WriteToVectorDest\n%s",RSPOpcodeName(RspOp.Hex,PC));
 				return TRUE;
 			}
 			break;
@@ -648,12 +649,12 @@ BOOL WriteToVectorDest2 (DWORD DestReg, int PC, BOOL RecursiveCall) {
 				if (DestReg == RspOp.rt) { return TRUE; }
 				break;
 			default:
-				CompilerWarning("Unkown opcode in WriteToVectorDest\n%s",RSPOpcodeName(RspOp.Hex,PC));
+				//CompilerWarning("Unkown opcode in WriteToVectorDest\n%s",RSPOpcodeName(RspOp.Hex,PC));
 				return TRUE;
 			}
 			break;
 		default:
-			CompilerWarning("Unkown opcode in WriteToVectorDest\n%s",RSPOpcodeName(RspOp.Hex,PC));
+			//CompilerWarning("Unkown opcode in WriteToVectorDest\n%s",RSPOpcodeName(RspOp.Hex,PC));
 			return TRUE;
 		}
 		switch (Instruction_State) {
@@ -758,7 +759,7 @@ BOOL UseRspFlags (int PC) {
 				Instruction_State = DO_DELAY_SLOT;
 				break;
 			default:
-				CompilerWarning("Unkown opcode in UseRspFlags\n%s",RSPOpcodeName(RspOp.Hex,PC));
+				//CompilerWarning("Unkown opcode in UseRspFlags\n%s",RSPOpcodeName(RspOp.Hex,PC));
 				return TRUE;
 			}
 			break;
@@ -788,7 +789,7 @@ BOOL UseRspFlags (int PC) {
 				break;
 
 			default:
-				CompilerWarning("Unkown opcode in WriteToVectorDest\n%s",RSPOpcodeName(RspOp.Hex,PC));
+				//CompilerWarning("Unkown opcode in WriteToVectorDest\n%s",RSPOpcodeName(RspOp.Hex,PC));
 				return TRUE;
 			}
 			break;
@@ -859,7 +860,7 @@ BOOL UseRspFlags (int PC) {
 					break;
 
 				default:
-					CompilerWarning("Unkown opcode in UseRspFlags\n%s",RSPOpcodeName(RspOp.Hex,PC));
+					//CompilerWarning("Unkown opcode in UseRspFlags\n%s",RSPOpcodeName(RspOp.Hex,PC));
 					return TRUE;
 				}
 			} else {
@@ -872,7 +873,7 @@ BOOL UseRspFlags (int PC) {
 				case RSP_COP2_MF:
 					break;
 				default:
-					CompilerWarning("Unkown opcode in UseRspFlags\n%s",RSPOpcodeName(RspOp.Hex,PC));
+					//CompilerWarning("Unkown opcode in UseRspFlags\n%s",RSPOpcodeName(RspOp.Hex,PC));
 					return TRUE;
 				}
 			}
@@ -900,7 +901,7 @@ BOOL UseRspFlags (int PC) {
 			case RSP_LSC2_HV:
 				break;
 			default:
-				CompilerWarning("Unkown opcode in UseRspFlags\n%s",RSPOpcodeName(RspOp.Hex,PC));
+				//CompilerWarning("Unkown opcode in UseRspFlags\n%s",RSPOpcodeName(RspOp.Hex,PC));
 				return TRUE;
 			}
 			break;
@@ -920,12 +921,12 @@ BOOL UseRspFlags (int PC) {
 			case RSP_LSC2_TV:
 				break;
 			default:
-				CompilerWarning("Unkown opcode in UseRspFlags\n%s",RSPOpcodeName(RspOp.Hex,PC));
+				//CompilerWarning("Unkown opcode in UseRspFlags\n%s",RSPOpcodeName(RspOp.Hex,PC));
 				return TRUE;
 			}
 			break;
 		default:
-			CompilerWarning("Unkown opcode in UseRspFlags\n%s",RSPOpcodeName(RspOp.Hex,PC));
+			//CompilerWarning("Unkown opcode in UseRspFlags\n%s",RSPOpcodeName(RspOp.Hex,PC));
 			return TRUE;
 		}
 		switch (Instruction_State) {
@@ -1271,7 +1272,7 @@ void GetInstructionInfo(DWORD PC, OPCODE * RspOp, OPCODE_INFO * info) {
 			break;
 
 		default:
-			CompilerWarning("Unkown opcode in GetInstructionInfo\n%s",RSPOpcodeName(RspOp->Hex,PC));
+			//CompilerWarning("Unkown opcode in GetInstructionInfo\n%s",RSPOpcodeName(RspOp->Hex,PC));
 			info->flags = InvalidOpcode;
 			break;
 		}
@@ -1319,7 +1320,7 @@ void GetInstructionInfo(DWORD PC, OPCODE * RspOp, OPCODE_INFO * info) {
 			break;
 
 		default:
-			CompilerWarning("Unkown opcode in GetInstructionInfo\n%s",RSPOpcodeName(RspOp->Hex,PC));
+			//CompilerWarning("Unkown opcode in GetInstructionInfo\n%s",RSPOpcodeName(RspOp->Hex,PC));
 			info->flags = InvalidOpcode;
 			break;
 		}
@@ -1463,7 +1464,7 @@ void GetInstructionInfo(DWORD PC, OPCODE * RspOp, OPCODE_INFO * info) {
 				break;
 
 			default:
-				CompilerWarning("Unkown opcode in GetInstructionInfo\n%s",RSPOpcodeName(RspOp->Hex,PC));
+				//CompilerWarning("Unkown opcode in GetInstructionInfo\n%s",RSPOpcodeName(RspOp->Hex,PC));
 				info->flags = InvalidOpcode;
 				break;
 			}
@@ -1496,7 +1497,7 @@ void GetInstructionInfo(DWORD PC, OPCODE * RspOp, OPCODE_INFO * info) {
 				info->flags = VEC_Instruction | GPR_Instruction | Store_Operation;
 				break;
 			default:
-				CompilerWarning("Unkown opcode in GetInstructionInfo\n%s",RSPOpcodeName(RspOp->Hex,PC));
+				//CompilerWarning("Unkown opcode in GetInstructionInfo\n%s",RSPOpcodeName(RspOp->Hex,PC));
 				info->flags = InvalidOpcode;
 				break;
 			}
@@ -1540,7 +1541,7 @@ void GetInstructionInfo(DWORD PC, OPCODE * RspOp, OPCODE_INFO * info) {
 			info->flags = InvalidOpcode;
 			break;
 		default:
-			CompilerWarning("Unkown opcode in GetInstructionInfo\n%s",RSPOpcodeName(RspOp->Hex,PC));
+			//CompilerWarning("Unkown opcode in GetInstructionInfo\n%s",RSPOpcodeName(RspOp->Hex,PC));
 			info->flags = InvalidOpcode;
 			break;
 		}
@@ -1567,7 +1568,7 @@ void GetInstructionInfo(DWORD PC, OPCODE * RspOp, OPCODE_INFO * info) {
 			info->flags = InvalidOpcode;
 			break;
 		default:
-			CompilerWarning("Unkown opcode in GetInstructionInfo\n%s",RSPOpcodeName(RspOp->Hex,PC));
+			//CompilerWarning("Unkown opcode in GetInstructionInfo\n%s",RSPOpcodeName(RspOp->Hex,PC));
 			info->flags = InvalidOpcode;
 			break;
 		}
@@ -1776,7 +1777,7 @@ BOOL CompareInstructions(DWORD PC, OPCODE * Top, OPCODE * Bottom) {
 			if (info1.SourceReg0 == info0.SourceReg0) { return FALSE; }
 			if (info1.SourceReg0 == info0.SourceReg1) { return FALSE; }
 		} else {
-			CompilerWarning("ReOrder: Unhandled Vector than Cop2");
+			//CompilerWarning("ReOrder: Unhandled Vector than Cop2");
 		}
 		// we want vectors on top
 		return FALSE;
@@ -1793,13 +1794,13 @@ BOOL CompareInstructions(DWORD PC, OPCODE * Top, OPCODE * Bottom) {
 			if (info0.SourceReg0 == info1.SourceReg0) { return FALSE; }
 			if (info0.SourceReg0 == info1.SourceReg1) { return FALSE; }
 		} else {
-			CompilerWarning("ReOrder: Unhandled Cop2 than Vector");
+			//CompilerWarning("ReOrder: Unhandled Cop2 than Vector");
 		}
 		// we want this at the top
 		return TRUE;
 
 	default:
-		CompilerWarning("ReOrder: Unhandled instruction type: %i", InstructionType);
+		;//CompilerWarning("ReOrder: Unhandled instruction type: %i", InstructionType);
 	}
 
 	return FALSE;

@@ -41,3 +41,4 @@ extern OPCODE RSPOpC;
 
 void SetCPU(DWORD core);
 void Build_RSP (void);
+//void DisplayErrorNULL (char * Message, ...){};

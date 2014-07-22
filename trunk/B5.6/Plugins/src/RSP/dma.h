@@ -24,6 +24,6 @@
  *
  */
 
-void SP_DMA_READ  ( void );
-void SP_DMA_WRITE ( void );
+void RCP_SP_DMA_READ  ( void );
+void RCP_SP_DMA_WRITE ( void );
 

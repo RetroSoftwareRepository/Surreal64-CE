@@ -24,16 +24,16 @@
  *
  */
 
-#include <windows.h>
+#include <xtl.h>
 #include <stdio.h>
 #include "RSP.h"
 #include "CPU.h"
 #include "Recompiler CPU.h"
 #include "RSP Command.h"
 #include "RSP Registers.h"
-#include "memory.h"
+#include "rspmemory.h"
 #include "dma.h"
-#include "log.h"
+//#include "log.h"
 #include "x86.h"
 
 void RSP_Sections_VMUDH ( OPCODE RspOp, DWORD AccumStyle ) {
@@ -803,27 +803,27 @@ void Compile_Section_000(void) {
 
 	RSP_LW_IMEM(CompilePC + 0x00, &vmudn.Hex);
 
-	CPU_Message("Compiling: %X to ..., RSP Optimization $000", CompilePC);
-	CPU_Message("  %X %s",CompilePC+0x00,RSPOpcodeName(vmudn.Hex,CompilePC + 0x00));
-	if (LogRDP){
+	//CPU_Message("Compiling: %X to ..., RSP Optimization $000", CompilePC);
+	//CPU_Message("  %X %s",CompilePC+0x00,RSPOpcodeName(vmudn.Hex,CompilePC + 0x00));
+	/*if (LogRDP){
 		char str[40];
 		sprintf(str,"%X",CompilePC);		
 		PushImm32(str,CompilePC);
 		Call_Direct(RDP_LogLoc,"RDP_LogLoc");
 		AddConstToX86Reg(x86_ESP, 4);
-	}
+	}*/
 
 	for (i = 0; i < Section_000_VMADN; i++) {
 		RSP_LW_IMEM(CompilePC + 0x04 + (i * 4), &vmadn.Hex);
-		CPU_Message("  %X %s",CompilePC+0x04+(i*4),RSPOpcodeName(vmadn.Hex,CompilePC+0x04+(i*4)));
+		//CPU_Message("  %X %s",CompilePC+0x04+(i*4),RSPOpcodeName(vmadn.Hex,CompilePC+0x04+(i*4)));
 
-		if (LogRDP){
+		/*if (LogRDP){
 			char str[40];
 			sprintf(str,"%X",CompilePC+0x04+(i*4));		
 			PushImm32(str,CompilePC+0x04+(i*4));
 			Call_Direct(RDP_LogLoc,"RDP_LogLoc");
 			AddConstToX86Reg(x86_ESP, 4);
-		}
+		}*/
 		
 	}
 
@@ -908,12 +908,12 @@ void Compile_Section_001(void) {
 
 	RSP_LW_IMEM(CompilePC + 0x00, &vmulf.Hex);
 
-	CPU_Message("Compiling: %X to ..., RSP Optimization $001", CompilePC);
-	CPU_Message("  %X %s",CompilePC+0x00,RSPOpcodeName(vmulf.Hex,CompilePC + 0x00));
+	//CPU_Message("Compiling: %X to ..., RSP Optimization $001", CompilePC);
+	//CPU_Message("  %X %s",CompilePC+0x00,RSPOpcodeName(vmulf.Hex,CompilePC + 0x00));
 	
 	for (i = 0; i < Section_001_VMACF; i++) {
 		RSP_LW_IMEM(CompilePC + 0x04 + (i * 4), &vmacf.Hex);
-		CPU_Message("  %X %s",CompilePC+0x04+(i*4),RSPOpcodeName(vmacf.Hex,CompilePC+0x04+(i*4)));
+		//CPU_Message("  %X %s",CompilePC+0x04+(i*4),RSPOpcodeName(vmacf.Hex,CompilePC+0x04+(i*4)));
 	}
 
 	RSP_Sections_VMULF(vmulf, Middle16BitAccum);
@@ -1007,17 +1007,17 @@ void Compile_Section_002 ( void ) {
 
 	OPCODE vmudh, vsaw;
 
-	CPU_Message("Compiling: %X to ..., RSP Optimization $002", CompilePC);	
+	//CPU_Message("Compiling: %X to ..., RSP Optimization $002", CompilePC);	
 	for (Count = 0; Count < 0xC; Count++) {
 		RSP_LW_IMEM(CompilePC + (Count * 0x04), &op[Count].Hex);
-		CPU_Message("  %X %s",CompilePC+(Count*0x04),RSPOpcodeName(op[Count].Hex,CompilePC + (Count*0x04)));
-		if (LogRDP){
+		//CPU_Message("  %X %s",CompilePC+(Count*0x04),RSPOpcodeName(op[Count].Hex,CompilePC + (Count*0x04)));
+		/*if (LogRDP){
 			char str[40];
 			sprintf(str,"%X",CompilePC+(Count*0x04));		
 			PushImm32(str,CompilePC+(Count*0x04));
 			Call_Direct(RDP_LogLoc,"RDP_LogLoc");
 			AddConstToX86Reg(x86_ESP, 4);
-		}
+		}*/
 	}
 
 	vmudh = op[0];
@@ -1110,8 +1110,8 @@ static void resampler_hle() {
 }
 
 void Compile_Section_003 ( void ) {
-	CPU_Message("Compiling: %X to ..., RSP Optimization $003", CompilePC);	
-	Call_Direct(resampler_hle, "Resampler_HLE");
+	//CPU_Message("Compiling: %X to ..., RSP Optimization $003", CompilePC);	
+	RSP_Call_Direct(resampler_hle, "Resampler_HLE");
 	CompilePC += 4 * sizeof(OPCODE);
 }
 

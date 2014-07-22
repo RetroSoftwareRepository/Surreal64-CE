@@ -24,7 +24,7 @@
  *
  */
 
-#include <windows.h>
+#include <xtl.h>
 #include <stdio.h>
 #include <float.h>
 #include "breakpoint.h"
@@ -34,9 +34,9 @@
 #include "Interpreter CPU.h"
 #include "RSP registers.h"
 #include "RSP Command.h"
-#include "memory.h"
+#include "rspmemory.h"
 #include "opcode.h"
-#include "log.h"
+//#include "log.h"
 
 DWORD RSP_NextInstruction, RSP_JumpTo;
 
@@ -409,19 +409,20 @@ DWORD RunInterpreterCPU(DWORD Cycles) {
 	CycleCount = 0;
 
 	while (RSP_Running) {
+		/*
 		if (NoOfBpoints != 0) {
 			if (CheckForRSPBPoint(*PrgCount)) {
 				if (InRSPCommandsWindow) {
 					Enter_RSP_Commands_Window();
 					if (Stepping_Commands) {
-						DisplayError ( "Encounted a R4300i Breakpoint" );
+						DisplayErrorNULL ( "Encounted a R4300i Breakpoint" );
 					} else {
-						DisplayError ( "Encounted a R4300i Breakpoint\n\nNow Stepping" );
+						DisplayErrorNULL ( "Encounted a R4300i Breakpoint\n\nNow Stepping" );
 						SetRSPCommandViewto( *PrgCount );
 						SetRSPCommandToStepping();
 					}
 				} else {
-					DisplayError ( "Encounted a RSP Breakpoint\n\nEntering Command Window" );
+					DisplayErrorNULL ( "Encounted a RSP Breakpoint\n\nEntering Command Window" );
 					Enter_RSP_Commands_Window();
 				}
 			}
@@ -441,6 +442,7 @@ DWORD RunInterpreterCPU(DWORD Cycles) {
 
 
 		RDP_LogLoc(*PrgCount);
+		*/
 
 		RSP_LW_IMEM(*PrgCount, &RSPOpC.Hex);
 		((void (*)()) RSP_Opcode[ RSPOpC.op ])();

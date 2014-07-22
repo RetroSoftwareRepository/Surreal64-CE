@@ -24,7 +24,7 @@
  *
  */
 
-#define MaxMaps	32
+enum { MaxMaps	= 32 };
 
 #include <xtl.h>
 #include "rsp.h"
@@ -35,23 +35,23 @@ BYTE * RecompCode, * RecompCodeSecondary, * RecompPos, *JumpTables;
 void ** JumpTable;
 
 int AllocateMemory (void) {
-	RecompCode=(BYTE *) VirtualAlloc( NULL, 0x00200004, MEM_RESERVE, PAGE_EXECUTE_READWRITE);
-	RecompCode=(BYTE *) VirtualAlloc( RecompCode, 0x00200000, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+	RecompCode=(BYTE *) VirtualAlloc( NULL, 0x00400004, MEM_RESERVE, PAGE_EXECUTE_READWRITE);
+	RecompCode=(BYTE *) VirtualAlloc( RecompCode, 0x00400000, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
 	
 	if(RecompCode == NULL) {
-		DisplayError("Not enough memory for RSP RecompCode!");
+		//DisplayError("Not enough memory for RSP RecompCode!");
 		return FALSE;
 	}
 
-	RecompCodeSecondary = (BYTE *)VirtualAlloc( NULL, 0x00100000, MEM_COMMIT, PAGE_EXECUTE_READWRITE );
+	RecompCodeSecondary = (BYTE *)VirtualAlloc( NULL, 0x00200000, MEM_COMMIT, PAGE_EXECUTE_READWRITE );
 	if(RecompCodeSecondary == NULL) {
-		DisplayError("Not enough memory for RSP RecompCode Secondary!");
+		//DisplayError("Not enough memory for RSP RecompCode Secondary!");
 		return FALSE;
 	}
 
 	JumpTables = (BYTE *)VirtualAlloc( NULL, 0x1000 * MaxMaps, MEM_COMMIT, PAGE_READWRITE );
 	if( JumpTables == NULL ) {  
-		DisplayError("Not enough memory for Jump Table!");
+		//DisplayError("Not enough memory for Jump Table!");
 		return FALSE;
 	}
 
@@ -67,19 +67,31 @@ void FreeMemory (void) {
 	VirtualFree( RecompCodeSecondary, 0 , MEM_RELEASE);
 }
 
-void SetJumpTable (void) {
+void ResetJumpTables ( void )
+{
+	memset(JumpTables,0,0x1000 * MaxMaps);
+	RecompPos = RecompCode;
+	NoOfMaps = 0;
+}
+
+void SetJumpTable (DWORD End) {
 	DWORD CRC, count;
 
 	CRC = 0;
-	for (count = 0; count < 0x800; count += 0x40) {
+	if (End < 0x800)
+	{
+		End = 0x800;
+	}
+	
+	if (End == 0x1000 && ((*RSPInfo.SP_MEM_ADDR_REG & 0x0FFF) & ~7) == 0x80)
+	{
+		End = 0x800;
+	}
+
+	for (count = 0; count < End; count += 0x40) {
 		CRC += *(DWORD *)(RSPInfo.IMEM + count);		
 	}
 
-/*	
-	for (count = 0; count < 0x1000; count += 0x4) {
-		CRC += *(DWORD *)(RSPInfo.IMEM + count) >> 10;
-	}
-*/	
 	for (count = 0; count <	NoOfMaps; count++ ) {
 		if (CRC == MapsCRC[count]) {
 			JumpTable = (void **)(JumpTables + count * 0x1000);
@@ -89,8 +101,7 @@ void SetJumpTable (void) {
 	}
 	//DisplayError("%X %X",NoOfMaps,CRC);
 	if (NoOfMaps == MaxMaps) {
-		DisplayError("Used up all the Jump tables in the rsp");
-		ExitThread(0);
+		ResetJumpTables();
 	}
 	MapsCRC[NoOfMaps] = CRC;
 	JumpTable = (void **)(JumpTables + NoOfMaps * 0x1000);
@@ -146,7 +157,7 @@ void RSP_LFV_DMEM ( DWORD Addr, int vect, int element ) {
 void RSP_LH_DMEM ( DWORD Addr, WORD * Value ) {
 	if ((Addr & 0x1) != 0) {
 		if (Addr > 0xFFE) {
-			DisplayError("hmmmm.... Problem with:\nRSP_LH_DMEM");
+			//DisplayError("hmmmm.... Problem with:\nRSP_LH_DMEM");
 			return;
 		}
 		Addr &= 0xFFF;
@@ -265,7 +276,7 @@ void RSP_LW_DMEM ( DWORD Addr, DWORD * Value ) {
 	if ((Addr & 0x3) != 0) {
 		Addr &= 0xFFF;
 		if (Addr > 0xFFC) {
-			DisplayError("hmmmm.... Problem with:\nRSP_LW_DMEM");
+			//DisplayError("hmmmm.... Problem with:\nRSP_LW_DMEM");
 			return;
 		}
 		*Value = *(BYTE *)(RSPInfo.DMEM + (Addr^ 3)) << 0x18;
@@ -279,7 +290,7 @@ void RSP_LW_DMEM ( DWORD Addr, DWORD * Value ) {
 
 void RSP_LW_IMEM ( DWORD Addr, DWORD * Value ) {
 	if ((Addr & 0x3) != 0) {
-		DisplayError("Unaligned RSP_LW_IMEM");
+		//DisplayError("Unaligned RSP_LW_IMEM");
 	}
 	* Value = *(DWORD *)(RSPInfo.IMEM + (Addr & 0xFFF));	
 }
@@ -407,7 +418,7 @@ void RSP_SFV_DMEM ( DWORD Addr, int vect, int element ) {
 
 void RSP_SH_DMEM ( DWORD Addr, WORD Value ) {
 	if ((Addr & 0x1) != 0) {
-		DisplayError("Unaligned RSP_SH_DMEM");
+		//DisplayError("Unaligned RSP_SH_DMEM");
 		return;
 	}
 	*(WORD *)(RSPInfo.DMEM + ((Addr ^ 2) & 0xFFF)) = Value;
@@ -508,8 +519,8 @@ void RSP_SUV_DMEM ( DWORD Addr, int vect, int element ) {
 
 	for (Count = element; Count < (8 + element); Count ++ ){
 		if (((Count) & 0xF) < 8) {
-			*(RSPInfo.DMEM + ((Addr ^ 3) & 0xFFF)) = (RSP_Vect[vect].UB[15 - ((Count & 0x7) << 1)] << 1) +
-				(RSP_Vect[vect].UB[14 - ((Count & 0x7) << 1)] >> 7);
+			*(RSPInfo.DMEM + ((Addr ^ 3) & 0xFFF)) = ((RSP_Vect[vect].UB[15 - ((Count & 0x7) << 1)] << 1) +
+				(RSP_Vect[vect].UB[14 - ((Count & 0x7) << 1)] >> 7)) & 0xFF;
 		} else {
 			*(RSPInfo.DMEM + ((Addr ^ 3) & 0xFFF)) = RSP_Vect[vect].UB[15 - ((Count & 0x7) << 1)];
 		}
@@ -521,13 +532,13 @@ void RSP_SW_DMEM ( DWORD Addr, DWORD Value ) {
 	Addr &= 0xFFF;
 	if ((Addr & 0x3) != 0) {
 		if (Addr > 0xFFC) {
-			DisplayError("hmmmm.... Problem with:\nRSP_SW_DMEM");
+			//DisplayError("hmmmm.... Problem with:\nRSP_SW_DMEM");
 			return;
 		}
-		*(BYTE *)(RSPInfo.DMEM + (Addr ^ 3)) = (BYTE)(Value >> 0x18);
-		*(BYTE *)(RSPInfo.DMEM + ((Addr + 1) ^ 3)) = (BYTE)(Value >> 0x10);
-		*(BYTE *)(RSPInfo.DMEM + ((Addr + 2) ^ 3)) = (BYTE)(Value >> 0x8);
-		*(BYTE *)(RSPInfo.DMEM + ((Addr + 3) ^ 3)) = (BYTE)(Value);
+		*(BYTE *)(RSPInfo.DMEM + (Addr ^ 3)) = (BYTE)((Value >> 0x18) & 0xFF);
+		*(BYTE *)(RSPInfo.DMEM + ((Addr + 1) ^ 3)) = (BYTE)((Value >> 0x10) & 0xFF);
+		*(BYTE *)(RSPInfo.DMEM + ((Addr + 2) ^ 3)) = (BYTE)((Value >> 0x8) & 0xFF);
+		*(BYTE *)(RSPInfo.DMEM + ((Addr + 3) ^ 3)) = (BYTE)(Value &0xFF);
 		return;
 	}
 	*(DWORD *)(RSPInfo.DMEM + Addr) = Value;
