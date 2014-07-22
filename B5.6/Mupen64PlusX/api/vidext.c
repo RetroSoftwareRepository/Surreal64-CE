@@ -44,9 +44,9 @@ m64p_error OverrideVideoFunctions(m64p_video_extension_functions *VideoFunctionS
 {
     /* check input data */
     if (VideoFunctionStruct == NULL)
-        return M64ERR_INPUT_ASSERT;
+        return M64ERRINPUT_ASSERT;
     if (VideoFunctionStruct->Functions < 11)
-        return M64ERR_INPUT_INVALID;
+        return M64ERRINPUT_INVALID;
 
     /* disable video extension if any of the function pointers are NULL */
     if (VideoFunctionStruct->VidExtFuncInit == NULL ||

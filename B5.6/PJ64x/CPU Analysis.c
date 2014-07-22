@@ -1,4 +1,4 @@
-#include <windows.h>
+#include <xtl.h>
 #include "main.h"
 #include "cpu.h"
 #include "debugger.h"
@@ -7,7 +7,7 @@ int DelaySlotEffectsCompare (DWORD PC, DWORD Reg1, DWORD Reg2) {
 	OPCODE Command;
 
 	if (!r4300i_LW_VAddr(PC + 4, &Command.Hex)) {
-		DisplayError(GS(MSG_FAILED_TO_LW));
+		//DisplayError(GS(MSG_FAILED_TO_LW));
 		ExitThread(0);
 	}
 

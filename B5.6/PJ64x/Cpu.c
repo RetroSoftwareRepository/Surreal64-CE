@@ -34,7 +34,7 @@
 #include "debugger.h"
 #include "plugin.h"
 #include "resource.h"
-extern void GameSpecificHackSetup();
+//extern void GameSpecificHackSetup();
 
 #define uint8  unsigned __int8
 
@@ -1268,7 +1268,7 @@ void StartEmulation ( void ) {
 	Timer_Start();
 	LoadRomOptions();
 	LoadCheats();
-	GameSpecificHackSetup();
+	//GameSpecificHackSetup();
 	if (Profiling) { ResetTimerList(); }
 	strcpy(ProfilingLabel,"");
 	strcpy(LoadFileName,"");

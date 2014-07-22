@@ -34,6 +34,7 @@
 #include "../main/savestates.h"
 #include "../main/cheat.h"
 #include "../plugin/plugin.h"
+#include "../plugin/Static_Video.h"
 
 #include "interupt.h"
 #include "r4300.h"
@@ -378,7 +379,7 @@ void gen_interupt(void)
 	    {
 		cheat_apply_cheats(ENTRY_VI);
 	    }
-            gfx.updateScreen();
+            VIDEO_UpdateScreen();
 
             refresh_stat();
             if (vi_register.vi_v_sync == 0) vi_register.vi_delay = 500000;

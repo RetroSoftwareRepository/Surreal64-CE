@@ -53,6 +53,6 @@ void event_set_gameshark(int active)
     GamesharkActive = (active ? 1 : 0);
 
     // notify front-end application that gameshark button state has changed
-    StateChanged(M64CORE_INPUT_GAMESHARK, GamesharkActive);
+    StateChanged(M64COREINPUT_GAMESHARK, GamesharkActive);
 }
 

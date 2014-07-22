@@ -290,7 +290,7 @@
 			IntermediateDirectory="obj\Release_LTCG"
 			ConfigurationType="1"
 			CharacterSet="2"
-			WholeProgramOptimization="TRUE">
+			WholeProgramOptimization="FALSE">
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
@@ -300,12 +300,12 @@
 				ImproveFloatingPointConsistency="FALSE"
 				FavorSizeOrSpeed="0"
 				OmitFramePointers="TRUE"
-				EnableFiberSafeOptimizations="FALSE"
+				EnableFiberSafeOptimizations="TRUE"
 				OptimizeForProcessor="2"
 				AdditionalIncludeDirectories=""
 				PreprocessorDefinitions="NDEBUG;_XBOX;EXTERNAL_RELEASE;WIN32;_WIN32;_WINDOWS;__WIN32__;LTCG;USE_MUSYX"
-				StringPooling="FALSE"
-				ExceptionHandling="FALSE"
+				StringPooling="TRUE"
+				ExceptionHandling="TRUE"
 				RuntimeLibrary="0"
 				StructMemberAlignment="4"
 				BufferSecurityCheck="FALSE"
@@ -330,8 +330,8 @@
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(OutDir)/$(ProjectName).pdb"
 				SubSystem="2"
-				OptimizeReferences="2"
-				EnableCOMDATFolding="2"
+				OptimizeReferences="1"
+				EnableCOMDATFolding="1"
 				OptimizeForWindows98="1"
 				SetChecksum="TRUE"
 				TargetMachine="1"/>
@@ -372,9 +372,6 @@
 				</File>
 				<File
 					RelativePath="FlashRam.c">
-				</File>
-				<File
-					RelativePath=".\gamehacks.c">
 				</File>
 				<File
 					RelativePath="Mapping.c">

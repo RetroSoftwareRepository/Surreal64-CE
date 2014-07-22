@@ -33,6 +33,7 @@
 
 #include <stdio.h>
 #include <stdarg.h>
+#include "IOSupport.h"
 
 #define M64P_CORE_PROTOTYPES 1
 #include "../api/m64p_types.h"
@@ -58,6 +59,13 @@
 #ifdef DBG
 #include "../debugger/dbg_types.h"
 #include "../debugger/debugger.h"
+#endif
+
+#ifdef _XBOX
+#include "../plugin/Static_Video.h"
+#include "../plugin/Static_Audio.h"
+#include "../plugin/Static_Input.h"
+//#include "../plugin/plugin.h"
 #endif
 
 /* version number for Core config section */
@@ -187,11 +195,11 @@ m64p_error main_core_state_query(m64p_core_param param, int *rval)
             else
                 *rval = M64EMU_RUNNING;
             break;
-	case M64CORE_INPUT_GAMESHARK:
+	case M64COREINPUT_GAMESHARK:
 	    *rval = event_gameshark_active();
 	    break;
         default:
-            return M64ERR_INPUT_INVALID;
+            return M64ERRINPUT_INVALID;
     }
 
     return M64ERR_SUCCESS;
@@ -222,21 +230,21 @@ m64p_error main_core_state_set(m64p_core_param param, int val)
                     main_toggle_pause();
                 return M64ERR_SUCCESS;
             }
-            return M64ERR_INPUT_INVALID;
-	case M64CORE_INPUT_GAMESHARK:
+            return M64ERRINPUT_INVALID;
+	case M64COREINPUT_GAMESHARK:
             if (!g_EmulatorRunning)
                 return M64ERR_INVALID_STATE;
 	    event_set_gameshark(val);
 	    return M64ERR_SUCCESS;
         default:
-            return M64ERR_INPUT_INVALID;
+            return M64ERRINPUT_INVALID;
     }
 }
 
 m64p_error main_read_screen(void *pixels, int bFront)
 {
-    int width_trash, height_trash;
-    gfx.readScreen(pixels, &width_trash, &height_trash, bFront);
+//    int width_trash, height_trash;
+    //VIDEO_ReadScreen2(pixels, &width_trash, &height_trash, bFront);
     return M64ERR_SUCCESS;
 }
 
@@ -295,21 +303,24 @@ m64p_error main_run(void)
     }
 
     // Attach rom to plugins
-    if (!gfx.romOpen())
+	VIDEO_RomOpen();
+	//AUDIO_RomOpen();
+	INPUT_RomOpen();
+    /*if (!VIDEO_RomOpen())
     {
         free_memory(); return M64ERR_PLUGIN_FAIL;
     }
-    if (!audio.romOpen())
+    if (!AUDIO_RomOpen())
     {
-        gfx.romClosed(); free_memory(); return M64ERR_PLUGIN_FAIL;
+        VIDEO_RomClosed(); free_memory(); return M64ERR_PLUGIN_FAIL;
     }
     if (!input.romOpen())
     {
-        audio.romClosed(); gfx.romClosed(); free_memory(); return M64ERR_PLUGIN_FAIL;
-    }
+       AUDIO_RomClosed(); VIDEO_RomClosed(); free_memory(); return M64ERR_PLUGIN_FAIL;
+    }*/
 
     // setup rendering callback from video plugin to the core, for screenshots and On-Screen-Display
-    gfx.setRenderingCallback(video_plugin_render_callback);
+    //VIDEO_SetRenderingCallback(video_plugin_render_callback);
 
 #ifdef DBG
     if (ConfigGetParamBool(g_CoreConfig, "EnableDebugger"))
@@ -330,11 +341,12 @@ m64p_error main_run(void)
         destroy_debugger();
 #endif
 
-    rsp.romClosed();
+   /* rsp.romClosed();
     input.romClosed();
-    audio.romClosed();
-    gfx.romClosed();
-    free_memory();
+    AUDIO_RomClosed();
+    VIDEO_RomClosed();
+    */
+	free_memory();
 
     // clean up
     g_EmulatorRunning = 0;
@@ -364,3 +376,107 @@ void main_stop(void)
     }
 #endif        
 }
+char g_szPathSaves[256] = "D:\\Saves\\";
+extern void GetPathSaves(char *pszPathSaves);
+
+BOOL PathFileExists(const char *pszPath)
+{   
+    return GetFileAttributes(pszPath) != INVALID_FILE_ATTRIBUTES;   
+}
+char g_temporaryRomPath[260];
+extern "C" char emuname[256];
+char emuname[256];
+void _cdecl main(){
+	// mount the common drives
+	Mount("A:","cdrom0");
+	Mount("E:","Harddisk0\\Partition1");
+	//Mount("C:","Harddisk0\\Partition2");
+	//Mount("X:","Harddisk0\\Partition3");
+	//Mount("Y:","Harddisk0\\Partition4");
+	//Mount("Z:","Harddisk0\\Partition5");
+	Mount("F:","Harddisk0\\Partition6");
+	Mount("G:","Harddisk0\\Partition7");
+	
+	// utility shoud be mounted automatically
+	if(XGetDiskSectorSize("Z:\\") == 0)
+		Mount("Z:","Harddisk0\\Partition5");
+	
+	// make sure there's a temp rom
+	if (PathFileExists("Z:\\TemporaryRom.dat")) {
+		OutputDebugString("Z:\\TemporaryRom.dat File Found!\n");
+		strcpy(g_temporaryRomPath, "Z:\\TemporaryRom.dat");
+	}
+	else {
+		OutputDebugString("Z:\\TemporaryRom.dat File Not Found!\n");
+		
+		// if debugging, a temp rom can be placed in T to skip the launcher
+		if (PathFileExists("T:\\Data\\TemporaryRom.dat")) {
+			OutputDebugString("T:\\Data\\TemporaryRom.dat File Found!\n");
+			strcpy(g_temporaryRomPath, "T:\\Data\\TemporaryRom.dat");
+		}
+		else {
+			OutputDebugString("T:\\Data\\TemporaryRom.dat File Not Found!\n");
+			Sleep(100);
+			XLaunchNewImage("D:\\default.xbe", NULL);
+		}
+	}
+ /* get the length of the ROM, allocate memory buffer, load it from disk */
+    FILE *fPtr = fopen(g_temporaryRomPath, "rb");
+	long romlength = 0;
+    fseek(fPtr, 0L, SEEK_END);
+    romlength = ftell(fPtr);
+    fseek(fPtr, 0L, SEEK_SET);
+    unsigned char *ROM_buffer = (unsigned char *) malloc(romlength);
+    if (ROM_buffer == NULL)
+    {
+        DebugMessage(M64MSG_ERROR, "couldn't allocate %li-byte buffer for ROM image file '%s'.", romlength, g_temporaryRomPath);
+        fclose(fPtr);
+        (*CoreShutdown)();
+        //DetachCoreLib();
+        //return 8;
+    }
+    else if (fread(ROM_buffer, 1, romlength, fPtr) != romlength)
+    {
+        DebugMessage(M64MSG_ERROR, "couldn't read %li bytes from ROM image file '%s'.", romlength, g_temporaryRomPath);
+        free(ROM_buffer);
+        fclose(fPtr);
+        (*CoreShutdown)();
+        //DetachCoreLib();
+        //return 9;
+    }
+    fclose(fPtr);
+
+    /* Try to load the ROM image into the core */
+    if (open_rom((const unsigned char *) ROM_buffer, (int) romlength) != M64ERR_SUCCESS)
+    {
+        DebugMessage(M64MSG_ERROR, "core failed to open ROM image file '%s'.", g_temporaryRomPath);
+        free(ROM_buffer);
+        (*CoreShutdown)();
+        //DetachCoreLib();
+        //return 10;
+    }
+    free(ROM_buffer); /* the core copies the ROM image, so we can release this buffer immediately */
+
+	//attach plugins
+	//plugin_link_gfx();
+	/* run the game */
+    main_run();
+}
+
+void __cdecl DisplayError (char * Message, ...)
+{
+//#ifdef DEBUG
+	char Msg[400];
+	va_list ap;
+
+	va_start( ap, Message );
+	vsprintf( Msg, Message, ap );
+	va_end( ap );
+	
+	OutputDebugString(Msg);
+/*#else
+	OutputDebugString(Message);
+#endif*/
+	OutputDebugString("\n");
+}
+

@@ -76,6 +76,19 @@ typedef struct
 	DWORD size;				// 1 = BYTE, 2 = WORD, 4=DWORD
 } FrameBufferModifyEntry;
 
+
+
+typedef struct 
+{
+   unsigned int addr;
+   unsigned int size;
+   unsigned int width;
+   unsigned int height;
+} FrameBufferInfo;
+ 
+
+//FrameBufferInfo frameBufferInfos[6];
+
 /******************************************************************
   Function: _VIDEO_CloseDLL
   Purpose:  This function is called when the emulator is closing
@@ -199,6 +212,16 @@ typedef struct
   output:   none
 *******************************************************************/ 
  void  _VIDEO_RomOpen (void);
+
+ /******************************************************************
+  Function: ShowCFB
+  Purpose:  Useally once Dlists are started being displayed, cfb is
+            ignored. This function tells the dll to start displaying
+			them again.
+  input:    none
+  output:   none
+*******************************************************************/ 
+void _VIDEO_ShowCFB (void);
 
 /******************************************************************
   Function: _VIDEO_UpdateScreen

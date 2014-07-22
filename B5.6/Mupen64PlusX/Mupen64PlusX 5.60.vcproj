@@ -20,24 +20,29 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				OptimizeForProcessor="2"
-				PreprocessorDefinitions="_DEBUG;_XBOX;LTCG;WIN32;_WIN32;DBG"
-				MinimalRebuild="TRUE"
-				BasicRuntimeChecks="3"
+				AdditionalIncludeDirectories="..\Plugins\include\"
+				PreprocessorDefinitions="_DEBUG;_XBOX;LTCG;WIN32;_WIN32;M64P_PLUGIN_PROTOTYPES"
+				BasicRuntimeChecks="0"
 				RuntimeLibrary="1"
+				StructMemberAlignment="4"
+				EnableFunctionLevelLinking="TRUE"
 				EnableEnhancedInstructionSet="1"
 				UsePrecompiledHeader="0"
 				PrecompiledHeaderFile="$(IntDir)/$(ProjectName).pch"
+				BrowseInformation="1"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
 				DebugInformationFormat="4"
+				CallingConvention="1"
 				CompileAs="2"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="xapilibd.lib d3d8d.lib d3dx8d.lib xgraphicsd.lib dsoundd.lib dmusicd.lib xactengd.lib xsndtrkd.lib xvoiced.lib xonlined.lib xboxkrnl.lib xbdm.lib AudioBasic.lib AudioJttl.lib AudioNone.lib AudioAzimer.lib Input.lib RSP.lib RSPHLE.lib RSPM64P.lib Video560.lib"
-				OutputFile="$(OutDir)/$M64P-560.exe"
+				AdditionalDependencies="xapilibd.lib d3d8d.lib d3dx8d.lib xgraphicsd.lib dsoundd.lib dmusicd.lib xactengd.lib xsndtrkd.lib xvoiced.lib xonlined.lib xboxkrnl.lib xbdm.lib AudioBasic.lib AudioJttl.lib AudioNone.lib AudioAzimer.lib Input.lib RSP.lib RSPHLE.lib RSPM64P.lib Video612.lib"
+				OutputFile="$(OutDir)/M64P-612.exe"
 				LinkIncremental="2"
+				SuppressStartupBanner="TRUE"
 				AdditionalLibraryDirectories="..\Plugins\lib"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(OutDir)/$(ProjectName).pdb"
@@ -52,13 +57,14 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="XboxDeploymentTool"
-				RemotePath="xe:\Surreal64 CE\M64P-560.xbe"/>
+				RemotePath="xe:\Surreal64 CE\M64P-612.xbe"/>
 			<Tool
 				Name="XboxImageTool"
-				FileName="$(TargetDir)/M64P-560.xbe"
+				FileName="$(TargetDir)/M64P-612.xbe"
 				StackSize="65536"
 				IncludeDebugInfo="TRUE"
-				NoLibWarn="TRUE"/>
+				NoLibWarn="TRUE"
+				TitleID="0x64CE64CE"/>
 		</Configuration>
 		<Configuration
 			Name="Profile|Xbox"
@@ -112,7 +118,8 @@
 				FileName="$(TargetDir)/M64P-560.xbe"
 				StackSize="65536"
 				IncludeDebugInfo="TRUE"
-				NoLibWarn="TRUE"/>
+				NoLibWarn="TRUE"
+				TitleID="0x64CE64CE"/>
 		</Configuration>
 		<Configuration
 			Name="Profile_FastCap|Xbox"
@@ -167,7 +174,8 @@
 				FileName="$(TargetDir)/M64P-560.xbe"
 				StackSize="65536"
 				IncludeDebugInfo="TRUE"
-				NoLibWarn="TRUE"/>
+				NoLibWarn="TRUE"
+				TitleID="0x64CE64CE"/>
 		</Configuration>
 		<Configuration
 			Name="Release|Xbox"
@@ -181,7 +189,7 @@
 				OmitFramePointers="TRUE"
 				OptimizeForProcessor="2"
 				AdditionalIncludeDirectories="..\Plugins\include\"
-				PreprocessorDefinitions="_XBOX;WIN32;_WIN32;_STATIC_PLUGINS_;M64P_PLUGIN_PROTOTYPES"
+				PreprocessorDefinitions="_XBOX;WIN32;_WIN32;_STATIC_PLUGINS_;M64P_PLUGIN_PROTOTYPES;M64P"
 				StringPooling="TRUE"
 				RuntimeLibrary="0"
 				BufferSecurityCheck="TRUE"
@@ -192,13 +200,14 @@
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
 				DebugInformationFormat="3"
+				CallingConvention="1"
 				CompileAs="2"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xacteng.lib xboxkrnl.lib xbdm.lib AudioM64plus.lib Input.lib RSPM64P.lib Video612.lib"
-				OutputFile="$(OutDir)/$M64P-560.exe"
+				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xacteng.lib xboxkrnl.lib xbdm.lib AudioM64plus.lib AudioBasic.lib Input.lib RSPM64P.lib Video612.lib"
+				OutputFile="$(OutDir)/$M64P-612.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\Plugins\lib"
 				GenerateDebugInformation="TRUE"
@@ -221,7 +230,8 @@
 			<Tool
 				Name="XboxImageTool"
 				FileName="$(TargetDir)/M64P-560.xbe"
-				StackSize="65536"/>
+				StackSize="65536"
+				TitleID="0x64CE64CE"/>
 		</Configuration>
 		<Configuration
 			Name="Release_LTCG|Xbox"
@@ -236,7 +246,7 @@
 				OmitFramePointers="TRUE"
 				OptimizeForProcessor="2"
 				AdditionalIncludeDirectories="..\Plugins\src\Common\SDL\SDL\include"
-				PreprocessorDefinitions="_XBOX;LTCG;WIN32;_WIN32;"
+				PreprocessorDefinitions="_XBOX;LTCG;WIN32;_WIN32;_STATIC_PLUGINS_"
 				StringPooling="TRUE"
 				RuntimeLibrary="0"
 				BufferSecurityCheck="TRUE"
@@ -252,7 +262,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="xapilib.lib d3d8ltcg.lib d3dx8.lib xgraphicsltcg.lib dsound.lib dmusicltcg.lib xactengltcg.lib xboxkrnl.lib AudioBasic.lib AudioJttl.lib AudioNone.lib AudioAzimer.lib Input.lib RSP.lib RSPHLE.lib RSPM64P.lib Video560.lib"
+				AdditionalDependencies="xapilib.lib d3d8ltcg.lib d3dx8.lib xgraphicsltcg.lib dsound.lib dmusicltcg.lib xactengltcg.lib xboxkrnl.lib AudioBasic.lib AudioJttl.lib AudioNone.lib AudioAzimer.lib Input.lib RSP.lib RSPHLE.lib RSPM64P.lib Video612.lib"
 				OutputFile="$(OutDir)/$M64P-560.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\Plugins\lib"
@@ -275,8 +285,9 @@
 				RemotePath="xe:\Surreal64 CE\M64P-560.xbe"/>
 			<Tool
 				Name="XboxImageTool"
-				FileName="$(TargetDir)/M64P-560.xbe"
-				StackSize="65536"/>
+				FileName="$(TargetDir)/M64P-612.xbe"
+				StackSize="65536"
+				TitleID="0x64CE64CE"/>
 		</Configuration>
 	</Configurations>
 	<References>
@@ -318,6 +329,9 @@
 					RelativePath="..\Mupen64PlusX\main\eventloop.c">
 				</File>
 				<File
+					RelativePath=".\main\IoSupport.c">
+				</File>
+				<File
 					RelativePath="..\Mupen64PlusX\main\main.c">
 				</File>
 				<File
@@ -332,12 +346,27 @@
 				<File
 					RelativePath="..\Mupen64PlusX\main\util.c">
 				</File>
+				<File
+					RelativePath=".\main\xbox.c">
+				</File>
 			</Filter>
 			<Filter
 				Name="Plugin"
 				Filter="">
 				<File
 					RelativePath="..\Mupen64PlusX\plugin\plugin.c">
+				</File>
+				<File
+					RelativePath=".\plugin\Static_Audio.c">
+				</File>
+				<File
+					RelativePath=".\plugin\Static_Input.c">
+				</File>
+				<File
+					RelativePath=".\plugin\Static_Rsp.c">
+				</File>
+				<File
+					RelativePath=".\plugin\Static_Video.c">
 				</File>
 			</Filter>
 			<Filter
@@ -469,9 +498,6 @@
 					RelativePath="..\Mupen64PlusX\api\m64p_types.h">
 				</File>
 				<File
-					RelativePath="..\Mupen64PlusX\api\m64p_vidext.h">
-				</File>
-				<File
 					RelativePath="..\Mupen64PlusX\api\vidext.h">
 				</File>
 			</Filter>
@@ -483,6 +509,9 @@
 				</File>
 				<File
 					RelativePath="..\Mupen64PlusX\main\eventloop.h">
+				</File>
+				<File
+					RelativePath=".\main\IoSupport.h">
 				</File>
 				<File
 					RelativePath="..\Mupen64PlusX\main\list.h">
@@ -500,10 +529,16 @@
 					RelativePath="..\Mupen64PlusX\main\savestates.h">
 				</File>
 				<File
+					RelativePath=".\main\Undocumented.h">
+				</File>
+				<File
 					RelativePath="..\Mupen64PlusX\main\util.h">
 				</File>
 				<File
 					RelativePath="..\Mupen64PlusX\main\version.h">
+				</File>
+				<File
+					RelativePath=".\main\xbox.h">
 				</File>
 			</Filter>
 			<Filter
@@ -538,6 +573,24 @@
 			<Filter
 				Name="Plugin"
 				Filter="">
+				<File
+					RelativePath=".\plugin\plugin.h">
+				</File>
+				<File
+					RelativePath=".\plugin\plugins.h">
+				</File>
+				<File
+					RelativePath=".\plugin\Static_Audio.h">
+				</File>
+				<File
+					RelativePath=".\plugin\Static_Input.h">
+				</File>
+				<File
+					RelativePath=".\plugin\Static_Rsp.h">
+				</File>
+				<File
+					RelativePath=".\plugin\Static_Video.h">
+				</File>
 			</Filter>
 			<Filter
 				Name="r4300i"

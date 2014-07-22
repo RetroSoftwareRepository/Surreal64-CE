@@ -25,7 +25,6 @@
 #include <sys/types.h>
 #include <errno.h>
 #include <string.h>
-
 #if !defined(WIN32) || !defined(_XBOX)
 //#include <sys/mman.h>
 #endif
@@ -48,6 +47,8 @@
 #include "../main/rom.h"
 #include "../osal/preproc.h"
 #include "../plugin/plugin.h"
+#include "../plugin/Static_Video.h"
+#include "../plugin/Static_RSP.h"
 //#include "../r4300/new_dynarec/new_dynarec.h"
 
 #ifdef DBG
@@ -130,7 +131,7 @@ unsigned int *readdp[0x10000];
 unsigned int *readdps[0x10000];
 
 // the frameBufferInfos
-static FrameBufferInfo frameBufferInfos[6];
+FrameBufferInfo frameBufferInfos[6];
 static char framebufferRead[0x800];
 static int firstFrameBufferSetting;
 
@@ -1169,8 +1170,8 @@ static void do_SP_Task(void)
         }
         
         // unprotecting old frame buffers
-        if (gfx.fBGetFrameBufferInfo && gfx.fBRead && gfx.fBWrite &&
-                frameBufferInfos[0].addr)
+        //if (gfx.fBGetFrameBufferInfo && gfx.fBRead && gfx.fBWrite &&
+        if (frameBufferInfos[0].addr)
         {
             int i;
             for (i=0; i<6; i++)
@@ -1262,10 +1263,10 @@ static void do_SP_Task(void)
             }
         }
 
-        //gfx.processDList();
+        VIDEO_ProcessDList();
         rsp_register.rsp_pc &= 0xFFF;
         start_section(GFX_SECTION);
-        rsp.doRspCycles(0xFFFFFFFF);
+        RSP_DoRspCycles(0xFFFFFFFF);
         end_section(GFX_SECTION);
         rsp_register.rsp_pc |= save_pc;
         new_frame();
@@ -1279,10 +1280,10 @@ static void do_SP_Task(void)
         sp_register.sp_status_reg &= ~0x303;
 
         // protecting new frame buffers
-        if (gfx.fBGetFrameBufferInfo && gfx.fBRead && gfx.fBWrite)
-            gfx.fBGetFrameBufferInfo(frameBufferInfos);
-        if (gfx.fBGetFrameBufferInfo && gfx.fBRead && gfx.fBWrite
-                && frameBufferInfos[0].addr)
+        //if (gfx.fBGetFrameBufferInfo && gfx.fBRead && gfx.fBWrite)
+            VIDEO_FBGetFrameBufferInfo(frameBufferInfos);
+        //if (gfx.fBGetFrameBufferInfo && gfx.fBRead && gfx.fBWrite && 
+        if (frameBufferInfos[0].addr)
         {
             int i;
             for (i=0; i<6; i++)
@@ -1395,7 +1396,7 @@ static void do_SP_Task(void)
         //audio.processAList();
         rsp_register.rsp_pc &= 0xFFF;
         start_section(AUDIO_SECTION);
-        rsp.doRspCycles(0xFFFFFFFF);
+        RSP_DoRspCycles(0xFFFFFFFF);
         end_section(AUDIO_SECTION);
         rsp_register.rsp_pc |= save_pc;
 
@@ -1409,7 +1410,7 @@ static void do_SP_Task(void)
     else
     {
         rsp_register.rsp_pc &= 0xFFF;
-        rsp.doRspCycles(0xFFFFFFFF);
+        RSP_DoRspCycles(0xFFFFFFFF);
         rsp_register.rsp_pc |= save_pc;
 
         update_count();
@@ -1687,7 +1688,7 @@ void read_rdramFB(void)
             if ((address & 0x7FFFFF) >= start && (address & 0x7FFFFF) <= end &&
                     framebufferRead[(address & 0x7FFFFF)>>12])
             {
-                gfx.fBRead(address);
+                VIDEO_FBRead(address);
                 framebufferRead[(address & 0x7FFFFF)>>12] = 0;
             }
         }
@@ -1709,7 +1710,7 @@ void read_rdramFBb(void)
             if ((address & 0x7FFFFF) >= start && (address & 0x7FFFFF) <= end &&
                     framebufferRead[(address & 0x7FFFFF)>>12])
             {
-                gfx.fBRead(address);
+                VIDEO_FBRead(address);
                 framebufferRead[(address & 0x7FFFFF)>>12] = 0;
             }
         }
@@ -1731,7 +1732,7 @@ void read_rdramFBh(void)
             if ((address & 0x7FFFFF) >= start && (address & 0x7FFFFF) <= end &&
                     framebufferRead[(address & 0x7FFFFF)>>12])
             {
-                gfx.fBRead(address);
+                VIDEO_FBRead(address);
                 framebufferRead[(address & 0x7FFFFF)>>12] = 0;
             }
         }
@@ -1753,7 +1754,7 @@ void read_rdramFBd(void)
             if ((address & 0x7FFFFF) >= start && (address & 0x7FFFFF) <= end &&
                     framebufferRead[(address & 0x7FFFFF)>>12])
             {
-                gfx.fBRead(address);
+                VIDEO_FBRead(address);
                 framebufferRead[(address & 0x7FFFFF)>>12] = 0;
             }
         }
@@ -1798,7 +1799,7 @@ void write_rdramFB(void)
                                frameBufferInfos[i].height*
                                frameBufferInfos[i].size - 1;
             if ((address & 0x7FFFFF) >= start && (address & 0x7FFFFF) <= end)
-                gfx.fBWrite(address, 4);
+                VIDEO_FBWrite(address, 4);
         }
     }
     write_rdram();
@@ -1816,7 +1817,7 @@ void write_rdramFBb(void)
                                frameBufferInfos[i].height*
                                frameBufferInfos[i].size - 1;
             if ((address & 0x7FFFFF) >= start && (address & 0x7FFFFF) <= end)
-                gfx.fBWrite(address^S8, 1);
+                VIDEO_FBWrite(address^S8, 1);
         }
     }
     write_rdramb();
@@ -1834,7 +1835,7 @@ void write_rdramFBh(void)
                                frameBufferInfos[i].height*
                                frameBufferInfos[i].size - 1;
             if ((address & 0x7FFFFF) >= start && (address & 0x7FFFFF) <= end)
-                gfx.fBWrite(address^S16, 2);
+                VIDEO_FBWrite(address^S16, 2);
         }
     }
     write_rdramh();
@@ -1852,7 +1853,7 @@ void write_rdramFBd(void)
                                frameBufferInfos[i].height*
                                frameBufferInfos[i].size - 1;
             if ((address & 0x7FFFFF) >= start && (address & 0x7FFFFF) <= end)
-                gfx.fBWrite(address, 8);
+                VIDEO_FBWrite(address, 8);
         }
     }
     write_rdramd();
@@ -2270,7 +2271,7 @@ void write_dp(void)
         dpc_register.dpc_current = dpc_register.dpc_start;
         break;
     case 0x4:
-        gfx.processRDPList();
+        VIDEO_ProcessRDPList();
         MI_register.mi_intr_reg |= 0x20;
         check_interupt();
         break;
@@ -2325,7 +2326,7 @@ void write_dpb(void)
     case 0x5:
     case 0x6:
     case 0x7:
-        gfx.processRDPList();
+        VIDEO_ProcessRDPList();
         MI_register.mi_intr_reg |= 0x20;
         check_interupt();
         break;
@@ -2364,7 +2365,7 @@ void write_dph(void)
         break;
     case 0x4:
     case 0x6:
-        gfx.processRDPList();
+        VIDEO_ProcessRDPList();
         MI_register.mi_intr_reg |= 0x20;
         check_interupt();
         break;
@@ -2391,7 +2392,7 @@ void write_dpd(void)
     {
     case 0x0:
         dpc_register.dpc_current = dpc_register.dpc_start;
-        gfx.processRDPList();
+        VIDEO_ProcessRDPList();
         MI_register.mi_intr_reg |= 0x20;
         check_interupt();
         break;
@@ -2644,13 +2645,13 @@ void write_vi(void)
 void update_vi_status(unsigned int word)
 {
     vi_register.vi_status = word;
-    gfx.viStatusChanged();
+    VIDEO_ViStatusChanged();
 }
 
 void update_vi_width(unsigned int word)
 {
     vi_register.vi_width = word;
-    gfx.viWidthChanged();
+    VIDEO_ViWidthChanged();
 }
 
 void write_vib(void)
@@ -2852,7 +2853,7 @@ void write_ai(void)
     {
     case 0x4:
         ai_register.ai_len = word;
-        audio.aiLenChanged();
+        AUDIO_AiLenChanged();
 
         freq = ROM_PARAMS.aidacrate / (ai_register.ai_dacrate+1);
         if (freq)
@@ -2893,7 +2894,7 @@ void write_ai(void)
 void update_ai_dacrate(unsigned int word)
 {
     ai_register.ai_dacrate = word;
-    audio.aiDacrateChanged(ROM_PARAMS.systemtype);
+    AUDIO_AiDacrateChanged(ROM_PARAMS.systemtype);
 }
 
 void write_aib(void)
@@ -2910,7 +2911,7 @@ void write_aib(void)
         *((unsigned char*)&temp
           + ((*address_low&3)^S8) ) = cpu_byte;
         ai_register.ai_len = temp;
-        audio.aiLenChanged();
+        AUDIO_AiLenChanged();
 
         delay = (unsigned int) (((unsigned long long)ai_register.ai_len*(ai_register.ai_dacrate+1)*
                                     vi_register.vi_delay*ROM_PARAMS.vilimit)/ROM_PARAMS.aidacrate);
@@ -2970,7 +2971,7 @@ void write_aih(void)
         *((unsigned short*)((unsigned char*)&temp
                             + ((*address_low&3)^S16) )) = hword;
         ai_register.ai_len = temp;
-        audio.aiLenChanged();
+        AUDIO_AiLenChanged();
 
         delay = (unsigned int) (((unsigned long long)ai_register.ai_len*(ai_register.ai_dacrate+1)*
                                     vi_register.vi_delay*ROM_PARAMS.vilimit)/ROM_PARAMS.aidacrate);
@@ -3021,7 +3022,7 @@ void write_aid(void)
     case 0x0:
         ai_register.ai_dram_addr = (unsigned int) (dword >> 32);
         ai_register.ai_len = (unsigned int) (dword & 0xFFFFFFFF);
-        audio.aiLenChanged();
+        AUDIO_AiLenChanged();
 
         delay = (unsigned int) (((unsigned long long)ai_register.ai_len*(ai_register.ai_dacrate+1)*
                                     vi_register.vi_delay*ROM_PARAMS.vilimit)/ROM_PARAMS.aidacrate);

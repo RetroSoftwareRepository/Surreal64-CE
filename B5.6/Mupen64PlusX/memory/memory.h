@@ -106,7 +106,7 @@ typedef struct _SP_register
    unsigned int sp_semaphore_reg;
 } SP_register;
 
-typedef struct _RSP_register
+typedef struct RSP_register
 {
    unsigned int rsp_pc;
    unsigned int rsp_ibist;

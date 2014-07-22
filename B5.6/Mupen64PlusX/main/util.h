@@ -43,31 +43,31 @@ extern "C" {
 
 static osal_inline unsigned short m64p_swap16(unsigned short x)
 {
-    #ifdef _MSC_VER
-    return _byteswap_ushort(x);
-    #else
+    //#ifdef _MSC_VER
+    //return _byteswap_ushort(x);
+    //#else
     return ((x & 0x00FF) << 8) |
            ((x & 0xFF00) >> 8);
-    #endif
+    //#endif
 }
 
 static osal_inline unsigned int m64p_swap32(unsigned int x)
 {
-    #ifdef _MSC_VER
-    return _byteswap_ulong(x); // long is always 32-bit in Windows
-    #else
+    //#ifdef _MSC_VER
+    //return _byteswap_ulong(x); // long is always 32-bit in Windows
+    //#else
     return ((x & 0x000000FF) << 24) |
            ((x & 0x0000FF00) << 8) |
            ((x & 0x00FF0000) >> 8) |
            ((x & 0xFF000000) >> 24);
-    #endif
+    //#endif
 }
 
 static osal_inline unsigned long long int m64p_swap64(unsigned long long int x)
 {
-    #ifdef _MSC_VER
-    return _byteswap_uint64(x);
-    #else
+    //#ifdef _MSC_VER
+    //return _byteswap_uint64(x);
+    //#else
     return ((x & 0x00000000000000FFULL) << 56) |
            ((x & 0x000000000000FF00ULL) << 40) |
            ((x & 0x0000000000FF0000ULL) << 24) |
@@ -76,7 +76,7 @@ static osal_inline unsigned long long int m64p_swap64(unsigned long long int x)
            ((x & 0x0000FF0000000000ULL) >> 24) |
            ((x & 0x00FF000000000000ULL) >> 40) |
            ((x & 0xFF00000000000000ULL) >> 56);
-    #endif
+    //#endif
 }
 
 #ifdef M64P_BIG_ENDIAN

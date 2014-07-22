@@ -363,13 +363,13 @@
 				Name="General Source"
 				Filter="">
 				<File
+					RelativePath=".\Cheat.c">
+				</File>
+				<File
 					RelativePath="Eeprom.c">
 				</File>
 				<File
 					RelativePath="FlashRam.c">
-				</File>
-				<File
-					RelativePath=".\gamehacks.c">
 				</File>
 				<File
 					RelativePath="Mapping.c">

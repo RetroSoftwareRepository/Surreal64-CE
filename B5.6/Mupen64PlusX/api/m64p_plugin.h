@@ -25,9 +25,18 @@
 
 #include "m64p_types.h"
 
+#include "../plugin/plugins.h"
+#include "../plugin/Static_Audio.h"
+
+
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
+#ifndef _XBOX
+
+//extern CONTROL		Controls[4];
 
 /*** Controller plugin's ****/
 #define PLUGIN_NONE                 1
@@ -37,6 +46,7 @@ extern "C" {
 #define PLUGIN_RAW                  5 /* the controller plugin is passed in raw data */
 
 /***** Structures *****/
+	/*
 typedef struct {
     unsigned char * RDRAM;
     unsigned char * DMEM;
@@ -69,43 +79,61 @@ typedef struct {
     void (*ProcessRdpList)(void);
     void (*ShowCFB)(void);
 } RSP_INFO;
-
+*/
+/*
 typedef struct {
-    unsigned char * HEADER;  /* This is the rom header (first 40h bytes of the rom) */
-    unsigned char * RDRAM;
-    unsigned char * DMEM;
-    unsigned char * IMEM;
+	HWND hWnd;			
+	HWND hStatusBar;   
 
-    unsigned int * MI_INTR_REG;
+	BOOL MemoryBswaped;    // If this is set to TRUE, then the memory has been pre
+	                       //   bswap on a dword (32 bits) boundry 
+						   //	eg. the first 8 bytes are stored like this:
+	                       //        4 3 2 1   8 7 6 5
 
-    unsigned int * DPC_START_REG;
-    unsigned int * DPC_END_REG;
-    unsigned int * DPC_CURRENT_REG;
-    unsigned int * DPC_STATUS_REG;
-    unsigned int * DPC_CLOCK_REG;
-    unsigned int * DPC_BUFBUSY_REG;
-    unsigned int * DPC_PIPEBUSY_REG;
-    unsigned int * DPC_TMEM_REG;
+    BYTE * HEADER; 
+    BYTE * RDRAM;
+    BYTE * DMEM;
+    BYTE * IMEM;
 
-    unsigned int * VI_STATUS_REG;
-    unsigned int * VI_ORIGIN_REG;
-    unsigned int * VI_WIDTH_REG;
-    unsigned int * VI_INTR_REG;
-    unsigned int * VI_V_CURRENT_LINE_REG;
-    unsigned int * VI_TIMING_REG;
-    unsigned int * VI_V_SYNC_REG;
-    unsigned int * VI_H_SYNC_REG;
-    unsigned int * VI_LEAP_REG;
-    unsigned int * VI_H_START_REG;
-    unsigned int * VI_V_START_REG;
-    unsigned int * VI_V_BURST_REG;
-    unsigned int * VI_X_SCALE_REG;
-    unsigned int * VI_Y_SCALE_REG;
+    DWORD * MI_INTR_REG;
+
+    DWORD * DPC_START_REG;
+    DWORD * DPC_END_REG;
+    DWORD * DPC_CURRENT_REG;
+    DWORD * DPC_STATUS_REG;
+    DWORD * DPC_CLOCK_REG;
+    DWORD * DPC_BUFBUSY_REG;
+    DWORD * DPC_PIPEBUSY_REG;
+    DWORD * DPC_TMEM_REG;
+
+    DWORD * VI_STATUS_REG;
+    DWORD * VI_ORIGIN_REG;
+    DWORD * VI_WIDTH_REG;
+    DWORD * VI_INTR_REG;
+    DWORD * VI_V_CURRENT_LINE_REG;
+    DWORD * VI_TIMING_REG;
+    DWORD * VI_V_SYNC_REG;
+    DWORD * VI_H_SYNC_REG;
+    DWORD * VI_LEAP_REG;
+    DWORD * VI_H_START_REG;
+    DWORD * VI_V_START_REG;
+    DWORD * VI_V_BURST_REG;
+    DWORD * VI_X_SCALE_REG;
+    DWORD * VI_Y_SCALE_REG;
 
     void (*CheckInterrupts)(void);
 } GFX_INFO;
-
+*/
+/*
 typedef struct {
+	HWND hwnd;
+	HINSTANCE hinst;
+	BOOL MemoryBswaped;    // If this is set to TRUE, then the memory has been pre
+	                       //   bswap on a dword (32 bits) boundry 
+						   //	eg. the first 8 bytes are stored like this:
+	                       //        4 3 2 1   8 7 6 5
+	BYTE * HEADER;	// This is the rom header (first 40h bytes of the rom
+					// This will be in the same memory format as the rest of the memory.
     unsigned char * RDRAM;
     unsigned char * DMEM;
     unsigned char * IMEM;
@@ -121,7 +149,8 @@ typedef struct {
 
     void (*CheckInterrupts)(void);
 } AUDIO_INFO;
-
+*/
+/*
 typedef struct {
     int Present;
     int RawData;
@@ -153,18 +182,26 @@ typedef union {
         signed   Y_AXIS       : 8;
     };
 } BUTTONS;
+*/
 
-typedef struct {
-    CONTROL *Controls;      /* A pointer to an array of 4 controllers .. eg:
-                               CONTROL Controls[4]; */
-} CONTROL_INFO;
+//typedef struct {
+ //  CONTROL *Controls;      /* A pointer to an array of 4 controllers .. eg:
+  //                             CONTROL Controls[4]; */
+//
+//} CONTROL_INFO;
 
 /* common plugin function pointer types */
 typedef void (*ptr_RomClosed)(void);
 typedef int  (*ptr_RomOpen)(void);
 #if defined(M64P_PLUGIN_PROTOTYPES)
-EXPORT int  CALL RomOpen(void);
-EXPORT void CALL RomClosed(void);
+extern int   VIDEO_RomOpen(void);
+extern void  VIDEO_RomClosed(void);
+extern int   AUDIO_RomOpen(void);
+extern void  AUDIO_RomClosed(void);
+extern int   INPUT_RomOpen(void);
+extern void  INPUT_RomClosed(void);
+extern int   RSP_RomOpen(void);
+extern void  RSP_RomClosed(void);
 #endif
 
 /* video plugin function pointer types */
@@ -181,36 +218,40 @@ typedef void (*ptr_ReadScreen2)(void *dest, int *width, int *height, int front);
 typedef void (*ptr_SetRenderingCallback)(void (*callback)(int));
 typedef void (*ptr_ResizeVideoOutput)(int width, int height);
 #if defined(M64P_PLUGIN_PROTOTYPES)
-EXPORT void CALL ChangeWindow(void);
-EXPORT int  CALL InitiateGFX(GFX_INFO Gfx_Info);
-EXPORT void CALL MoveScreen(int x, int y);
-EXPORT void CALL ProcessDList(void);
-EXPORT void CALL ProcessRDPList(void);
-EXPORT void CALL ShowCFB(void);
-EXPORT void CALL UpdateScreen(void);
-EXPORT void CALL ViStatusChanged(void);
-EXPORT void CALL ViWidthChanged(void);
-EXPORT void CALL ReadScreen2(void *dest, int *width, int *height, int front);
-EXPORT void CALL SetRenderingCallback(void (*callback)(int));
-EXPORT void CALL ResizeVideoOutput(int width, int height);
+/*extern void  VIDEO_ChangeWindow(void);
+extern int   VIDEO_InitiateGFX(GFX_INFO Gfx_Info);
+extern void  VIDEO_MoveScreen(int x, int y);
+extern void  VIDEO_ProcessDList(void);
+extern void  VIDEO_ProcessRDPList(void);
+extern void  VIDEO_ShowCFB(void);
+extern void  VIDEO_UpdateScreen(void);
+extern void  VIDEO_ViStatusChanged(void);
+extern void  VIDEO_ViWidthChanged(void);
+extern void  VIDEO_ReadScreen2(void *dest, int *width, int *height, int front);
+extern void  VIDEO_SetRenderingCallback(void (*callback)(int));
+extern void  VIDEO_ResizeVideoOutput(int width, int height);*/
 #endif
 
 /* frame buffer plugin spec extension */
-typedef struct
+/*
+typedef struct FrameBufferInfo2
 {
    unsigned int addr;
    unsigned int size;
    unsigned int width;
    unsigned int height;
-} FrameBufferInfo;
-typedef void (*ptr_FBRead)(unsigned int addr);
-typedef void (*ptr_FBWrite)(unsigned int addr, unsigned int size);
+} FrameBufferInfo2;
+
+
+typedef void (*ptr_FBRead)(DWORD addr);
+typedef void (*ptr_FBWrite)(DWORD addr, DWORD size);
 typedef void (*ptr_FBGetFrameBufferInfo)(void *p);
 #if defined(M64P_PLUGIN_PROTOTYPES)
-EXPORT void CALL FBRead(unsigned int addr);
-EXPORT void CALL FBWrite(unsigned int addr, unsigned int size);
-EXPORT void CALL FBGetFrameBufferInfo(void *p);
+extern void  VIDEO_FBRead(DWORD addr);
+extern void  VIDEO_FBWrite(DWORD addr, DWORD size);
+extern void  VIDEO_FBGetFrameBufferInfo(void *p);
 #endif
+*/
 
 /* audio plugin function pointers */
 typedef void (*ptr_AiDacrateChanged)(int SystemType);
@@ -225,39 +266,39 @@ typedef void (*ptr_VolumeSetLevel)(int level);
 typedef void (*ptr_VolumeMute)(void);
 typedef const char * (*ptr_VolumeGetString)(void);
 #if defined(M64P_PLUGIN_PROTOTYPES)
-EXPORT void CALL *_AUDIO_AiDacrateChanged(int SystemType);
-EXPORT void CALL *_AUDIO_AiLenChanged(void);
-EXPORT int  CALL *_AUDIO_InitiateAudio(AUDIO_INFO Audio_Info);
-EXPORT void CALL *_AUDIO_ProcessAList(void);
-EXPORT void CALL *_AUDIO_SetSpeedFactor(int percent);
-EXPORT void CALL *_AUDIO_VolumeUp(void);
-EXPORT void CALL *_AUDIO_VolumeDown(void);
-EXPORT int  CALL *_AUDIO_VolumeGetLevel(void);
-EXPORT void CALL *_AUDIO_VolumeSetLevel(int level);
-EXPORT void CALL *_AUDIO_VolumeMute(void);
-EXPORT const char * CALL *_AUDIO_VolumeGetString(void);
+/*void (*AUDIO_AiDacrateChanged)(int SystemType);
+void (*AUDIO_AiLenChanged)(void);
+int (*AUDIO_InitiateAudio)(AUDIO_INFO Audio_Info);
+void (*AUDIO_ProcessAList)(void);
+void(*AUDIO_SetSpeedFactor)(int percent);
+void( *AUDIO_VolumeUp)(void);
+void ( *AUDIO_VolumeDown)(void);
+int ( *AUDIO_VolumeGetLevel)(void);
+void ( *AUDIO_VolumeSetLevel)(int level);
+void ( *AUDIO_VolumeMute)(void);
+const char *  AUDIO_VolumeGetString(void);*/
 #endif
 
 /* input plugin function pointers */
 typedef void (*ptr_ControllerCommand)(int Control, unsigned char *Command);
 typedef void (*ptr_GetKeys)(int Control, BUTTONS *Keys);
-typedef void (*ptr_InitiateControllers)(CONTROL_INFO ControlInfo);
+typedef void (*ptr_InitiateControllers)(HWND hwnnd, CONTROL Controls[4]);
 typedef void (*ptr_ReadController)(int Control, unsigned char *Command);
 #if defined(M64P_PLUGIN_PROTOTYPES)
-EXPORT void CALL ControllerCommand(int Control, unsigned char *Command);
-EXPORT void CALL GetKeys(int Control, BUTTONS *Keys);
-EXPORT void CALL InitiateControllers(CONTROL_INFO ControlInfo);
-EXPORT void CALL ReadController(int Control, unsigned char *Command);
+extern void  INPUT_ControllerCommand(int Control, unsigned char *Command);
+extern void  INPUT_GetKeys(int Control, BUTTONS *Keys);
+extern void  INPUT_InitiateControllers(HWND hwnnd, CONTROL Controls[4]);
+extern void  INPUT_ReadController(int Control, unsigned char *Command);
 #endif
 
 /* RSP plugin function pointers */
-typedef unsigned int (*ptr_DoRspCycles)(unsigned int Cycles);
-typedef void (*ptr_InitiateRSP)(RSP_INFO Rsp_Info, unsigned int *CycleCount);
+typedef DWORD (*ptr_DoRspCycles)(DWORD Cycles);
+typedef void (*ptr_InitiateRSP)(RSP_INFO Rsp_Info, DWORD *CycleCount);
 #if defined(M64P_PLUGIN_PROTOTYPES)
-EXPORT unsigned int CALL DoRspCycles(unsigned int Cycles);
-EXPORT void CALL InitiateRSP(RSP_INFO Rsp_Info, unsigned int *CycleCount);
+extern DWORD  RSP_DoRspCycles(DWORD Cycles);
+extern void  RSP_InitiateRSP(RSP_INFO Rsp_Info, DWORD *CycleCount);
 #endif
-
+#endif
 #ifdef __cplusplus
 }
 #endif

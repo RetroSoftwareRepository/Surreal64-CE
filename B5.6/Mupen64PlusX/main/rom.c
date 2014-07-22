@@ -53,6 +53,7 @@ unsigned char* rom = NULL;
 int rom_size = 0;
 
 unsigned char isGoldeneyeRom = 0;
+extern char	g_temporaryRomPath[260];
 
 m64p_rom_header   ROM_HEADER;
 rom_params        ROM_PARAMS;
@@ -134,7 +135,7 @@ m64p_error open_rom(const unsigned char* romimage, unsigned int size)
     if (romimage == NULL || !is_valid_rom(romimage))
     {
         DebugMessage(M64MSG_ERROR, "open_rom(): not a valid ROM image");
-        return M64ERR_INPUT_INVALID;
+        return M64ERRINPUT_INVALID;
     }
 
     /* Clear Byte-swapped flag, since ROM is now deleted. */
@@ -416,7 +417,7 @@ void romdatabase_open(void)
                 else if(!strcmp(l.value, "Flash RAM"))
                     search->entry.savetype = FLASH_RAM;
                 else if(!strcmp(l.value, "Controller Pack"))
-                    search->entry.savetype = CONTROLLER_PACK;
+                    search->entry.savetype = INPUT_PACK;
                 else if(!strcmp(l.value, "None"))
                     search->entry.savetype = NONE;
                 else

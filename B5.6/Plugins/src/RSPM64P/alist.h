@@ -1,8 +1,7 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *   Mupen64plus - main.h                                                  *
+ *   Mupen64plus-rsp-hle - alist.h                                         *
  *   Mupen64Plus homepage: http://code.google.com/p/mupen64plus/           *
- *   Copyright (C) 2012 CasualJames                                        *
- *   Copyright (C) 2002 Blight                                             *
+ *   Copyright (C) 2002 Hacktarux                                          *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,41 +19,31 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.          *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-#ifndef __MAIN_H__
-#define __MAIN_H__
+#ifndef ALIST_H
+#define ALIST_H
 
-#include "../api/m64p_types.h"
+void alist_process_audio(void);
+void alist_process_audio_ge(void);
+void alist_process_audio_bc(void);
+void alist_process_mk(void);
+void alist_process_sfj(void);
+void alist_process_wrjb(void);
+void alist_process_sf(void);
+void alist_process_fz(void);
+void alist_process_ys(void);
+void alist_process_1080(void);
+void alist_process_oot(void);
+void alist_process_mm(void);
+void alist_process_mmb(void);
+void alist_process_ac(void);
+void alist_process_naudio(void);
+void alist_process_naudio_bk(void);
+void alist_process_naudio_dk(void);
+void alist_process_naudio_mp3(void);
+void alist_process_naudio_cbfd(void);
 
-/* globals */
-extern m64p_handle g_CoreConfig;
+/* FIXME: to remove when isZeldaABI/isMKABI workaround is gone */
+void init_ucode2(void);
 
-extern int g_MemHasBeenBSwapped;
-extern int g_EmulatorRunning;
-
-extern m64p_frame_callback g_FrameCallback;
-
-void new_frame(void);
-
-int  main_set_core_defaults(void);
-void main_message(m64p_msg_level level, unsigned int osd_corner, const char *format, ...);
-
-m64p_error main_run(void);
-void main_stop(void);
-void main_toggle_pause(void);
-void main_advance_one(void);
-
-m64p_error main_core_state_query(m64p_core_param param, int *rval);
-m64p_error main_core_state_set(m64p_core_param param, int val);
-
-m64p_error main_read_screen(void *pixels, int bFront);
-
-m64p_error main_reset(int do_hard_reset);
-
-
-#define INVALID_FILE_ATTRIBUTES ((DWORD)-1)
-extern BOOL PathFileExists(const char *pszPath);
-extern void DisplayError       ( char * Message, ... );
-extern char g_szPathSaves[256];
-
-#endif /* __MAIN_H__ */
+#endif
 
