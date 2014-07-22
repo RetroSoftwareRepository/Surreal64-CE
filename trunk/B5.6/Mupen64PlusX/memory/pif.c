@@ -38,6 +38,7 @@
 #include "../main/rom.h"
 #include "../main/util.h"
 #include "../plugin/plugin.h"
+#include "../plugin/Static_Input.h"
 
 /*static void mempack_format(void)
 {
@@ -211,7 +212,7 @@ static void internal_ReadController(int Control, unsigned char *Command)
         if (Controls[Control].Present)
         {
             BUTTONS Keys;
-            input.getKeys(Control, &Keys);
+            INPUT_GetKeys(Control, &Keys);
             *((unsigned int *)(Command + 3)) = Keys.Value;
 #ifdef COMPARE_CORE
             CoreCompareDataSync(4, Command+3);
@@ -225,8 +226,8 @@ static void internal_ReadController(int Control, unsigned char *Command)
         if (Controls[Control].Present)
         {
             if (Controls[Control].Plugin == PLUGIN_RAW)
-                if (input.readController)
-                    input.readController(Control, Command);
+                //if (INPUT_ReadController)
+                    INPUT_ReadController(Control, Command);
         }
         break;
     case 3: // write controller pack
@@ -236,8 +237,8 @@ static void internal_ReadController(int Control, unsigned char *Command)
         if (Controls[Control].Present)
         {
             if (Controls[Control].Plugin == PLUGIN_RAW)
-                if (input.readController)
-                    input.readController(Control, Command);
+                //if (INPUT_ReadController)
+                    INPUT_ReadController(Control, Command);
         }
         break;
     }
@@ -316,8 +317,8 @@ static void internal_ControllerCommand(int Control, unsigned char *Command)
 #ifdef DEBUG_PIF
                 DebugMessage(M64MSG_INFO, "internal_ControllerCommand() Channel %i Command 2 controllerCommand (in Input plugin)", Control);
 #endif
-                if (input.controllerCommand)
-                    input.controllerCommand(Control, Command);
+                //if (INPUT_ControllerCommand)
+                    INPUT_ControllerCommand(Control, Command);
                 break;
             default:
 #ifdef DEBUG_PIF
@@ -358,8 +359,8 @@ static void internal_ControllerCommand(int Control, unsigned char *Command)
 #ifdef DEBUG_PIF
                 DebugMessage(M64MSG_INFO, "internal_ControllerCommand() Channel %i Command 3 controllerCommand (in Input plugin)", Control);
 #endif
-                if (input.controllerCommand)
-                    input.controllerCommand(Control, Command);
+                //if (INPUT_ControllerCommand)
+                    INPUT_ControllerCommand(Control, Command);
                 break;
             default:
 #ifdef DEBUG_PIF
@@ -430,7 +431,7 @@ void update_pif_write(void)
                 {
                     if (Controls[channel].Present &&
                             Controls[channel].RawData)
-                        input.controllerCommand(channel, &PIF_RAMb[i]);
+                        INPUT_ControllerCommand(channel, &PIF_RAMb[i]);
                     else
                         internal_ControllerCommand(channel, &PIF_RAMb[i]);
                 }
@@ -447,7 +448,7 @@ void update_pif_write(void)
         i++;
     }
     //PIF_RAMb[0x3F] = 0;
-    input.controllerCommand(-1, NULL);
+    INPUT_ControllerCommand(-1, NULL);
 }
 
 void update_pif_read(void)
@@ -477,7 +478,7 @@ void update_pif_read(void)
                 {
                     if (Controls[channel].Present &&
                             Controls[channel].RawData)
-                        input.readController(channel, &PIF_RAMb[i]);
+                        INPUT_ReadController(channel, &PIF_RAMb[i]);
                     else
                         internal_ReadController(channel, &PIF_RAMb[i]);
                 }
@@ -489,6 +490,6 @@ void update_pif_read(void)
         }
         i++;
     }
-    input.readController(-1, NULL);
+    INPUT_ReadController(-1, NULL);
 }
 

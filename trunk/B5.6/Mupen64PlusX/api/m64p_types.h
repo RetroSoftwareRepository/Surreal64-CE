@@ -39,7 +39,7 @@
 
 /* DLL handles and function declaration specifiers */
 #define IMPORT
-#define EXPORT 
+#define EXPORT extern
 #define CALL 
 typedef void * m64p_dynlib_handle;
 
@@ -74,9 +74,9 @@ typedef enum {
   M64ERR_NOT_INIT,        /* Function is disallowed before InitMupen64Plus() is called */
   M64ERR_ALREADY_INIT,    /* InitMupen64Plus() was called twice */
   M64ERR_INCOMPATIBLE,    /* API versions between components are incompatible */
-  M64ERR_INPUT_ASSERT,    /* Invalid parameters for function call, such as ParamValue=NULL for GetCoreParameter() */
-  M64ERR_INPUT_INVALID,   /* Invalid input data, such as ParamValue="maybe" for SetCoreParameter() to set a BOOL-type value */
-  M64ERR_INPUT_NOT_FOUND, /* The input parameter(s) specified a particular item which was not found */
+  M64ERRINPUT_ASSERT,    /* Invalid parameters for function call, such as ParamValue=NULL for GetCoreParameter() */
+  M64ERRINPUT_INVALID,   /* Invalid input data, such as ParamValue="maybe" for SetCoreParameter() to set a BOOL-type value */
+  M64ERRINPUT_NOT_FOUND, /* The input parameter(s) specified a particular item which was not found */
   M64ERR_NO_MEMORY,       /* Memory allocation failed */
   M64ERR_FILES,           /* Error opening, creating, reading, or writing to a file */
   M64ERR_INTERNAL,        /* Internal error (bug) */
@@ -120,8 +120,8 @@ typedef enum {
 
 typedef enum {
   M64CORE_EMU_STATE = 1,
-  M64CORE_VIDEO_SIZE,
-  M64CORE_INPUT_GAMESHARK,
+  M64COREVIDEO_SIZE,
+  M64COREINPUT_GAMESHARK,
   M64CORE_STATE_LOADCOMPLETE,
   M64CORE_STATE_SAVECOMPLETE
 } m64p_core_param;

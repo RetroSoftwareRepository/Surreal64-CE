@@ -19,6 +19,10 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.          *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+//#include <math.h>
+#include <xtl.h>
+#include <stdio.h>
+#include <float.h>
 #include <math.h>
 
 #include "r4300.h"

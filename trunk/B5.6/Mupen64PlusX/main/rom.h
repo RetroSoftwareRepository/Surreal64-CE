@@ -35,6 +35,7 @@ extern unsigned char* rom;
 extern int rom_size;
 
 extern unsigned char isGoldeneyeRom;
+//extern char	g_temporaryRomPath[260];
 
 typedef struct _rom_params
 {
@@ -84,7 +85,7 @@ enum
     EEPROM_16KB,
     SRAM,
     FLASH_RAM,
-    CONTROLLER_PACK,
+    INPUT_PACK,
     NONE
 };
 

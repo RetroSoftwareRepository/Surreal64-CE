@@ -1,8 +1,7 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *   Mupen64plus - main.h                                                  *
+ *   Mupen64plus-rsp-hle - cicx105.h                                       *
  *   Mupen64Plus homepage: http://code.google.com/p/mupen64plus/           *
- *   Copyright (C) 2012 CasualJames                                        *
- *   Copyright (C) 2002 Blight                                             *
+ *   Copyright (C) 2002 Hacktarux                                          *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,41 +19,10 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.          *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-#ifndef __MAIN_H__
-#define __MAIN_H__
+#ifndef CICX105_H
+#define CICX105_H
 
-#include "../api/m64p_types.h"
+void cicx105_ucode(void);
 
-/* globals */
-extern m64p_handle g_CoreConfig;
-
-extern int g_MemHasBeenBSwapped;
-extern int g_EmulatorRunning;
-
-extern m64p_frame_callback g_FrameCallback;
-
-void new_frame(void);
-
-int  main_set_core_defaults(void);
-void main_message(m64p_msg_level level, unsigned int osd_corner, const char *format, ...);
-
-m64p_error main_run(void);
-void main_stop(void);
-void main_toggle_pause(void);
-void main_advance_one(void);
-
-m64p_error main_core_state_query(m64p_core_param param, int *rval);
-m64p_error main_core_state_set(m64p_core_param param, int val);
-
-m64p_error main_read_screen(void *pixels, int bFront);
-
-m64p_error main_reset(int do_hard_reset);
-
-
-#define INVALID_FILE_ATTRIBUTES ((DWORD)-1)
-extern BOOL PathFileExists(const char *pszPath);
-extern void DisplayError       ( char * Message, ... );
-extern char g_szPathSaves[256];
-
-#endif /* __MAIN_H__ */
+#endif
 

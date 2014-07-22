@@ -1186,13 +1186,7 @@ input:    FrameBufferInfo pinfo[6]
 output:   Values are return in the FrameBufferInfo structure
 		  Plugin can return up to 6 frame buffer info
 /************************************************************************/
-typedef struct
-{
-	uint32	addr;
-	uint32	size;
-	uint32	width;
-	uint32	height;
-} FrameBufferInfo;
+
 //__declspec(dllexport) void CALL FBGetFrameBufferInfo(void *p)
 FUNC_TYPE(void) NAME_DEFINE(FBGetFrameBufferInfo)(void *p)
 {

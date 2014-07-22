@@ -97,6 +97,14 @@ typedef struct
 	uint32 size;				// 1 = uint8, 2 = uint16, 4=uint32
 } FrameBufferModifyEntry;
 
+typedef struct
+{
+	unsigned int	addr;
+	unsigned int	size;
+	unsigned int	width;
+	unsigned int	height;
+} FrameBufferInfo;
+
 #ifdef _XBOX
 #define NAME_DEFINE(name) _VIDEO_##name
 #define FUNC_TYPE(type) type
@@ -293,7 +301,7 @@ FUNC_TYPE(void) NAME_DEFINE(ViWidthChanged) (void);
 			size		1 = uint8, 2 = uint16, 4 = uint32
   output:   none
 *******************************************************************/ 
-FUNC_TYPE(void) NAME_DEFINE(FBWrite)(uint32, uint32);
+FUNC_TYPE(void) _fastcall NAME_DEFINE(FBWrite)(uint32, uint32);
 
 /******************************************************************
   Function: FrameBufferWriteList
@@ -303,7 +311,7 @@ FUNC_TYPE(void) NAME_DEFINE(FBWrite)(uint32, uint32);
 			size = size of the plist, max = 1024
   output:   none
 *******************************************************************/ 
-FUNC_TYPE(void) NAME_DEFINE(FBWList)(FrameBufferModifyEntry *plist, uint32 size);
+FUNC_TYPE(void) _fastcall NAME_DEFINE(FBWList)(FrameBufferModifyEntry *plist, uint32 size);
 
 /******************************************************************
   Function: FrameBufferRead
@@ -320,7 +328,7 @@ FUNC_TYPE(void) NAME_DEFINE(FBWList)(FrameBufferModifyEntry *plist, uint32 size)
 			size		1 = uint8, 2 = uint16, 4 = uint32
   output:   none
 *******************************************************************/ 
-FUNC_TYPE(void) NAME_DEFINE(FBRead)(uint32 addr);
+FUNC_TYPE(void) _fastcall NAME_DEFINE(FBRead)(uint32 addr);
 
 
 
@@ -345,7 +353,7 @@ pinfo is pointed to a FrameBufferInfo structure which to be
 filled in by this function
 output:   Values are return in the FrameBufferInfo structure
 /************************************************************************/
-FUNC_TYPE(void) NAME_DEFINE(FBGetFrameBufferInfo)(void *pinfo);
+FUNC_TYPE(void) _fastcall NAME_DEFINE(FBGetFrameBufferInfo)(void *pinfo);
 
 
 /******************************************************************

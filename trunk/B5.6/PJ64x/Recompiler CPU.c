@@ -217,7 +217,7 @@ BYTE * Compiler4300iBlock(void) {
 	BlockInfo.ExitInfo = NULL;
 	BlockInfo.ExitCount = 0;
 
-	//ShowCompMem = 0;
+	ShowCompMem = 0;
 	if (ShowCompMem) {
 		char StatusString[256];		
 		DWORD Size, MB, KB;
@@ -2860,7 +2860,7 @@ void StartRecompilerCPU (void ) {
 	DWORD Addr;
 	BYTE * Block;
 		
-//	CoInitialize(NULL);
+	//CoInitialize(NULL);
 #ifdef Log_x86Code
 	Start_x86_Log();
 #endif

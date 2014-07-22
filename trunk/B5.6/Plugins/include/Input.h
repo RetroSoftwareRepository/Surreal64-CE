@@ -64,6 +64,11 @@ typedef union {
 	};
 } BUTTONS;
 
+typedef struct {
+    CONTROL *Controls;      /* A pointer to an array of 4 controllers .. eg:
+                               CONTROL Controls[4]; */
+} CONTROL_INFO;
+
 /******************************************************************
   Function: _INPUT_CloseDLL
   Purpose:  This function is called when the emulator is closing

@@ -113,7 +113,7 @@ EXPORT m64p_error CALL CoreDoCommand(m64p_command Command, int ParamInt, void *P
             if (g_EmulatorRunning || l_ROMOpen)
                 return M64ERR_INVALID_STATE;
             if (ParamPtr == NULL || ParamInt < 4096)
-                return M64ERR_INPUT_ASSERT;
+                return M64ERRINPUT_ASSERT;
             rval = open_rom((const unsigned char *) ParamPtr, ParamInt);
             if (rval == M64ERR_SUCCESS)
             {
@@ -129,7 +129,7 @@ EXPORT m64p_error CALL CoreDoCommand(m64p_command Command, int ParamInt, void *P
             if (!l_ROMOpen)
                 return M64ERR_INVALID_STATE;
             if (ParamPtr == NULL)
-                return M64ERR_INPUT_ASSERT;
+                return M64ERRINPUT_ASSERT;
             if (sizeof(m64p_rom_header) < ParamInt)
                 ParamInt = sizeof(m64p_rom_header);
             memcpy(ParamPtr, &ROM_HEADER, ParamInt);
@@ -145,7 +145,7 @@ EXPORT m64p_error CALL CoreDoCommand(m64p_command Command, int ParamInt, void *P
             if (!l_ROMOpen)
                 return M64ERR_INVALID_STATE;
             if (ParamPtr == NULL)
-                return M64ERR_INPUT_ASSERT;
+                return M64ERRINPUT_ASSERT;
             if (sizeof(m64p_rom_settings) < ParamInt)
                 ParamInt = sizeof(m64p_rom_settings);
             memcpy(ParamPtr, &ROM_SETTINGS, ParamInt);
@@ -171,11 +171,11 @@ EXPORT m64p_error CALL CoreDoCommand(m64p_command Command, int ParamInt, void *P
             return main_core_state_set(M64CORE_EMU_STATE, M64EMU_RUNNING);
         case M64CMD_CORE_STATE_QUERY:
             if (ParamPtr == NULL)
-                return M64ERR_INPUT_ASSERT;
+                return M64ERRINPUT_ASSERT;
             return main_core_state_query((m64p_core_param) ParamInt, (int *) ParamPtr);
         case M64CMD_CORE_STATE_SET:
             if (ParamPtr == NULL)
-                return M64ERR_INPUT_ASSERT;
+                return M64ERRINPUT_ASSERT;
             return main_core_state_set((m64p_core_param) ParamInt, *((int *)ParamPtr));
         case M64CMD_SET_FRAME_CALLBACK:
             g_FrameCallback = (m64p_frame_callback) ParamPtr;
@@ -184,15 +184,15 @@ EXPORT m64p_error CALL CoreDoCommand(m64p_command Command, int ParamInt, void *P
             if (!g_EmulatorRunning)
                 return M64ERR_INVALID_STATE;
             if (ParamPtr == NULL)
-                return M64ERR_INPUT_ASSERT;
+                return M64ERRINPUT_ASSERT;
             if (ParamInt < 0 || ParamInt > 1)
-                return M64ERR_INPUT_INVALID;
+                return M64ERRINPUT_INVALID;
             return main_read_screen(ParamPtr, ParamInt);
         case M64CMD_RESET:
             if (!g_EmulatorRunning)
                 return M64ERR_INVALID_STATE;
             if (ParamInt < 0 || ParamInt > 1)
-                return M64ERR_INPUT_INVALID;
+                return M64ERRINPUT_INVALID;
             return main_reset(ParamInt);
         case M64CMD_ADVANCE_FRAME:
             if (!g_EmulatorRunning)
@@ -200,7 +200,7 @@ EXPORT m64p_error CALL CoreDoCommand(m64p_command Command, int ParamInt, void *P
             main_advance_one();
             return M64ERR_SUCCESS;
         default:
-            return M64ERR_INPUT_INVALID;
+            return M64ERRINPUT_INVALID;
     }
 
     return M64ERR_INTERNAL;
@@ -214,14 +214,14 @@ EXPORT m64p_error CALL CoreGetRomSettings(m64p_rom_settings *RomSettings, int Ro
     if (!l_CoreInit)
         return M64ERR_NOT_INIT;
     if (RomSettings == NULL)
-        return M64ERR_INPUT_ASSERT;
+        return M64ERRINPUT_ASSERT;
     if (RomSettingsLength < sizeof(m64p_rom_settings))
-        return M64ERR_INPUT_INVALID;
+        return M64ERRINPUT_INVALID;
 
     /* Look up this ROM in the .ini file and fill in goodname, etc */
     entry = ini_search_by_crc(Crc1, Crc2);
     if (entry == NULL)
-        return M64ERR_INPUT_NOT_FOUND;
+        return M64ERRINPUT_NOT_FOUND;
 
     strncpy(RomSettings->goodname, entry->goodname, 255);
     RomSettings->goodname[255] = '\0';

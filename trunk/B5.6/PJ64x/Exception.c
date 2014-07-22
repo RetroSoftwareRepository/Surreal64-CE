@@ -170,7 +170,7 @@ void _fastcall DoTLBMiss ( BOOL DelaySlot, DWORD BadVaddr ) {
 	}
 }
 
-void DoSysCallException ( BOOL DelaySlot) {
+void _fastcall DoSysCallException ( BOOL DelaySlot) {
 #ifndef EXTERNAL_RELEASE
 	if (( STATUS_REGISTER & STATUS_EXL  ) != 0 ) { 
 		DisplayError("EXL set in SysCall Exception");

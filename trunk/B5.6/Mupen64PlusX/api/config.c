@@ -599,7 +599,7 @@ EXPORT m64p_error CALL ConfigListSections(void *context, void (*SectionListCallb
     if (!l_ConfigInit)
         return M64ERR_NOT_INIT;
     if (SectionListCallback == NULL)
-        return M64ERR_INPUT_ASSERT;
+        return M64ERRINPUT_ASSERT;
 
     /* just walk through the section list, making a callback for each section name */
     curr_section = l_ConfigListActive;
@@ -620,7 +620,7 @@ EXPORT m64p_error CALL ConfigOpenSection(const char *SectionName, m64p_handle *C
     if (!l_ConfigInit)
         return M64ERR_NOT_INIT;
     if (SectionName == NULL || ConfigSectionHandle == NULL)
-        return M64ERR_INPUT_ASSERT;
+        return M64ERRINPUT_ASSERT;
 
     /* walk through the section list, looking for a case-insensitive name match */
     curr_section = find_alpha_section_link(&l_ConfigListActive, SectionName);
@@ -651,11 +651,11 @@ EXPORT m64p_error CALL ConfigListParameters(m64p_handle ConfigSectionHandle, voi
     if (!l_ConfigInit)
         return M64ERR_NOT_INIT;
     if (ConfigSectionHandle == NULL || ParameterListCallback == NULL)
-        return M64ERR_INPUT_ASSERT;
+        return M64ERRINPUT_ASSERT;
 
     section = (config_section *) ConfigSectionHandle;
     if (section->magic != SECTION_MAGIC)
-        return M64ERR_INPUT_INVALID;
+        return M64ERRINPUT_INVALID;
 
     /* walk through this section's parameter list, making a callback for each parameter */
     curr_var = section->first_var;
@@ -789,12 +789,12 @@ EXPORT m64p_error CALL ConfigDeleteSection(const char *SectionName)
     if (!l_ConfigInit)
         return M64ERR_NOT_INIT;
     if (l_ConfigListActive == NULL)
-        return M64ERR_INPUT_NOT_FOUND;
+        return M64ERRINPUT_NOT_FOUND;
 
     /* find the named section and pull it out of the list */
     curr_section_link = find_section_link(&l_ConfigListActive, SectionName);
     if (*curr_section_link == NULL)
-        return M64ERR_INPUT_NOT_FOUND;
+        return M64ERRINPUT_NOT_FOUND;
 
     next_section = (*curr_section_link)->next;
 
@@ -827,12 +827,12 @@ EXPORT m64p_error CALL ConfigSaveSection(const char *SectionName)
     if (!l_ConfigInit)
         return M64ERR_NOT_INIT;
     if (SectionName == NULL || strlen(SectionName) < 1)
-        return M64ERR_INPUT_ASSERT;
+        return M64ERRINPUT_ASSERT;
 
     /* walk through the Active section list, looking for a case-insensitive name match */
     curr_section = find_section(l_ConfigListActive, SectionName);
     if (curr_section == NULL)
-        return M64ERR_INPUT_NOT_FOUND;
+        return M64ERRINPUT_NOT_FOUND;
 
     /* duplicate this section */
     new_section = section_deepcopy(curr_section);
@@ -867,20 +867,20 @@ EXPORT m64p_error CALL ConfigRevertChanges(const char *SectionName)
     if (!l_ConfigInit)
         return M64ERR_NOT_INIT;
     if (SectionName == NULL)
-        return M64ERR_INPUT_ASSERT;
+        return M64ERRINPUT_ASSERT;
 
     /* walk through the Active section list, looking for a case-insensitive name match with input string */
     active_section_link = find_section_link(&l_ConfigListActive, SectionName);
     active_section = *active_section_link;
     if (active_section == NULL)
-        return M64ERR_INPUT_NOT_FOUND;
+        return M64ERRINPUT_NOT_FOUND;
 
     /* walk through the Saved section list, looking for a case-insensitive name match */
     saved_section = find_section(l_ConfigListSaved, SectionName);
     if (saved_section == NULL)
     {
         /* if this section isn't present in saved list, then it has been newly created */
-        return M64ERR_INPUT_NOT_FOUND;
+        return M64ERRINPUT_NOT_FOUND;
     }
 
     /* copy the section as it is on the disk */
@@ -912,11 +912,11 @@ EXPORT m64p_error CALL ConfigSetParameter(m64p_handle ConfigSectionHandle, const
     if (!l_ConfigInit)
         return M64ERR_NOT_INIT;
     if (ConfigSectionHandle == NULL || ParamName == NULL || ParamValue == NULL || (int) ParamType < 1 || (int) ParamType > 4)
-        return M64ERR_INPUT_ASSERT;
+        return M64ERRINPUT_ASSERT;
 
     section = (config_section *) ConfigSectionHandle;
     if (section->magic != SECTION_MAGIC)
-        return M64ERR_INPUT_INVALID;
+        return M64ERRINPUT_INVALID;
 
     /* if this parameter doesn't already exist, then create it and add it to the section */
     var = find_section_var(section, ParamName);
@@ -973,39 +973,39 @@ EXPORT m64p_error CALL ConfigGetParameter(m64p_handle ConfigSectionHandle, const
     if (!l_ConfigInit)
         return M64ERR_NOT_INIT;
     if (ConfigSectionHandle == NULL || ParamName == NULL || ParamValue == NULL || (int) ParamType < 1 || (int) ParamType > 4)
-        return M64ERR_INPUT_ASSERT;
+        return M64ERRINPUT_ASSERT;
 
     section = (config_section *) ConfigSectionHandle;
     if (section->magic != SECTION_MAGIC)
-        return M64ERR_INPUT_INVALID;
+        return M64ERRINPUT_INVALID;
 
     /* if this parameter doesn't already exist, return an error */
     var = find_section_var(section, ParamName);
     if (var == NULL)
-        return M64ERR_INPUT_NOT_FOUND;
+        return M64ERRINPUT_NOT_FOUND;
 
     /* call the specific Get function to translate the parameter to the desired type */
     switch(ParamType)
     {
         case M64TYPE_INT:
-            if (MaxSize < sizeof(int)) return M64ERR_INPUT_INVALID;
+            if (MaxSize < sizeof(int)) return M64ERRINPUT_INVALID;
             if (var->type != M64TYPE_INT && var->type != M64TYPE_FLOAT) return M64ERR_WRONG_TYPE;
             *((int *) ParamValue) = ConfigGetParamInt(ConfigSectionHandle, ParamName);
             break;
         case M64TYPE_FLOAT:
-            if (MaxSize < sizeof(float)) return M64ERR_INPUT_INVALID;
+            if (MaxSize < sizeof(float)) return M64ERRINPUT_INVALID;
             if (var->type != M64TYPE_INT && var->type != M64TYPE_FLOAT) return M64ERR_WRONG_TYPE;
             *((float *) ParamValue) = ConfigGetParamFloat(ConfigSectionHandle, ParamName);
             break;
         case M64TYPE_BOOL:
-            if (MaxSize < sizeof(int)) return M64ERR_INPUT_INVALID;
+            if (MaxSize < sizeof(int)) return M64ERRINPUT_INVALID;
             if (var->type != M64TYPE_BOOL && var->type != M64TYPE_INT) return M64ERR_WRONG_TYPE;
             *((int *) ParamValue) = ConfigGetParamBool(ConfigSectionHandle, ParamName);
             break;
         case M64TYPE_STRING:
         {
             const char *string;
-            if (MaxSize < 1) return M64ERR_INPUT_INVALID;
+            if (MaxSize < 1) return M64ERRINPUT_INVALID;
             if (var->type != M64TYPE_STRING && var->type != M64TYPE_BOOL) return M64ERR_WRONG_TYPE;
             string = ConfigGetParamString(ConfigSectionHandle, ParamName);
             strncpy((char *) ParamValue, string, MaxSize);
@@ -1029,16 +1029,16 @@ EXPORT m64p_error CALL ConfigGetParameterType(m64p_handle ConfigSectionHandle, c
     if (!l_ConfigInit)
         return M64ERR_NOT_INIT;
     if (ConfigSectionHandle == NULL || ParamName == NULL || ParamType == NULL)
-        return M64ERR_INPUT_ASSERT;
+        return M64ERRINPUT_ASSERT;
 
     section = (config_section *) ConfigSectionHandle;
     if (section->magic != SECTION_MAGIC)
-        return M64ERR_INPUT_INVALID;
+        return M64ERRINPUT_INVALID;
 
     /* if this parameter doesn't already exist, return an error */
     var = find_section_var(section, ParamName);
     if (var == NULL)
-        return M64ERR_INPUT_NOT_FOUND;
+        return M64ERRINPUT_NOT_FOUND;
 
     *ParamType = var->type;
     return M64ERR_SUCCESS;
@@ -1079,11 +1079,11 @@ EXPORT m64p_error CALL ConfigSetDefaultInt(m64p_handle ConfigSectionHandle, cons
     if (!l_ConfigInit)
         return M64ERR_NOT_INIT;
     if (ConfigSectionHandle == NULL || ParamName == NULL)
-        return M64ERR_INPUT_ASSERT;
+        return M64ERRINPUT_ASSERT;
 
     section = (config_section *) ConfigSectionHandle;
     if (section->magic != SECTION_MAGIC)
-        return M64ERR_INPUT_INVALID;
+        return M64ERRINPUT_INVALID;
 
     /* if this parameter already exists, then just return successfully */
     var = find_section_var(section, ParamName);
@@ -1110,11 +1110,11 @@ EXPORT m64p_error CALL ConfigSetDefaultFloat(m64p_handle ConfigSectionHandle, co
     if (!l_ConfigInit)
         return M64ERR_NOT_INIT;
     if (ConfigSectionHandle == NULL || ParamName == NULL)
-        return M64ERR_INPUT_ASSERT;
+        return M64ERRINPUT_ASSERT;
 
     section = (config_section *) ConfigSectionHandle;
     if (section->magic != SECTION_MAGIC)
-        return M64ERR_INPUT_INVALID;
+        return M64ERRINPUT_INVALID;
 
     /* if this parameter already exists, then just return successfully */
     var = find_section_var(section, ParamName);
@@ -1141,11 +1141,11 @@ EXPORT m64p_error CALL ConfigSetDefaultBool(m64p_handle ConfigSectionHandle, con
     if (!l_ConfigInit)
         return M64ERR_NOT_INIT;
     if (ConfigSectionHandle == NULL || ParamName == NULL)
-        return M64ERR_INPUT_ASSERT;
+        return M64ERRINPUT_ASSERT;
 
     section = (config_section *) ConfigSectionHandle;
     if (section->magic != SECTION_MAGIC)
-        return M64ERR_INPUT_INVALID;
+        return M64ERRINPUT_INVALID;
 
     /* if this parameter already exists, then just return successfully */
     var = find_section_var(section, ParamName);
@@ -1172,11 +1172,11 @@ EXPORT m64p_error CALL ConfigSetDefaultString(m64p_handle ConfigSectionHandle, c
     if (!l_ConfigInit)
         return M64ERR_NOT_INIT;
     if (ConfigSectionHandle == NULL || ParamName == NULL || ParamValue == NULL)
-        return M64ERR_INPUT_ASSERT;
+        return M64ERRINPUT_ASSERT;
 
     section = (config_section *) ConfigSectionHandle;
     if (section->magic != SECTION_MAGIC)
-        return M64ERR_INPUT_INVALID;
+        return M64ERRINPUT_INVALID;
 
     /* if this parameter already exists, then just return successfully */
     var = find_section_var(section, ParamName);
