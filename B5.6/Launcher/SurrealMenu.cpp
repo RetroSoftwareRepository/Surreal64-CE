@@ -260,6 +260,7 @@ string GetAudioPluginName(int p_iAudioPlugin)
 		case _AudioPluginJttl : szAudioPlugin = "JttL"; break;
 		case _AudioPluginAzimer : szAudioPlugin = "Azimer"; break;
 		case _AudioPluginMusyX : szAudioPlugin = "MusyX"; break;
+		case _AudioPluginMusyX : szAudioPlugin = "M64Plus"; break;
 		//case _AudioPluginMissing : 
 		default : szAudioPlugin = "JttL"; break;//freakdave - set JttL plugin as default
 	}	
@@ -293,6 +294,7 @@ string GetEmulatorName(int p_iEmulator)
 	switch (p_iEmulator) {
 		case _1964 : szEmulator = "1964"; break;
 		case _Project64 : szEmulator = "Project64"; break;
+		case _Mupen64Plus : szEmulator = "Mupen64Plus"; break;
 		case _UltraHLE : szEmulator = "UltraHLE"; break;
 		case _None : 
 		default : szEmulator = "Unknown"; break;
@@ -1184,6 +1186,7 @@ extern void Launch();
 //int m_emulator; // Ez0n3 - why was this used at all?
 void Launch1964();
 void PJ64Launch();
+void M64PLaunch();
 void UltraHLELaunch();
 void launch510();
 void launch531();
@@ -1282,7 +1285,8 @@ void LaunchMenu(void)
 	XLMenu_SetTitle(m_pMainMenu,L"Launch Menu",dwMenuTitleColor);
 
 	XLMenu_AddItem(m_pMainMenu,MITEM_ROUTINE,L"Launch with 1964",Launch1964);
-	XLMenu_AddItem(m_pMainMenu,MITEM_ROUTINE,L"Launch with PJ64",PJ64Launch);
+	XLMenu_AddItem(m_pMainMenu,MITEM_ROUTINE,L"Launch with Project64",PJ64Launch);
+	XLMenu_AddItem(m_pMainMenu,MITEM_ROUTINE,L"Launch with Mupen64Plus",M64PLaunch);
 	XLMenu_AddItem(m_pMainMenu,MITEM_ROUTINE,L"Launch with UltraHLE",UltraHLELaunch);
 
 
@@ -1337,6 +1341,14 @@ void PJ64Launch(void)
 {
 	//m_emulator = _Project64;
 	preferedemu = _Project64;
+	ConfigAppSave2();
+	selectvideomode();
+}
+
+void M64PLaunch(void)
+{
+	//m_emulator = _Project64;
+	preferedemu = _Mupen64Plus;
 	ConfigAppSave2();
 	selectvideomode();
 }

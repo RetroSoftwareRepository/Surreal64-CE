@@ -46,7 +46,7 @@
 #define X86_RECOMP_VERBOSE
 #define BUILD_BRANCHLABELS_VERBOSE
 
-DWORD CompilePC, JumpTableSize, BlockID = 0;
+DWORD CompilePC, JumpTableSize=0x800, BlockID = 0;
 DWORD dwBuffer = MainBuffer;
 BOOL ChangedPC;
 

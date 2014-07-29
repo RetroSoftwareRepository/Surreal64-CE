@@ -24,10 +24,8 @@
 
 #if defined(USE_MUSYX)
 #include <AudioMusyX.h>
-#elif defined(USE_M64PAUDIO)
-#include <AudioM64Plus.h>
 #else
-
+#include <AudioM64Plus.h>
 #include <AudioJttL.h>
 #include <AudioBasic.h>
 #include <AudioNone.h>
