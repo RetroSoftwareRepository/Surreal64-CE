@@ -183,7 +183,7 @@ void Build_RSP ( void ) {
 
 DWORD RunInterpreterCPU(DWORD Cycles);
 DWORD RunRecompilerCPU ( DWORD Cycles );
-
+#define MI_INTR_SP				0x01		/* Bit 0: SP intr */
 DWORD _RSP_DoRspCycles ( DWORD Cycles ) {
 	extern BOOL AudioHle, GraphicsHle;
 	DWORD TaskType = *(DWORD*)(RSPInfo.DMEM + 0xFC0);

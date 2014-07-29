@@ -22,6 +22,7 @@
  *   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.          *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+#include <xtl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -36,11 +37,13 @@
 #include <speex/speex_resampler.h>
 #endif
 
-#define M64P_PLUGIN_PROTOTYPES 1
-#include "m64p_types.h"
-#include "m64p_plugin.h"
-#include "m64p_common.h"
-#include "m64p_config.h"
+//#define M64P_PLUGIN_PROTOTYPES 1
+//#include "m64p_types.h"
+//#include "m64p_plugin.h"
+//#include "m64p_common.h"
+//#include "m64p_config.h"
+#include "Audio.h"
+#include "mytypes.h"
 
 #include "main.h"
 #include "volume.h"
@@ -83,7 +86,7 @@ static void (*l_DebugCallback)(void *, int, const char *) = NULL;
 static void *l_DebugCallContext = NULL;
 static int l_PluginInit = 0;
 static int l_PausedForSync = 1; /* Audio is started in paused state after SDL initialization */
-static m64p_handle l_ConfigAudio;
+//static m64p_handle l_ConfigAudio;
 
 enum resampler_type {
 	RESAMPLER_TRIVIAL,
@@ -96,7 +99,7 @@ enum resampler_type {
 };
 
 /* Read header for type definition */
-static AUDIO_INFO AudioInfo;
+AUDIO_INFO AudioInfo;
 /* The hardware specifications we are using */
 static SDL_AudioSpec *hardware_spec;
 /* Pointer to the primary audio buffer */
@@ -147,6 +150,7 @@ static void InitializeSDL(void);
 static int critical_failure = 0;
 
 /* definitions of pointers to Core config functions */
+/*
 ptr_ConfigOpenSection      ConfigOpenSection = NULL;
 ptr_ConfigDeleteSection    ConfigDeleteSection = NULL;
 ptr_ConfigSaveSection      ConfigSaveSection = NULL;
@@ -161,10 +165,11 @@ ptr_ConfigGetParamInt      ConfigGetParamInt = NULL;
 ptr_ConfigGetParamFloat    ConfigGetParamFloat = NULL;
 ptr_ConfigGetParamBool     ConfigGetParamBool = NULL;
 ptr_ConfigGetParamString   ConfigGetParamString = NULL;
-
+*/
 /* Global functions */
 static void DebugMessage(int level, const char *message, ...)
 {
+	/*
   char msgbuf[1024];
   va_list args;
 
@@ -176,7 +181,7 @@ static void DebugMessage(int level, const char *message, ...)
 
   (*l_DebugCallback)(l_DebugCallContext, level, msgbuf);
 
-  va_end(args);
+  va_end(args);*/
 }
 
 /* Mupen64Plus plugin functions */
@@ -228,7 +233,7 @@ EXPORT m64p_error CALL PluginStartup(m64p_dynlib_handle CoreLibHandle, void *Con
     ConfigGetParamFloat = (ptr_ConfigGetParamFloat) osal_dynlib_getproc(CoreLibHandle, "ConfigGetParamFloat");
     ConfigGetParamBool = (ptr_ConfigGetParamBool) osal_dynlib_getproc(CoreLibHandle, "ConfigGetParamBool");
     ConfigGetParamString = (ptr_ConfigGetParamString) osal_dynlib_getproc(CoreLibHandle, "ConfigGetParamString");
-*/
+	*/
 	/*
     if (!ConfigOpenSection || !ConfigDeleteSection || !ConfigSetParameter || !ConfigGetParameter ||
         !ConfigSetDefaultInt || !ConfigSetDefaultFloat || !ConfigSetDefaultBool || !ConfigSetDefaultString ||
@@ -403,7 +408,7 @@ void _AUDIO_M64P_AiLenChanged( void )
     }
     else
     {
-        DebugMessage(M64MSG_WARNING, "AiLenChanged(): Audio buffer overflow.");
+        //DebugMessage(M64MSG_WARNING, "AiLenChanged(): Audio buffer overflow.");
     }
 
     /* Now we need to handle synchronization, by inserting time delay to keep the emulator running at the correct speed */
@@ -418,12 +423,12 @@ void _AUDIO_M64P_AiLenChanged( void )
         ExpectedLevel += (ExpectedTime - CurrTime) * OutputFreq / 1000;
     /* If the expected value of the Primary Buffer Fullness at the time of the next audio callback is more than 10
        milliseconds ahead of our target buffer fullness level, then insert a delay now */
-    DebugMessage(M64MSG_VERBOSE, "%03i New audio bytes: %i  Time to next callback: %i  Current/Expected buffer level: %i/%i",
-                 CurrTime % 1000, LenReg, (int) (ExpectedTime - CurrTime), CurrLevel, ExpectedLevel);
+    //DebugMessage(M64MSG_VERBOSE, "%03i New audio bytes: %i  Time to next callback: %i  Current/Expected buffer level: %i/%i",
+    //             CurrTime % 1000, LenReg, (int) (ExpectedTime - CurrTime), CurrLevel, ExpectedLevel);
     if (ExpectedLevel >= PrimaryBufferTarget + OutputFreq / 100)
     {
         unsigned int WaitTime = (ExpectedLevel - PrimaryBufferTarget) * 1000 / OutputFreq;
-        DebugMessage(M64MSG_VERBOSE, "    AiLenChanged(): Waiting %ims", WaitTime);
+        //DebugMessage(M64MSG_VERBOSE, "    AiLenChanged(): Waiting %ims", WaitTime);
         if (l_PausedForSync)
             SDL_PauseAudio(0);
         l_PausedForSync = 0;
@@ -433,7 +438,7 @@ void _AUDIO_M64P_AiLenChanged( void )
        (ie, predicting an underflow), then pause the audio to let the emulator catch up to speed */
     else if (ExpectedLevel < SecondaryBufferSize)
     {
-        DebugMessage(M64MSG_VERBOSE, "    AiLenChanged(): Possible underflow at next audio callback; pausing playback");
+        //DebugMessage(M64MSG_VERBOSE, "    AiLenChanged(): Possible underflow at next audio callback; pausing playback");
         if (!l_PausedForSync)
             SDL_PauseAudio(1);
         l_PausedForSync = 1;
@@ -607,16 +612,16 @@ static void my_audio_callback(void *userdata, unsigned char *stream, int len)
         }
         memmove(primaryBuffer, &primaryBuffer[input_used], buffer_pos - input_used);
         buffer_pos -= input_used;
-        DebugMessage(M64MSG_VERBOSE, "%03i my_audio_callback: used %i samples",
-                     last_callback_ticks % 1000, len / SDL_SAMPLE_BYTES);
+        //DebugMessage(M64MSG_VERBOSE, "%03i my_audio_callback: used %i samples",
+        //             last_callback_ticks % 1000, len / SDL_SAMPLE_BYTES);
     }
     else
     {
         unsigned int SamplesNeeded = (len * oldsamplerate) / (newsamplerate * SDL_SAMPLE_BYTES);
         unsigned int SamplesPresent = buffer_pos / N64_SAMPLE_BYTES;
         underrun_count++;
-        DebugMessage(M64MSG_VERBOSE, "%03i Buffer underflow (%i).  %i samples present, %i needed",
-                     last_callback_ticks % 1000, underrun_count, SamplesPresent, SamplesNeeded);
+        //DebugMessage(M64MSG_VERBOSE, "%03i Buffer underflow (%i).  %i samples present, %i needed",
+        //             last_callback_ticks % 1000, underrun_count, SamplesPresent, SamplesNeeded);
         memset(stream , 0, len);
     }
 }
@@ -632,11 +637,11 @@ int _AUDIO_M64P_RomOpen(void)
 
 static void InitializeSDL(void)
 {
-    DebugMessage(M64MSG_INFO, "Initializing SDL audio subsystem...");
+    //DebugMessage(M64MSG_INFO, "Initializing SDL audio subsystem...");
 
     if(SDL_Init(SDL_INIT_AUDIO | SDL_INIT_TIMER) < 0)
     {
-        DebugMessage(M64MSG_ERROR, "Failed to initialize SDL audio subsystem; forcing exit.\n");
+        //DebugMessage(M64MSG_ERROR, "Failed to initialize SDL audio subsystem; forcing exit.\n");
         critical_failure = 1;
         return;
     }
@@ -650,7 +655,7 @@ static void CreatePrimaryBuffer(void)
                                                    (OutputFreq * 100)) * N64_SAMPLE_BYTES;
     if (primaryBuffer == NULL)
     {
-        DebugMessage(M64MSG_VERBOSE, "Allocating memory for audio buffer: %i bytes.", newPrimaryBytes);
+        //DebugMessage(M64MSG_VERBOSE, "Allocating memory for audio buffer: %i bytes.", newPrimaryBytes);
         primaryBuffer = (unsigned char*) malloc(newPrimaryBytes);
         memset(primaryBuffer, 0, newPrimaryBytes);
         primaryBufferBytes = newPrimaryBytes;
@@ -675,16 +680,16 @@ static void InitializeAudio(int freq)
     
     if(SDL_WasInit(SDL_INIT_AUDIO|SDL_INIT_TIMER) == (SDL_INIT_AUDIO|SDL_INIT_TIMER) ) 
     {
-        DebugMessage(M64MSG_VERBOSE, "InitializeAudio(): SDL Audio sub-system already initialized.");
+        //DebugMessage(M64MSG_VERBOSE, "InitializeAudio(): SDL Audio sub-system already initialized.");
         SDL_PauseAudio(1);
         SDL_CloseAudio();
     }
     else 
     {
-        DebugMessage(M64MSG_VERBOSE, "InitializeAudio(): Initializing SDL Audio");
-        DebugMessage(M64MSG_VERBOSE, "Primary buffer: %i output samples.", PrimaryBufferSize);
-        DebugMessage(M64MSG_VERBOSE, "Primary target fullness: %i output samples.", PrimaryBufferTarget);
-        DebugMessage(M64MSG_VERBOSE, "Secondary buffer: %i output samples.", SecondaryBufferSize);
+        //DebugMessage(M64MSG_VERBOSE, "InitializeAudio(): Initializing SDL Audio");
+        //DebugMessage(M64MSG_VERBOSE, "Primary buffer: %i output samples.", PrimaryBufferSize);
+        //DebugMessage(M64MSG_VERBOSE, "Primary target fullness: %i output samples.", PrimaryBufferTarget);
+        //DebugMessage(M64MSG_VERBOSE, "Secondary buffer: %i output samples.", SecondaryBufferSize);
         InitializeSDL();
     }
     if (critical_failure == 1)
@@ -702,16 +707,16 @@ static void InitializeAudio(int freq)
     
     desired->freq = OutputFreq;
     
-    DebugMessage(M64MSG_VERBOSE, "Requesting frequency: %iHz.", desired->freq);
+    //DebugMessage(M64MSG_VERBOSE, "Requesting frequency: %iHz.", desired->freq);
     /* 16-bit signed audio */
     desired->format=AUDIO_S16SYS;
-    DebugMessage(M64MSG_VERBOSE, "Requesting format: %i.", desired->format);
+    //DebugMessage(M64MSG_VERBOSE, "Requesting format: %i.", desired->format);
     /* Stereo */
     desired->channels=2;
     /* reload these because they gets re-assigned from SDL data below, and InitializeAudio can be called more than once */
-    PrimaryBufferSize = ConfigGetParamInt(l_ConfigAudio, "PRIMARY_BUFFER_SIZE");
-    PrimaryBufferTarget = ConfigGetParamInt(l_ConfigAudio, "PRIMARY_BUFFER_TARGET");
-    SecondaryBufferSize = ConfigGetParamInt(l_ConfigAudio, "SECONDARY_BUFFER_SIZE");
+    PrimaryBufferSize = PRIMARY_BUFFER_SIZE;
+    PrimaryBufferTarget = PRIMARY_BUFFER_TARGET;
+    SecondaryBufferSize = SECONDARY_BUFFER_SIZE;
     desired->samples = SecondaryBufferSize;
     /* Our callback function */
     desired->callback = my_audio_callback;
@@ -721,17 +726,17 @@ static void InitializeAudio(int freq)
     l_PausedForSync = 1;
     if (SDL_OpenAudio(desired, obtained) < 0)
     {
-        DebugMessage(M64MSG_ERROR, "Couldn't open audio: %s", SDL_GetError());
+        //DebugMessage(M64MSG_ERROR, "Couldn't open audio: %s", SDL_GetError());
         critical_failure = 1;
         return;
     }
     if (desired->format != obtained->format)
     {
-        DebugMessage(M64MSG_WARNING, "Obtained audio format differs from requested.");
+        //DebugMessage(M64MSG_WARNING, "Obtained audio format differs from requested.");
     }
     if (desired->freq != obtained->freq)
     {
-        DebugMessage(M64MSG_WARNING, "Obtained frequency differs from requested.");
+        //DebugMessage(M64MSG_WARNING, "Obtained frequency differs from requested.");
     }
 
     /* desired spec is no longer needed */
@@ -756,12 +761,12 @@ static void InitializeAudio(int freq)
     if (last_callback_ticks == 0)
         last_callback_ticks = SDL_GetTicks();
 
-    DebugMessage(M64MSG_VERBOSE, "Frequency: %i", hardware_spec->freq);
-    DebugMessage(M64MSG_VERBOSE, "Format: %i", hardware_spec->format);
-    DebugMessage(M64MSG_VERBOSE, "Channels: %i", hardware_spec->channels);
-    DebugMessage(M64MSG_VERBOSE, "Silence: %i", hardware_spec->silence);
-    DebugMessage(M64MSG_VERBOSE, "Samples: %i", hardware_spec->samples);
-    DebugMessage(M64MSG_VERBOSE, "Size: %i", hardware_spec->size);
+    //DebugMessage(M64MSG_VERBOSE, "Frequency: %i", hardware_spec->freq);
+    //DebugMessage(M64MSG_VERBOSE, "Format: %i", hardware_spec->format);
+    //DebugMessage(M64MSG_VERBOSE, "Channels: %i", hardware_spec->channels);
+    //DebugMessage(M64MSG_VERBOSE, "Silence: %i", hardware_spec->silence);
+    //DebugMessage(M64MSG_VERBOSE, "Samples: %i", hardware_spec->samples);
+    //DebugMessage(M64MSG_VERBOSE, "Size: %i", hardware_spec->size);
 
     /* set playback volume */
 #if defined(HAS_OSS_SUPPORT)
@@ -782,7 +787,7 @@ void _AUDIO_M64P_RomClosed( void )
         return;
    if (critical_failure == 1)
        return;
-    DebugMessage(M64MSG_VERBOSE, "Cleaning up SDL sound plugin...");
+    //DebugMessage(M64MSG_VERBOSE, "Cleaning up SDL sound plugin...");
     
     // Shut down SDL Audio output
     SDL_PauseAudio(1);
@@ -829,19 +834,19 @@ static void ReadConfig(void)
     const char *resampler_id;
 
     /* read the configuration values into our static variables */
-    GameFreq = ConfigGetParamInt(l_ConfigAudio, "DEFAULT_FREQUENCY");
-    SwapChannels = ConfigGetParamBool(l_ConfigAudio, "SWAP_CHANNELS");
-    PrimaryBufferSize = ConfigGetParamInt(l_ConfigAudio, "PRIMARY_BUFFER_SIZE");
-    PrimaryBufferTarget = ConfigGetParamInt(l_ConfigAudio, "PRIMARY_BUFFER_TARGET");
-    SecondaryBufferSize = ConfigGetParamInt(l_ConfigAudio, "SECONDARY_BUFFER_SIZE");
-    resampler_id = ConfigGetParamString(l_ConfigAudio, "RESAMPLE");
-    VolumeControlType = ConfigGetParamInt(l_ConfigAudio, "VOLUME_CONTROL_TYPE");
-    VolDelta = ConfigGetParamInt(l_ConfigAudio, "VOLUME_ADJUST");
-    VolPercent = ConfigGetParamInt(l_ConfigAudio, "VOLUME_DEFAULT");
+    GameFreq = DEFAULT_FREQUENCY;
+    SwapChannels = 0;
+    PrimaryBufferSize = PRIMARY_BUFFER_SIZE;
+    PrimaryBufferTarget = PRIMARY_BUFFER_TARGET;
+    SecondaryBufferSize = SECONDARY_BUFFER_SIZE;
+    resampler_id = "RESAMPLE";
+    VolumeControlType = VOLUME_TYPE_SDL;
+    VolDelta = 5;
+    VolPercent = 100;
 
     if (!resampler_id) {
         Resample = RESAMPLER_TRIVIAL;
-	DebugMessage(M64MSG_WARNING, "Could not find RESAMPLE configuration; use trivial resampler");
+	//DebugMessage(M64MSG_WARNING, "Could not find RESAMPLE configuration; use trivial resampler");
 	return;
     }
     if (strcmp(resampler_id, "trivial") == 0) {
@@ -871,7 +876,7 @@ static void ReadConfig(void)
                 return;
             }
         }
-        DebugMessage(M64MSG_WARNING, "Unknown RESAMPLE configuration %s; use speex-fixed-4 resampler", resampler_id);
+        //DebugMessage(M64MSG_WARNING, "Unknown RESAMPLE configuration %s; use speex-fixed-4 resampler", resampler_id);
         ResampleQuality = 4;
         return;
     }
@@ -899,12 +904,12 @@ static void ReadConfig(void)
             ResampleQuality = SRC_LINEAR;
             return;
         }
-        DebugMessage(M64MSG_WARNING, "Unknown RESAMPLE configuration %s; use src-sinc-medium-quality resampler", resampler_id);
+        //DebugMessage(M64MSG_WARNING, "Unknown RESAMPLE configuration %s; use src-sinc-medium-quality resampler", resampler_id);
         ResampleQuality = SRC_SINC_MEDIUM_QUALITY;
         return;
     }
 #endif
-    DebugMessage(M64MSG_WARNING, "Unknown RESAMPLE configuration %s; use trivial resampler", resampler_id);
+    //DebugMessage(M64MSG_WARNING, "Unknown RESAMPLE configuration %s; use trivial resampler", resampler_id);
     Resample = RESAMPLER_TRIVIAL;
 }
 
@@ -940,6 +945,24 @@ static void VolumeCommit(void)
     }
 }
 
+void _AUDIO_M64P_VolumeSetLevel(int level)
+{
+    if (!l_PluginInit)
+        return;
+
+    //if muted, unmute first
+    VolIsMuted = 0;
+
+    // adjust volume 
+    VolPercent = level;
+    if (VolPercent < 0)
+        VolPercent = 0;
+    else if (VolPercent > 100)
+        VolPercent = 100;
+
+    VolumeCommit();
+}
+
 void _AUDIO_M64P_VolumeMute(void)
 {
     if (!l_PluginInit)
@@ -959,7 +982,7 @@ void _AUDIO_M64P_VolumeUp(void)
     if (!l_PluginInit)
         return;
 
-    VolumeSetLevel(VolumeGetUnmutedLevel() + VolDelta);
+    _AUDIO_M64P_VolumeSetLevel(VolumeGetUnmutedLevel() + VolDelta);
 }
 
 void _AUDIO_M64P_VolumeDown(void)
@@ -967,7 +990,7 @@ void _AUDIO_M64P_VolumeDown(void)
     if (!l_PluginInit)
         return;
 
-    VolumeSetLevel(VolumeGetUnmutedLevel() - VolDelta);
+    _AUDIO_M64P_VolumeSetLevel(VolumeGetUnmutedLevel() - VolDelta);
 }
 
 int _AUDIO_M64P_VolumeGetLevel(void)
@@ -975,23 +998,7 @@ int _AUDIO_M64P_VolumeGetLevel(void)
     return VolIsMuted ? 0 : VolumeGetUnmutedLevel();
 }
 
-void _AUDIO_M64P_VolumeSetLevel(int level)
-{
-    if (!l_PluginInit)
-        return;
 
-    //if muted, unmute first
-    VolIsMuted = 0;
-
-    // adjust volume 
-    VolPercent = level;
-    if (VolPercent < 0)
-        VolPercent = 0;
-    else if (VolPercent > 100)
-        VolPercent = 100;
-
-    VolumeCommit();
-}
 
 const char * _AUDIO_M64P_VolumeGetString(void)
 {

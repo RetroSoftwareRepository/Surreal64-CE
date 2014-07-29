@@ -148,6 +148,7 @@ int DisplayRSPCommand (DWORD location, int InsertPos) {
 	}
 	return LinesUsed;
 	*/
+	return 1;
 }
 
 void DumpRSPCode (void) {

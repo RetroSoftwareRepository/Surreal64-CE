@@ -302,6 +302,7 @@ void Launch()
 			case _1964: 		sprintf(szEmulator, "1964"); break;
 			case _Project64: 	sprintf(szEmulator, "PJ64"); break;
 			//case _UltraHLE: 	sprintf(szEmulator, "UltraHLE"); break;
+			case _Mupen64Plus:	sprintf(szEmulator, "M64P"); break;
 			default:
 				sprintf(szEmulator, "1964"); break;
 		}

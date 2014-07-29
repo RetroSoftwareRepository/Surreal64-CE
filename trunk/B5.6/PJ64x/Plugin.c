@@ -70,7 +70,8 @@ extern void _AUDIO_MUSYX_AiUpdate			(BOOL Wait);
 extern BOOL _AUDIO_MUSYX_InitiateAudio		(AUDIO_INFO Audio_Info);
 extern void _AUDIO_MUSYX_ProcessAList		(void);
 extern void _AUDIO_MUSYX_AudioBoost			(BOOL Boost);
-#elif defined(USE_M64PAUDIO)
+#else
+
 // mupen 1.5 audio
 extern void _AUDIO_M64P_CloseDLL			(void);
 extern void _AUDIO_M64P_RomClosed			(void);
@@ -83,7 +84,6 @@ extern void _AUDIO_M64P_AiUpdate			(BOOL Wait);
 extern BOOL _AUDIO_M64P_InitiateAudio		(AUDIO_INFO Audio_Info);
 extern void _AUDIO_M64P_ProcessAList		(void);
 extern void _AUDIO_M64P_AudioBoost			(BOOL Boost);
-#else
 
 //freakdave - JttL
 extern void _AUDIO_JTTL_CloseDLL			(void);
@@ -705,13 +705,13 @@ void SetupPlugins (HWND hWnd) {
 		// going to use rsp audio plugin here instead of the use lle rsp bool
 		if (g_bUseRspAudio) // g_bUseLLERspPlugin // g_iAudioPlugin != _AudioPluginLleRsp
 		{
-			RspInfo10.ProcessAlist = NULL;
-			RspInfo11.ProcessAlist = NULL;
+			RspInfo10.ProcessAlist = ProcessAList;
+			RspInfo11.ProcessAlist = ProcessAList;
 		}
 		else
 		{
-			RspInfo10.ProcessAlist = ProcessAList;
-			RspInfo11.ProcessAlist = ProcessAList;
+			RspInfo10.ProcessAlist = NULL;
+			RspInfo11.ProcessAlist = NULL;
 		}
 
 		RspInfo10.ProcessRdpList = ProcessRDPList;

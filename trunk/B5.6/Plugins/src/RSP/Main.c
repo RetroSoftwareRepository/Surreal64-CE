@@ -40,7 +40,7 @@ void ClearAllx86Code(void);
 //void ProcessMenuItem(int ID);
 //BOOL CALLBACK CompilerDlgProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-BOOL GraphicsHle = TRUE, AudioHle, ConditionalMove;
+BOOL GraphicsHle = TRUE, AudioHle=0, ConditionalMove;
 /*BOOL DebuggingEnabled = FALSE, 
 	Profiling, 
 	IndvidualBlock, 
@@ -71,7 +71,7 @@ enum {
 	Set_JumpTableSize
 };
 
-short Set_AudioHle = 0, Set_GraphicsHle = 0;
+/*short Set_AudioHle = 0, Set_GraphicsHle = 0;*/
 
 /************ DLL info **************/
 /*
@@ -145,6 +145,7 @@ DWORD AsciiToHex (char * HexValue) {
 *******************************************************************/ 
 void _RSP_CloseDLL (void) 
 {
+	if (!AudioHle)
 		FreeMemory();
 }
 
@@ -157,7 +158,7 @@ void _RSP_CloseDLL (void)
   output:   none
 *******************************************************************/ 
 void _RSP_GetDllInfo ( PLUGIN_INFO * PluginInfo ) {
-	PluginInfo->Version = 0x0102;
+	PluginInfo->Version = 0x0101;
 	PluginInfo->Type = PLUGIN_TYPE_RSP;
 	/*
 #ifdef _DEBUG
@@ -260,11 +261,13 @@ void DetectCpuSpecs(void) {
 
 void _RSP_InitiateRSP ( RSP_INFO Rsp_Info, DWORD * CycleCount) {
 	RSPInfo = Rsp_Info;
-	AudioHle = 0;
-	GraphicsHle = 1;
+	if (RSPInfo.ProcessAList != NULL)
+		AudioHle = 1;
+	//GraphicsHle = 1;
 	
 	*CycleCount = 0;
-	AllocateMemory();
+	if (!AudioHle)
+		AllocateMemory();
 	InitilizeRSPRegisters();
 	Build_RSP();
 	#ifdef GenerateLog
@@ -435,17 +438,18 @@ void ProcessMenuItem(int ID) {
   input:    none
   output:   none
 *******************************************************************/ 
-void _RSP_RomOpen (void) 
+/*void _RSP_RomOpen (void) 
 {
 	ClearAllx86Code();
-	/*
+	
 	if (DebuggingEnabled)
 	{
 		EnableDebugging(true);
 	}
-	*/
+	
 	JumpTableSize = 0x800; 
 }
+*/
 
 /******************************************************************
   Function: RomClosed
@@ -454,7 +458,8 @@ void _RSP_RomOpen (void)
   output:   none
 *******************************************************************/ 
 void  _RSP_RomClosed (void) {
-	ClearAllx86Code();
+	if (!AudioHle)
+		ClearAllx86Code();
 
 #ifdef GenerateLog
 	Stop_Log();

@@ -40,14 +40,15 @@ enum AudioPlugins
 	_AudioPluginJttl,
 	_AudioPluginAzimer,
 	_AudioPluginMusyX,
+	_AudioPluginM64P,
 	_AudioPluginMissing
 };
 
-enum AudioPluginsTest
+/*enum AudioPluginsTest
 {
 	_AudioPluginM64p = 99 // mupen 1.5 audio
 };
-
+*/
 //RSP Plugins
 enum RSPPlugins 
 {

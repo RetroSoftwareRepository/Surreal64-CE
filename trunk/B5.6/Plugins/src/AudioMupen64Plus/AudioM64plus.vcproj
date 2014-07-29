@@ -258,19 +258,19 @@
 			Name="Headers"
 			Filter="">
 			<File
-				RelativePath=".\m64p_common.h">
+				RelativePath=".\Audio.h">
 			</File>
 			<File
-				RelativePath=".\m64p_config.h">
-			</File>
-			<File
-				RelativePath=".\m64p_plugin.h">
-			</File>
-			<File
-				RelativePath=".\m64p_types.h">
+				RelativePath=".\Common.h">
 			</File>
 			<File
 				RelativePath=".\main.h">
+			</File>
+			<File
+				RelativePath=".\mytypes.h">
+			</File>
+			<File
+				RelativePath=".\simpleini.h">
 			</File>
 			<File
 				RelativePath=".\volume.h">

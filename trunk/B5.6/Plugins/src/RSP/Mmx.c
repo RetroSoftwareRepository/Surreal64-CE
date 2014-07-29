@@ -30,7 +30,7 @@
 #include "x86.h"
 #include "RSPmemory.h"
 #include "RSP registers.h"
-#include "log.h"
+//#include "log.h"
 
 #define PUTDST8(dest,value)  (*((BYTE *)(dest))=(BYTE)(value)); dest += 1;
 #define PUTDST16(dest,value) (*((WORD *)(dest))=(WORD)(value)); dest += 2;
