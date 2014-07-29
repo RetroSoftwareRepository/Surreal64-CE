@@ -260,7 +260,7 @@ string GetAudioPluginName(int p_iAudioPlugin)
 		case _AudioPluginJttl : szAudioPlugin = "JttL"; break;
 		case _AudioPluginAzimer : szAudioPlugin = "Azimer"; break;
 		case _AudioPluginMusyX : szAudioPlugin = "MusyX"; break;
-		case _AudioPluginMusyX : szAudioPlugin = "M64Plus"; break;
+		case _AudioPluginM64P : szAudioPlugin = "M64Plus"; break;
 		//case _AudioPluginMissing : 
 		default : szAudioPlugin = "JttL"; break;//freakdave - set JttL plugin as default
 	}	
@@ -311,7 +311,8 @@ string GetRspPluginName(int p_iRspPlugin)
 		case _RSPPluginNone :
 		case _RSPPluginMissing : szRSPPlugin = "None"; break;
 		case _RSPPluginLLE : szRSPPlugin = "Low Level"; break;
-		case _RSPPluginM64p : szRSPPlugin = "M64Plus HLE"; break;
+		case _RSPPluginM64P : szRSPPlugin = "M64Plus HLE"; break;
+		case _RSPPluginCXD4 : szRSPPlugin = "CXD4 LLE"; break;
 		case _RSPPluginHLE : 
 		default : szRSPPlugin = "High Level"; break; // set hle as default
 	}	

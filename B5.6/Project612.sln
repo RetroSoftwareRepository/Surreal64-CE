@@ -98,6 +98,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AudioM64plus", "Plugins\src
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RSP-CXD4", "Plugins\src\RSPCXD4\RSPCXD4.vcproj", "{BBDE61F2-D298-4B51-BA24-98831EA6B16E}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfiguration) = preSolution
 		Debug = Debug
@@ -257,6 +261,16 @@ Global
 		{DAE1DCB6-1992-4939-B13B-A59451415CC2}.Release.Build.0 = Release|Xbox
 		{DAE1DCB6-1992-4939-B13B-A59451415CC2}.Release_LTCG.ActiveCfg = Release_LTCG|Xbox
 		{DAE1DCB6-1992-4939-B13B-A59451415CC2}.Release_LTCG.Build.0 = Release_LTCG|Xbox
+		{BBDE61F2-D298-4B51-BA24-98831EA6B16E}.Debug.ActiveCfg = Debug|Xbox
+		{BBDE61F2-D298-4B51-BA24-98831EA6B16E}.Debug.Build.0 = Debug|Xbox
+		{BBDE61F2-D298-4B51-BA24-98831EA6B16E}.Profile.ActiveCfg = Profile|Xbox
+		{BBDE61F2-D298-4B51-BA24-98831EA6B16E}.Profile.Build.0 = Profile|Xbox
+		{BBDE61F2-D298-4B51-BA24-98831EA6B16E}.Profile_FastCap.ActiveCfg = Profile_FastCap|Xbox
+		{BBDE61F2-D298-4B51-BA24-98831EA6B16E}.Profile_FastCap.Build.0 = Profile_FastCap|Xbox
+		{BBDE61F2-D298-4B51-BA24-98831EA6B16E}.Release.ActiveCfg = Release|Xbox
+		{BBDE61F2-D298-4B51-BA24-98831EA6B16E}.Release.Build.0 = Release|Xbox
+		{BBDE61F2-D298-4B51-BA24-98831EA6B16E}.Release_LTCG.ActiveCfg = Release_LTCG|Xbox
+		{BBDE61F2-D298-4B51-BA24-98831EA6B16E}.Release_LTCG.Build.0 = Release_LTCG|Xbox
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection

@@ -55,7 +55,8 @@ enum RSPPlugins
 	_RSPPluginNone,
 	_RSPPluginLLE,
 	_RSPPluginHLE,
-	_RSPPluginM64p,
+	_RSPPluginM64P,
+	_RSPPluginCXD4,
 	_RSPPluginMissing
 };
 
