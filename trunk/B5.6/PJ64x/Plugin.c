@@ -174,6 +174,13 @@ extern void _RSP_M64p_DllConfig				(HWND hWnd);
 extern DWORD _RSP_M64p_DoRspCycles			(DWORD Cycles);
 extern void _RSP_M64p_InitiateRSP			( RSP_INFO_1_1 Rsp_Info, DWORD * CycleCount);
 
+extern void _RSP_CXD4_GetDllInfo			( PLUGIN_INFO * PluginInfo );
+extern void _RSP_CXD4_RomClosed				(void);
+extern void _RSP_CXD4_CloseDLL				(void);
+extern void _RSP_CXD4_DllConfig				(HWND hWnd);
+extern DWORD _RSP_CXD4_DoRspCycles			(DWORD Cycles);
+extern void _RSP_CXD4_InitiateRSP			( RSP_INFO_1_1 Rsp_Info, DWORD * CycleCount);
+
 DWORD (*_RSP_LINK_DoRspCycles)				(DWORD)						= NULL;
 void (*_RSP_LINK_CloseDLL)					(void)						= NULL;
 void (*_RSP_LINK_RomClosed)					(void)						= NULL;
@@ -539,6 +546,17 @@ BOOL LoadRSPDll(void) {
 		_RSP_LINK_GetDllInfo		= _RSP_M64p_GetDllInfo;
 		//_RSP_LINK_InitiateRSP_1_0	= _RSP_M64p_InitiateRSP;
 		_RSP_LINK_InitiateRSP_1_1	= _RSP_M64p_InitiateRSP;
+	}
+	else if(g_iRspPlugin == _RSPPluginCXD4)
+	{
+		_RSP_LINK_DoRspCycles 		= _RSP_CXD4_DoRspCycles;
+		_RSP_LINK_CloseDLL	 		= _RSP_CXD4_CloseDLL;
+		_RSP_LINK_RomClosed	 		= _RSP_CXD4_RomClosed;
+		_RSP_LINK_DllConfig		 	= _RSP_CXD4_DllConfig;
+		//_RSP_LINK_DllAbout		 	= NULL;
+		_RSP_LINK_GetDllInfo		= _RSP_CXD4_GetDllInfo;
+		//_RSP_LINK_InitiateRSP_1_0	= _RSP_CXD4_InitiateRSP;
+		_RSP_LINK_InitiateRSP_1_1	= _RSP_CXD4_InitiateRSP;
 	}
 
 	

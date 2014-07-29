@@ -68,6 +68,13 @@ BOOL LoadRSPPlugin(){
 		_RSP_LINK_InitiateRSP	=	_RSP_M64p_InitiateRSP;
 		_RSP_LINK_RomClosed		=	_RSP_M64p_RomClosed;
 	}
+	else if(g_iRspPlugin == _RSPPluginCXD4)
+	{
+		_RSP_LINK_CloseDLL		=	_RSP_CXD4_CloseDLL;
+		_RSP_LINK_DoRspCycles	=	_RSP_CXD4_DoRspCycles;
+		_RSP_LINK_InitiateRSP	=	_RSP_CXD4_InitiateRSP;
+		_RSP_LINK_RomClosed		=	_RSP_CXD4_RomClosed;
+	}
 
 	return TRUE;
 }

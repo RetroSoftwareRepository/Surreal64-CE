@@ -1124,7 +1124,9 @@ bool RspDoesAlist(int p_iRspPlugin)
 			break;
 		case _RSPPluginHLE: 	bRspAlist = false;
 			break;
-		case _RSPPluginM64p: 	bRspAlist = true;
+		case _RSPPluginM64P: 	bRspAlist = true;
+			break;
+		case _RSPPluginCXD4: 	bRspAlist = true;
 			break;
 	}
 	
