@@ -345,7 +345,8 @@ EX:
                         *(int32_t *)(RSP.DMEM + addr) = SR[rt];
                     CONTINUE
                 case 062: /* LWC2 */
-                    offset = (int)(SE(inst, 6));
+                    //offset = SE((int)inst, 6);
+					offset = (-(inst & (1 << 6)) | (inst & ~(~0 << 6)));
                     switch (rd)
                     {
                         case 000: /* LBV */
@@ -387,7 +388,8 @@ EX:
                     }
                     CONTINUE
                 case 072: /* SWC2 */
-                    offset = SE(inst, 6);
+                    //offset = SE((int)inst, 6);
+					offset = (-(inst & (1 << 6)) | (inst & ~(~0 << 6)));
                     switch (rd)
                     {
                         case 000: /* SBV */

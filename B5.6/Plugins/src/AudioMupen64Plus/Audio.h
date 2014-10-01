@@ -29,13 +29,13 @@ typedef struct
 	BYTE * RDRAM;
 	BYTE * DMEM;
 	BYTE * IMEM;
-	DWORD * MI_INTR_REG;
-	DWORD * AI_DRAM_ADDR_REG;
-	DWORD * AI_LEN_REG;
-	DWORD * AI_CONTROL_REG;
-	DWORD * AI_STATUS_REG;
-	DWORD * AI_DACRATE_REG;
-	DWORD * AI_BITRATE_REG;
+	DWORD * MI_INTR_RG;
+	DWORD * AI_DRAM_ADDR_RG;
+	DWORD * AI_LEN_RG;
+	DWORD * AI_CONTROL_RG;
+	DWORD * AI_STATUS_RG;
+	DWORD * AI_DACRATE_RG;
+	DWORD * AI_BITRATE_RG;
 	void (*CheckInterrupts)( void );
 } AUDIO_INFO;
 /* Note: BOOL, BYTE, WORD, DWORD, TRUE, FALSE are defined in windows.h */
@@ -162,5 +162,5 @@ typedef struct
 #if defined(__cplusplus)
 }
 #endif
-extern AUDIO_INFO AudioInfo;
+extern AUDIO_INFO AudioInfo2;
 

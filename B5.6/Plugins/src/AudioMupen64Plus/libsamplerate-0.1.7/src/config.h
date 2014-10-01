@@ -120,7 +120,7 @@
 /* #undef HAVE_SIGNAL */
 
 /* Set to 1 if you have libsndfile. */
-//#define HAVE_SNDFILE 1
+#define HAVE_SNDFILE 1
 
 /* Define to 1 if you have the <stdint.h> header file. */
 /* #undef HAVE_STDINT_H */

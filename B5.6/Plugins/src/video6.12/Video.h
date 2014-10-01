@@ -32,7 +32,7 @@ typedef struct {
 	
 	BOOL	bDisplayFullscreen;
 	int		uFullScreenRefreshRate;
-
+	int		uScreenScaleMode;
 	float	fMultX, fMultY;
 	int		vpLeftW, vpTopW, vpRightW, vpBottomW, vpWidthW, vpHeightW;
 
@@ -111,7 +111,6 @@ typedef struct {
 	CurScissorType  curScissor;
 
 	PrimitiveType primitiveType;
-
 	uint32	lastPurgeTimeTime;		// Time textures were last purged
 
 	bool	UseLargerTile[2];		// This is a speed up for large tile loading,
@@ -164,7 +163,7 @@ extern void XBOX_Debugger_Log(const char *Message, ...);
 
 
 // Ez0n3 - reinstate max video mem until freakdave finishes this
-void	_VIDEO_SetMaxTextureMem(DWORD mem);
+void	_VIDEO_RICE_612_SetMaxTextureMem(DWORD mem);
 
 
 #endif

@@ -61,7 +61,7 @@ BOOL LoadRSPPlugin(){
 		_RSP_LINK_InitiateRSP	=	_RSP_HLE_InitiateRSP;
 		_RSP_LINK_RomClosed		=	_RSP_HLE_RomClosed;
 	}
-	else if(g_iRspPlugin == _RSPPluginM64p)
+	else if(g_iRspPlugin == _RSPPluginM64P)
 	{
 		_RSP_LINK_CloseDLL		=	_RSP_M64p_CloseDLL;
 		_RSP_LINK_DoRspCycles	=	_RSP_M64p_DoRspCycles;

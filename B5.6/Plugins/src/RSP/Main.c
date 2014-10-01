@@ -268,7 +268,7 @@ void _RSP_InitiateRSP ( RSP_INFO Rsp_Info, DWORD * CycleCount) {
 	*CycleCount = 0;
 	if (!AudioHle)
 		AllocateMemory();
-	InitilizeRSPRegisters();
+	//InitilizeRSPRegisters();
 	Build_RSP();
 	#ifdef GenerateLog
 	Start_Log();

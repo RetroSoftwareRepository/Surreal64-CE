@@ -41,7 +41,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				AdditionalDependencies="libSDLx_Audiod.lib LibSampleRateD.lib"
+				AdditionalDependencies="libSDLx_Audiod.lib LibSampleRate.lib"
 				OutputFile="../../lib/AudioM64Plus.lib"
 				AdditionalLibraryDirectories="..\Common\SDL\lib;libsamplerate-0.1.7\src\lib"/>
 			<Tool
@@ -240,7 +240,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				AdditionalDependencies="libSDLx_Audiol.lib LibSampleRateL.lib"
+				AdditionalDependencies="libSDLx_Audiol.lib LibSampleRate.lib"
 				OutputFile="../../lib/AudioM64Plus.lib"
 				AdditionalLibraryDirectories="..\Common\SDL\lib;libsamplerate-0.1.7\src\lib"/>
 			<Tool

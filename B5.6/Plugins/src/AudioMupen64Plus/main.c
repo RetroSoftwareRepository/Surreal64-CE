@@ -99,7 +99,7 @@ enum resampler_type {
 };
 
 /* Read header for type definition */
-AUDIO_INFO AudioInfo;
+AUDIO_INFO AudioInfo2;
 /* The hardware specifications we are using */
 static SDL_AudioSpec *hardware_spec;
 /* Pointer to the primary audio buffer */
@@ -349,13 +349,13 @@ void _AUDIO_M64P_AiDacrateChanged( int SystemType )
     switch (SystemType)
     {
         case SYSTEM_NTSC:
-            f = 48681812 / (*AudioInfo.AI_DACRATE_REG + 1);
+            f = 48681812 / (*AudioInfo2.AI_DACRATE_RG + 1);
             break;
         case SYSTEM_PAL:
-            f = 49656530 / (*AudioInfo.AI_DACRATE_REG + 1);
+            f = 49656530 / (*AudioInfo2.AI_DACRATE_RG + 1);
             break;
         case SYSTEM_MPAL:
-            f = 48628316 / (*AudioInfo.AI_DACRATE_REG + 1);
+            f = 48628316 / (*AudioInfo2.AI_DACRATE_RG + 1);
             break;
     }
     InitializeAudio(f);
@@ -373,8 +373,8 @@ void _AUDIO_M64P_AiLenChanged( void )
     if (!l_PluginInit)
         return;
 
-    LenReg = *AudioInfo.AI_LEN_REG;
-    p = AudioInfo.RDRAM + (*AudioInfo.AI_DRAM_ADDR_REG & 0xFFFFFF);
+    LenReg = *AudioInfo2.AI_LEN_RG;
+    p = AudioInfo2.RDRAM + (*AudioInfo2.AI_DRAM_ADDR_RG & 0xFFFFFF);
 
     if (buffer_pos + LenReg < primaryBufferBytes)
     {
@@ -457,7 +457,7 @@ int _AUDIO_M64P_InitiateAudio( AUDIO_INFO Audio_Info )
     if (!l_PluginInit)
         return 0;
 
-    AudioInfo = Audio_Info;
+    AudioInfo2 = Audio_Info;
     return 1;
 }
 
@@ -817,6 +817,7 @@ void _AUDIO_M64P_RomClosed( void )
 
 void _AUDIO_M64P_ProcessAList(void)
 {
+	//Rsp_Info.ProcessAList();
 }
 
 void _AUDIO_M64P_SetSpeedFactor(int percentage)

@@ -938,11 +938,11 @@ DWORD RunRecompilerCPU ( DWORD Cycles ) {
 		}		
 		/*if (Profiling && IndvidualBlock) {
 			StopTimer();
-		}*/
+		}
 		if (NextInstruction == SINGLE_STEP)
 		{
 			RSP_Running = FALSE;
-		}
+		}*/
 	}
 
 	if (IsMmxEnabled == TRUE) {

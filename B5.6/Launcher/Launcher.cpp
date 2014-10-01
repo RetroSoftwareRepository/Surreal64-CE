@@ -1101,6 +1101,8 @@ bool EmuDoesNoRsp(int p_iEmulator)
 	{
 		case _1964: 		bEmuNoRsp = true;
 			break;
+		case _1964x11: 		bEmuNoRsp = true;
+			break;
 		case _Project64: 	bEmuNoRsp = false;
 			break;
 		case _Mupen64Plus: 	bEmuNoRsp = false;

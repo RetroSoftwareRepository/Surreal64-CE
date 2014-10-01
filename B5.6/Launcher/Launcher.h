@@ -38,6 +38,7 @@ enum Emulators
 	_Project64,
 	_UltraHLE,
 	_Mupen64Plus,
+	_1964x11,
 	_None
 };
 

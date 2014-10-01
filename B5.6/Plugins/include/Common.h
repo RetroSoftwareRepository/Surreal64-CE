@@ -3,7 +3,7 @@ Common defines used in every plugin spec,
 version #1.0 maintained by zilmar (zilmar@emulation64.com)
 All questions or suggestions should go through the mailing list.
 http://www.egroups.com/group/Plugin64-Dev
-***********************************************************************************/
+***********************************************************************************/#ifndef _1964_11
 #pragma once
 /* Plugin types */
 #define PLUGIN_TYPE_RSP			1
@@ -50,3 +50,4 @@ typedef struct
 	DWORD * AI_BITRATE_RG;
 	void (*CheckInterrupts)( void );
 } AUDIO_INFO;
+#endif

@@ -31,7 +31,7 @@ extern BOOL VIDEO_InitiateGFX(GFX_INFO);
 extern void VIDEO_ProcessDList(void);
 extern void VIDEO_RomOpen(void);
 extern void VIDEO_RomClosed(void);
-//extern BOOL LoadVideoPlugin(char *libname);
+extern BOOL LoadVideoPlugin(char *libname);
 //extern void CloseVideoPlugin(void);
 extern void VIDEO_DllConfig(HWND);
 extern void VIDEO_About(HWND);
