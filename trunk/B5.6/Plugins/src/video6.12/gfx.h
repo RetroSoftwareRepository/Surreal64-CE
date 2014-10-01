@@ -106,7 +106,7 @@ typedef struct
 } FrameBufferInfo;
 
 #ifdef _XBOX
-#define NAME_DEFINE(name) _VIDEO_##name
+#define NAME_DEFINE(name) _VIDEO_RICE_612_##name
 #define FUNC_TYPE(type) type
 #else
 #define NAME_DEFINE(name)  CALL name

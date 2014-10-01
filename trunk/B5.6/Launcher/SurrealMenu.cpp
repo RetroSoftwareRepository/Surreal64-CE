@@ -293,6 +293,7 @@ string GetEmulatorName(int p_iEmulator)
 
 	switch (p_iEmulator) {
 		case _1964 : szEmulator = "1964"; break;
+		case _1964x11 : szEmulator = "1964x11"; break;
 		case _Project64 : szEmulator = "Project64"; break;
 		case _Mupen64Plus : szEmulator = "Mupen64Plus"; break;
 		case _UltraHLE : szEmulator = "UltraHLE"; break;
@@ -1186,6 +1187,7 @@ void TogglePJ64PagingMem(bool inc)
 extern void Launch();
 //int m_emulator; // Ez0n3 - why was this used at all?
 void Launch1964();
+void Launch1964x11();
 void PJ64Launch();
 void M64PLaunch();
 void UltraHLELaunch();
@@ -1277,7 +1279,7 @@ void LaunchMenu(void)
 	XLMenu_CurMenu = NULL;
 	XLMenu_SetFont(&m_Font);
 
-	m_pMainMenu = XLMenu_Init((float)iLaunchMenuTxtPosX, (float)iLaunchMenuTxtPosY,3, GetMenuFontAlign(iLaunchMenuTxtAlign)|MENU_WRAP, NULL);//210, 160
+	m_pMainMenu = XLMenu_Init((float)iLaunchMenuTxtPosX, (float)iLaunchMenuTxtPosY,5, GetMenuFontAlign(iLaunchMenuTxtAlign)|MENU_WRAP, NULL);//210, 160
 
 	
 	m_pMainMenu->itemcolor = dwMenuItemColor;
@@ -1286,6 +1288,7 @@ void LaunchMenu(void)
 	XLMenu_SetTitle(m_pMainMenu,L"Launch Menu",dwMenuTitleColor);
 
 	XLMenu_AddItem(m_pMainMenu,MITEM_ROUTINE,L"Launch with 1964",Launch1964);
+	XLMenu_AddItem(m_pMainMenu,MITEM_ROUTINE,L"Launch with 1964x11",Launch1964x11);
 	XLMenu_AddItem(m_pMainMenu,MITEM_ROUTINE,L"Launch with Project64",PJ64Launch);
 	XLMenu_AddItem(m_pMainMenu,MITEM_ROUTINE,L"Launch with Mupen64Plus",M64PLaunch);
 	XLMenu_AddItem(m_pMainMenu,MITEM_ROUTINE,L"Launch with UltraHLE",UltraHLELaunch);
@@ -1334,6 +1337,14 @@ void Launch1964(void)
 {
 	//m_emulator = _1964;
 	preferedemu = _1964;
+	ConfigAppSave2();
+	selectvideomode();
+}
+
+void Launch1964x11(void)
+{
+	//m_emulator = _1964;
+	preferedemu = _1964x11;
 	ConfigAppSave2();
 	selectvideomode();
 }

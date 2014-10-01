@@ -35,7 +35,64 @@
 #include "../Plugins.h"
 
 #include <Input.h>
-#include <Video.h>
+typedef struct
+{
+	HWND	hWnd;
+	HWND	hStatusBar;
+	int		MemoryBswaped;
+	_int8	*HEADER;
+	_int8	*RDRAM;
+	_int8	*DMEM;
+	_int8	*IMEM;
+	uint32	*MI_INTR_RG;
+	uint32	*DPC_START_RG;
+	uint32	*DPC_END_RG;
+	uint32	*DPC_CURRENT_RG;
+	uint32	*DPC_STATUS_RG;
+	uint32	*DPC_CLOCK_RG;
+	uint32	*DPC_BUFBUSY_RG;
+	uint32	*DPC_PIPEBUSY_RG;
+	uint32	*DPC_TMEM_RG;
+	uint32	*VI_STATUS_RG;
+	uint32	*VI_ORIGIN_RG;
+	uint32	*VI_WIDTH_RG;
+	uint32	*VI_INTR_RG;
+	uint32	*VI_V_CURRENT_LINE_RG;
+	uint32	*VI_TIMING_RG;
+	uint32	*VI_V_SYNC_RG;
+	uint32	*VI_H_SYNC_RG;
+	uint32	*VI_LEAP_RG;
+	uint32	*VI_H_START_RG;
+	uint32	*VI_V_START_RG;
+	uint32	*VI_V_BURST_RG;
+	uint32	*VI_X_SCALE_RG;
+	uint32	*VI_Y_SCALE_RG;
+	void (*CheckInterrupts) (void);
+}
+GFX_INFO;
+
+typedef struct
+{
+	uint32	addr;
+	uint32	size;
+	uint32	width;
+	uint32	height;
+} FrameBufferInfo;
+
+//#include <Video.h>
+#if defined(_VIDEO_1964_11)
+#include <Video1964.h>
+#elif defined(_VIDEO_RICE_510)
+
+#elif defined(_VIDEO_RICE_531)
+
+#elif defined(_VIDEO_RICE_560)
+#include <VideoRice560.h>
+#elif defined(_VIDEO_RICE_611)
+
+#elif defined(_VIDEO_RICE_612)
+#include <VideoRice612.h>
+#endif
 
 extern GFX_INFO		Gfx_Info;
 extern AUDIO_INFO	Audio_Info;

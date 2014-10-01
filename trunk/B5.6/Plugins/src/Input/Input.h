@@ -63,7 +63,6 @@ typedef union {
 		signed   X_AXIS       : 8;
 	};
 } BUTTONS;
-
 /******************************************************************
   Function: _INPUT_CloseDLL
   Purpose:  This function is called when the emulator is closing

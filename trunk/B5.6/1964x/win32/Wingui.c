@@ -150,7 +150,7 @@ extern int loadiRspPlugin();
 extern int loadiAudioPlugin();
 
 // Ez0n3 - reinstate max video mem
-extern int loaddwMaxVideoMem();
+//extern int loaddwMaxVideoMem();
 
 extern int loadiPagingMethod();
 extern int loadbAudioBoost();
@@ -218,7 +218,7 @@ void __cdecl main()
 
 	
 	// max texture mem, 0 = auto
-	_VIDEO_SetMaxTextureMem(loaddwMaxVideoMem());
+	//_VIDEO_SetMaxTextureMem(loaddwMaxVideoMem());
 	
 	g_bAudioBoost = (loadbAudioBoost() == 1 ? TRUE : FALSE); // set before audio init
 	
@@ -228,6 +228,7 @@ void __cdecl main()
 	g_iRspPlugin = loadiRspPlugin();
 	g_iAudioPlugin = loadiAudioPlugin();
 	
+	LoadVideoPlugin("XBOX");
 	LoadAudioPlugin();
 	LoadRSPPlugin();
 

@@ -1,0 +1,30 @@
+Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "1964x11_Rice560_MusyX", "1964x11_Rice560_MusyX.vcproj", "{33F4B993-02F8-4004-9BC9-D81AF53F4824}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		Debug = Debug
+		Profile = Profile
+		Profile_FastCap = Profile_FastCap
+		Release = Release
+		Release_LTCG = Release_LTCG
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{33F4B993-02F8-4004-9BC9-D81AF53F4824}.Debug.ActiveCfg = Debug|Xbox
+		{33F4B993-02F8-4004-9BC9-D81AF53F4824}.Debug.Build.0 = Debug|Xbox
+		{33F4B993-02F8-4004-9BC9-D81AF53F4824}.Profile.ActiveCfg = Profile|Xbox
+		{33F4B993-02F8-4004-9BC9-D81AF53F4824}.Profile.Build.0 = Profile|Xbox
+		{33F4B993-02F8-4004-9BC9-D81AF53F4824}.Profile_FastCap.ActiveCfg = Profile_FastCap|Xbox
+		{33F4B993-02F8-4004-9BC9-D81AF53F4824}.Profile_FastCap.Build.0 = Profile_FastCap|Xbox
+		{33F4B993-02F8-4004-9BC9-D81AF53F4824}.Release.ActiveCfg = Release|Xbox
+		{33F4B993-02F8-4004-9BC9-D81AF53F4824}.Release.Build.0 = Release|Xbox
+		{33F4B993-02F8-4004-9BC9-D81AF53F4824}.Release_LTCG.ActiveCfg = Release_LTCG|Xbox
+		{33F4B993-02F8-4004-9BC9-D81AF53F4824}.Release_LTCG.Build.0 = Release_LTCG|Xbox
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal

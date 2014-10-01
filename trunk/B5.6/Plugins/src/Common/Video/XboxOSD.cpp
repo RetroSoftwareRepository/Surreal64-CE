@@ -228,7 +228,7 @@ __forceinline void XboxDrawDebugInfo()
 		case _RSPPluginNone:	swprintf(debugrsp,L"RSP Plugin: None");		break;
 		case _RSPPluginLLE:		swprintf(debugrsp,L"RSP Plugin: LLE");		break;
 		case _RSPPluginHLE:		swprintf(debugrsp,L"RSP Plugin: HLE");		break;
-		case _RSPPluginM64p:	swprintf(debugrsp,L"RSP Plugin: Mupen64");	break;
+		case _RSPPluginM64P:	swprintf(debugrsp,L"RSP Plugin: Mupen64");	break;
 	}
 
 	//check Default Paks
