@@ -156,15 +156,16 @@ void FastPIMemoryCopy(void)
 				jz _Label2
 				push ecx //added
 				push edx //added
-				mov ecx, source //mov ecx, dword ptr[ebx]
+				mov ecx, source
+				//mov ecx, dword ptr[ebx]
 				call ReadUWORDFromROM //added
 				pop edx //added
 				pop ecx //added
-				inc ecx // inc eax //1.1 location //etempp
+				//inc ecx // inc eax //1.1 location //etempp
 				mov dword ptr[edx], eax //mov dword ptr[edx], ecx
 				add source, 4 //add ebx, 4
 				add edx, 4
-				//inc ecx //0.85 location
+				inc ecx //0.85 location
 				jmp _Label
 	_Label2 :
 				popad
@@ -210,10 +211,10 @@ void FastPIMemoryCopy(void)
 				and eax, eax
 				jz _Label4
 				mov ecx, dword ptr[ebx]
-				inc eax
 				mov dword ptr[edx], ecx
 				add ebx, 4
 				add edx, 4
+				inc eax
 				jmp _Label3
 	_Label4 :
 				popad

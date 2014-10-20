@@ -92,7 +92,7 @@ void SetDefaultOptions(void)
 	defaultoptions.Use_TLB = USETLB_YES;
 	defaultoptions.Eeprom_size = EEPROMSIZE_4KB;
 	defaultoptions.Use_Register_Caching = USEREGC_YES;
-	defaultoptions.Counter_Factor = COUTERFACTOR_2;
+	defaultoptions.Counter_Factor = COUTERFACTOR_3;
 	defaultoptions.FPU_Hack = USEFPUHACK_YES;
 	defaultoptions.timing_Control = DELAY_DMA;
 	defaultoptions.Link_4KB_Blocks = USE4KBLINKBLOCK_YES;
