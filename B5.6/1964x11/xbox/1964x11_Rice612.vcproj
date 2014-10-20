@@ -234,7 +234,7 @@
 				EnableFiberSafeOptimizations="TRUE"
 				OptimizeForProcessor="2"
 				AdditionalIncludeDirectories="..\..\Plugins\include\;..\..\Common\"
-				PreprocessorDefinitions="NDEBUG;_XBOX;DYNAREC;ENABLE_64BIT_FPU;WIN32;_WIN32;_WINDOWS;EXTERNAL_RELEASE;_VIDEO_RICE_612;_RSP_M64P_HLE;_RSP_SOLO;_AUDIO_AZIMER;_AUDIO_JTTL;_AUDIO_NONE;_1964_11"
+				PreprocessorDefinitions="NDEBUG;_XBOX;DYNAREC;ENABLE_64BIT_FPU;WIN32;_WIN32;_WINDOWS;EXTERNAL_RELEASE;_VIDEO_RICE_612;_RSP_M64P_HLE;_RSP_SOLO;_AUDIO_AZIMER;_AUDIO_JTTL;_AUDIO_NONE;_1964_11;USE_ROM_PAGING"
 				StringPooling="TRUE"
 				RuntimeLibrary="0"
 				StructMemberAlignment="5"
