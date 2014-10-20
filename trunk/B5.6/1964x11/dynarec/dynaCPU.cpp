@@ -3238,14 +3238,14 @@ _Default:
 			uint32	vAddr = (uint32) ((_int32) temp + (_s32) (_s16) __dotI);
 
 			//etemp - this bit is diff in 1.1
-            /*if (xRT->mips_reg != 0)
-            {*/
+            if (xRT->mips_reg != 0)
+            {
                 xRT->IsDirty = 1;
 			    xRT->NoNeedToLoadTheLo = 1;
     			MapRT;
-            /*}
+            }
             else
-                xRT->x86reg = Reg_EDI; //a little trick. rt isn't used when rt is 0.*/
+                xRT->x86reg = Reg_EDI; //a little trick. rt isn't used when rt is 0.
 
 /*------------------------------------------------------------------
 // looks ok
@@ -3309,6 +3309,9 @@ _Default:
 				ADD_ImmToReg(xRT->x86reg, (_s32) (_s16) __dotI, 0);
 				//Lea(Reg_EAX, xRT->x86reg, (_s32) (_s16) __dotI);
 
+// 1964 1.1
+
+
 /*------------------------------------------------------------------
 // looks ok
 ------------------------------------------------------------------*/
@@ -3354,8 +3357,8 @@ _Default:
 
 				if(xRT->mips_reg != 0)
 					MOV_ModRMToReg(xRT->x86reg, ModRM_EAX);
-                /*else
-					XOR_Reg2ToReg1(xRT->x86reg, xRT->x86reg);*/  //etemp - new to 1.1
+                else
+					XOR_Reg2ToReg1(xRT->x86reg, xRT->x86reg);  //etemp - new to 1.1
 
 				SetTarget(2); //oDD
 
@@ -3439,6 +3442,7 @@ _next:
 
 /*------------------------------------------------------------------
 ------------------------------------------------------------------*/
+/*
 				// added by oDD //etemp - should this be after the next?
 				{
 					PUSHAD();
@@ -3468,6 +3472,7 @@ _next:
 					SetTarget(1);
 					POPAD();
 				}
+*/
 				SHR_RegByImm(ExtraRegister, SHIFTER2_READ);
 				WC16(0x14FF);
 				WC8(0x85 | (ExtraRegister << 3));
@@ -3477,10 +3482,10 @@ _next:
 
 				if(__RT != 0)
 					MOV_ModRMToReg(xRT->x86reg, ModRM_EAX);
-                /*else
-					XOR_Reg2ToReg1(xRT->x86reg, xRT->x86reg);*/  //etemp - 1964 1.1
+                else
+					XOR_Reg2ToReg1(xRT->x86reg, xRT->x86reg);  //etemp - 1964 1.1
 
-				SetTarget(2); //oDD
+				//SetTarget(2); //oDD
 
 				//etemp - 1964 1.1	
 				if(ExtraRegister == Reg_EBP)
