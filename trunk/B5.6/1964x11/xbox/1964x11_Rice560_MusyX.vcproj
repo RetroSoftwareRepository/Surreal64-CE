@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.10"
-	Name="1964x11_Rice560_MusyX"
+	Name="1964x11-560M"
 	ProjectGUID="{33F4B993-02F8-4004-9BC9-D81AF53F4824}"
 	RootNamespace="1964x11"
 	Keyword="XboxProj">
@@ -45,7 +45,7 @@
 				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xacteng.lib xboxkrnl.lib xbdm.lib xzlib.lib Input.lib VideoRice560.lib RspPJ64LLE.lib AudioMusyX.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\..\..\Plugins\lib;.\zlib"
+				AdditionalLibraryDirectories="..\..\Plugins\lib;.\zlib"
 				IgnoreAllDefaultLibraries="FALSE"
 				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="TRUE"
@@ -253,10 +253,10 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xacteng.lib xboxkrnl.lib xbdm.lib xzlib.lib Input.lib VideoRice560.lib RspPJ64LLE.lib AudioMusyX.lib"
+				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xacteng.lib xboxkrnl.lib xbdm.lib xzlib.lib Input.lib VideoRice560.lib RSP.lib RSPCXD4.lib RSPHLE.lib RSPM64P.lib AudioMusyX.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\..\..\Plugins\lib;.\zlib"
+				AdditionalLibraryDirectories="..\..\Plugins\lib;.\zlib"
 				IgnoreAllDefaultLibraries="FALSE"
 				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="TRUE"
@@ -323,10 +323,10 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="xapilib.lib d3d8ltcg.lib d3dx8.lib xgraphicsltcg.lib dsound.lib dmusicltcg.lib xactengltcg.lib xboxkrnl.lib xzlib.lib Input.lib VideoRice560.lib RspPJ64LLE.lib AudioMusyX.lib"
+				AdditionalDependencies="xapilib.lib d3d8ltcg.lib d3dx8.lib xgraphicsltcg.lib dsound.lib dmusicltcg.lib xactengltcg.lib xboxkrnl.lib xzlib.lib Input.lib VideoRice560.lib RSP.lib RSPCXD4.lib RSPHLE.lib RSPM64P.lib AudioMusyX.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\..\..\Plugins\lib;.\zlib"
+				AdditionalLibraryDirectories="..\..\Plugins\lib;.\zlib"
 				IgnoreAllDefaultLibraries="FALSE"
 				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="TRUE"
@@ -433,10 +433,10 @@
 					RelativePath="..\_memory.h">
 				</File>
 				<File
-					RelativePath="..\debug_option.h">
+					RelativePath="..\dbgPrint.h">
 				</File>
 				<File
-					RelativePath="..\dbgPrint.h">
+					RelativePath="..\debug_option.h">
 				</File>
 				<File
 					RelativePath="..\dma.h">
@@ -710,10 +710,10 @@
 				RelativePath=".\rompaging.cpp">
 			</File>
 			<File
-				RelativePath=".\xboxgui.cpp">
+				RelativePath="..\..\..\..\Common\xbox_depp.cpp">
 			</File>
 			<File
-				RelativePath="..\..\..\..\Common\xbox_depp.cpp">
+				RelativePath=".\xboxgui.cpp">
 			</File>
 			<Filter
 				Name="headers">
@@ -727,10 +727,10 @@
 					RelativePath=".\rompaging.h">
 				</File>
 				<File
-					RelativePath=".\xboxgui.h">
+					RelativePath="..\..\..\..\Common\xbox_depp.h">
 				</File>
 				<File
-					RelativePath="..\..\..\..\Common\xbox_depp.h">
+					RelativePath=".\xboxgui.h">
 				</File>
 			</Filter>
 		</Filter>

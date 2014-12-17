@@ -790,7 +790,7 @@ void InitTLBOther(void)
 {
     /* some TLB hacks to speed up some games, but fails at others */
 	trigger_tlb_exception_faster = FALSE;
-
+#ifndef USE_ROM_PAGING //Check with Conker
 #define GE_HACK // _XBOX // weinersch - this does work for xbox, at least without paging.
 #ifdef GE_HACK 
 	if(strncmp(currentromoptions.Game_Name, "GOLDENEYE", 9) == 0)
@@ -823,8 +823,10 @@ void InitTLBOther(void)
 	if(strncmp(currentromoptions.Game_Name, "CONKER", 6) == 0)
 #endif
 	{
+
 		trigger_tlb_exception_faster = TRUE;
 	}
+#endif
 }
 
 /*

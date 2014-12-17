@@ -22,6 +22,7 @@
 //		are not for the current rom
 // 2.	Have rom CRC info in the 1964.cht
 #include "stdafx.h"
+#include "cheatcode.h"
 
 extern BOOL IsBooting;
 
@@ -43,6 +44,7 @@ char	*cheatcode_countries[8] =
 	"France - PAL",
 	"Germany - PAL"
 };
+
 
 char *cheatfilename = "1964.cht";
 
@@ -574,7 +576,7 @@ BOOL CodeList_ApplyAllCode(enum APPLYCHEATMODE mode)
 	if( IsBooting && mode != BOOTUPONCE ) 
 		return FALSE;
 
-	if( (emuoptions.auto_apply_cheat_code && Kaillera_Is_Running == FALSE) || (Kaillera_Is_Running && kailleraAutoApplyCheat) )
+	if( (emuoptions.auto_apply_cheat_code /* && Kaillera_Is_Running == FALSE  ) || (Kaillera_Is_Running && kailleraAutoApplyCheat) */ ) )
 	{
 		for(i = 0; i < codegroupcount; i++)
 		{
@@ -679,12 +681,12 @@ LRESULT APIENTRY CheatAndHackDialog(HWND hDlg, unsigned message, WORD wParam, LO
 	CODEGROUP			newgroup;
 	DWORD				dwParam = *(DWORD *) &wParam;
 	COLORREF			savecol;
-	TEXTMETRIC			tm;
+	//TEXTMETRIC			tm;
 	int					y, i;
-	LPMEASUREITEMSTRUCT lpmis;
-	LPDRAWITEMSTRUCT	lpdis;
+	//LPMEASUREITEMSTRUCT lpmis;
+	//LPDRAWITEMSTRUCT	lpdis;
 	/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
+#ifndef _XBOX
 	switch(message)
 	{
 	case WM_INITDIALOG:
@@ -1316,6 +1318,10 @@ LRESULT APIENTRY CheatAndHackDialog(HWND hDlg, unsigned message, WORD wParam, LO
 	}
 
 	return(FALSE);
+#else //_XBOX
+//CodeList_ReadCode(romlist[rlstatus.selected_rom_index]->pinientry->Game_Name,cheatfilename);
+return TRUE;
+#endif
 }
 
 /*
@@ -1609,7 +1615,7 @@ BOOL AllocateOneCheatCodeMemoryMap(uint32 block)
 {
 	if( cheatCodeBlockMap[block] == NULL )
 	{
-		cheatCodeBlockMap[block] = VirtualAlloc(NULL, 0x2000, MEM_COMMIT, PAGE_READWRITE);
+		cheatCodeBlockMap[block] = (unsigned short *)VirtualAlloc(NULL, 0x2000, MEM_COMMIT, PAGE_READWRITE);
 		if( cheatCodeBlockMap[block] != NULL )
 		{
 			TRACE1("Allocate cheat code memory block at %08X", ((block*0x1000)|0x80000000) );

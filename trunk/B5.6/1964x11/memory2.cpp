@@ -23,6 +23,7 @@
  * memory. by Rice -- 11/09/2001
  */
 #include "stdafx.h"
+#include "cheatcode.h"
 
 /*#ifdef _XBOX
 #include "rompaging.h" // needed?
@@ -937,7 +938,7 @@ uint32 *read_mem_cheatcode_block(uint32 addr)
 		__asm popad;
 #endif
 		//Reapply the cheat code
-		//CodeList_ApplyCode_At_Address(cheatCodeBlockMap[block][addr&0xFFF], addr);		
+		CodeList_ApplyCode_At_Address(cheatCodeBlockMap[block][addr&0xFFF], addr);		
 		__asm mov eax, addr;
 		__asm call read_mem_rdram_not_at_0x20000000_eax_only;
 		__asm mov retval, eax;
@@ -1049,13 +1050,13 @@ void enable_cheat_code_lock_block(uint32 addr)
 		TRACE1("Enable cheat code protection at block=%08X", block);
 		if( rdram_is_at_0x20000000 )
 		{
-			(uint32) gHardwareState.memory_read_functions[( addr				/ 0x10000) >> SHIFTER1_READ] = (uint32) read_mem_cheatcode_block_k0seg_eax_only_rdram_at_0x20000000;
-			(uint32) gHardwareState.memory_read_functions[((addr | 0x20000000) / 0x10000) >> SHIFTER1_READ] = (uint32) read_mem_cheatcode_block_k1seg_eax_only_rdram_at_0x20000000;
+			/*(uint32)*/ gHardwareState.memory_read_functions[( addr				/ 0x10000) >> SHIFTER1_READ] = /*(uint32)*/ read_mem_cheatcode_block_k0seg_eax_only_rdram_at_0x20000000;
+			/*(uint32)*/ gHardwareState.memory_read_functions[((addr | 0x20000000) / 0x10000) >> SHIFTER1_READ] = /*(uint32)*/ read_mem_cheatcode_block_k1seg_eax_only_rdram_at_0x20000000;
 		}
 		else
 		{
-			(uint32) gHardwareState.memory_read_functions[( addr				/ 0x10000) >> SHIFTER1_READ] = (uint32) read_mem_cheatcode_block_eax_only_rdram_not_at_20000000;
-			(uint32) gHardwareState.memory_read_functions[((addr | 0x20000000) / 0x10000) >> SHIFTER1_READ] = (uint32) read_mem_cheatcode_block_eax_only_rdram_not_at_20000000;
+			/*(uint32)*/ gHardwareState.memory_read_functions[( addr				/ 0x10000) >> SHIFTER1_READ] = /*(uint32)*/ read_mem_cheatcode_block_eax_only_rdram_not_at_20000000;
+			/*(uint32)*/ gHardwareState.memory_read_functions[((addr | 0x20000000) / 0x10000) >> SHIFTER1_READ] = /*(uint32)*/ read_mem_cheatcode_block_eax_only_rdram_not_at_20000000;
 		}
 	}
 }

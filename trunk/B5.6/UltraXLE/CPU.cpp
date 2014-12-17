@@ -368,10 +368,10 @@ void cpu_init(void)
 
     st.nextswitch=0x40000000;
 
-    //RA.d=0x3ff0000; // return address os segment
+    RA.d=0x3ff0000; // return address os segment
 	//RA.q = 0xFFFFFFFFA4001550;
 
-	InitalizeR4300iRegisters(0,*(cart.data + 0x3D),GetCicChipID((char *)cart.data));
+	//InitalizeR4300iRegisters(0,*(cart.data + 0x3D),GetCicChipID((char *)cart.data));
 
     mem.groupnum=0;
     a_clearcodecache();

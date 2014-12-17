@@ -41,7 +41,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xacteng.lib xboxkrnl.lib xbdm.lib zlib\xzlib.lib AudioMusyX.lib Input.lib RSP.lib RSPHLE.lib RSPM64P.lib Video560.lib"
+				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xacteng.lib xboxkrnl.lib xbdm.lib zlib\xzlib.lib AudioMusyX.lib Input.lib RSP.lib RSPHLE.lib RSPM64P.lib VideoRice560.lib"
 				OutputFile="$(OutDir)/1964-560M.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\Plugins\lib"
@@ -252,7 +252,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xacteng.lib xboxkrnl.lib xbdm.lib zlib\xzlib.lib AudioMusyX.lib Input.lib RSP.lib RSPHLE.lib RSPM64P.lib Video560.lib"
+				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xacteng.lib xboxkrnl.lib xbdm.lib zlib\xzlib.lib AudioMusyX.lib Input.lib RSP.lib RSPHLE.lib RSPM64P.lib VideoRice560.lib"
 				OutputFile="$(OutDir)/1964-560M.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\Plugins\lib"
@@ -322,7 +322,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="xapilib.lib d3d8ltcg.lib d3dx8.lib xgraphicsltcg.lib dsound.lib dmusicltcg.lib xactengltcg.lib xboxkrnl.lib zlib\xzlib.lib AudioMusyX.lib Input.lib RSP.lib RSPHLE.lib RSPM64P.lib Video560.lib"
+				AdditionalDependencies="xapilib.lib d3d8ltcg.lib d3dx8.lib xgraphicsltcg.lib dsound.lib dmusicltcg.lib xactengltcg.lib xboxkrnl.lib zlib\xzlib.lib AudioMusyX.lib Input.lib RSP.lib RSPHLE.lib RSPM64P.lib VideoRice560.lib"
 				OutputFile="$(OutDir)/1964-560M.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\Plugins\lib"

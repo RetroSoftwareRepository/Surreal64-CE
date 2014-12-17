@@ -135,7 +135,7 @@ extern "C" {
   input:    none
   output:   none
 *******************************************************************/ 
- void  _AUDIO_MUSYX_RomClosed (void); void _AUDIO_MUSYX_AudioBoost (BOOL Boost);
+ void  _AUDIO_MUSYX_RomClosed (void); void _AUDIO_MUSYX_AudioBoost (BOOL Boost);BOOL _AUDIO_MUSYX_IsMusyX(void);
 #if defined(__cplusplus)
 }
 #endif
