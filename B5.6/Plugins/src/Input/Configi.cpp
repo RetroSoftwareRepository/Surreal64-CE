@@ -354,7 +354,7 @@ DWORD Config::GetN64ButtonValue(DWORD controller, byte n64Button)
 			// if the axis is moved across greater than 30000 then its
 			// considered a button push
 			//weinerschnitzel - Button press should occur regardless of deadzone, change threshold
-			return (GetXboxButtonValue(controller, xboxButton) > (30000 - XBOX_CONTROLLER_DEAD_ZONE));
+			return (GetXboxButtonValue(controller, xboxButton) > (25000 - XBOX_CONTROLLER_DEAD_ZONE));
 		}
 		else // if we are mapping this button to an xbox button
 		{

@@ -212,9 +212,10 @@ void FastPIMemoryCopy(void)
 				jz _Label4
 				mov ecx, dword ptr[ebx]
 				mov dword ptr[edx], ecx
+				//inc eax
 				add ebx, 4
 				add edx, 4
-				inc eax
+				inc eax // oDD :)
 				jmp _Label3
 	_Label4 :
 				popad

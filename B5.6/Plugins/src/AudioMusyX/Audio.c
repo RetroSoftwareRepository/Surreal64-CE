@@ -843,3 +843,8 @@ void _AUDIO_MUSYX_AudioBoost (BOOL Boost)
 {
 	bAudioBoostMusyX = Boost;
 }
+
+BOOL _AUDIO_MUSYX_IsMusyX(void)
+{
+	return TRUE;
+}

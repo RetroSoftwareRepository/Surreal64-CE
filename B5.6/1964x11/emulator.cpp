@@ -20,10 +20,11 @@
  */
 
 #include "stdafx.h"
+#include "cheatcode.h"
 #ifdef _XBOX
 //#include "rompaging.h"
 #else //win32
-#include "cheatcode.h"
+
 #include "romlist.h"
 #endif
 #include "float.h"
@@ -213,15 +214,19 @@ void ResumeEmulator(int action_after_pause)
 	emustatus.action_after_resume = action_after_pause;
 
 	/* Apply the hack codes */
+
+	if( emuoptions.auto_apply_cheat_code
 #ifndef _XBOX
-	if( emuoptions.auto_apply_cheat_code || kailleraAutoApplyCheat )
+		|| kailleraAutoApplyCheat 
+#endif
+		)
 	{
 		CodeList_ApplyAllCode(INGAME);
 #ifdef CHEATCODE_LOCK_MEMORY
 		InitCheatCodeEngineMemoryLock();
 #endif
 	}
-#endif
+
 
 	emustatus.Emu_Keep_Running = TRUE;
 #ifndef _XBOX
@@ -550,15 +555,19 @@ void N64_Boot(void)
 		}
 	}
 
+
+	if(emuoptions.auto_apply_cheat_code 
 #ifndef _XBOX
-	if(emuoptions.auto_apply_cheat_code || kailleraAutoApplyCheat)
+		|| kailleraAutoApplyCheat 
+#endif
+		)
 	{
 		CodeList_ApplyAllCode(BOOTUPONCE);
 #ifdef CHEATCODE_LOCK_MEMORY
 		InitCheatCodeEngineMemoryLock();
 #endif
 	}
-#endif
+
 
 	emustatus.Emu_Is_Running = FALSE;
 	IsBooting = FALSE;

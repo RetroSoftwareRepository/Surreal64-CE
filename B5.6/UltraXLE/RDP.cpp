@@ -40,8 +40,8 @@ extern int DefaultPak;
 // whole frame collected, drawn in bursts
 #define MAXVX       16384
 #define MAXPR       8192
-#define MAXTXT      200  // max textures in a frame
-#define MAXLOAD     1000  // max textures loaded
+#define MAXTXT      1000  // max textures in a frame
+#define MAXLOAD     2048  // max textures loaded
 #define MAXCOMB     256   // max different combinemodes
 
 #define GEOMFLAGS   0 //X_DUMPDATA

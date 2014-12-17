@@ -30,7 +30,7 @@ extern char *cheatfilename;
 
 
 //Option to apply cheat code and lock memory
-//#define CHEATCODE_LOCK_MEMORY
+#define CHEATCODE_LOCK_MEMORY
 
 enum APPLYCHEATMODE { INGAME, BOOTUPONCE, GSBUTTON, ONLYIN1964 };
 

@@ -3309,8 +3309,6 @@ _Default:
 				ADD_ImmToReg(xRT->x86reg, (_s32) (_s16) __dotI, 0);
 				//Lea(Reg_EAX, xRT->x86reg, (_s32) (_s16) __dotI);
 
-// 1964 1.1
-
 
 /*------------------------------------------------------------------
 // looks ok
@@ -3444,6 +3442,7 @@ _next:
 ------------------------------------------------------------------*/
 /*
 				// added by oDD //etemp - should this be after the next?
+				// weinersch - nope, only after ADD_ImmToReg 
 				{
 					PUSHAD();
 

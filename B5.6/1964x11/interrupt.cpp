@@ -23,6 +23,7 @@
  */
 #include "stdafx.h"
 #include <float.h>
+#include "cheatcode.h"
 
 extern void		Init_Timer_Event_List(void);
 extern uint32	TLB_Error_Vector;
@@ -919,15 +920,19 @@ void Trigger_VIInterrupt(void)
 		vi_field_number = 0;
 	}
 
-#ifndef _XBOX
-	if(emuoptions.auto_apply_cheat_code || kailleraAutoApplyCheat)
+
+	if(emuoptions.auto_apply_cheat_code
+#ifndef _XBOX		
+		|| kailleraAutoApplyCheat
+#endif		
+		)
 	{
 		// Apply the hack codes
 #ifndef CHEATCODE_LOCK_MEMORY
 		CodeList_ApplyAllCode(INGAME);
 #endif
 	}
-#endif
+
 
 	Set_AutoCF();
     

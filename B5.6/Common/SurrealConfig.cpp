@@ -3,6 +3,7 @@
 //#include "xbresource.h"
 #include "simpleini.h"
 
+/*
 int dw1964DynaMem			= default1964DynaMem;
 int dw1964PagingMem			= default1964PagingMem;
 int dwPJ64DynaMem			= defaultPJ64DynaMem;
@@ -15,7 +16,7 @@ int iVideoplugin			= defaultVideoplugin;
 int iAudioPlugin			= defaultAudioPlugin;
 int iRspPlugin				= defaultRspPlugin;
 bool bUseRspAudio			= defaultUseRspAudio;
-
+*/
 int iPagingMethod			= defaultPagingMethod;
 bool bAudioBoost			= defaultAudioBoost;
 

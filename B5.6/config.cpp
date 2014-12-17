@@ -360,7 +360,7 @@ void ResetDefaults()
 
 	DefaultPak = RumblePak;
 	FlickerFilter = 1;
-	TextureMode = 3;
+	TextureMode = 0;
 	VertexMode = 2;
 	VSync = INTERVAL_IMMEDIATE;
 	AntiAliasMode = 0;
@@ -538,7 +538,8 @@ int ConfigAppSave2()
 	ini.SetBoolValue("Settings", "EnableController3", EnableController3);
 	ini.SetBoolValue("Settings", "EnableController4", EnableController4);
 	
-	
+	ini.SetLongValue("Settings", "ShowDebug", showdebug);
+
 	char szFloatBuf[64];
 	
 	sprintf(szFloatBuf, "%.6f", XBOX_CONTROLLER_DEAD_ZONE);

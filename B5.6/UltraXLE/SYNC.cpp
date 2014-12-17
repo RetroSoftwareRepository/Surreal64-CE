@@ -17,7 +17,7 @@
 static Timer retracetimer;
 static Timer longtimer;
 
-#define SOUNDTARGET      10000   // try to keep 20Kbytes of sound in buffer
+#define SOUNDTARGET      20000   // try to keep 20Kbytes of sound in buffer
 
 //bool bResynced = false;
 
@@ -55,9 +55,9 @@ void sync_audio(void)
     if(st2.audioon)
     {
         unsigned int buffered;
-        //int target;
+        int target;
 
-        //target=SOUNDTARGET;
+        target=SOUNDTARGET;
         /*
         if(st.audiorate<23000) target=SOUNDTARGET/2;
         else target=SOUNDTARGET;
@@ -72,35 +72,31 @@ void sync_audio(void)
         // we have audio, syncronize to it
 
         buffered=sound_buffered(); // how many bytes in buffer
-		
-        st2.audiobuffered=buffered-SOUNDTARGET;
+        st2.audiobuffered=buffered-target;
 
         st2.audiobufferedsum+=st2.audiobuffered;
         st2.audiobufferedcnt++;
 
         {
-            if(/*!bResynced && */buffered>SOUNDTARGET*4)
+            if(buffered>target*4)
             { // buffer overflowing, resync
 				//OutputDebugString("Buffer overflow, resync : SYNC.cpp Line 82\n");
-                sound_resync(SOUNDTARGET);
+                sound_resync(target);
                 st2.audiostatus=9;
                 st2.audioresync++;
                 st2.audiobufferedcnt+=0x10000;
 				//bResynced = true;
             }
-            else if(/*!bResynced && */buffered<SOUNDTARGET/4)
+            else if(buffered<4000)
             { // ran out of buffer! (4K safety)
 				//OutputDebugString("Ran out of buffer! 4k safety : SYNC.cpp Line 90\n");
-
-				buffered=sound_buffered(); // how many bytes in buffer
-
-                sound_resync(SOUNDTARGET*2);
+								sound_resync(target*3);
                 st2.audiostatus=-9;
                 st2.audioresync++;
                 st2.audiobufferedcnt+=0x10000;
 				//bResynced = true;
             }
-            else if(buffered>SOUNDTARGET*6/4)
+            else if(buffered>target*6/4)
             { // too much data, slow down
 				//OutputDebugString("Too much data, slow down : SYNC.cpp Line 101\n");
 
@@ -108,19 +104,19 @@ void sync_audio(void)
                 st2.audioresync++;
 				//bResynced = false;
             }
-            else if(buffered<SOUNDTARGET*2/4)
+            else if(buffered<target*2/4)
             { // too little data, more speed
 				//OutputDebugString("Too little data, more speed : SYNC.cpp Line 108\n");
                 st2.audiostatus=-2;
 				//bResynced = false;
             }
-            else if(buffered>SOUNDTARGET*5/4)
+            else if(buffered>target*5/4)
             { // too much data, slow down
 				//OutputDebugString("Too much data, slow down : SYNC.cpp Line 113\n");
                 st2.audiostatus=1;
 				//bResynced = false;
             }
-            else if(buffered<SOUNDTARGET*3/4)
+            else if(buffered<target*3/4)
             { // too little data, more speed
 				//OutputDebugString("Too little data, more speed : SYNC.cpp Line 118\n");
                 st2.audiostatus=-1;
@@ -128,9 +124,8 @@ void sync_audio(void)
             }
             else
             { // about the correct amount, reset status when we cross target
-				//bResynced = false;
-                if(buffered<SOUNDTARGET && st2.audiostatus>0) st2.audiostatus=0;
-                if(buffered>SOUNDTARGET && st2.audiostatus<0) st2.audiostatus=0;
+                if(buffered<target && st2.audiostatus>0) st2.audiostatus=0;
+                if(buffered>target && st2.audiostatus<0) st2.audiostatus=0;
             }
         }
 
@@ -215,7 +210,7 @@ void sync_gfxframedone(void)
     st2.ops+=(int)(st.cputime-st.synctime);
     st.synctime=st.cputime;
 
-    //pad_drawframe();
+    pad_drawframe();
 
     if(1)
     {
