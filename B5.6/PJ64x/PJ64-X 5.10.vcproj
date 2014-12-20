@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.10"
-	Name="PJ64x 5.10"
+	Name="PJ64x16 5.10"
 	ProjectGUID="{889EA010-906E-4817-862B-20E152193325}"
 	RootNamespace="PJ64x.5-10"
 	Keyword="XboxProj">
@@ -22,7 +22,7 @@
 				Optimization="0"
 				OptimizeForProcessor="2"
 				AdditionalIncludeDirectories=""
-				PreprocessorDefinitions="DEBUG;_XBOX;EXTERNAL_RELEASE;WIN32;_WIN32;_WINDOWS;__WIN32__"
+				PreprocessorDefinitions="DEBUG;_XBOX;EXTERNAL_RELEASE;WIN32;_WIN32;_WINDOWS;__WIN32__;_VIDEO_RICE_510"
 				BasicRuntimeChecks="0"
 				RuntimeLibrary="0"
 				StructMemberAlignment="4"
@@ -41,7 +41,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xacteng.lib xboxkrnl.lib xbdm.lib AudioBasic.lib AudioJttl.lib AudioNone.lib AudioAzimer.lib Input.lib RSP.lib RSPHLE.lib RSPM64P.lib Video510.lib"
+				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xacteng.lib xboxkrnl.lib xbdm.lib AudioBasic.lib AudioJttl.lib AudioNone.lib AudioAzimer.lib Input.lib RSP.lib RSPHLE.lib RSPM64P.lib VideoRice510.lib"
 				OutputFile="$(OutDir)/PJ64-510.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\Plugins\lib"
@@ -66,7 +66,7 @@
 				RemotePath="xe:\Surreal64 CE\PJ64-510.xbe"/>
 			<Tool
 				Name="XboxImageTool"
-				FileName="$(TargetDir)/PJ64-510.xbe"
+				FileName="$(TargetDir)/PJ64x16-510.xbe"
 				StackSize="131072"
 				IncludeDebugInfo="TRUE"
 				DontMountUD="FALSE"
@@ -232,7 +232,7 @@
 				EnableFiberSafeOptimizations="TRUE"
 				OptimizeForProcessor="2"
 				AdditionalIncludeDirectories=""
-				PreprocessorDefinitions="NDEBUG;_XBOX;EXTERNAL_RELEASE;WIN32;_WIN32;_WINDOWS;__WIN32__"
+				PreprocessorDefinitions="NDEBUG;_XBOX;EXTERNAL_RELEASE;WIN32;_WIN32;_VIDEO_RICE_510;_WINDOWS;__WIN32__"
 				StringPooling="TRUE"
 				RuntimeLibrary="0"
 				StructMemberAlignment="4"
@@ -251,7 +251,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xacteng.lib xboxkrnl.lib xbdm.lib AudioBasic.lib AudioJttl.lib AudioNone.lib AudioAzimer.lib Input.lib RSP.lib RSPHLE.lib RSPM64P.lib Video510.lib"
+				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xacteng.lib xboxkrnl.lib xbdm.lib AudioBasic.lib AudioJttl.lib AudioNone.lib AudioAzimer.lib Input.lib RSP.lib RSPHLE.lib RSPM64P.lib VideoRice510.lib"
 				OutputFile="$(OutDir)/PJ64-510.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\Plugins\lib"
@@ -274,7 +274,7 @@
 				RemotePath="xe:\Surreal64 CE\PJ64-510.xbe"/>
 			<Tool
 				Name="XboxImageTool"
-				FileName="$(TargetDir)/PJ64-510.xbe"
+				FileName="$(TargetDir)/PJ64x16-510.xbe"
 				StackSize="131072"
 				DontMountUD="FALSE"
 				NoLibWarn="TRUE"
@@ -301,7 +301,7 @@
 				EnableFiberSafeOptimizations="TRUE"
 				OptimizeForProcessor="2"
 				AdditionalIncludeDirectories=""
-				PreprocessorDefinitions="NDEBUG;_XBOX;EXTERNAL_RELEASE;WIN32;_WIN32;_WINDOWS;__WIN32__;LTCG"
+				PreprocessorDefinitions="NDEBUG;_XBOX;EXTERNAL_RELEASE;WIN32;_WIN32;_WINDOWS;__WIN32__;LTCG;_VIDEO_RICE_510"
 				StringPooling="TRUE"
 				RuntimeLibrary="0"
 				StructMemberAlignment="4"
@@ -320,7 +320,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="xapilib.lib d3d8ltcg.lib d3dx8.lib xgraphicsltcg.lib dsound.lib dmusicltcg.lib xactengltcg.lib xboxkrnl.lib AudioBasic.lib AudioJttl.lib AudioNone.lib AudioAzimer.lib Input.lib RSP.lib RSPHLE.lib RSPM64P.lib Video510.lib"
+				AdditionalDependencies="xapilib.lib d3d8ltcg.lib d3dx8.lib xgraphicsltcg.lib dsound.lib dmusicltcg.lib xactengltcg.lib xboxkrnl.lib AudioBasic.lib AudioJttl.lib AudioNone.lib AudioAzimer.lib Input.lib RSP.lib RSPHLE.lib RSPM64P.lib VideoRice510.lib"
 				OutputFile="$(OutDir)/PJ64-510.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\Plugins\lib"
@@ -343,7 +343,7 @@
 				RemotePath="xe:\Surreal64 CE\PJ64-510.xbe"/>
 			<Tool
 				Name="XboxImageTool"
-				FileName="$(TargetDir)/PJ64-510.xbe"
+				FileName="$(TargetDir)/PJ64x16-510.xbe"
 				StackSize="131072"
 				DontMountUD="FALSE"
 				NoLibWarn="TRUE"
@@ -362,13 +362,13 @@
 				Name="General Source"
 				Filter="">
 				<File
+					RelativePath=".\Cheat.c">
+				</File>
+				<File
 					RelativePath="Eeprom.c">
 				</File>
 				<File
 					RelativePath="FlashRam.c">
-				</File>
-				<File
-					RelativePath=".\gamehacks.c">
 				</File>
 				<File
 					RelativePath="Mapping.c">

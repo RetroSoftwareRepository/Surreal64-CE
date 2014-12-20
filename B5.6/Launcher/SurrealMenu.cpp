@@ -295,7 +295,8 @@ string GetEmulatorName(int p_iEmulator)
 		case _1964 : szEmulator = "1964"; break;
 		case _1964x11 : szEmulator = "1964x11"; break;
 		case _Project64 : szEmulator = "Project64"; break;
-		case _Mupen64Plus : szEmulator = "Mupen64Plus"; break;
+		case _PJ64x14 : szEmulator = "PJ64x14"; break;
+		//case _Mupen64Plus : szEmulator = "Mupen64Plus"; break;
 		case _UltraHLE : szEmulator = "UltraHLE"; break;
 		case _None : 
 		default : szEmulator = "Unknown"; break;
@@ -1349,6 +1350,14 @@ void Launch1964x11(void)
 	selectvideomode();
 }
 
+void LaunchPJ64x14(void)
+{
+	//m_emulator = _PJ64x14;
+	preferedemu = _PJ64x14;
+	ConfigAppSave2();
+	selectvideomode();
+}
+
 void PJ64Launch(void)
 {
 	//m_emulator = _Project64;
@@ -1360,7 +1369,7 @@ void PJ64Launch(void)
 void M64PLaunch(void)
 {
 	//m_emulator = _Project64;
-	preferedemu = _Mupen64Plus;
+	//preferedemu = _Mupen64Plus; //disable M64P until port is finished
 	ConfigAppSave2();
 	selectvideomode();
 }

@@ -20,6 +20,7 @@ extern "C" void _VIDEO_DisplayTemporaryMessage(const char *msg);
 #else
 extern void _VIDEO_DisplayTemporaryMessage(const char *msg);
 #endif
+
 void _INPUT_CloseDLL(){}
 
 void _INPUT_ControllerCommand(int Control, BYTE * Command){}

@@ -70,8 +70,9 @@
 #include "win32/windebug.h"
 #include "win32/wingui.h"
 #include "romlist.h"
-#include "cheatcode.h"
 #endif
+
+#include "cheatcode.h"
 
 #if defined(USE_ROM_PAGING) || defined(_XBOX) //_XBOX
 #include "xbox/rompaging.h"

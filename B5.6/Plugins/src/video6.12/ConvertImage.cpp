@@ -1146,7 +1146,7 @@ void ConvertYUV(CTexture *pTexture, const TxtrInfo &tinfo)
 
 				for (x = 0; x < tinfo.WidthToLoad/2; x++)
 				{
-					int y0 = *(uint8*)&pByteSrc[(dwByteOffset=2)];
+					int y0 = *(uint8*)&pByteSrc[(dwByteOffset+2)];
 					int v0 = *(uint8*)&pByteSrc[(dwByteOffset+1)];
 					int y1 = *(uint8*)&pByteSrc[(dwByteOffset  )];
 					int u0 = *(uint8*)&pByteSrc[(dwByteOffset+3)];

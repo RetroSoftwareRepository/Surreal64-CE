@@ -82,7 +82,7 @@ void GetPluginDir( char * Directory )
 }
 
 //-------------------------------------------------------------------------------------
-void _VIDEO_GetDllInfo ( PLUGIN_INFO * PluginInfo )
+void _VIDEO_RICE_510_GetDllInfo ( PLUGIN_INFO * PluginInfo )
 {
 #ifdef _DEBUG
 	sprintf(PluginInfo->Name, "Rice's Daedalus Debug %d.%d.%d",FILE_VERSION0,FILE_VERSION1,FILE_VERSION2);
@@ -97,7 +97,7 @@ void _VIDEO_GetDllInfo ( PLUGIN_INFO * PluginInfo )
 
 //---------------------------------------------------------------------------------------
 
-void _VIDEO_DllAbout ( HWND hParent )
+void _VIDEO_RICE_510_DllAbout ( HWND hParent )
 {
 	 
 }
@@ -105,12 +105,12 @@ void _VIDEO_DllAbout ( HWND hParent )
 
 //---------------------------------------------------------------------------------------
 
-void _VIDEO_DllTest ( HWND hParent )
+void _VIDEO_RICE_510_DllTest ( HWND hParent )
 {
 	 
 }
 
-void _VIDEO_DllConfig ( HWND hParent )
+void _VIDEO_RICE_510_DllConfig ( HWND hParent )
 {
 	 
 }
@@ -131,7 +131,7 @@ void ChangeWindowStep2()
 	g_CritialSection.Unlock();
 }
 
-void _VIDEO_ChangeWindow ()
+void _VIDEO_RICE_510_ChangeWindow ()
 {
 	ChangeWindowStep2();
 
@@ -143,13 +143,13 @@ void ChangeWinSize( void )
 }
 //---------------------------------------------------------------------------------------
 
-void _VIDEO_DrawScreen (void)
+void _VIDEO_RICE_510_DrawScreen (void)
 {
 }
 
 //---------------------------------------------------------------------------------------
 
-void _VIDEO_MoveScreen (int xpos, int ypos)
+void _VIDEO_RICE_510_MoveScreen (int xpos, int ypos)
 { 
 }
 
@@ -302,7 +302,7 @@ DWORD WINAPI VideoThreadProc( LPVOID lpParameter )
 
 
 //---------------------------------------------------------------------------------------
-void _VIDEO_RomClosed (void)
+void _VIDEO_RICE_510_RomClosed (void)
 {
 #ifdef USING_THREAD
 	if(videoThread)
@@ -323,7 +323,7 @@ void _VIDEO_RomClosed (void)
 	//Ini_StoreRomOptions(&g_curRomInfo);
 }
 
-void _VIDEO_RomOpen (void)
+void _VIDEO_RICE_510_RomOpen (void)
 {
 	//InitGammaValues();
 
@@ -578,7 +578,7 @@ void UpdateScreenStep2 (void)
 #endif
 }
 
-void _VIDEO_UpdateScreen (void)
+void _VIDEO_RICE_510_UpdateScreen (void)
 {
 #ifdef USING_THREAD
 	if (videoThread)
@@ -593,21 +593,21 @@ void _VIDEO_UpdateScreen (void)
 
 //---------------------------------------------------------------------------------------
 
-void _VIDEO_ViStatusChanged (void)
+void _VIDEO_RICE_510_ViStatusChanged (void)
 {
 	SetVIScales();
 	CDaedalusRender::g_pRender->UpdateClipRectangle();
 }
 
 //---------------------------------------------------------------------------------------
-void _VIDEO_ViWidthChanged (void)
+void _VIDEO_RICE_510_ViWidthChanged (void)
 {
 	SetVIScales();
 	CDaedalusRender::g_pRender->UpdateClipRectangle();
 }
 
 
-BOOL _VIDEO_InitiateGFX(GFX_INFO Gfx_Info)
+BOOL _VIDEO_RICE_510_InitiateGFX(GFX_INFO Gfx_Info)
 {
  
 	windowSetting.bDisplayFullscreen = TRUE;
@@ -673,7 +673,7 @@ void __cdecl ErrorMsg (char * Message, ...)
 
 //---------------------------------------------------------------------------------------
 
-void _VIDEO_CloseDLL (void)
+void _VIDEO_RICE_510_CloseDLL (void)
 { 
 	delete g_pIniFile;		// Will write ini file if changed
 	g_pIniFile = NULL;
@@ -706,7 +706,7 @@ void ProcessDListStep2(void)
 	g_CritialSection.Unlock();
 }	
 
-DWORD _VIDEO_ProcessDListCountCycles(void)
+DWORD _VIDEO_RICE_510_ProcessDListCountCycles(void)
 {
 #ifdef USING_THREAD
 	if (videoThread)
@@ -744,7 +744,7 @@ DWORD _VIDEO_ProcessDListCountCycles(void)
 #endif
 }	
 
-void _VIDEO_ProcessRDPList(void)
+void _VIDEO_RICE_510_ProcessRDPList(void)
 {
 #ifdef USING_THREAD
 	if (videoThread)
@@ -766,7 +766,7 @@ void _VIDEO_ProcessRDPList(void)
 #endif
 }	
 
-void _VIDEO_ProcessDList(void)
+void _VIDEO_RICE_510_ProcessDList(void)
 {
 #ifdef USING_THREAD
 	if (videoThread)
@@ -795,7 +795,7 @@ void TriggerDPInterrupt(void)
 			size = size of the plist, max = 1024
   output:   none
 *******************************************************************/ 
-void _VIDEO_FBWList(FrameBufferModifyEntry *plist, DWORD size)
+void _VIDEO_RICE_510_FBWList(FrameBufferModifyEntry *plist, DWORD size)
 {
 }
 
@@ -820,7 +820,7 @@ void FrameBufferReadByCPU( u32 addr );
 
 extern SetImgInfo g_CI;
 
- void _VIDEO_FBRead(DWORD addr)
+ void _VIDEO_RICE_510_FBRead(DWORD addr)
 {
 	FrameBufferReadByCPU(addr);
 }
@@ -836,7 +836,7 @@ extern SetImgInfo g_CI;
   output:   none
 *******************************************************************/ 
 
-void _VIDEO_FBWrite(DWORD addr, DWORD size)
+void _VIDEO_RICE_510_FBWrite(DWORD addr, DWORD size)
 {
 	FrameBufferWriteByCPU(addr, size);
 }
@@ -851,7 +851,7 @@ void _VIDEO_FBWrite(DWORD addr, DWORD size)
 } FrameBufferInfo;
 extern SetImgInfo g_DI;
 extern RecentCIInfo g_RecentCIInfo[];
-void _VIDEO_FBGetFrameBufferInfo(void *p)
+void _VIDEO_RICE_510_FBGetFrameBufferInfo(void *p)
 {
 	FrameBufferInfo * pinfo = (FrameBufferInfo *)p;
 	if( g_DI.dwAddr == 0 )
@@ -884,12 +884,12 @@ void _VIDEO_FBGetFrameBufferInfo(void *p)
 	}
 }*/
 // Plugin spec 1.3 functions
-void _VIDEO_ShowCFB (void)
+void _VIDEO_RICE_510_ShowCFB (void)
 {
 	//status.toShowCFB = true;
 }
 
-void _VIDEO_CaptureScreen ( char * Directory )
+void _VIDEO_RICE_510_CaptureScreen ( char * Directory )
 {
 #ifndef _XBOX
 	if( status.bGameIsRunning && status.gDlistCount > 0 )
@@ -927,7 +927,7 @@ void _VIDEO_CaptureScreen ( char * Directory )
 #endif
 }
 
-void _VIDEO_SetMaxTextureMem(DWORD mem)
+void _VIDEO_RICE_510_SetMaxTextureMem(DWORD mem)
 {
 	if (mem == 0) // auto mem
 	{
