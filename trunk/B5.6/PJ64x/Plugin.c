@@ -42,13 +42,106 @@ BOOL g_bAudioBoost = FALSE;
 #include <Video1964.h>
 #elif defined(_VIDEO_RICE_510)
 
+extern void _VIDEO_RICE_510_CloseDLL					(void);
+extern void _VIDEO_RICE_510_DllConfig				( HWND hParent );
+extern void _VIDEO_RICE_510_GetDllInfo				( PLUGIN_INFO *PluginInfo);
+extern void _VIDEO_RICE_510_ChangeWindow				(void);
+extern void _VIDEO_RICE_510_DrawScreen				(void);
+extern void _VIDEO_RICE_510_FBRead					( DWORD addr );
+extern void _VIDEO_RICE_510_FBWrite					( DWORD addr, DWORD Bytes );
+extern BOOL _VIDEO_RICE_510_InitiateGFX				(GFX_INFO Gfx_Info);
+extern void _VIDEO_RICE_510_MoveScreen				(int xpos, int ypos);
+extern void _VIDEO_RICE_510_ProcessDList				(void);
+extern void _VIDEO_RICE_510_RomClosed				(void);
+extern void _VIDEO_RICE_510_RomOpen					(void);
+extern void _VIDEO_RICE_510_UpdateScreen				(void);
+extern void _VIDEO_RICE_510_ViStatusChanged			(void);
+extern void _VIDEO_RICE_510_ViStatusChanged			(void);
+extern void _VIDEO_RICE_510_ViWidthChanged			(void);
+
+extern void _VIDEO_RICE_510_ProcessRDPList			(void);
+extern void _VIDEO_RICE_510_CaptureScreen			(char *);
+extern void _VIDEO_RICE_510_ShowCFB					(void);
+
+extern void _VIDEO_RICE_510_SetMaxTextureMem(DWORD mem);
+
 #elif defined(_VIDEO_RICE_531)
 
+extern void _VIDEO_RICE_531_CloseDLL					(void);
+extern void _VIDEO_RICE_531_DllConfig				( HWND hParent );
+extern void _VIDEO_RICE_531_GetDllInfo				( PLUGIN_INFO *PluginInfo);
+extern void _VIDEO_RICE_531_ChangeWindow				(void);
+extern void _VIDEO_RICE_531_DrawScreen				(void);
+extern void _VIDEO_RICE_531_FBRead					( DWORD addr );
+extern void _VIDEO_RICE_531_FBWrite					( DWORD addr, DWORD Bytes );
+extern BOOL _VIDEO_RICE_531_InitiateGFX				(GFX_INFO Gfx_Info);
+extern void _VIDEO_RICE_531_MoveScreen				(int xpos, int ypos);
+extern void _VIDEO_RICE_531_ProcessDList				(void);
+extern void _VIDEO_RICE_531_RomClosed				(void);
+extern void _VIDEO_RICE_531_RomOpen					(void);
+extern void _VIDEO_RICE_531_UpdateScreen				(void);
+extern void _VIDEO_RICE_531_ViStatusChanged			(void);
+extern void _VIDEO_RICE_531_ViStatusChanged			(void);
+extern void _VIDEO_RICE_531_ViWidthChanged			(void);
+
+extern void _VIDEO_RICE_531_ProcessRDPList			(void);
+extern void _VIDEO_RICE_531_CaptureScreen			(char *);
+extern void _VIDEO_RICE_531_ShowCFB					(void);
+
+extern void _VIDEO_RICE_531_SetMaxTextureMem(DWORD mem);
+
 #elif defined(_VIDEO_RICE_560)
-#include <VideoRice560.h>
+
+extern void _VIDEO_RICE_560_CloseDLL					(void);
+extern void _VIDEO_RICE_560_DllConfig				( HWND hParent );
+extern void _VIDEO_RICE_560_GetDllInfo				( PLUGIN_INFO *PluginInfo);
+extern void _VIDEO_RICE_560_ChangeWindow				(void);
+extern void _VIDEO_RICE_560_DrawScreen				(void);
+extern void _VIDEO_RICE_560_FBRead					( DWORD addr );
+extern void _VIDEO_RICE_560_FBWrite					( DWORD addr, DWORD Bytes );
+extern BOOL _VIDEO_RICE_560_InitiateGFX				(GFX_INFO Gfx_Info);
+extern void _VIDEO_RICE_560_MoveScreen				(int xpos, int ypos);
+extern void _VIDEO_RICE_560_ProcessDList				(void);
+extern void _VIDEO_RICE_560_RomClosed				(void);
+extern void _VIDEO_RICE_560_RomOpen					(void);
+extern void _VIDEO_RICE_560_UpdateScreen				(void);
+extern void _VIDEO_RICE_560_ViStatusChanged			(void);
+extern void _VIDEO_RICE_560_ViStatusChanged			(void);
+extern void _VIDEO_RICE_560_ViWidthChanged			(void);
+
+extern void _VIDEO_RICE_560_ProcessRDPList			(void);
+extern void _VIDEO_RICE_560_CaptureScreen			(char *);
+extern void _VIDEO_RICE_560_ShowCFB					(void);
+
+extern void _VIDEO_RICE_560_SetMaxTextureMem(DWORD mem);
+
 #elif defined(_VIDEO_RICE_611)
 
+extern void _VIDEO_RICE_611_CloseDLL					(void);
+extern void _VIDEO_RICE_611_DllConfig				( HWND hParent );
+extern void _VIDEO_RICE_611_GetDllInfo				( PLUGIN_INFO *PluginInfo);
+extern void _VIDEO_RICE_611_ChangeWindow				(void);
+extern void _VIDEO_RICE_611_DrawScreen				(void);
+extern void _VIDEO_RICE_611_FBRead					( DWORD addr );
+extern void _VIDEO_RICE_611_FBWrite					( DWORD addr, DWORD Bytes );
+extern BOOL _VIDEO_RICE_611_InitiateGFX				(GFX_INFO Gfx_Info);
+extern void _VIDEO_RICE_611_MoveScreen				(int xpos, int ypos);
+extern void _VIDEO_RICE_611_ProcessDList				(void);
+extern void _VIDEO_RICE_611_RomClosed				(void);
+extern void _VIDEO_RICE_611_RomOpen					(void);
+extern void _VIDEO_RICE_611_UpdateScreen				(void);
+extern void _VIDEO_RICE_611_ViStatusChanged			(void);
+extern void _VIDEO_RICE_611_ViStatusChanged			(void);
+extern void _VIDEO_RICE_611_ViWidthChanged			(void);
+
+extern void _VIDEO_RICE_611_ProcessRDPList			(void);
+extern void _VIDEO_RICE_611_CaptureScreen			(char *);
+extern void _VIDEO_RICE_611_ShowCFB					(void);
+
+extern void _VIDEO_RICE_611_SetMaxTextureMem(DWORD mem);
+
 #elif defined(_VIDEO_RICE_612)
+
 extern void _VIDEO_RICE_612_CloseDLL					(void);
 extern void _VIDEO_RICE_612_DllConfig				( HWND hParent );
 extern void _VIDEO_RICE_612_GetDllInfo				( PLUGIN_INFO *PluginInfo);
@@ -71,7 +164,32 @@ extern void _VIDEO_RICE_612_CaptureScreen			(char *);
 extern void _VIDEO_RICE_612_ShowCFB					(void);
 
 extern void _VIDEO_RICE_612_SetMaxTextureMem(DWORD mem);
+
 #endif
+
+void (*_VIDEO_CloseDLL)			(void)						= NULL;
+void (*_VIDEO_DllConfig)		( HWND hParent )			= NULL;
+void (*_VIDEO_GetDllInfo)		( PLUGIN_INFO *PluginInfo)	= NULL;
+void (*_VIDEO_ChangeWindow)		(void)						= NULL;
+void (*_VIDEO_DrawScreen)		(void)						= NULL;
+void (*_VIDEO_FBRead)			( DWORD addr )				= NULL;
+void (*_VIDEO_FBWrite)			( DWORD addr, DWORD Bytes ) = NULL;
+BOOL (*_VIDEO_InitiateGFX)		(GFX_INFO Gfx_Info)			= NULL;
+void (*_VIDEO_MoveScreen)		(int xpos, int ypos)		= NULL;
+void (*_VIDEO_ProcessDList)		(void)						= NULL;
+void (*_VIDEO_RomClosed)		(void)						= NULL;
+void (*_VIDEO_RomOpen)			(void)						= NULL;
+void (*_VIDEO_UpdateScreen)		(void)						= NULL;
+void (*_VIDEO_ViStatusChanged)	(void)						= NULL;
+//void (*_VIDEO_ViStatusChanged)	(void)						= NULL;
+void (*_VIDEO_ViWidthChanged)	(void)						= NULL;
+
+void (*_VIDEO_ProcessRDPList)	(void)						= NULL;
+void (*_VIDEO_CaptureScreen)	(char *)					= NULL;
+void (*_VIDEO_ShowCFB)			(void)						= NULL;
+
+void (*_VIDEO_SetMaxTextureMem)	(DWORD mem)					= NULL;
+
 
 
 #if defined(USE_MUSYX)
@@ -90,6 +208,7 @@ extern void _AUDIO_MUSYX_AudioBoost			(BOOL Boost);
 #else
 
 // mupen 1.5 audio
+/*
 //extern void _AUDIO_M64P_CloseDLL			(void);
 extern void _AUDIO_M64P_RomClosed			(void);
 //extern void _AUDIO_M64P_DllConfig			( HWND hParent );
@@ -101,7 +220,7 @@ extern void _AUDIO_M64P_AiLenChanged		(void);
 extern BOOL _AUDIO_M64P_InitiateAudio		(AUDIO_INFO Audio_Info);
 extern void _AUDIO_M64P_ProcessAList		(void);
 //extern void _AUDIO_M64P_AudioBoost			(BOOL Boost);
-
+*/
 //freakdave - JttL
 extern void _AUDIO_JTTL_CloseDLL			(void);
 extern void _AUDIO_JTTL_RomClosed			(void);
@@ -279,6 +398,7 @@ BOOL LoadAudioDll(void) {
 		_AUDIO_LINK_AudioBoost		 	= _AUDIO_MUSYX_AudioBoost;
 	}
 #else
+	/*
 	if (g_iAudioPlugin == _AudioPluginM64P) // so it doesn't break for now
 	{
 		// Mupen 1.5 Audio plugin
@@ -298,6 +418,7 @@ BOOL LoadAudioDll(void) {
 		
 		//_AUDIO_LINK_AudioBoost		 	= _AUDIO_M64P_AudioBoost;
 	}
+	*/
 	if (g_iAudioPlugin == _AudioPluginNone)
 	{
 		// Ez0n3 - No Audio (declared in plugin.h include)
@@ -507,9 +628,78 @@ BOOL LoadGFXDll(char * RspDll) {
 
 #elif defined(_VIDEO_RICE_510)
 
+	
+	//GfxPluginVersion						= 0x0102;
+	_VIDEO_InitiateGFX						= _VIDEO_RICE_510_InitiateGFX;
+	_VIDEO_ProcessDList						= _VIDEO_RICE_510_ProcessDList;
+	//_VIDEO_ProcessDList_Count_Cycles		= _VIDEO_RICE_510_ProcessDListCountCycles;
+	_VIDEO_RomOpen							= _VIDEO_RICE_510_RomOpen;
+	_VIDEO_RomClosed						= _VIDEO_RICE_510_RomClosed;
+	//_VIDEO_DllClose							= _VIDEO_RICE_510_CloseDLL;
+	_VIDEO_UpdateScreen						= _VIDEO_RICE_510_UpdateScreen;
+	_VIDEO_GetDllInfo						= _VIDEO_RICE_510_GetDllInfo;
+	//_VIDEO_ExtraChangeResolution			= 
+	_VIDEO_DllConfig						= _VIDEO_RICE_510_DllConfig;
+	//_VIDEO_Test								= _VIDEO_RICE_510_DllTest;
+	//_VIDEO_About							= _VIDEO_RICE_510_DllAbout;
+	_VIDEO_MoveScreen						= _VIDEO_RICE_510_MoveScreen;
+	_VIDEO_DrawScreen						= _VIDEO_RICE_510_DrawScreen;
+	_VIDEO_ViStatusChanged					= _VIDEO_RICE_510_ViStatusChanged;
+	_VIDEO_ViWidthChanged					= _VIDEO_RICE_510_ViWidthChanged;
+	//_VIDEO_ChangeWindow					= _VIDEO_RICE_510_ChangeWindow;
+	
+	//_VIDEO_ChangeWindow_1_3					= _VIDEO_RICE_510_ChangeWindow;
+	//_VIDEO_CaptureScreen					= _VIDEO_RICE_510_CaptureScreen;
+	_VIDEO_ProcessRDPList					= _VIDEO_RICE_510_ProcessRDPList;
+	//_VIDEO_ShowCFB						= _VIDEO_RICE_510_ShowCFB;
+	
+	//_VIDEO_FrameBufferWrite					= _VIDEO_RICE_510_FBWrite;
+	//_VIDEO_FrameBufferWriteList				= _VIDEO_RICE_510_FBWList;
+	//_VIDEO_FrameBufferRead					= _VIDEO_RICE_510_FBRead;
+	//_VIDEO_GetFrameBufferInfo				= _VIDEO_RICE_510_FBGetFrameBufferInfo;
+	//_VIDEO_SetOnScreenText				= _VIDEO_RICE_510_SetOnScreenText;
+	//_VIDEO_GetFullScreenStatus			= _VIDEO_RICE_510_GetFullScreenStatus;
+	
+	_VIDEO_SetMaxTextureMem					= _VIDEO_RICE_510_SetMaxTextureMem;
+
+
 #elif defined(_VIDEO_RICE_531)
 
+	GfxPluginVersion						= 0x0102;
+	_VIDEO_InitiateGFX						= _VIDEO_RICE_531_InitiateGFX;
+	_VIDEO_ProcessDList						= _VIDEO_RICE_531_ProcessDList;
+	_VIDEO_ProcessDList_Count_Cycles		= _VIDEO_RICE_531_ProcessDListCountCycles;
+	_VIDEO_RomOpen							= _VIDEO_RICE_531_RomOpen;
+	_VIDEO_RomClosed						= _VIDEO_RICE_531_RomClosed;
+	_VIDEO_DllClose							= _VIDEO_RICE_531_CloseDLL;
+	_VIDEO_UpdateScreen						= _VIDEO_RICE_531_UpdateScreen;
+	_VIDEO_GetDllInfo						= _VIDEO_RICE_531_GetDllInfo;
+	//_VIDEO_ExtraChangeResolution			= 
+	_VIDEO_DllConfig						= _VIDEO_RICE_531_DllConfig;
+	_VIDEO_Test								= _VIDEO_RICE_531_DllTest;
+	_VIDEO_About							= _VIDEO_RICE_531_DllAbout;
+	_VIDEO_MoveScreen						= _VIDEO_RICE_531_MoveScreen;
+	_VIDEO_DrawScreen						= _VIDEO_RICE_531_DrawScreen;
+	_VIDEO_ViStatusChanged					= _VIDEO_RICE_531_ViStatusChanged;
+	_VIDEO_ViWidthChanged					= _VIDEO_RICE_531_ViWidthChanged;
+	//_VIDEO_ChangeWindow					= _VIDEO_RICE_531_ChangeWindow;
+	
+	_VIDEO_ChangeWindow_1_3					= _VIDEO_RICE_531_ChangeWindow;
+	//_VIDEO_CaptureScreen					= _VIDEO_RICE_531_CaptureScreen;
+	_VIDEO_ProcessRDPList					= _VIDEO_RICE_531_ProcessRDPList;
+	//_VIDEO_ShowCFB						= _VIDEO_RICE_531_ShowCFB;
+	
+	_VIDEO_FrameBufferWrite					= _VIDEO_RICE_531_FBWrite;
+	_VIDEO_FrameBufferWriteList				= _VIDEO_RICE_531_FBWList;
+	_VIDEO_FrameBufferRead					= _VIDEO_RICE_531_FBRead;
+	_VIDEO_GetFrameBufferInfo				= _VIDEO_RICE_531_FBGetFrameBufferInfo;
+	//_VIDEO_SetOnScreenText				= _VIDEO_RICE_531_SetOnScreenText;
+	//_VIDEO_GetFullScreenStatus			= _VIDEO_RICE_531_GetFullScreenStatus;
+	
+	_VIDEO_SetMaxTextureMem					= _VIDEO_RICE_531_SetMaxTextureMem;
+
 #elif defined(_VIDEO_RICE_560)
+
 	GfxPluginVersion						= 0x0103;
 	_VIDEO_InitiateGFX						= _VIDEO_RICE_560_InitiateGFX;
 	_VIDEO_ProcessDList						= _VIDEO_RICE_560_ProcessDList;
@@ -545,41 +735,82 @@ BOOL LoadGFXDll(char * RspDll) {
 
 #elif defined(_VIDEO_RICE_611)
 
+
+
 #elif defined(_VIDEO_RICE_612)
-	GetDllInfo = (void ( *)(PLUGIN_INFO *))_VIDEO_RICE_612_GetDllInfo;
+	//GfxPluginVersion						= 0x0103;
+	_VIDEO_InitiateGFX						= _VIDEO_RICE_612_InitiateGFX;
+	_VIDEO_ProcessDList						= _VIDEO_RICE_612_ProcessDList;
+	//_VIDEO_ProcessDList_Count_Cycles		= _VIDEO_RICE_612_ProcessDListCountCycles;
+	_VIDEO_RomOpen							= _VIDEO_RICE_612_RomOpen;
+	_VIDEO_RomClosed						= _VIDEO_RICE_612_RomClosed;
+	//_VIDEO_DllClose							= _VIDEO_RICE_612_CloseDLL;
+	_VIDEO_UpdateScreen						= _VIDEO_RICE_612_UpdateScreen;
+	_VIDEO_GetDllInfo						= _VIDEO_RICE_612_GetDllInfo;
+	//_VIDEO_ExtraChangeResolution			= 
+	_VIDEO_DllConfig						= _VIDEO_RICE_612_DllConfig;
+	//_VIDEO_Test								= _VIDEO_RICE_612_DllTest;
+	//_VIDEO_About							= _VIDEO_RICE_612_DllAbout;
+	_VIDEO_MoveScreen						= _VIDEO_RICE_612_MoveScreen;
+	_VIDEO_DrawScreen						= _VIDEO_RICE_612_DrawScreen;
+	_VIDEO_ViStatusChanged					= _VIDEO_RICE_612_ViStatusChanged;
+	_VIDEO_ViWidthChanged					= _VIDEO_RICE_612_ViWidthChanged;
+	//_VIDEO_ChangeWindow					= _VIDEO_RICE_612_ChangeWindow;
+	
+	//_VIDEO_ChangeWindow_1_3					= _VIDEO_RICE_612_ChangeWindow;
+	//_VIDEO_CaptureScreen					= _VIDEO_RICE_612_CaptureScreen;
+	_VIDEO_ProcessRDPList					= _VIDEO_RICE_612_ProcessRDPList;
+	//_VIDEO_ShowCFB						= _VIDEO_RICE_612_ShowCFB;
+	
+#ifdef CFB_READ
+	_VIDEO_FrameBufferWrite					= _VIDEO_RICE_612_FBWrite;
+	_VIDEO_FrameBufferWriteList				= _VIDEO_RICE_612_FBWList;
+	_VIDEO_FrameBufferRead					= _VIDEO_RICE_612_FBRead;
+	_VIDEO_GetFrameBufferInfo				= _VIDEO_RICE_612_FBGetFrameBufferInfo;
+#endif
+	//_VIDEO_SetOnScreenText				= _VIDEO_RICE_612_SetOnScreenText;
+	//_VIDEO_GetFullScreenStatus			= _VIDEO_RICE_612_GetFullScreenStatus;
+	
+	_VIDEO_SetMaxTextureMem					= _VIDEO_RICE_612_SetMaxTextureMem;
+
+#else
+	DisplayError("No Video Plugin Defined!");
+#endif
+
+	GetDllInfo = (void ( *)(PLUGIN_INFO *))_VIDEO_GetDllInfo;
 	if (GetDllInfo == NULL) { return FALSE; }
 	GetDllInfo(&PluginInfo);
 	if (!ValidPluginVersion(&PluginInfo) || PluginInfo.MemoryBswaped == FALSE) { return FALSE; }
-	//GFXCloseDLL = (void ( *)(void))_VIDEO_RICE_612_CloseDLL;
+	//GFXCloseDLL = (void ( *)(void))_VIDEO_CloseDLL;
 	//if (GFXCloseDLL == NULL) { return FALSE; }
-	ChangeWindow = (void ( *)(void))_VIDEO_RICE_612_ChangeWindow;
+	ChangeWindow = (void ( *)(void))_VIDEO_ChangeWindow;
 	if (ChangeWindow == NULL) { return FALSE; }
-	GFXDllConfig = (void ( *)(HWND))_VIDEO_RICE_612_DllConfig;
-	DrawScreen = (void ( *)(void))_VIDEO_RICE_612_DrawScreen;
+	GFXDllConfig = (void ( *)(HWND))_VIDEO_DllConfig;
+	DrawScreen = (void ( *)(void))_VIDEO_DrawScreen;
 	if (DrawScreen == NULL) { return FALSE; }
-	InitiateGFX = (BOOL ( *)(GFX_INFO))_VIDEO_RICE_612_InitiateGFX;
+	InitiateGFX = (BOOL ( *)(GFX_INFO))_VIDEO_InitiateGFX;
 	if (InitiateGFX == NULL) { return FALSE; }
-	MoveScreen = (void ( *)(int, int))_VIDEO_RICE_612_MoveScreen;
+	MoveScreen = (void ( *)(int, int))_VIDEO_MoveScreen;
 	if (MoveScreen == NULL) { return FALSE; }
-	ProcessDList = (void ( *)(void))_VIDEO_RICE_612_ProcessDList;
+	ProcessDList = (void ( *)(void))_VIDEO_ProcessDList;
 	if (ProcessDList == NULL) { return FALSE; }
-	GfxRomClosed = (void ( *)(void))_VIDEO_RICE_612_RomClosed;
+	GfxRomClosed = (void ( *)(void))_VIDEO_RomClosed;
 	if (GfxRomClosed == NULL) { return FALSE; }
-	GfxRomOpen = (void ( *)(void))_VIDEO_RICE_612_RomOpen;
+	GfxRomOpen = (void ( *)(void))_VIDEO_RomOpen;
 	if (GfxRomOpen == NULL) { return FALSE; }
-	UpdateScreen = (void ( *)(void))_VIDEO_RICE_612_UpdateScreen;
+	UpdateScreen = (void ( *)(void))_VIDEO_UpdateScreen;
 	if (UpdateScreen == NULL) { return FALSE; }
-	ViStatusChanged = (void ( *)(void))_VIDEO_RICE_612_ViStatusChanged;
+	ViStatusChanged = (void ( *)(void))_VIDEO_ViStatusChanged;
 	if (ViStatusChanged == NULL) { return FALSE; }
-	ViWidthChanged = (void ( *)(void))_VIDEO_RICE_612_ViWidthChanged;
+	ViWidthChanged = (void ( *)(void))_VIDEO_ViWidthChanged;
 	if (ViWidthChanged == NULL) { return FALSE; }
 	
 	if (PluginInfo.Version >= 0x0103 ){
-		ProcessRDPList = (void ( *)(void))_VIDEO_RICE_612_ProcessRDPList;
+		ProcessRDPList = (void ( *)(void))_VIDEO_ProcessRDPList;
 		if (ProcessRDPList == NULL) { return FALSE; }
-		//CaptureScreen = (void ( *)(char *))_VIDEO_RICE_612_CaptureScreen;
+		//CaptureScreen = (void ( *)(char *))_VIDEO_CaptureScreen;
 		//if (CaptureScreen == NULL) { return FALSE; }
-		//ShowCFB = (void ( *)(void))_VIDEO_RICE_612_ShowCFB;
+		//ShowCFB = (void ( *)(void))_VIDEO_ShowCFB;
 		//if (ShowCFB == NULL) { return FALSE; }
 		//GetGfxDebugInfo = (void ( *)(GFXDEBUG_INFO *))_VIDEO_GetGfxDebugInfo;
 		//InitiateGFXDebugger = (void ( *)(DEBUG_INFO))_VIDEO_InitiateGFXDebugger;
@@ -591,16 +822,14 @@ BOOL LoadGFXDll(char * RspDll) {
 		//InitiateGFXDebugger = NULL;
 	}
 #ifdef CFB_READ
-	FrameBufferRead = (void ( *)(DWORD))_VIDEO_RICE_612_FBRead;
-	FrameBufferWrite = (void ( *)(DWORD, DWORD))_VIDEO_RICE_612_FBWrite;
+	FrameBufferRead = (void ( *)(DWORD))_VIDEO_FBRead;
+	FrameBufferWrite = (void ( *)(DWORD, DWORD))_VIDEO_FBWrite;
 #endif
-	_VIDEO_RICE_612_SetMaxTextureMem(loaddwMaxVideoMem());
+	SetMaxTextureMem = (void ( *)(DWORD))_VIDEO_SetMaxTextureMem;
+	SetMaxTextureMem(loaddwMaxVideoMem());
 
 
 
-#else
-	DisplayError("No Video Plugin Defined!");
-#endif
 	
 	GetDllInfo(&PluginInfo);
 	if (!ValidPluginVersion(&PluginInfo) || PluginInfo.MemoryBswaped == FALSE) { return FALSE; }
@@ -650,6 +879,7 @@ BOOL LoadRSPDll(void) {
 		//_RSP_LINK_InitiateRSP_1_0	= _RSP_M64p_InitiateRSP;
 		_RSP_LINK_InitiateRSP_1_1	= _RSP_M64p_InitiateRSP;
 	}
+	/*
 	else if(g_iRspPlugin == _RSPPluginCXD4)
 	{
 		_RSP_LINK_DoRspCycles 		= _RSP_CXD4_DoRspCycles;
@@ -661,7 +891,7 @@ BOOL LoadRSPDll(void) {
 		//_RSP_LINK_InitiateRSP_1_0	= _RSP_CXD4_InitiateRSP;
 		_RSP_LINK_InitiateRSP_1_1	= _RSP_CXD4_InitiateRSP;
 	}
-
+	*/
 	
 	GetDllInfo = (void ( *)(PLUGIN_INFO *))_RSP_LINK_GetDllInfo;
 	if (GetDllInfo == NULL) { return FALSE; }

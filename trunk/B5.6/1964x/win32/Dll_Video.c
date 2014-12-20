@@ -81,7 +81,6 @@ void ( *_VIDEO_SetMaxTextureMem) (DWORD mem) = NULL;
 BOOL LoadVideoPlugin(char *libname)
 {
 #ifdef _XBOX
-
 #if defined(_VIDEO_1964_11)
 	GfxPluginVersion						= 0x0103;
 	_VIDEO_InitiateGFX						= _VIDEO_1964_11_InitiateGFX;
@@ -118,7 +117,75 @@ BOOL LoadVideoPlugin(char *libname)
 
 #elif defined(_VIDEO_RICE_510)
 
+	GfxPluginVersion						= 0x0102;
+	_VIDEO_InitiateGFX						= _VIDEO_RICE_510_InitiateGFX;
+	_VIDEO_ProcessDList						= _VIDEO_RICE_510_ProcessDList;
+	_VIDEO_ProcessDList_Count_Cycles		= _VIDEO_RICE_510_ProcessDListCountCycles;
+	_VIDEO_RomOpen							= _VIDEO_RICE_510_RomOpen;
+	_VIDEO_RomClosed						= _VIDEO_RICE_510_RomClosed;
+	_VIDEO_DllClose							= _VIDEO_RICE_510_CloseDLL;
+	_VIDEO_UpdateScreen						= _VIDEO_RICE_510_UpdateScreen;
+	_VIDEO_GetDllInfo						= _VIDEO_RICE_510_GetDllInfo;
+	//_VIDEO_ExtraChangeResolution			= 
+	_VIDEO_DllConfig						= _VIDEO_RICE_510_DllConfig;
+	_VIDEO_Test								= _VIDEO_RICE_510_DllTest;
+	_VIDEO_About							= _VIDEO_RICE_510_DllAbout;
+	_VIDEO_MoveScreen						= _VIDEO_RICE_510_MoveScreen;
+	_VIDEO_DrawScreen						= _VIDEO_RICE_510_DrawScreen;
+	_VIDEO_ViStatusChanged					= _VIDEO_RICE_510_ViStatusChanged;
+	_VIDEO_ViWidthChanged					= _VIDEO_RICE_510_ViWidthChanged;
+	//_VIDEO_ChangeWindow					= _VIDEO_RICE_510_ChangeWindow;
+	
+	_VIDEO_ChangeWindow_1_3					= _VIDEO_RICE_510_ChangeWindow;
+	//_VIDEO_CaptureScreen					= _VIDEO_RICE_510_CaptureScreen;
+	_VIDEO_ProcessRDPList					= _VIDEO_RICE_510_ProcessRDPList;
+	//_VIDEO_ShowCFB						= _VIDEO_RICE_510_ShowCFB;
+	
+	_VIDEO_FrameBufferWrite					= _VIDEO_RICE_510_FBWrite;
+	_VIDEO_FrameBufferWriteList				= _VIDEO_RICE_510_FBWList;
+	_VIDEO_FrameBufferRead					= _VIDEO_RICE_510_FBRead;
+	_VIDEO_GetFrameBufferInfo				= _VIDEO_RICE_510_FBGetFrameBufferInfo;
+	//_VIDEO_SetOnScreenText				= _VIDEO_RICE_510_SetOnScreenText;
+	//_VIDEO_GetFullScreenStatus			= _VIDEO_RICE_510_GetFullScreenStatus;
+	
+	_VIDEO_SetMaxTextureMem					= _VIDEO_RICE_510_SetMaxTextureMem;
+
+
 #elif defined(_VIDEO_RICE_531)
+
+	GfxPluginVersion						= 0x0102;
+	_VIDEO_InitiateGFX						= _VIDEO_RICE_531_InitiateGFX;
+	_VIDEO_ProcessDList						= _VIDEO_RICE_531_ProcessDList;
+	_VIDEO_ProcessDList_Count_Cycles		= _VIDEO_RICE_531_ProcessDListCountCycles;
+	_VIDEO_RomOpen							= _VIDEO_RICE_531_RomOpen;
+	_VIDEO_RomClosed						= _VIDEO_RICE_531_RomClosed;
+	_VIDEO_DllClose							= _VIDEO_RICE_531_CloseDLL;
+	_VIDEO_UpdateScreen						= _VIDEO_RICE_531_UpdateScreen;
+	_VIDEO_GetDllInfo						= _VIDEO_RICE_531_GetDllInfo;
+	//_VIDEO_ExtraChangeResolution			= 
+	_VIDEO_DllConfig						= _VIDEO_RICE_531_DllConfig;
+	_VIDEO_Test								= _VIDEO_RICE_531_DllTest;
+	_VIDEO_About							= _VIDEO_RICE_531_DllAbout;
+	_VIDEO_MoveScreen						= _VIDEO_RICE_531_MoveScreen;
+	_VIDEO_DrawScreen						= _VIDEO_RICE_531_DrawScreen;
+	_VIDEO_ViStatusChanged					= _VIDEO_RICE_531_ViStatusChanged;
+	_VIDEO_ViWidthChanged					= _VIDEO_RICE_531_ViWidthChanged;
+	//_VIDEO_ChangeWindow					= _VIDEO_RICE_531_ChangeWindow;
+	
+	_VIDEO_ChangeWindow_1_3					= _VIDEO_RICE_531_ChangeWindow;
+	//_VIDEO_CaptureScreen					= _VIDEO_RICE_531_CaptureScreen;
+	_VIDEO_ProcessRDPList					= _VIDEO_RICE_531_ProcessRDPList;
+	//_VIDEO_ShowCFB						= _VIDEO_RICE_531_ShowCFB;
+	
+	_VIDEO_FrameBufferWrite					= _VIDEO_RICE_531_FBWrite;
+	_VIDEO_FrameBufferWriteList				= _VIDEO_RICE_531_FBWList;
+	_VIDEO_FrameBufferRead					= _VIDEO_RICE_531_FBRead;
+	_VIDEO_GetFrameBufferInfo				= _VIDEO_RICE_531_FBGetFrameBufferInfo;
+	//_VIDEO_SetOnScreenText				= _VIDEO_RICE_531_SetOnScreenText;
+	//_VIDEO_GetFullScreenStatus			= _VIDEO_RICE_531_GetFullScreenStatus;
+	
+	_VIDEO_SetMaxTextureMem					= _VIDEO_RICE_531_SetMaxTextureMem;
+
 
 #elif defined(_VIDEO_RICE_560)
 	GfxPluginVersion						= 0x0103;
@@ -155,9 +222,41 @@ BOOL LoadVideoPlugin(char *libname)
 	_VIDEO_SetMaxTextureMem					= _VIDEO_RICE_560_SetMaxTextureMem;
 
 #elif defined(_VIDEO_RICE_611)
+	GfxPluginVersion						= 0x0103;
+	_VIDEO_InitiateGFX						= _VIDEO_RICE_611_InitiateGFX;
+	_VIDEO_ProcessDList						= _VIDEO_RICE_611_ProcessDList;
+	_VIDEO_ProcessDList_Count_Cycles		= _VIDEO_RICE_611_ProcessDListCountCycles;
+	_VIDEO_RomOpen							= _VIDEO_RICE_611_RomOpen;
+	_VIDEO_RomClosed						= _VIDEO_RICE_611_RomClosed;
+	_VIDEO_DllClose							= _VIDEO_RICE_611_CloseDLL;
+	_VIDEO_UpdateScreen						= _VIDEO_RICE_611_UpdateScreen;
+	_VIDEO_GetDllInfo						= _VIDEO_RICE_611_GetDllInfo;
+	//_VIDEO_ExtraChangeResolution			= 
+	_VIDEO_DllConfig						= _VIDEO_RICE_611_DllConfig;
+	_VIDEO_Test								= _VIDEO_RICE_611_DllTest;
+	_VIDEO_About							= _VIDEO_RICE_611_DllAbout;
+	_VIDEO_MoveScreen						= _VIDEO_RICE_611_MoveScreen;
+	_VIDEO_DrawScreen						= _VIDEO_RICE_611_DrawScreen;
+	_VIDEO_ViStatusChanged					= _VIDEO_RICE_611_ViStatusChanged;
+	_VIDEO_ViWidthChanged					= _VIDEO_RICE_611_ViWidthChanged;
+	//_VIDEO_ChangeWindow					= _VIDEO_RICE_611_ChangeWindow;
+	
+	_VIDEO_ChangeWindow_1_3					= _VIDEO_RICE_611_ChangeWindow;
+	//_VIDEO_CaptureScreen					= _VIDEO_RICE_611_CaptureScreen;
+	_VIDEO_ProcessRDPList					= _VIDEO_RICE_611_ProcessRDPList;
+	//_VIDEO_ShowCFB						= _VIDEO_RICE_611_ShowCFB;
+	
+	_VIDEO_FrameBufferWrite					= _VIDEO_RICE_611_FBWrite;
+	//_VIDEO_FrameBufferWriteList				= _VIDEO_RICE_611_FBWList;
+	_VIDEO_FrameBufferRead					= _VIDEO_RICE_611_FBRead;
+	_VIDEO_GetFrameBufferInfo				= _VIDEO_RICE_611_FBGetFrameBufferInfo;
+	//_VIDEO_SetOnScreenText				= _VIDEO_RICE_611_SetOnScreenText;
+	//_VIDEO_GetFullScreenStatus			= _VIDEO_RICE_611_GetFullScreenStatus;
+	
+	_VIDEO_SetMaxTextureMem					= _VIDEO_RICE_611_SetMaxTextureMem;
 
 #elif defined(_VIDEO_RICE_612)
-	//GfxPluginVersion						= 0x0103;
+	GfxPluginVersion						= 0x0103;
 	_VIDEO_InitiateGFX						= _VIDEO_RICE_612_InitiateGFX;
 	_VIDEO_ProcessDList						= _VIDEO_RICE_612_ProcessDList;
 	_VIDEO_ProcessDList_Count_Cycles		= _VIDEO_RICE_612_ProcessDListCountCycles;

@@ -282,6 +282,8 @@ void ( *UpdateScreen)       ( void );
 void ( *ViStatusChanged)    ( void );
 void ( *ViWidthChanged)     ( void );
 
+void ( *SetMaxTextureMem)   ( DWORD );
+
 /************ Audio DLL: Functions *****************/
 void ( *AiCloseDLL)       ( void );
 void ( *AiDacrateChanged) ( int SystemType );

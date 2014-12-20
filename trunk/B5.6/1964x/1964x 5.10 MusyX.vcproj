@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.10"
-	Name="1964x 5.10 MusyX"
+	Name="1964x085 5.10 MusyX"
 	ProjectGUID="{8093DA18-6D55-4807-89F1-E33B99D4237D}"
 	RootNamespace="1964x.5-10.MusyX"
 	Keyword="XboxProj">
@@ -41,7 +41,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xacteng.lib xboxkrnl.lib xbdm.lib zlib\xzlib.lib AudioMusyX.lib Input.lib RSP.lib RSPHLE.lib RSPM64P.lib Video510.lib"
+				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xacteng.lib xboxkrnl.lib xbdm.lib zlib\xzlib.lib AudioMusyX.lib Input.lib RSP.lib RSPHLE.lib RSPM64P.lib VideoRice510.lib"
 				OutputFile="$(OutDir)/1964-510M.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\Plugins\lib"
@@ -64,7 +64,7 @@
 				RemotePath="xe:\Surreal64 CE\1964-510M.xbe"/>
 			<Tool
 				Name="XboxImageTool"
-				FileName="$(TargetDir)1964-510M.xbe"
+				FileName="$(TargetDir)1964x085-510M.xbe"
 				StackSize="65536"
 				IncludeDebugInfo="TRUE"
 				NoLibWarn="TRUE"
@@ -252,7 +252,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xacteng.lib xboxkrnl.lib xbdm.lib zlib\xzlib.lib AudioMusyX.lib Input.lib RSP.lib RSPHLE.lib RSPM64P.lib Video510.lib"
+				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xacteng.lib xboxkrnl.lib xbdm.lib zlib\xzlib.lib AudioMusyX.lib Input.lib RSP.lib RSPHLE.lib RSPM64P.lib VideoRice510.lib"
 				OutputFile="$(OutDir)/1964-510M.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\Plugins\lib"
@@ -277,7 +277,7 @@
 				RemotePath="xe:\Surreal64 CE\1964-510M.xbe"/>
 			<Tool
 				Name="XboxImageTool"
-				FileName="$(TargetDir)1964-510M.xbe"
+				FileName="$(TargetDir)1964x085-510M.xbe"
 				StackSize="65536"
 				NoLibWarn="TRUE"
 				UDCluster="3"
@@ -322,7 +322,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="xapilib.lib d3d8ltcg.lib d3dx8.lib xgraphicsltcg.lib dsound.lib dmusicltcg.lib xactengltcg.lib xboxkrnl.lib zlib\xzlib.lib AudioMusyX.lib Input.lib RSP.lib RSPHLE.lib RSPM64P.lib Video510.lib"
+				AdditionalDependencies="xapilib.lib d3d8ltcg.lib d3dx8.lib xgraphicsltcg.lib dsound.lib dmusicltcg.lib xactengltcg.lib xboxkrnl.lib zlib\xzlib.lib AudioMusyX.lib Input.lib RSP.lib RSPHLE.lib RSPM64P.lib VideoRice510.lib"
 				OutputFile="$(OutDir)/1964-510M.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\Plugins\lib"
@@ -347,7 +347,7 @@
 				RemotePath="xe:\Surreal64 CE\1964-510M.xbe"/>
 			<Tool
 				Name="XboxImageTool"
-				FileName="$(TargetDir)1964-510M.xbe"
+				FileName="$(TargetDir)1964x085-510M.xbe"
 				StackSize="65536"
 				NoLibWarn="TRUE"
 				UDCluster="3"

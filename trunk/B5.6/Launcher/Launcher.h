@@ -37,8 +37,9 @@ enum Emulators
 	_1964,
 	_Project64,
 	_UltraHLE,
-	_Mupen64Plus,
+	_PJ64x14,
 	_1964x11,
+	//_Mupen64PlusX,
 	_None
 };
 
