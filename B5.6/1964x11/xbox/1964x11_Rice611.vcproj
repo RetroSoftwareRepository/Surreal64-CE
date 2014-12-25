@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.10"
-	Name="1964x11-612"
+	Name="1964x11-611"
 	ProjectGUID="{AE93B07A-3290-4453-9045-F4FDFB2E3383}"
 	RootNamespace="1964x11"
 	Keyword="XboxProj">
@@ -234,7 +234,7 @@
 				EnableFiberSafeOptimizations="TRUE"
 				OptimizeForProcessor="2"
 				AdditionalIncludeDirectories="..\..\Plugins\include\;..\..\Common\"
-				PreprocessorDefinitions="NDEBUG;_XBOX;DYNAREC;ENABLE_64BIT_FPU;WIN32;_WIN32;_WINDOWS;EXTERNAL_RELEASE;_VIDEO_RICE_612;_RSP_M64P_HLE;_RSP_SOLO;_AUDIO_AZIMER;_AUDIO_JTTL;_AUDIO_NONE;_AUDIO_BASIC;_1964_11;USE_ROM_PAGING"
+				PreprocessorDefinitions="NDEBUG;_XBOX;DYNAREC;ENABLE_64BIT_FPU;WIN32;_WIN32;_WINDOWS;EXTERNAL_RELEASE;_VIDEO_RICE_611;_RSP_M64P_HLE;_RSP_SOLO;_AUDIO_AZIMER;_AUDIO_JTTL;_AUDIO_NONE;_AUDIO_BASIC;_1964_11;USE_ROM_PAGING"
 				StringPooling="TRUE"
 				RuntimeLibrary="0"
 				StructMemberAlignment="5"
@@ -253,7 +253,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xacteng.lib xboxkrnl.lib xbdm.lib zlib\xzlib.lib AudioBasic.lib AudioJttl.lib AudioM64Plus.lib AudioNone.lib AudioAzimer.lib Input.lib RSP.lib RSPCXD4.lib RSPHLE.lib RSPM64P.lib Video612.lib"
+				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xacteng.lib xboxkrnl.lib xbdm.lib zlib\xzlib.lib AudioBasic.lib AudioJttl.lib AudioM64Plus.lib AudioNone.lib AudioAzimer.lib Input.lib RSP.lib RSPCXD4.lib RSPHLE.lib RSPM64P.lib Video611.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\Plugins\lib;.\zlib"

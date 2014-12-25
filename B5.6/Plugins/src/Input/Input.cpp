@@ -110,7 +110,7 @@ void _INPUT_GetKeys(int Control, BUTTONS * Keys)
 		OutputDebugString("\n");
 #endif*/
 
-		_VIDEO_DisplayTemporaryMessage(msg);
+		//_VIDEO_DisplayTemporaryMessage(msg);
 	}
 }
 

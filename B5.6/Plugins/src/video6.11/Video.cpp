@@ -926,7 +926,7 @@ FUNC_TYPE(void) NAME_DEFINE(CloseDLL) (void)
 	if( status.bGameIsRunning )
 	{
 #ifdef _XBOX
-		_VIDEO_RomClosed();
+		_VIDEO_RICE_611_RomClosed();
 #else
 		RomClosed();
 #endif
@@ -1117,7 +1117,7 @@ void _VIDEO_DisplayTemporaryMessage(const char *Message)
 }
 
 #ifdef _XBOX
-void _VIDEO_SetMaxTextureMem(DWORD mem)
+void _VIDEO_RICE_611_SetMaxTextureMem(DWORD mem)
 {
 	if (mem == 0) // auto mem
 	{

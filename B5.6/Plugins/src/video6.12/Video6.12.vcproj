@@ -39,7 +39,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="../../lib/Video612.lib"/>
+				OutputFile="../../lib/VideoRice612.lib"/>
 			<Tool
 				Name="VCPostBuildEventTool"/>
 			<Tool
@@ -170,7 +170,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="../../lib/Video612.lib"/>
+				OutputFile="../../lib/VideoRice612.lib"/>
 			<Tool
 				Name="VCPostBuildEventTool"/>
 			<Tool
@@ -214,7 +214,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="../../lib/Video612.lib"/>
+				OutputFile="../../lib/VideoRice612.lib"/>
 			<Tool
 				Name="VCPostBuildEventTool"/>
 			<Tool

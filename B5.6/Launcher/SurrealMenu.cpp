@@ -292,7 +292,7 @@ string GetEmulatorName(int p_iEmulator)
 	string szEmulator;
 
 	switch (p_iEmulator) {
-		case _1964 : szEmulator = "1964"; break;
+		case _1964 : szEmulator = "1964x085"; break;
 		case _1964x11 : szEmulator = "1964x11"; break;
 		case _Project64 : szEmulator = "Project64"; break;
 		case _PJ64x14 : szEmulator = "PJ64x14"; break;

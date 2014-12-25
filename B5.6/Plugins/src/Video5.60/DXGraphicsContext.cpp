@@ -545,7 +545,7 @@ HRESULT CDXGraphicsContext::InitializeD3D()
     m_d3dpp.BackBufferCount        = 1;
 	m_d3dpp.MultiSampleType        = SetAntiAliasMode(AntiAliasMode);
 	//m_d3dpp.SwapEffect             = bufferSettings[curBufferSetting].swapEffect;
-    m_d3dpp.SwapEffect             =  D3DSWAPEFFECT_COPY;
+    m_d3dpp.SwapEffect             =  D3DSWAPEFFECT_FLIP;
 	m_d3dpp.EnableAutoDepthStencil = TRUE; /*m_bUseDepthBuffer;*/
     //m_d3dpp.AutoDepthStencilFormat = pModeInfo->DepthStencilFormat;
 	m_d3dpp.AutoDepthStencilFormat = D3DFMT_D16;

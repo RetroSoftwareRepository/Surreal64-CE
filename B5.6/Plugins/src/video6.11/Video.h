@@ -163,6 +163,6 @@ extern void _VIDEO_DisplayTemporaryMessage(const char *msg);
 extern void XBOX_Debugger_Log(const char *Message, ...);
 
 // reinstate max video mem
-void _VIDEO_SetMaxTextureMem(DWORD mem);
+void _VIDEO_RICE_611_SetMaxTextureMem(DWORD mem);
 
 #endif

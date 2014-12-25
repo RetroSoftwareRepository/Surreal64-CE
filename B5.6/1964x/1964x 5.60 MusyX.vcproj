@@ -2,8 +2,8 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.10"
-	Name="1964x 5.60 MusyX"
-	ProjectGUID="{6200FC2F-B1AD-4912-B807-E600915DD004}"
+	Name="1964x085 5.60 MusyX"
+	ProjectGUID="{8093DA18-6D55-4807-89F1-E33B99D4237D}"
 	RootNamespace="1964x.5-60.MusyX"
 	Keyword="XboxProj">
 	<Platforms>
@@ -64,7 +64,7 @@
 				RemotePath="xe:\Surreal64 CE\1964-560M.xbe"/>
 			<Tool
 				Name="XboxImageTool"
-				FileName="$(TargetDir)1964-560M.xbe"
+				FileName="$(TargetDir)1964x085-560M.xbe"
 				StackSize="65536"
 				IncludeDebugInfo="TRUE"
 				NoLibWarn="TRUE"
@@ -277,7 +277,7 @@
 				RemotePath="xe:\Surreal64 CE\1964-560M.xbe"/>
 			<Tool
 				Name="XboxImageTool"
-				FileName="$(TargetDir)1964-560M.xbe"
+				FileName="$(TargetDir)1964x085-560M.xbe"
 				StackSize="65536"
 				NoLibWarn="TRUE"
 				UDCluster="3"
@@ -347,7 +347,7 @@
 				RemotePath="xe:\Surreal64 CE\1964-560M.xbe"/>
 			<Tool
 				Name="XboxImageTool"
-				FileName="$(TargetDir)1964-560M.xbe"
+				FileName="$(TargetDir)1964x085-560M.xbe"
 				StackSize="65536"
 				NoLibWarn="TRUE"
 				UDCluster="3"
