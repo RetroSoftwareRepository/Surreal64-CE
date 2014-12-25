@@ -179,7 +179,7 @@ BOOL LoadVideoPlugin(char *libname)
 	_VIDEO_FrameBufferWrite					= _VIDEO_RICE_531_FBWrite;
 	_VIDEO_FrameBufferWriteList				= _VIDEO_RICE_531_FBWList;
 	_VIDEO_FrameBufferRead					= _VIDEO_RICE_531_FBRead;
-	_VIDEO_GetFrameBufferInfo				= _VIDEO_RICE_531_FBGetFrameBufferInfo;
+	//_VIDEO_GetFrameBufferInfo				= _VIDEO_RICE_531_FBGetFrameBufferInfo;
 	//_VIDEO_SetOnScreenText				= _VIDEO_RICE_531_SetOnScreenText;
 	//_VIDEO_GetFullScreenStatus			= _VIDEO_RICE_531_GetFullScreenStatus;
 	

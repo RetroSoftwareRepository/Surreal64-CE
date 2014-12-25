@@ -104,7 +104,7 @@ typedef struct
   input:    pointer to the directory to save the file to
   output:   none
 *******************************************************************/ 
-EXPORT void CALL _VIDEO_CaptureScreen ( char * Directory );
+EXPORT void CALL CaptureScreen ( char * Directory );
 
 /******************************************************************
   Function: ChangeWindow
@@ -114,7 +114,7 @@ EXPORT void CALL _VIDEO_CaptureScreen ( char * Directory );
   input:    none
   output:   none
 *******************************************************************/ 
-EXPORT void CALL _VIDEO_ChangeWindow (void);
+EXPORT void CALL _VIDEO_RICE_560_ChangeWindow (void);
 
 /******************************************************************
   Function: CloseDLL
@@ -123,7 +123,7 @@ EXPORT void CALL _VIDEO_ChangeWindow (void);
   input:    none
   output:   none
 *******************************************************************/ 
-EXPORT void CALL _VIDEO_CloseDLL (void);
+EXPORT void CALL _VIDEO_RICE_560_CloseDLL (void);
 
 /******************************************************************
   Function: DllAbout
@@ -132,7 +132,7 @@ EXPORT void CALL _VIDEO_CloseDLL (void);
   input:    a handle to the window that calls this function
   output:   none
 *******************************************************************/ 
-EXPORT void CALL _VIDEO_DllAbout ( HWND hParent );
+EXPORT void CALL _VIDEO_RICE_560_DllAbout ( HWND hParent );
 
 /******************************************************************
   Function: DllConfig
@@ -141,7 +141,7 @@ EXPORT void CALL _VIDEO_DllAbout ( HWND hParent );
   input:    a handle to the window that calls this function
   output:   none
 *******************************************************************/ 
-EXPORT void CALL _VIDEO_DllConfig ( HWND hParent );
+EXPORT void CALL _VIDEO_RICE_560_DllConfig ( HWND hParent );
 
 /******************************************************************
   Function: DllTest
@@ -150,7 +150,7 @@ EXPORT void CALL _VIDEO_DllConfig ( HWND hParent );
   input:    a handle to the window that calls this function
   output:   none
 *******************************************************************/ 
-EXPORT void CALL _VIDEO_DllTest ( HWND hParent );
+EXPORT void CALL _VIDEO_RICE_560_DllTest ( HWND hParent );
 
 /******************************************************************
   Function: DrawScreen
@@ -160,7 +160,7 @@ EXPORT void CALL _VIDEO_DllTest ( HWND hParent );
   input:    none
   output:   none
 *******************************************************************/ 
-EXPORT void CALL _VIDEO_DrawScreen (void);
+EXPORT void CALL _VIDEO_RICE_560_DrawScreen (void);
 
 /******************************************************************
   Function: GetDllInfo
@@ -170,7 +170,7 @@ EXPORT void CALL _VIDEO_DrawScreen (void);
             filled by the function. (see def above)
   output:   none
 *******************************************************************/ 
-EXPORT void CALL _VIDEO_GetDllInfo ( PLUGIN_INFO * PluginInfo );
+EXPORT void CALL _VIDEO_RICE_560_GetDllInfo ( PLUGIN_INFO * PluginInfo );
 
 /******************************************************************
   Function: InitiateGFX
@@ -187,7 +187,7 @@ EXPORT void CALL _VIDEO_GetDllInfo ( PLUGIN_INFO * PluginInfo );
   and then call the function CheckInterrupts to tell the emulator
   that there is a waiting interrupt.
 *******************************************************************/ 
-EXPORT BOOL CALL _VIDEO_InitiateGFX (GFX_INFO Gfx_Info);
+EXPORT BOOL CALL _VIDEO_RICE_560_InitiateGFX (GFX_INFO Gfx_Info);
 
 /******************************************************************
   Function: MoveScreen
@@ -200,7 +200,7 @@ EXPORT BOOL CALL _VIDEO_InitiateGFX (GFX_INFO Gfx_Info);
 			client area of the window. 
   output:   none
 *******************************************************************/ 
-EXPORT void CALL _VIDEO_MoveScreen (int xpos, int ypos);
+EXPORT void CALL _VIDEO_RICE_560_MoveScreen (int xpos, int ypos);
 
 /******************************************************************
   Function: ProcessDList
@@ -209,8 +209,8 @@ EXPORT void CALL _VIDEO_MoveScreen (int xpos, int ypos);
   input:    none
   output:   none
 *******************************************************************/ 
-EXPORT void CALL _VIDEO_ProcessDList(void);
-EXPORT DWORD CALL _VIDEO_ProcessDListCountCycles(void);
+EXPORT void CALL _VIDEO_RICE_560_ProcessDList(void);
+EXPORT DWORD CALL _VIDEO_RICE_560_ProcessDListCountCycles(void);
 
 /******************************************************************
   Function: ProcessRDPList
@@ -219,7 +219,7 @@ EXPORT DWORD CALL _VIDEO_ProcessDListCountCycles(void);
   input:    none
   output:   none
 *******************************************************************/ 
-EXPORT void CALL _VIDEO_ProcessRDPList(void);
+EXPORT void CALL _VIDEO_RICE_560_ProcessRDPList(void);
 
 /******************************************************************
   Function: RomClosed
@@ -227,7 +227,7 @@ EXPORT void CALL _VIDEO_ProcessRDPList(void);
   input:    none
   output:   none
 *******************************************************************/ 
-EXPORT void CALL _VIDEO_RomClosed (void);
+EXPORT void CALL _VIDEO_RICE_560_RomClosed (void);
 
 /******************************************************************
   Function: RomOpen
@@ -236,7 +236,7 @@ EXPORT void CALL _VIDEO_RomClosed (void);
   input:    none
   output:   none
 *******************************************************************/ 
-EXPORT void CALL _VIDEO_RomOpen (void);
+EXPORT void CALL _VIDEO_RICE_560_RomOpen (void);
 
 /******************************************************************
   Function: ShowCFB
@@ -246,7 +246,7 @@ EXPORT void CALL _VIDEO_RomOpen (void);
   input:    none
   output:   none
 *******************************************************************/ 
-EXPORT void CALL _VIDEO_ShowCFB (void);
+EXPORT void CALL ShowCFB (void);
 
 /******************************************************************
   Function: UpdateScreen
@@ -256,7 +256,7 @@ EXPORT void CALL _VIDEO_ShowCFB (void);
   input:    none
   output:   none
 *******************************************************************/ 
-EXPORT void CALL _VIDEO_UpdateScreen (void);
+EXPORT void CALL _VIDEO_RICE_560_UpdateScreen (void);
 
 /******************************************************************
   Function: ViStatusChanged
@@ -265,7 +265,7 @@ EXPORT void CALL _VIDEO_UpdateScreen (void);
   input:    none
   output:   none
 *******************************************************************/ 
-EXPORT void CALL _VIDEO_ViStatusChanged (void);
+EXPORT void CALL _VIDEO_RICE_560_ViStatusChanged (void);
 
 /******************************************************************
   Function: ViWidthChanged
@@ -274,7 +274,7 @@ EXPORT void CALL _VIDEO_ViStatusChanged (void);
   input:    none
   output:   none
 *******************************************************************/ 
-EXPORT void CALL _VIDEO_ViWidthChanged (void);
+EXPORT void CALL _VIDEO_RICE_560_ViWidthChanged (void);
 
 
 
@@ -287,7 +287,7 @@ EXPORT void CALL _VIDEO_ViWidthChanged (void);
 			size		1 = BYTE, 2 = WORD, 4 = DWORD
   output:   none
 *******************************************************************/ 
-EXPORT void CALL _VIDEO_FBWrite(DWORD, DWORD);
+EXPORT void CALL _VIDEO_RICE_560_FBWrite(DWORD, DWORD);
 
 /******************************************************************
   Function: FrameBufferWriteList
@@ -297,7 +297,7 @@ EXPORT void CALL _VIDEO_FBWrite(DWORD, DWORD);
 			size = size of the plist, max = 1024
   output:   none
 *******************************************************************/ 
-EXPORT void CALL _VIDEO_FBWList(FrameBufferModifyEntry *plist, DWORD size);
+EXPORT void CALL _VIDEO_RICE_560_FBWList(FrameBufferModifyEntry *plist, DWORD size);
 
 /******************************************************************
   Function: FrameBufferRead
@@ -314,7 +314,7 @@ EXPORT void CALL _VIDEO_FBWList(FrameBufferModifyEntry *plist, DWORD size);
 			size		1 = BYTE, 2 = WORD, 4 = DWORD
   output:   none
 *******************************************************************/ 
-EXPORT void CALL _VIDEO_FBRead(DWORD addr);
+EXPORT void CALL _VIDEO_RICE_560_FBRead(DWORD addr);
 
 
 
@@ -339,7 +339,7 @@ pinfo is pointed to a FrameBufferInfo structure which to be
 filled in by this function
 output:   Values are return in the FrameBufferInfo structure
 /************************************************************************/
-EXPORT void CALL _VIDEO_FBGetFrameBufferInfo(void *pinfo);
+EXPORT void CALL _VIDEO_RICE_560_FBGetFrameBufferInfo(void *pinfo);
 
 
 /******************************************************************
@@ -368,7 +368,7 @@ EXPORT void CALL SetOnScreenText(char *msg);
 
 
 // Ez0n3 - reinstate max video mem until freakdave finishes this
-void	_VIDEO_SetMaxTextureMem(DWORD mem);
+void	_VIDEO_RICE_560_SetMaxTextureMem(DWORD mem);
 
 #if defined(__cplusplus)
 }

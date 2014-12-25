@@ -106,7 +106,7 @@ void GetPluginDir( char * Directory )
 }
 
 //-------------------------------------------------------------------------------------
-EXPORT void CALL _VIDEO_GetDllInfo ( PLUGIN_INFO * PluginInfo )
+EXPORT void CALL _VIDEO_RICE_560_GetDllInfo ( PLUGIN_INFO * PluginInfo )
 {
 #ifdef _DEBUG
 #if _MSC_VER > 1200
@@ -130,7 +130,7 @@ EXPORT void CALL _VIDEO_GetDllInfo ( PLUGIN_INFO * PluginInfo )
 
 //---------------------------------------------------------------------------------------
 
-EXPORT void CALL _VIDEO_DllAbout ( HWND hParent )
+EXPORT void CALL _VIDEO_RICE_560_DllAbout ( HWND hParent )
 {
 	char temp[300];
 	sprintf(temp,"Rice's Video Plugin %d.%d.%d (build %d) \nDirectX 8.1+\nOpenGL 1.1-1.4/ATI/Nvidia TNT/Geforce Extension",FILE_VERSION0,FILE_VERSION1,FILE_VERSION2,BUILD_NUMBER) ;
@@ -140,12 +140,12 @@ EXPORT void CALL _VIDEO_DllAbout ( HWND hParent )
 
 //---------------------------------------------------------------------------------------
 
-EXPORT void CALL _VIDEO_DllTest ( HWND hParent )
+EXPORT void CALL _VIDEO_RICE_560_DllTest ( HWND hParent )
 {
 	MsgInfo("TODO: Test");
 }
 
-EXPORT void CALL _VIDEO_DllConfig ( HWND hParent )
+EXPORT void CALL _VIDEO_RICE_560_DllConfig ( HWND hParent )
 {
 	
 }
@@ -168,7 +168,7 @@ void ChangeWindowStep2()
 	status.ToToggleFullScreen = FALSE;
 }
 
-EXPORT void CALL _VIDEO_ChangeWindow ()
+EXPORT void CALL _VIDEO_RICE_560_ChangeWindow ()
 {
 	if( status.ToToggleFullScreen )
 		status.ToToggleFullScreen = FALSE;
@@ -182,13 +182,13 @@ void ChangeWinSize( void )
 }
 //---------------------------------------------------------------------------------------
 
-EXPORT void CALL _VIDEO_DrawScreen (void)
+EXPORT void CALL _VIDEO_RICE_560_DrawScreen (void)
 {
 }
 
 //---------------------------------------------------------------------------------------
 
-EXPORT void CALL _VIDEO_MoveScreen (int xpos, int ypos)
+EXPORT void CALL _VIDEO_RICE_560_MoveScreen (int xpos, int ypos)
 { 
 }
 
@@ -351,7 +351,7 @@ DWORD WINAPI VideoThreadProc( LPVOID lpParameter )
 
 
 //---------------------------------------------------------------------------------------
-EXPORT void CALL _VIDEO_RomClosed (void)
+EXPORT void CALL _VIDEO_RICE_560_RomClosed (void)
 {
 	TRACE0("To stop video");
 	Ini_StoreRomOptions(&g_curRomInfo);
@@ -374,7 +374,7 @@ EXPORT void CALL _VIDEO_RomClosed (void)
 	TRACE0("Video is stopped");
 }
 
-EXPORT void CALL _VIDEO_RomOpen (void)
+EXPORT void CALL _VIDEO_RICE_560_RomOpen (void)
 {
 	if( g_CritialSection.IsLocked() )
 	{
@@ -673,7 +673,7 @@ void UpdateScreenStep2 (void)
 	g_CritialSection.Unlock();
 }
 
-EXPORT void CALL _VIDEO_UpdateScreen (void)
+EXPORT void CALL _VIDEO_RICE_560_UpdateScreen (void)
 {
 #ifdef USING_THREAD
 	if (videoThread)
@@ -688,7 +688,7 @@ EXPORT void CALL _VIDEO_UpdateScreen (void)
 
 //---------------------------------------------------------------------------------------
 
-EXPORT void CALL _VIDEO_ViStatusChanged (void)
+EXPORT void CALL _VIDEO_RICE_560_ViStatusChanged (void)
 {
 	g_CritialSection.Lock();
 	SetVIScales();
@@ -697,7 +697,7 @@ EXPORT void CALL _VIDEO_ViStatusChanged (void)
 }
 
 //---------------------------------------------------------------------------------------
-EXPORT void CALL _VIDEO_ViWidthChanged (void)
+EXPORT void CALL _VIDEO_RICE_560_ViWidthChanged (void)
 {
 	g_CritialSection.Lock();
 	SetVIScales();
@@ -724,7 +724,7 @@ EXPORT BOOL CALL GetFullScreenStatus(void)
 	}
 }
 
-EXPORT BOOL CALL _VIDEO_InitiateGFX(GFX_INFO Gfx_Info)
+EXPORT BOOL CALL _VIDEO_RICE_560_InitiateGFX(GFX_INFO Gfx_Info)
 {
 #ifdef _DEBUG
 	OpenDialogBox();
@@ -818,11 +818,11 @@ void __cdecl ErrorMsg (char * Message, ...)
 
 //---------------------------------------------------------------------------------------
 
-EXPORT void CALL _VIDEO_CloseDLL (void)
+EXPORT void CALL _VIDEO_RICE_560_CloseDLL (void)
 { 
 	if( status.bGameIsRunning )
 	{
-		_VIDEO_RomClosed();
+		_VIDEO_RICE_560_RomClosed();
 	}
 
 	delete g_pIniFile;		// Will write ini file if changed
@@ -854,7 +854,7 @@ void ProcessDListStep2(void)
 	g_CritialSection.Unlock();
 }	
 
-EXPORT DWORD CALL _VIDEO_ProcessDListCountCycles(void)
+EXPORT DWORD CALL _VIDEO_RICE_560_ProcessDListCountCycles(void)
 {
 #ifdef USING_THREAD
 	if (videoThread)
@@ -889,7 +889,7 @@ EXPORT DWORD CALL _VIDEO_ProcessDListCountCycles(void)
 #endif
 }	
 
-EXPORT void CALL _VIDEO_ProcessRDPList(void)
+EXPORT void CALL _VIDEO_RICE_560_ProcessRDPList(void)
 {
 #ifdef USING_THREAD
 	if (videoThread)
@@ -910,7 +910,7 @@ EXPORT void CALL _VIDEO_ProcessRDPList(void)
 #endif
 }	
 
-EXPORT void CALL _VIDEO_ProcessDList(void)
+EXPORT void CALL _VIDEO_RICE_560_ProcessDList(void)
 {
 #ifdef USING_THREAD
 	if (videoThread)
@@ -939,7 +939,7 @@ void TriggerDPInterrupt(void)
 			size = size of the plist, max = 1024
   output:   none
 *******************************************************************/ 
-EXPORT  void CALL _VIDEO_FBWList(FrameBufferModifyEntry *plist, DWORD size)
+EXPORT  void CALL _VIDEO_RICE_560_FBWList(FrameBufferModifyEntry *plist, DWORD size)
 {
 }
 
@@ -965,7 +965,7 @@ EXPORT  void CALL _VIDEO_FBWList(FrameBufferModifyEntry *plist, DWORD size)
 void FrameBufferWriteByCPU(DWORD addr, DWORD size);
 void FrameBufferReadByCPU( DWORD addr );
 
-EXPORT  void CALL _VIDEO_FBRead(DWORD addr)
+EXPORT  void CALL _VIDEO_RICE_560_FBRead(DWORD addr)
 {
 	FrameBufferReadByCPU(addr);
 }
@@ -985,7 +985,7 @@ EXPORT  void CALL _VIDEO_FBRead(DWORD addr)
   output:   none
 *******************************************************************/ 
 
-EXPORT void CALL _VIDEO_FBWrite(DWORD addr, DWORD size)
+EXPORT void CALL _VIDEO_RICE_560_FBWrite(DWORD addr, DWORD size)
 {
 	FrameBufferWriteByCPU(addr, size);
 }
@@ -1022,12 +1022,12 @@ output:   Values are return in the FrameBufferInfo structure
   output:   none
 *******************************************************************/ 
 
-/*void __VIDEO_FBWrite(DWORD addr, DWORD size)
+/*void __VIDEO_RICE_560_FBWrite(DWORD addr, DWORD size)
 {
 	FrameBufferWriteByCPU(addr, size);
 }*/
 
-void _VIDEO_SetMaxTextureMem(DWORD mem) // supposed to be double underscore?? //	__VIDEO_SetMaxTextureMem(DWORD mem)
+void _VIDEO_RICE_560_SetMaxTextureMem(DWORD mem) // supposed to be double underscore?? //	__VIDEO_RICE_560_SetMaxTextureMem(DWORD mem)
 {
 	if (mem == 0) // auto mem
 	{
@@ -1055,7 +1055,7 @@ typedef struct
 	DWORD	height;
 } FrameBufferInfo;
 extern RecentCIInfo g_RecentCIInfo[];
-EXPORT void CALL _VIDEO_FBGetFrameBufferInfo(void *p)
+EXPORT void CALL _VIDEO_RICE_560_FBGetFrameBufferInfo(void *p)
 {
 	FrameBufferInfo * pinfo = (FrameBufferInfo *)p;
 	if( g_ZI.dwAddr == 0 )
@@ -1094,12 +1094,14 @@ EXPORT void CALL _VIDEO_FBGetFrameBufferInfo(void *p)
 //}
 
 // Plugin spec 1.3 functions
-EXPORT void CALL _VIDEO_ShowCFB (void)
+#ifndef _XBOX
+void CALL ShowCFB (void)
 {
 	status.toShowCFB = true;
 }
+#endif
 
-EXPORT void CALL _VIDEO_CaptureScreen ( char * Directory )
+void CALL CaptureScreen ( char * Directory )
 {
 #ifndef _XBOX
 	if( status.bGameIsRunning && status.gDlistCount > 0 )
