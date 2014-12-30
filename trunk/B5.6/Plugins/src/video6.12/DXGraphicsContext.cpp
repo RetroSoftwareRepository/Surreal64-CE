@@ -810,11 +810,13 @@ HRESULT CDXGraphicsContext::InitializeD3D()
 	}
 
 
-	else if(VertexMode == 1){
+	else if(VertexMode == 1){ //Xbox doesn't do Software vertex processing. Do Software Vertex Clipper instead.
 		// Create the device
 		hr = m_pD3D->CreateDevice( D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL,
-			NULL, D3DCREATE_SOFTWARE_VERTEXPROCESSING, &m_d3dpp,
+			NULL, D3DCREATE_HARDWARE_VERTEXPROCESSING, &m_d3dpp,
 			&m_pd3dDevice );
+
+		options.bForceSoftwareClipper = TRUE;
 
 	}
 

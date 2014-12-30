@@ -1026,12 +1026,12 @@ void ToggleTextureFilter(bool inc)
 	if (inc)
 	{
 	TextureMode++;
-    if (TextureMode > 7) TextureMode = 0;
+    if (TextureMode > 5) TextureMode = 1;
 	}
 	else
 	{
 	TextureMode--;
-    if (TextureMode < 0) TextureMode = 7;
+    if (TextureMode < 1) TextureMode = 5;
 	}
 	D3DDevice::SetTextureStageState(0, D3DTSS_MINFILTER, TextureMode);
 	D3DDevice::SetTextureStageState(0, D3DTSS_MAGFILTER, TextureMode);
@@ -1039,8 +1039,6 @@ void ToggleTextureFilter(bool inc)
 	XLMenu_CurRoutine = NULL;
 	
 	switch (TextureMode){
-		case 0 : 	swprintf(currentname,L"Texture Filter : None");
-			break;
 		case 1 : 	swprintf(currentname,L"Texture Filter : Point");
 			break;
 		case 2 : 	swprintf(currentname,L"Texture Filter : Linear");
@@ -1050,8 +1048,6 @@ void ToggleTextureFilter(bool inc)
 		case 4 : 	swprintf(currentname,L"Texture Filter : Quincunx");
 			break;
 		case 5 : 	swprintf(currentname,L"Texture Filter : Gaussian");
-			break;
-		case 7 : 	swprintf(currentname,L"Texture Filter : Default");
 			break;	}
 	XLMenu_SetItemText(&m_pSettingsMenu->items[currentItem], currentname);
 

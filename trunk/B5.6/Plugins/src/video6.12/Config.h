@@ -210,6 +210,7 @@ typedef struct {
 	BOOL	bWinFrameMode;
 	BOOL	bForceSoftwareTnL;
 	BOOL	bForceSoftwareClipper;
+	BOOL	bUseLinearFog;
 	BOOL	bOGLVertexClipper;
 	BOOL	bEnableSSE;
 	BOOL	bEnableVertexShader;
