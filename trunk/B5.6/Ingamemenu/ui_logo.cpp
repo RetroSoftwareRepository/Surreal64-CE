@@ -3,7 +3,7 @@
 #include "../config.h"
 #include <xgraphics.h>
 
-#define VERSION L"Surreal64 CE (B5.52u)"
+#define VERSION L"Surreal64 CE (B6.0)"
 
 //weinerschnitzel- Skin Control
 extern DWORD dwTitleColor;
