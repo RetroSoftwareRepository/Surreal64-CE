@@ -22,7 +22,7 @@
 				Optimization="0"
 				OptimizeForProcessor="2"
 				AdditionalIncludeDirectories="..\..\..\Include"
-				PreprocessorDefinitions="DEBUG;_XBOX;_LIB;_OLDCLIPPER"
+				PreprocessorDefinitions="DEBUG;_XBOX;_LIB;_OLDCLIPPER;OLDTXTCACHE"
 				BasicRuntimeChecks="0"
 				RuntimeLibrary="0"
 				BufferSecurityCheck="FALSE"

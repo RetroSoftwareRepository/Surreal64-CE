@@ -2,8 +2,8 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.10"
-	Name="1964x085 5.10 MusyX"
-	ProjectGUID="{8093DA18-6D55-4807-89F1-E33B99D4237D}"
+	Name="1964x085-510M"
+	ProjectGUID="{C82F3B8C-5EC1-4617-8BCC-6091B7674AD5}"
 	RootNamespace="1964x.5-10.MusyX"
 	Keyword="XboxProj">
 	<Platforms>
@@ -22,7 +22,7 @@
 				Optimization="0"
 				OptimizeForProcessor="2"
 				AdditionalIncludeDirectories="..\Plugins\include\"
-				PreprocessorDefinitions="DEBUG;_XBOX;DYNAREC;ENABLE_64BIT_FPU;WIN32;_WIN32;_WINDOWS;EXTERNAL_RELEASE;USE_MUSYX"
+				PreprocessorDefinitions="DEBUG;_XBOX;DYNAREC;ENABLE_64BIT_FPU;WIN32;_WIN32;_WINDOWS;EXTERNAL_RELEASE;USE_MUSYX;_VIDEO_RICE_510"
 				BasicRuntimeChecks="0"
 				RuntimeLibrary="0"
 				StructMemberAlignment="4"
@@ -64,7 +64,7 @@
 				RemotePath="xe:\Surreal64 CE\1964-510M.xbe"/>
 			<Tool
 				Name="XboxImageTool"
-				FileName="$(TargetDir)1964x085-510M.xbe"
+				FileName="$(TargetDir)$(ProjectName).xbe"
 				StackSize="65536"
 				IncludeDebugInfo="TRUE"
 				NoLibWarn="TRUE"
@@ -99,6 +99,7 @@
 				EnableEnhancedInstructionSet="1"
 				UsePrecompiledHeader="0"
 				PrecompiledHeaderFile="$(IntDir)\$(ProjectName).pch"
+				AssemblerOutput="0"
 				BrowseInformation="1"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
@@ -109,7 +110,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="xapilib.lib d3d8i.lib d3dx8.lib xgraphics.lib dsound.lib dmusici.lib xactengi.lib xboxkrnl.lib xbdm.lib zlib\xzlib.lib AudioMusyX.lib Input.lib RSP.lib RSPHLE.lib RSPM64P.lib Video510.lib"
+				AdditionalDependencies="xapilib.lib d3d8i.lib d3dx8.lib xgraphics.lib dsound.lib dmusici.lib xactengi.lib xboxkrnl.lib xbdm.lib zlib\xzlib.lib AudioMusyX.lib Input.lib RSP.lib RSPHLE.lib RSPM64P.lib VideoRice510.lib"
 				OutputFile="$(OutDir)/1964-510M.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\Plugins\lib"
@@ -134,7 +135,7 @@
 				RemotePath="xe:\Surreal64 CE\1964-510M.xbe"/>
 			<Tool
 				Name="XboxImageTool"
-				FileName="$(TargetDir)1964-510M.xbe"
+				FileName="$(TargetDir)$(ProjectName).xbe"
 				StackSize="65536"
 				IncludeDebugInfo="TRUE"
 				NoLibWarn="TRUE"
@@ -170,6 +171,7 @@
 				EnableEnhancedInstructionSet="1"
 				UsePrecompiledHeader="0"
 				PrecompiledHeaderFile="$(IntDir)\$(ProjectName).pch"
+				AssemblerOutput="0"
 				BrowseInformation="1"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
@@ -181,7 +183,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="xapilib.lib d3d8i.lib d3dx8.lib xgraphics.lib dsound.lib dmusici.lib xactengi.lib xboxkrnl.lib xbdm.lib zlib\xzlib.lib AudioMusyX.lib Input.lib RSP.lib RSPHLE.lib RSPM64P.lib Video510.lib"
+				AdditionalDependencies="xapilib.lib d3d8i.lib d3dx8.lib xgraphics.lib dsound.lib dmusici.lib xactengi.lib xboxkrnl.lib xbdm.lib zlib\xzlib.lib AudioMusyX.lib Input.lib RSP.lib RSPHLE.lib RSPM64P.lib VideoRice510.lib"
 				OutputFile="$(OutDir)/1964-510M.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\Plugins\lib"
@@ -206,7 +208,7 @@
 				RemotePath="xe:\Surreal64 CE\1964-510M.xbe"/>
 			<Tool
 				Name="XboxImageTool"
-				FileName="$(TargetDir)1964-510M.xbe"
+				FileName="$(TargetDir)$(ProjectName).xbe"
 				StackSize="65536"
 				IncludeDebugInfo="TRUE"
 				NoLibWarn="TRUE"
@@ -233,7 +235,7 @@
 				EnableFiberSafeOptimizations="TRUE"
 				OptimizeForProcessor="2"
 				AdditionalIncludeDirectories="..\Plugins\include\"
-				PreprocessorDefinitions="NDEBUG;_XBOX;DYNAREC;ENABLE_64BIT_FPU;WIN32;_WIN32;_WINDOWS;EXTERNAL_RELEASE;USE_MUSYX"
+				PreprocessorDefinitions="NDEBUG;_XBOX;DYNAREC;ENABLE_64BIT_FPU;WIN32;_WIN32;_WINDOWS;EXTERNAL_RELEASE;USE_MUSYX;_VIDEO_RICE_510"
 				StringPooling="TRUE"
 				RuntimeLibrary="0"
 				StructMemberAlignment="4"
@@ -242,6 +244,7 @@
 				EnableEnhancedInstructionSet="1"
 				UsePrecompiledHeader="0"
 				PrecompiledHeaderFile="$(IntDir)\$(ProjectName).pch"
+				AssemblerOutput="0"
 				BrowseInformation="1"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
@@ -277,7 +280,7 @@
 				RemotePath="xe:\Surreal64 CE\1964-510M.xbe"/>
 			<Tool
 				Name="XboxImageTool"
-				FileName="$(TargetDir)1964x085-510M.xbe"
+				FileName="$(TargetDir)$(ProjectName).xbe"
 				StackSize="65536"
 				NoLibWarn="TRUE"
 				UDCluster="3"
@@ -293,7 +296,7 @@
 			WholeProgramOptimization="TRUE">
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="3"
+				Optimization="2"
 				GlobalOptimizations="TRUE"
 				InlineFunctionExpansion="2"
 				EnableIntrinsicFunctions="FALSE"
@@ -303,7 +306,7 @@
 				EnableFiberSafeOptimizations="TRUE"
 				OptimizeForProcessor="2"
 				AdditionalIncludeDirectories="..\Plugins\include\"
-				PreprocessorDefinitions="NDEBUG;_XBOX;DYNAREC;ENABLE_64BIT_FPU;WIN32;_WIN32;_WINDOWS;EXTERNAL_RELEASE;LTCG;USE_MUSYX"
+				PreprocessorDefinitions="NDEBUG;_XBOX;DYNAREC;ENABLE_64BIT_FPU;WIN32;_WIN32;_WINDOWS;EXTERNAL_RELEASE;LTCG;USE_MUSYX;_VIDEO_RICE_510"
 				StringPooling="TRUE"
 				RuntimeLibrary="0"
 				StructMemberAlignment="4"
@@ -312,6 +315,7 @@
 				EnableEnhancedInstructionSet="1"
 				UsePrecompiledHeader="0"
 				PrecompiledHeaderFile="$(IntDir)\$(ProjectName).pch"
+				AssemblerOutput="0"
 				BrowseInformation="1"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
@@ -347,7 +351,7 @@
 				RemotePath="xe:\Surreal64 CE\1964-510M.xbe"/>
 			<Tool
 				Name="XboxImageTool"
-				FileName="$(TargetDir)1964x085-510M.xbe"
+				FileName="$(TargetDir)$(ProjectName).xbe"
 				StackSize="65536"
 				NoLibWarn="TRUE"
 				UDCluster="3"

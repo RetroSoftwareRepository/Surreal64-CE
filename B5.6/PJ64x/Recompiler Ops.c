@@ -1296,9 +1296,7 @@ void Compile_R4300i_SLTIU (BLOCK_SECTION * Section) {
 		MoveVariableToX86reg(&BranchCompare,"BranchCompare",MipsRegLo(Opcode.rt));*/
 	}
 }
-#ifndef USE_MUSYX
-#pragma optimize( "", off )
-#endif
+
 void Compile_R4300i_SLTI (BLOCK_SECTION * Section) {
 	////CPU_Message("  %X %s",Section->CompilePC,R4300iOpcodeName(Opcode.Hex,Section->CompilePC));
 	if (Opcode.rt == 0) { return; }
@@ -1374,9 +1372,7 @@ void Compile_R4300i_SLTI (BLOCK_SECTION * Section) {
 		MoveVariableToX86reg(&BranchCompare,"BranchCompare",MipsRegLo(Opcode.rt));
 	}
 }
-#ifndef USE_MUSYX
-#pragma optimize( "", on )
-#endif
+
 void Compile_R4300i_ANDI (BLOCK_SECTION * Section) {
 	////CPU_Message("  %X %s",Section->CompilePC,R4300iOpcodeName(Opcode.Hex,Section->CompilePC));
 

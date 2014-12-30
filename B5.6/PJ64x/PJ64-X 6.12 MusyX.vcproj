@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.10"
-	Name="PJ64x 6.12 MusyX"
+	Name="PJ64x16 6.12 MusyX"
 	ProjectGUID="{9F79754A-DD1F-4793-8449-9744E6A73D3C}"
 	RootNamespace="PJ64x.6-12.MusyX"
 	Keyword="XboxProj">
@@ -22,7 +22,7 @@
 				Optimization="0"
 				OptimizeForProcessor="2"
 				AdditionalIncludeDirectories=""
-				PreprocessorDefinitions="DEBUG;_XBOX;EXTERNAL_RELEASE;WIN32;_WIN32;_WINDOWS;__WIN32__;USE_MUSYX"
+				PreprocessorDefinitions="DEBUG;_XBOX;EXTERNAL_RELEASE;WIN32;_WIN32;_WINDOWS;__WIN32__;USE_MUSYX;_VIDEO_RICE_612"
 				BasicRuntimeChecks="0"
 				RuntimeLibrary="0"
 				StructMemberAlignment="4"
@@ -66,7 +66,7 @@
 				RemotePath="xe:\Surreal64 CE\PJ64-612M.xbe"/>
 			<Tool
 				Name="XboxImageTool"
-				FileName="$(TargetDir)/PJ64-612M.xbe"
+				FileName="$(TargetDir)/PJ64x16-612M.xbe"
 				StackSize="131072"
 				IncludeDebugInfo="TRUE"
 				DontMountUD="FALSE"
@@ -134,7 +134,7 @@
 				RemotePath="xe:\Surreal64 CE\PJ64-612M.xbe"/>
 			<Tool
 				Name="XboxImageTool"
-				FileName="$(TargetDir)/PJ64-612M.xbe"
+				FileName="$(TargetDir)/PJ64x16-612M.xbe"
 				StackSize="131072"
 				IncludeDebugInfo="TRUE"
 				DontMountUD="FALSE"
@@ -204,7 +204,7 @@
 				RemotePath="xe:\Surreal64 CE\PJ64-612M.xbe"/>
 			<Tool
 				Name="XboxImageTool"
-				FileName="$(TargetDir)/PJ64-612M.xbe"
+				FileName="$(TargetDir)/PJ64x16-612M.xbe"
 				StackSize="131072"
 				IncludeDebugInfo="TRUE"
 				DontMountUD="FALSE"
@@ -232,7 +232,7 @@
 				EnableFiberSafeOptimizations="TRUE"
 				OptimizeForProcessor="2"
 				AdditionalIncludeDirectories=""
-				PreprocessorDefinitions="NDEBUG;_XBOX;EXTERNAL_RELEASE;WIN32;_WIN32;_WINDOWS;__WIN32__;USE_MUSYX"
+				PreprocessorDefinitions="NDEBUG;_XBOX;EXTERNAL_RELEASE;WIN32;_WIN32;_WINDOWS;__WIN32__;USE_MUSYX;_VIDEO_RICE_612"
 				StringPooling="FALSE"
 				ExceptionHandling="FALSE"
 				RuntimeLibrary="0"
@@ -275,7 +275,7 @@
 				RemotePath="xe:\Surreal64 CE\PJ64-612M.xbe"/>
 			<Tool
 				Name="XboxImageTool"
-				FileName="$(TargetDir)/PJ64-612M.xbe"
+				FileName="$(TargetDir)/PJ64x16-612M.xbe"
 				StackSize="131072"
 				IncludeDebugInfo="TRUE"
 				DontMountUD="FALSE"
@@ -303,7 +303,7 @@
 				EnableFiberSafeOptimizations="TRUE"
 				OptimizeForProcessor="2"
 				AdditionalIncludeDirectories=""
-				PreprocessorDefinitions="NDEBUG;_XBOX;EXTERNAL_RELEASE;WIN32;_WIN32;_WINDOWS;__WIN32__;LTCG;USE_MUSYX"
+				PreprocessorDefinitions="NDEBUG;_XBOX;EXTERNAL_RELEASE;WIN32;_WIN32;_WINDOWS;__WIN32__;LTCG;USE_MUSYX;_VIDEO_RICE_612"
 				StringPooling="TRUE"
 				ExceptionHandling="TRUE"
 				RuntimeLibrary="0"
@@ -346,7 +346,7 @@
 				RemotePath="xe:\Surreal64 CE\PJ64-612M.xbe"/>
 			<Tool
 				Name="XboxImageTool"
-				FileName="$(TargetDir)/PJ64-612M.xbe"
+				FileName="$(TargetDir)/PJ64x16-612M.xbe"
 				StackSize="131072"
 				DontMountUD="FALSE"
 				NoLibWarn="TRUE"

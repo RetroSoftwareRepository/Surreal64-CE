@@ -48,11 +48,12 @@ DWORD GetMenuFontAlign(int iAlign);
 //freakdave
 enum Emulators
 {
-	_1964,
-	_Project64,
+	_1964x085,
+	_PJ64x16,
 	_UltraHLE,
-	_Mupen64Plus,
+	_PJ64x14,
 	_1964x11,
+	//_Mupen64PlusX,
 	_None
 };
 
@@ -368,13 +369,14 @@ void ResetRom(void)
 		//char szPagingMethod[16];
 		
 		switch (preferedemu) {
-			case _1964: 		sprintf(szEmulator, "1964"); break;
-			case _Project64: 	sprintf(szEmulator, "PJ64"); break;
+			case _1964x085: 		sprintf(szEmulator, "1964x085"); break;
+			case _PJ64x16: 	sprintf(szEmulator, "PJ64x16"); break;
 			//case _UltraHLE: 	sprintf(szEmulator, "UltraHLE"); break;
-			case _Mupen64Plus: 		sprintf(szEmulator, "M64P"); break;
+			//case _Mupen64Plus: 		sprintf(szEmulator, "M64P"); break;
+			case _PJ64x14: 	sprintf(szEmulator, "PJ64x14"); break;
 			case _1964x11: 	sprintf(szEmulator, "1964x11"); break;
 			default:
-				sprintf(szEmulator, "1964"); break;
+				sprintf(szEmulator, "1964x085"); break;
 		}
 		
 		switch (videoplugin) {

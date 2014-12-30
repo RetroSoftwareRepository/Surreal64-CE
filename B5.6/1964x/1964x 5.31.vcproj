@@ -2,8 +2,8 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.10"
-	Name="1964x085 5.31"
-	ProjectGUID="{5B602B97-9A1A-4395-A6B6-BBEB9BB1B89E}"
+	Name="1964x085-531"
+	ProjectGUID="{0EC6D186-B75A-46F3-A9A9-D1CB6E72A386}"
 	RootNamespace="1964x.5-31"
 	Keyword="XboxProj">
 	<Platforms>
@@ -22,7 +22,7 @@
 				Optimization="0"
 				OptimizeForProcessor="2"
 				AdditionalIncludeDirectories="..\Plugins\include\"
-				PreprocessorDefinitions="DEBUG;_XBOX;DYNAREC;ENABLE_64BIT_FPU;WIN32;_WIN32;_WINDOWS;EXTERNAL_RELEASE"
+				PreprocessorDefinitions="DEBUG;_XBOX;DYNAREC;ENABLE_64BIT_FPU;WIN32;_WIN32;_WINDOWS;EXTERNAL_RELEASE;_VIDEO_RICE_531"
 				BasicRuntimeChecks="0"
 				RuntimeLibrary="0"
 				StructMemberAlignment="4"
@@ -41,7 +41,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xacteng.lib xboxkrnl.lib xbdm.lib zlib\xzlib.lib AudioBasic.lib AudioJttl.lib AudioNone.lib AudioAzimer.lib Input.lib RSP.lib RSPHLE.lib RSPM64P.lib VideoRice531.lib"
+				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xacteng.lib xboxkrnl.lib xbdm.lib zlib\xzlib.lib AudioBasic.lib AudioJttl.lib AudioM64Plus.lib AudioNone.lib AudioAzimer.lib Input.lib RSP.lib RSPCXD4.lib RSPHLE.lib RSPM64P.lib VideoRice531.lib"
 				OutputFile="$(OutDir)/1964-531.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\Plugins\lib"
@@ -64,7 +64,7 @@
 				RemotePath="xe:\Surreal64 CE\1964-531.xbe"/>
 			<Tool
 				Name="XboxImageTool"
-				FileName="$(TargetDir)1964x085-531.xbe"
+				FileName="$(TargetDir)$(ProjectName).xbe"
 				StackSize="65536"
 				IncludeDebugInfo="TRUE"
 				NoLibWarn="TRUE"
@@ -99,6 +99,7 @@
 				EnableEnhancedInstructionSet="1"
 				UsePrecompiledHeader="0"
 				PrecompiledHeaderFile="$(IntDir)\$(ProjectName).pch"
+				AssemblerOutput="0"
 				BrowseInformation="1"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
@@ -109,7 +110,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="xapilib.lib d3d8i.lib d3dx8.lib xgraphics.lib dsound.lib dmusici.lib xactengi.lib xboxkrnl.lib xbdm.lib zlib\xzlib.lib AudioBasic.lib AudioJttl.lib AudioNone.lib AudioAzimer.lib Input.lib RSP.lib RSPHLE.lib RSPM64P.lib Video531.lib"
+				AdditionalDependencies="xapilib.lib d3d8i.lib d3dx8.lib xgraphics.lib dsound.lib dmusici.lib xactengi.lib xboxkrnl.lib xbdm.lib zlib\xzlib.lib AudioBasic.lib AudioJttl.lib AudioNone.lib AudioAzimer.lib Input.lib RSP.lib RSPHLE.lib RSPM64P.lib VideoRice531.lib"
 				OutputFile="$(OutDir)/1964-531.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\Plugins\lib"
@@ -134,7 +135,7 @@
 				RemotePath="xe:\Surreal64 CE\1964-531.xbe"/>
 			<Tool
 				Name="XboxImageTool"
-				FileName="$(TargetDir)1964-531.xbe"
+				FileName="$(TargetDir)$(ProjectName).xbe"
 				StackSize="65536"
 				IncludeDebugInfo="TRUE"
 				NoLibWarn="TRUE"
@@ -170,6 +171,7 @@
 				EnableEnhancedInstructionSet="1"
 				UsePrecompiledHeader="0"
 				PrecompiledHeaderFile="$(IntDir)\$(ProjectName).pch"
+				AssemblerOutput="0"
 				BrowseInformation="1"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
@@ -181,7 +183,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="xapilib.lib d3d8i.lib d3dx8.lib xgraphics.lib dsound.lib dmusici.lib xactengi.lib xboxkrnl.lib xbdm.lib zlib\xzlib.lib AudioBasic.lib AudioJttl.lib AudioNone.lib AudioAzimer.lib Input.lib RSP.lib RSPHLE.lib RSPM64P.lib Video531.lib"
+				AdditionalDependencies="xapilib.lib d3d8i.lib d3dx8.lib xgraphics.lib dsound.lib dmusici.lib xactengi.lib xboxkrnl.lib xbdm.lib zlib\xzlib.lib AudioBasic.lib AudioJttl.lib AudioNone.lib AudioAzimer.lib Input.lib RSP.lib RSPHLE.lib RSPM64P.lib VideoRice531.lib"
 				OutputFile="$(OutDir)/1964-531.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\Plugins\lib"
@@ -206,7 +208,7 @@
 				RemotePath="xe:\Surreal64 CE\1964-531.xbe"/>
 			<Tool
 				Name="XboxImageTool"
-				FileName="$(TargetDir)1964-531.xbe"
+				FileName="$(TargetDir)$(ProjectName).xbe"
 				StackSize="65536"
 				IncludeDebugInfo="TRUE"
 				NoLibWarn="TRUE"
@@ -233,7 +235,7 @@
 				EnableFiberSafeOptimizations="TRUE"
 				OptimizeForProcessor="2"
 				AdditionalIncludeDirectories="..\Plugins\include\"
-				PreprocessorDefinitions="NDEBUG;_XBOX;DYNAREC;ENABLE_64BIT_FPU;WIN32;_WIN32;_WINDOWS;EXTERNAL_RELEASE"
+				PreprocessorDefinitions="NDEBUG;_XBOX;DYNAREC;ENABLE_64BIT_FPU;WIN32;_WIN32;_WINDOWS;EXTERNAL_RELEASE;_VIDEO_RICE_531"
 				StringPooling="TRUE"
 				RuntimeLibrary="0"
 				StructMemberAlignment="4"
@@ -242,6 +244,7 @@
 				EnableEnhancedInstructionSet="1"
 				UsePrecompiledHeader="0"
 				PrecompiledHeaderFile="$(IntDir)\$(ProjectName).pch"
+				AssemblerOutput="0"
 				BrowseInformation="1"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
@@ -252,7 +255,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xacteng.lib xboxkrnl.lib xbdm.lib zlib\xzlib.lib AudioBasic.lib AudioJttl.lib AudioNone.lib AudioAzimer.lib Input.lib RSP.lib RSPHLE.lib RSPM64P.lib VideoRice531.lib"
+				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xacteng.lib xboxkrnl.lib xbdm.lib zlib\xzlib.lib AudioBasic.lib AudioJttl.lib AudioM64Plus.lib AudioNone.lib AudioAzimer.lib Input.lib RSP.lib RSPCXD4.lib RSPHLE.lib RSPM64P.lib VideoRice531.lib"
 				OutputFile="$(OutDir)/1964-531.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\Plugins\lib"
@@ -277,7 +280,7 @@
 				RemotePath="xe:\Surreal64 CE\1964-531.xbe"/>
 			<Tool
 				Name="XboxImageTool"
-				FileName="$(TargetDir)1964x085-531.xbe"
+				FileName="$(TargetDir)$(ProjectName).xbe"
 				StackSize="65536"
 				NoLibWarn="TRUE"
 				UDCluster="3"
@@ -293,7 +296,7 @@
 			WholeProgramOptimization="TRUE">
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="3"
+				Optimization="2"
 				GlobalOptimizations="TRUE"
 				InlineFunctionExpansion="2"
 				EnableIntrinsicFunctions="FALSE"
@@ -303,7 +306,7 @@
 				EnableFiberSafeOptimizations="TRUE"
 				OptimizeForProcessor="2"
 				AdditionalIncludeDirectories="..\Plugins\include\"
-				PreprocessorDefinitions="NDEBUG;_XBOX;DYNAREC;ENABLE_64BIT_FPU;WIN32;_WIN32;_WINDOWS;EXTERNAL_RELEASE;LTCG"
+				PreprocessorDefinitions="NDEBUG;_XBOX;DYNAREC;ENABLE_64BIT_FPU;WIN32;_WIN32;_WINDOWS;EXTERNAL_RELEASE;LTCG;_VIDEO_RICE_531"
 				StringPooling="TRUE"
 				RuntimeLibrary="0"
 				StructMemberAlignment="4"
@@ -312,6 +315,7 @@
 				EnableEnhancedInstructionSet="1"
 				UsePrecompiledHeader="0"
 				PrecompiledHeaderFile="$(IntDir)\$(ProjectName).pch"
+				AssemblerOutput="0"
 				BrowseInformation="1"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
@@ -322,7 +326,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="xapilib.lib d3d8ltcg.lib d3dx8.lib xgraphicsltcg.lib dsound.lib dmusicltcg.lib xactengltcg.lib xboxkrnl.lib zlib\xzlib.lib AudioBasic.lib AudioJttl.lib AudioNone.lib AudioAzimer.lib Input.lib RSP.lib RSPHLE.lib RSPM64P.lib VideoRice531.lib"
+				AdditionalDependencies="xapilib.lib d3d8ltcg.lib d3dx8.lib xgraphicsltcg.lib dsound.lib dmusicltcg.lib xactengltcg.lib xboxkrnl.lib zlib\xzlib.lib AudioBasic.lib AudioJttl.lib AudioM64Plus.lib AudioNone.lib AudioAzimer.lib Input.lib RSP.lib RSPCXD4.lib RSPHLE.lib RSPM64P.lib VideoRice531.lib"
 				OutputFile="$(OutDir)/1964-531.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\Plugins\lib"
@@ -347,7 +351,7 @@
 				RemotePath="xe:\Surreal64 CE\1964-531.xbe"/>
 			<Tool
 				Name="XboxImageTool"
-				FileName="$(TargetDir)1964x085-531.xbe"
+				FileName="$(TargetDir)$(ProjectName).xbe"
 				StackSize="65536"
 				NoLibWarn="TRUE"
 				UDCluster="3"

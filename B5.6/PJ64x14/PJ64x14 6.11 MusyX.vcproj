@@ -3,8 +3,8 @@
 	ProjectType="Visual C++"
 	Version="7.10"
 	Name="PJ64x14 6.11 MusyX"
-	ProjectGUID="{FC45B107-2692-476F-8A53-0B7672164C40}"
-	RootNamespace="PJ64x.6-11.MusyX"
+	ProjectGUID="{889EA010-906E-4817-862B-20E152193325}"
+	RootNamespace="PJ64x.6-11"
 	Keyword="XboxProj">
 	<Platforms>
 		<Platform
@@ -21,8 +21,8 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				OptimizeForProcessor="2"
-				AdditionalIncludeDirectories=""
-				PreprocessorDefinitions="DEBUG;_XBOX;EXTERNAL_RELEASE;WIN32;_WIN32;_WINDOWS;__WIN32__;USE_MUSYX;_VIDEO_RICE_611"
+				AdditionalIncludeDirectories="..\Plugins\include\"
+				PreprocessorDefinitions="DEBUG;_XBOX;EXTERNAL_RELEASE;WIN32;_WIN32;_WINDOWS;__WIN32__;_VIDEO_RICE_611;USE_MUSYX"
 				BasicRuntimeChecks="0"
 				RuntimeLibrary="0"
 				StructMemberAlignment="4"
@@ -42,7 +42,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xacteng.lib xboxkrnl.lib xbdm.lib AudioMusyX.lib Input.lib RSP.lib RSPHLE.lib RSPM64P.lib VideoRice611.lib"
-				OutputFile="$(OutDir)/PJ64-611M.exe"
+				OutputFile="$(OutDir)/PJ64-611.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\Plugins\lib"
 				IgnoreAllDefaultLibraries="FALSE"
@@ -63,10 +63,10 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="XboxDeploymentTool"
-				RemotePath="xe:\Surreal64 CE\Pj64-611M.xbe"/>
+				RemotePath="xe:\Surreal64 CE\PJ64-611.xbe"/>
 			<Tool
 				Name="XboxImageTool"
-				FileName="$(TargetDir)/PJ64x14-611M.xbe"
+				FileName="$(TargetDir)/PJ64x14-611.xbe"
 				StackSize="131072"
 				IncludeDebugInfo="TRUE"
 				DontMountUD="FALSE"
@@ -91,8 +91,8 @@
 				OmitFramePointers="TRUE"
 				EnableFiberSafeOptimizations="TRUE"
 				OptimizeForProcessor="2"
-				AdditionalIncludeDirectories=""
-				PreprocessorDefinitions="NDEBUG;_XBOX;EXTERNAL_RELEASE;WIN32;_WIN32;_WINDOWS;__WIN32__;PROFILE;USE_MUSYX"
+				AdditionalIncludeDirectories="..\Plugins\include\"
+				PreprocessorDefinitions="NDEBUG;_XBOX;EXTERNAL_RELEASE;WIN32;_WIN32;_WINDOWS;__WIN32__;PROFILE"
 				StringPooling="TRUE"
 				RuntimeLibrary="0"
 				StructMemberAlignment="4"
@@ -111,8 +111,8 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="xapilib.lib d3d8i.lib d3dx8.lib xgraphics.lib dsound.lib dmusici.lib xactengi.lib xboxkrnl.lib xbdm.lib AudioMusyX.lib Input.lib RSP.lib RSPHLE.lib RSPM64P.lib Video611.lib"
-				OutputFile="$(OutDir)/PJ64-611M.exe"
+				AdditionalDependencies="xapilib.lib d3d8i.lib d3dx8.lib xgraphics.lib dsound.lib dmusici.lib xactengi.lib xboxkrnl.lib xbdm.lib AudioBasic.lib AudioJttl.lib AudioNone.lib AudioAzimer.lib Input.lib RSP.lib RSPHLE.lib RSPM64P.lib VideoRice611.lib"
+				OutputFile="$(OutDir)/PJ64-611.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\Plugins\lib"
 				GenerateDebugInformation="TRUE"
@@ -131,10 +131,10 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="XboxDeploymentTool"
-				RemotePath="xe:\Surreal64 CE\PJ64-611M.xbe"/>
+				RemotePath="xe:\Surreal64 CE\PJ64-611.xbe"/>
 			<Tool
 				Name="XboxImageTool"
-				FileName="$(TargetDir)/PJ64-611M.xbe"
+				FileName="$(TargetDir)/PJ64-611.xbe"
 				StackSize="131072"
 				IncludeDebugInfo="TRUE"
 				DontMountUD="FALSE"
@@ -160,8 +160,8 @@
 				OmitFramePointers="TRUE"
 				EnableFiberSafeOptimizations="TRUE"
 				OptimizeForProcessor="2"
-				AdditionalIncludeDirectories=""
-				PreprocessorDefinitions="NDEBUG;_XBOX;EXTERNAL_RELEASE;WIN32;_WIN32;_WINDOWS;__WIN32__;PROFILE;FASTCAP;USE_MUSYX"
+				AdditionalIncludeDirectories="..\Plugins\include\"
+				PreprocessorDefinitions="NDEBUG;_XBOX;EXTERNAL_RELEASE;WIN32;_WIN32;_WINDOWS;__WIN32__;PROFILE;FASTCAP"
 				StringPooling="TRUE"
 				RuntimeLibrary="0"
 				StructMemberAlignment="4"
@@ -181,8 +181,8 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="xapilib.lib d3d8i.lib d3dx8.lib xgraphics.lib dsound.lib dmusici.lib xactengi.lib xboxkrnl.lib xbdm.lib AudioMusyX.lib Input.lib RSP.lib RSPHLE.lib RSPM64P.lib Video611.lib"
-				OutputFile="$(OutDir)/PJ64-611M.exe"
+				AdditionalDependencies="xapilib.lib d3d8i.lib d3dx8.lib xgraphics.lib dsound.lib dmusici.lib xactengi.lib xboxkrnl.lib xbdm.lib AudioBasic.lib AudioJttl.lib AudioNone.lib AudioAzimer.lib Input.lib RSP.lib RSPHLE.lib RSPM64P.lib VideoRice611.lib"
+				OutputFile="$(OutDir)/PJ64-611.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\Plugins\lib"
 				GenerateDebugInformation="TRUE"
@@ -201,10 +201,10 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="XboxDeploymentTool"
-				RemotePath="xe:\Surreal64 CE\PJ64-611M.xbe"/>
+				RemotePath="xe:\Surreal64 CE\PJ64-611.xbe"/>
 			<Tool
 				Name="XboxImageTool"
-				FileName="$(TargetDir)/PJ64-611M.xbe"
+				FileName="$(TargetDir)/PJ64-611.xbe"
 				StackSize="131072"
 				IncludeDebugInfo="TRUE"
 				DontMountUD="FALSE"
@@ -231,8 +231,8 @@
 				OmitFramePointers="TRUE"
 				EnableFiberSafeOptimizations="TRUE"
 				OptimizeForProcessor="2"
-				AdditionalIncludeDirectories=""
-				PreprocessorDefinitions="NDEBUG;_XBOX;EXTERNAL_RELEASE;WIN32;_WIN32;_WINDOWS;__WIN32__;USE_MUSYX;_VIDEO_RICE_611"
+				AdditionalIncludeDirectories="..\Plugins\include\"
+				PreprocessorDefinitions="NDEBUG;_XBOX;EXTERNAL_RELEASE;WIN32;_WIN32;_WINDOWS;__WIN32__;_VIDEO_RICE_611;USE_MUSYX"
 				StringPooling="TRUE"
 				RuntimeLibrary="0"
 				StructMemberAlignment="4"
@@ -252,7 +252,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xacteng.lib xboxkrnl.lib xbdm.lib AudioMusyX.lib Input.lib RSP.lib RSPHLE.lib RSPM64P.lib VideoRice611.lib"
-				OutputFile="$(OutDir)/PJ64-611M.exe"
+				OutputFile="$(OutDir)/PJ64-611.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\Plugins\lib"
 				GenerateDebugInformation="TRUE"
@@ -271,7 +271,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="XboxDeploymentTool"
-				RemotePath="xe:\Surreal64 CE\PJ64-611M.xbe"/>
+				RemotePath="xe:\Surreal64 CE\PJ64-611.xbe"/>
 			<Tool
 				Name="XboxImageTool"
 				FileName="$(TargetDir)/PJ64x14-611M.xbe"
@@ -300,8 +300,8 @@
 				OmitFramePointers="TRUE"
 				EnableFiberSafeOptimizations="TRUE"
 				OptimizeForProcessor="2"
-				AdditionalIncludeDirectories=""
-				PreprocessorDefinitions="NDEBUG;_XBOX;EXTERNAL_RELEASE;WIN32;_WIN32;_WINDOWS;__WIN32__;LTCG;USE_MUSYX;_VIDEO_RICE_611"
+				AdditionalIncludeDirectories="..\Plugins\include\"
+				PreprocessorDefinitions="NDEBUG;_XBOX;EXTERNAL_RELEASE;WIN32;_WIN32;_WINDOWS;__WIN32__;LTCG;_VIDEO_RICE_611;USE_MUSYX"
 				StringPooling="TRUE"
 				RuntimeLibrary="0"
 				StructMemberAlignment="4"
@@ -321,7 +321,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="xapilib.lib d3d8ltcg.lib d3dx8.lib xgraphicsltcg.lib dsound.lib dmusicltcg.lib xactengltcg.lib xboxkrnl.lib AudioMusyX.lib Input.lib RSP.lib RSPHLE.lib RSPM64P.lib VideoRice611.lib"
-				OutputFile="$(OutDir)/PJ64-611M.exe"
+				OutputFile="$(OutDir)/PJ64-611.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\Plugins\lib"
 				GenerateDebugInformation="TRUE"
@@ -340,10 +340,10 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="XboxDeploymentTool"
-				RemotePath="xe:\Surreal64 CE\PJ64-611M.xbe"/>
+				RemotePath="xe:\Surreal64 CE\PJ64-611.xbe"/>
 			<Tool
 				Name="XboxImageTool"
-				FileName="$(TargetDir)/PJ64x14-611M.xbe"
+				FileName="$(TargetDir)/PJ64x14-611.xbe"
 				StackSize="131072"
 				DontMountUD="FALSE"
 				NoLibWarn="TRUE"
