@@ -1099,11 +1099,11 @@ bool EmuDoesNoRsp(int p_iEmulator)
 	// add supporting emulators here
 	switch (p_iEmulator)
 	{
-		case _1964: 		bEmuNoRsp = true;
+		case _1964x085: 		bEmuNoRsp = true;
 			break;
 		case _1964x11: 		bEmuNoRsp = true;
 			break;
-		case _Project64: 	bEmuNoRsp = false;
+		case _PJ64x16: 	bEmuNoRsp = false;
 			break;
 		case _PJ64x14:		bEmuNoRsp = false;
 		//case _Mupen64Plus: 	bEmuNoRsp = false;
@@ -1198,7 +1198,7 @@ int ConfigAppLoad3() //LoadRomConfig()
 	}
 	
 	if (preferedemu < 0 || preferedemu >= _None)
-		preferedemu = _1964;
+		preferedemu = _1964x085;
 		
 	if (videoplugin < 0 || videoplugin >= _VideoPluginMissing)
 		videoplugin = _VideoPluginRice560;

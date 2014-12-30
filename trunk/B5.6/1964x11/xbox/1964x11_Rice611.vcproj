@@ -42,7 +42,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xacteng.lib xboxkrnl.lib xbdm.lib xzlib.lib Input.lib VideoRice560.lib RspPJ64LLE.lib AudioAzimer.lib AudioJttL.lib AudioNone.lib AudioDaedalus.lib"
+				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xacteng.lib xboxkrnl.lib xbdm.lib xzlib.lib Input.lib VideoRice611.lib RspPJ64LLE.lib AudioAzimer.lib AudioJttL.lib AudioNone.lib AudioDaedalus.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\..\Plugins\lib;.\zlib"
@@ -253,7 +253,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xacteng.lib xboxkrnl.lib xbdm.lib zlib\xzlib.lib AudioBasic.lib AudioJttl.lib AudioM64Plus.lib AudioNone.lib AudioAzimer.lib Input.lib RSP.lib RSPCXD4.lib RSPHLE.lib RSPM64P.lib Video611.lib"
+				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xacteng.lib xboxkrnl.lib xbdm.lib zlib\xzlib.lib AudioBasic.lib AudioJttl.lib AudioM64Plus.lib AudioNone.lib AudioAzimer.lib Input.lib RSP.lib RSPCXD4.lib RSPHLE.lib RSPM64P.lib VideoRice611.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\Plugins\lib;.\zlib"
@@ -323,7 +323,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="xapilib.lib d3d8ltcg.lib d3dx8.lib xgraphicsltcg.lib dsound.lib dmusicltcg.lib xactengltcg.lib xboxkrnl.lib xzlib.lib Input.lib VideoRice560.lib RspPJ64LLE.lib AudioAzimer.lib AudioJttL.lib AudioNone.lib"
+				AdditionalDependencies="xapilib.lib d3d8ltcg.lib d3dx8.lib xgraphicsltcg.lib dsound.lib dmusicltcg.lib xactengltcg.lib xboxkrnl.lib xzlib.lib Input.lib VideoRice611.lib RspPJ64LLE.lib AudioAzimer.lib AudioJttL.lib AudioNone.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\..\Plugins\lib;.\zlib"

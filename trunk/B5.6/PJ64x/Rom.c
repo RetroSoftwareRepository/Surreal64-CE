@@ -1302,7 +1302,7 @@ VOID __cdecl main()
 	//freakdave - check for 128mb
 	//PhysRam128();
 
-    sprintf(emuname,"Project64x");
+    sprintf(emuname,"Project64x 1.6");
 	
 	GetPathSaves(g_szPathSaves);
 
@@ -1320,7 +1320,7 @@ VOID __cdecl main()
 
 	
 	// max texture mem, 0 = auto
-	//_VIDEO_SetMaxTextureMem(loaddwMaxVideoMem());
+	//SetMaxTextureMem(loaddwMaxVideoMem());
 	
 	g_bAudioBoost = (loadbAudioBoost() == 1 ? TRUE : FALSE); // set before audio init
 	

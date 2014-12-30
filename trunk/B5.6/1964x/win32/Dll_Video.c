@@ -117,7 +117,7 @@ BOOL LoadVideoPlugin(char *libname)
 
 #elif defined(_VIDEO_RICE_510)
 
-	GfxPluginVersion						= 0x0102;
+	//GfxPluginVersion						= 0x0102;
 	_VIDEO_InitiateGFX						= _VIDEO_RICE_510_InitiateGFX;
 	_VIDEO_ProcessDList						= _VIDEO_RICE_510_ProcessDList;
 	_VIDEO_ProcessDList_Count_Cycles		= _VIDEO_RICE_510_ProcessDListCountCycles;
@@ -142,9 +142,9 @@ BOOL LoadVideoPlugin(char *libname)
 	//_VIDEO_ShowCFB						= _VIDEO_RICE_510_ShowCFB;
 	
 	_VIDEO_FrameBufferWrite					= _VIDEO_RICE_510_FBWrite;
-	_VIDEO_FrameBufferWriteList				= _VIDEO_RICE_510_FBWList;
+	//_VIDEO_FrameBufferWriteList				= _VIDEO_RICE_510_FBWList;
 	_VIDEO_FrameBufferRead					= _VIDEO_RICE_510_FBRead;
-	_VIDEO_GetFrameBufferInfo				= _VIDEO_RICE_510_FBGetFrameBufferInfo;
+	//_VIDEO_GetFrameBufferInfo				= _VIDEO_RICE_510_FBGetFrameBufferInfo;
 	//_VIDEO_SetOnScreenText				= _VIDEO_RICE_510_SetOnScreenText;
 	//_VIDEO_GetFullScreenStatus			= _VIDEO_RICE_510_GetFullScreenStatus;
 	
@@ -153,13 +153,13 @@ BOOL LoadVideoPlugin(char *libname)
 
 #elif defined(_VIDEO_RICE_531)
 
-	GfxPluginVersion						= 0x0102;
+	//GfxPluginVersion						= 0x0102;
 	_VIDEO_InitiateGFX						= _VIDEO_RICE_531_InitiateGFX;
 	_VIDEO_ProcessDList						= _VIDEO_RICE_531_ProcessDList;
-	_VIDEO_ProcessDList_Count_Cycles		= _VIDEO_RICE_531_ProcessDListCountCycles;
+	//_VIDEO_ProcessDList_Count_Cycles		= _VIDEO_RICE_531_ProcessDListCountCycles;
 	_VIDEO_RomOpen							= _VIDEO_RICE_531_RomOpen;
 	_VIDEO_RomClosed						= _VIDEO_RICE_531_RomClosed;
-	_VIDEO_DllClose							= _VIDEO_RICE_531_CloseDLL;
+	//_VIDEO_DllClose							= _VIDEO_RICE_531_CloseDLL;
 	_VIDEO_UpdateScreen						= _VIDEO_RICE_531_UpdateScreen;
 	_VIDEO_GetDllInfo						= _VIDEO_RICE_531_GetDllInfo;
 	//_VIDEO_ExtraChangeResolution			= 
@@ -172,13 +172,13 @@ BOOL LoadVideoPlugin(char *libname)
 	_VIDEO_ViWidthChanged					= _VIDEO_RICE_531_ViWidthChanged;
 	//_VIDEO_ChangeWindow					= _VIDEO_RICE_531_ChangeWindow;
 	
-	_VIDEO_ChangeWindow_1_3					= _VIDEO_RICE_531_ChangeWindow;
+	//_VIDEO_ChangeWindow_1_3					= _VIDEO_RICE_531_ChangeWindow;
 	//_VIDEO_CaptureScreen					= _VIDEO_RICE_531_CaptureScreen;
 	_VIDEO_ProcessRDPList					= _VIDEO_RICE_531_ProcessRDPList;
 	//_VIDEO_ShowCFB						= _VIDEO_RICE_531_ShowCFB;
 	
 	_VIDEO_FrameBufferWrite					= _VIDEO_RICE_531_FBWrite;
-	_VIDEO_FrameBufferWriteList				= _VIDEO_RICE_531_FBWList;
+	//_VIDEO_FrameBufferWriteList				= _VIDEO_RICE_531_FBWList;
 	_VIDEO_FrameBufferRead					= _VIDEO_RICE_531_FBRead;
 	_VIDEO_GetFrameBufferInfo				= _VIDEO_RICE_531_FBGetFrameBufferInfo;
 	//_VIDEO_SetOnScreenText				= _VIDEO_RICE_531_SetOnScreenText;
@@ -188,7 +188,7 @@ BOOL LoadVideoPlugin(char *libname)
 
 
 #elif defined(_VIDEO_RICE_560)
-	GfxPluginVersion						= 0x0103;
+	//GfxPluginVersion						= 0x0103;
 	_VIDEO_InitiateGFX						= _VIDEO_RICE_560_InitiateGFX;
 	_VIDEO_ProcessDList						= _VIDEO_RICE_560_ProcessDList;
 	_VIDEO_ProcessDList_Count_Cycles		= _VIDEO_RICE_560_ProcessDListCountCycles;
@@ -213,7 +213,7 @@ BOOL LoadVideoPlugin(char *libname)
 	//_VIDEO_ShowCFB						= _VIDEO_RICE_560_ShowCFB;
 	
 	_VIDEO_FrameBufferWrite					= _VIDEO_RICE_560_FBWrite;
-	_VIDEO_FrameBufferWriteList				= _VIDEO_RICE_560_FBWList;
+	//_VIDEO_FrameBufferWriteList				= _VIDEO_RICE_560_FBWList;
 	_VIDEO_FrameBufferRead					= _VIDEO_RICE_560_FBRead;
 	_VIDEO_GetFrameBufferInfo				= _VIDEO_RICE_560_FBGetFrameBufferInfo;
 	//_VIDEO_SetOnScreenText				= _VIDEO_RICE_560_SetOnScreenText;
@@ -222,7 +222,7 @@ BOOL LoadVideoPlugin(char *libname)
 	_VIDEO_SetMaxTextureMem					= _VIDEO_RICE_560_SetMaxTextureMem;
 
 #elif defined(_VIDEO_RICE_611)
-	GfxPluginVersion						= 0x0103;
+	//GfxPluginVersion						= 0x0103;
 	_VIDEO_InitiateGFX						= _VIDEO_RICE_611_InitiateGFX;
 	_VIDEO_ProcessDList						= _VIDEO_RICE_611_ProcessDList;
 	_VIDEO_ProcessDList_Count_Cycles		= _VIDEO_RICE_611_ProcessDListCountCycles;
@@ -256,7 +256,7 @@ BOOL LoadVideoPlugin(char *libname)
 	_VIDEO_SetMaxTextureMem					= _VIDEO_RICE_611_SetMaxTextureMem;
 
 #elif defined(_VIDEO_RICE_612)
-	GfxPluginVersion						= 0x0103;
+	//GfxPluginVersion						= 0x0103;
 	_VIDEO_InitiateGFX						= _VIDEO_RICE_612_InitiateGFX;
 	_VIDEO_ProcessDList						= _VIDEO_RICE_612_ProcessDList;
 	_VIDEO_ProcessDList_Count_Cycles		= _VIDEO_RICE_612_ProcessDListCountCycles;

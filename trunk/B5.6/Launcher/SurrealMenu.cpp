@@ -292,9 +292,9 @@ string GetEmulatorName(int p_iEmulator)
 	string szEmulator;
 
 	switch (p_iEmulator) {
-		case _1964 : szEmulator = "1964x085"; break;
+		case _1964x085 : szEmulator = "1964x085"; break;
 		case _1964x11 : szEmulator = "1964x11"; break;
-		case _Project64 : szEmulator = "Project64"; break;
+		case _PJ64x16 : szEmulator = "PJ64x16"; break;
 		case _PJ64x14 : szEmulator = "PJ64x14"; break;
 		//case _Mupen64Plus : szEmulator = "Mupen64Plus"; break;
 		case _UltraHLE : szEmulator = "UltraHLE"; break;
@@ -1189,7 +1189,8 @@ extern void Launch();
 //int m_emulator; // Ez0n3 - why was this used at all?
 void Launch1964();
 void Launch1964x11();
-void PJ64Launch();
+void PJ64x14Launch();
+void PJ64x16Launch();
 void M64PLaunch();
 void UltraHLELaunch();
 void launch510();
@@ -1290,8 +1291,9 @@ void LaunchMenu(void)
 
 	XLMenu_AddItem(m_pMainMenu,MITEM_ROUTINE,L"Launch with 1964",Launch1964);
 	XLMenu_AddItem(m_pMainMenu,MITEM_ROUTINE,L"Launch with 1964x11",Launch1964x11);
-	XLMenu_AddItem(m_pMainMenu,MITEM_ROUTINE,L"Launch with Project64",PJ64Launch);
-	XLMenu_AddItem(m_pMainMenu,MITEM_ROUTINE,L"Launch with Mupen64Plus",M64PLaunch);
+	XLMenu_AddItem(m_pMainMenu,MITEM_ROUTINE,L"Launch with PJ64x16",PJ64x16Launch);
+	XLMenu_AddItem(m_pMainMenu,MITEM_ROUTINE,L"Launch with PJ64x14",PJ64x14Launch);
+	//XLMenu_AddItem(m_pMainMenu,MITEM_ROUTINE,L"Launch with Mupen64Plus",M64PLaunch);
 	XLMenu_AddItem(m_pMainMenu,MITEM_ROUTINE,L"Launch with UltraHLE",UltraHLELaunch);
 
 
@@ -1337,7 +1339,7 @@ void LaunchMenu(void)
 void Launch1964(void)
 {
 	//m_emulator = _1964;
-	preferedemu = _1964;
+	preferedemu = _1964x085;
 	ConfigAppSave2();
 	selectvideomode();
 }
@@ -1358,14 +1360,21 @@ void LaunchPJ64x14(void)
 	selectvideomode();
 }
 
-void PJ64Launch(void)
+void PJ64x14Launch(void)
 {
 	//m_emulator = _Project64;
-	preferedemu = _Project64;
+	preferedemu = _PJ64x14;
 	ConfigAppSave2();
 	selectvideomode();
 }
 
+void PJ64x16Launch(void)
+{
+	//m_emulator = _Project64;
+	preferedemu = _PJ64x16;
+	ConfigAppSave2();
+	selectvideomode();
+}
 void M64PLaunch(void)
 {
 	//m_emulator = _Project64;

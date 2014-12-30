@@ -34,8 +34,8 @@ using namespace std;
 
 enum Emulators
 {
-	_1964,
-	_Project64,
+	_1964x085,
+	_PJ64x16,
 	_UltraHLE,
 	_PJ64x14,
 	_1964x11,

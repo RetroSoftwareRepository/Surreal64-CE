@@ -854,7 +854,7 @@ VOID __cdecl main()
 
 	
 	// max texture mem, 0 = auto
-	SetMaxTextureMem(loaddwMaxVideoMem());
+	//SetMaxTextureMem(loaddwMaxVideoMem());
 	
 	g_bAudioBoost = (loadbAudioBoost() == 1 ? TRUE : FALSE); // set before audio init
 	

@@ -35,10 +35,12 @@ IniFile::IniFile(void)
 	// dont yet have an entry and for games that have an entry but dont
 	// use every ini option
 	memset(&m_defaultIniEntry, 0, sizeof(RomIniEntry));
-	m_defaultIniEntry.pbEmuSupported[_1964]		= true;
-	m_defaultIniEntry.pbEmuSupported[_Project64]	= true;
+	m_defaultIniEntry.pbEmuSupported[_1964x085]		= true;
+	m_defaultIniEntry.pbEmuSupported[_PJ64x14]	= true;
+	m_defaultIniEntry.pbEmuSupported[_1964x11]		= true;
+	m_defaultIniEntry.pbEmuSupported[_PJ64x16]	= true;
 	m_defaultIniEntry.pbEmuSupported[_UltraHLE]	= false;
-	m_defaultIniEntry.preferedemu = _1964;
+	m_defaultIniEntry.preferedemu = _1964x085;
 	
 	// Ez0n3 - default plugins per ini
 	//m_defaultIniEntry.videoplugin = _VideoPluginMissing; // = num of video plugins + 1
@@ -436,13 +438,17 @@ bool IniFile::Save(const string &szIniFilename)
 				// from now on, only output values that differ from the current default values
 				
 				// emulators supported
-				if (pCurrentEntry->pbEmuSupported[_1964] != m_currentIniEntry.pbEmuSupported[_1964] || 
-					pCurrentEntry->pbEmuSupported[_Project64] != m_currentIniEntry.pbEmuSupported[_Project64] ||
+				if (pCurrentEntry->pbEmuSupported[_1964x085] != m_currentIniEntry.pbEmuSupported[_1964x085] || 
+					pCurrentEntry->pbEmuSupported[_PJ64x14] != m_currentIniEntry.pbEmuSupported[_PJ64x14] ||
+					pCurrentEntry->pbEmuSupported[_1964x11] != m_currentIniEntry.pbEmuSupported[_1964x085] || 
+					pCurrentEntry->pbEmuSupported[_PJ64x16] != m_currentIniEntry.pbEmuSupported[_PJ64x14] ||
 					pCurrentEntry->pbEmuSupported[_UltraHLE] != m_currentIniEntry.pbEmuSupported[_UltraHLE])
 				{
 				
-					szStrBuf.append(pCurrentEntry->pbEmuSupported[_1964] ? "1," : "0,");
-					szStrBuf.append(pCurrentEntry->pbEmuSupported[_1964] ? "1," : "0,");
+					szStrBuf.append(pCurrentEntry->pbEmuSupported[_1964x085] ? "1," : "0,");
+					szStrBuf.append(pCurrentEntry->pbEmuSupported[_1964x11] ? "1," : "0,");
+					szStrBuf.append(pCurrentEntry->pbEmuSupported[_PJ64x14] ? "1," : "0,");
+					szStrBuf.append(pCurrentEntry->pbEmuSupported[_PJ64x16] ? "1," : "0,");
 					szStrBuf.append(pCurrentEntry->pbEmuSupported[_UltraHLE] ? "1" : "0");
 					
 					ini.SetValue(szRomCrcs, "Emulators Supported", szStrBuf.c_str());
