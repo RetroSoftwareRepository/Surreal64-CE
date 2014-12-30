@@ -167,7 +167,7 @@ bool D3DRender::InitDeviceObjects()
 	float density = 1.0f;
 	gD3DDevWrapper.SetRenderState(D3DRS_FOGDENSITY,   *(uint32 *)(&density));
 #ifdef _XBOX
-	if(bUseLinFog)
+	if(options.bUseLinearFog)
 		gD3DDevWrapper.SetRenderState( D3DRS_FOGTABLEMODE, D3DFOG_LINEAR );
 	else
 		gD3DDevWrapper.SetRenderState(D3DRS_RANGEFOGENABLE, TRUE);
@@ -774,7 +774,7 @@ void D3DRender::SetFogEnable(bool bEnable)
 		gD3DDevWrapper.SetRenderState( D3DRS_FOGENABLE, TRUE);
 		gD3DDevWrapper.SetRenderState(D3DRS_FOGCOLOR, gRDP.fogColor);
 #ifdef _XBOX
-		if(!bUseLinFog)
+		if(!options.bUseLinearFog)
 			gD3DDevWrapper.SetRenderState(D3DRS_RANGEFOGENABLE, TRUE);
 #endif
 		

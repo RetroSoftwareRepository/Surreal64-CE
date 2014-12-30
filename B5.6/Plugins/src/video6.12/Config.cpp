@@ -404,7 +404,8 @@ void ReadConfiguration(void)
 		options.bUseFullTMEM = TRUE;
 
 		options.bForceSoftwareTnL = FALSE; //FALSE;
-		options.bForceSoftwareClipper = bUseLinFog;;
+		options.bForceSoftwareClipper = (VertexMode == 1);
+		options.bUseLinearFog = (bUseLinFog && (VertexMode == 1));
 
 		options.bEnableVertexShader = FALSE;
 		options.RenderBufferSetting=0;
@@ -422,7 +423,7 @@ void ReadConfiguration(void)
 		options.DirectXAntiAliasingValue = 0;
 		options.DirectXCombiner = DX_PIXEL_SHADER;
 		options.DirectXDevice = XBOX_DIRECTX_DEVICE;	// HAL device
-		options.DirectXAnisotropyValue = 0;
+		options.DirectXAnisotropyValue = 2;
 		options.DirectXMaxFSAA = 4;
 		options.FPSColor = 0xFFFFFFFF;
 		options.DirectXMaxAnisotropy = 2;
