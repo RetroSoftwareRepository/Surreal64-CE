@@ -343,7 +343,7 @@
 				RemotePath="xe:\Surreal64 CE\PJ64-510.xbe"/>
 			<Tool
 				Name="XboxImageTool"
-				FileName="$(TargetDir)/PJ64x14-510.xbe"
+				FileName="$(TargetDir)/PJ64x14-510M.xbe"
 				StackSize="131072"
 				DontMountUD="FALSE"
 				NoLibWarn="TRUE"
