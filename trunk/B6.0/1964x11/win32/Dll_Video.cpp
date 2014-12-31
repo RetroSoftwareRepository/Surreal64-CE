@@ -141,7 +141,7 @@ BOOL LoadVideoPlugin(char *libname)
 	//_VIDEO_ShowCFB						= _VIDEO_RICE_510_ShowCFB;
 	
 	_VIDEO_FrameBufferWrite					= _VIDEO_RICE_510_FBWrite;
-	_VIDEO_FrameBufferWriteList				= _VIDEO_RICE_510_FBWList;
+	//_VIDEO_FrameBufferWriteList				= _VIDEO_RICE_510_FBWList;
 	_VIDEO_FrameBufferRead					= _VIDEO_RICE_510_FBRead;
 	//_VIDEO_GetFrameBufferInfo				= _VIDEO_RICE_510_FBGetFrameBufferInfo;
 	//_VIDEO_SetOnScreenText				= _VIDEO_RICE_510_SetOnScreenText;
@@ -177,7 +177,7 @@ BOOL LoadVideoPlugin(char *libname)
 	//_VIDEO_ShowCFB						= _VIDEO_RICE_531_ShowCFB;
 	
 	_VIDEO_FrameBufferWrite					= _VIDEO_RICE_531_FBWrite;
-	_VIDEO_FrameBufferWriteList				= _VIDEO_RICE_531_FBWList;
+	//_VIDEO_FrameBufferWriteList				= _VIDEO_RICE_531_FBWList;
 	_VIDEO_FrameBufferRead					= _VIDEO_RICE_531_FBRead;
 	//_VIDEO_GetFrameBufferInfo				= _VIDEO_RICE_531_FBGetFrameBufferInfo;
 	//_VIDEO_SetOnScreenText				= _VIDEO_RICE_531_SetOnScreenText;
@@ -212,7 +212,7 @@ BOOL LoadVideoPlugin(char *libname)
 	//_VIDEO_ShowCFB						= _VIDEO_RICE_560_ShowCFB;
 	
 	_VIDEO_FrameBufferWrite					= _VIDEO_RICE_560_FBWrite;
-	_VIDEO_FrameBufferWriteList				= _VIDEO_RICE_560_FBWList;
+	//_VIDEO_FrameBufferWriteList				= _VIDEO_RICE_560_FBWList;
 	_VIDEO_FrameBufferRead					= _VIDEO_RICE_560_FBRead;
 	_VIDEO_GetFrameBufferInfo				= _VIDEO_RICE_560_FBGetFrameBufferInfo;
 	//_VIDEO_SetOnScreenText				= _VIDEO_RICE_560_SetOnScreenText;

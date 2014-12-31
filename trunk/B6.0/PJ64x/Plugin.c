@@ -1185,10 +1185,10 @@ void SetupPlugins (HWND hWnd) {
 		if (RSPVersion == 0x0100) { InitiateRSP_1_0(RspInfo10, &RspTaskValue); }
 		if (RSPVersion == 0x0101) { InitiateRSP_1_1(RspInfo11, &RspTaskValue); }
 
-		if(g_iAudioPlugin == _AudioPluginM64P)
+		/*if(g_iAudioPlugin == _AudioPluginM64P)
 		{
 			//ProcessAList = RspInfo11.ProcessAlist;
-		}
+		}*/
 	}
 	
 #if (!defined(EXTERNAL_RELEASE))

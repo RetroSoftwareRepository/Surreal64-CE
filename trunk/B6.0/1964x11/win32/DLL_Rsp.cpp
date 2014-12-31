@@ -27,7 +27,7 @@ void	(CALL *_RSPRomClosed)			( void ) = NULL;
 DWORD	(CALL *_DoRspCycles)			( DWORD ) = NULL;
 void	(CALL *_InitiateRSP_1_0)		( RSP_INFO_1_0 rspinfo, DWORD * cycles) = NULL;
 void	(CALL *_InitiateRSP_1_1)		( RSP_INFO_1_1 rspinfo, DWORD * cycles) = NULL;
-void	(CALL *_RSP_GetDllInfo)			(PLUGIN_INFO *) = NULL;
+//void	(CALL *_RSP_GetDllInfo)			(PLUGIN_INFO *) = NULL;
 void	(CALL *_RSP_Under_Selecting_DllAbout) (HWND _hWnd) = NULL;
 
 #ifdef _DEBUG
@@ -246,11 +246,11 @@ BOOL LoadRSPPlugin(char * libname)
 #if defined(_RSP_HACK_HLE)
 	case _RSPPluginHLE :
 		RSPVersion							= 0x0101;
-		_RSPCloseDLL						= _RSP_HACK_HLE_CloseDLL;
-		_DoRspCycles						= _RSP_HACK_HLE_DoRspCycles;
-		_InitiateRSP_1_1					= _RSP_HACK_HLE_InitiateRSP;
-		_RSPRomClosed						= _RSP_HACK_HLE_RomClosed;
-		//_RSP_GetDllInfo					= _RSP_HACK_HLE_GetDllInfo;
+		_RSPCloseDLL						= _RSP_HLE_CloseDLL;
+		_DoRspCycles						= _RSP_HLE_DoRspCycles;
+		_InitiateRSP_1_1					= _RSP_HLE_InitiateRSP;
+		_RSPRomClosed						= _RSP_HLE_RomClosed;
+		//_RSP_GetDllInfo					= _RSP_HLE_GetDllInfo;
 			break;
 #endif //_RSP_HACK_HLE
 
@@ -268,11 +268,11 @@ BOOL LoadRSPPlugin(char * libname)
 #if defined(_RSP_PJ64_LLE)
 	case _RSPPluginLLE :
 		RSPVersion							= 0x0101;
-		_RSPCloseDLL						= _RSP_PJ64_LLE_CloseDLL;
-		_DoRspCycles						= _RSP_PJ64_LLE_DoRspCycles;
-		_InitiateRSP_1_1					= _RSP_PJ64_LLE_InitiateRSP;
-		_RSPRomClosed						= _RSP_PJ64_LLE_RomClosed;
-		//_RSP_GetDllInfo					= _RSP_PJ64_LLE_GetDllInfo;
+		_RSPCloseDLL						= _RSP_CloseDLL;
+		_DoRspCycles						= _RSP_DoRspCycles;
+		_InitiateRSP_1_1					= _RSP_InitiateRSP;
+		_RSPRomClosed						= _RSP_RomClosed;
+		//_RSP_GetDllInfo					= _RSP_GetDllInfo;
 			break;
 #endif //_RSP_PJ64_LLE
 
