@@ -218,7 +218,7 @@ __forceinline void XboxDrawDebugInfo()
 		case _AudioPluginJttl:		swprintf(debugaudio,L"Audio Plugin: JttL");		break;
 		case _AudioPluginAzimer:	swprintf(debugaudio,L"Audio Plugin: Azimer");	break;
 		case _AudioPluginMusyX:		swprintf(debugaudio,L"Audio Plugin: MusyX");	break;
-		case _AudioPluginM64P:		swprintf(debugaudio,L"Audio Plugin: Mupen64");	break;
+		//case _AudioPluginM64P:		swprintf(debugaudio,L"Audio Plugin: Mupen64");	break;
 	}
 
 	//check RSP plugins

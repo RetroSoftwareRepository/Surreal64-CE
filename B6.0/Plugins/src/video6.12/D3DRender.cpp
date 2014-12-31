@@ -166,13 +166,12 @@ bool D3DRender::InitDeviceObjects()
 	//gD3DDevWrapper.SetRenderState( D3DRS_FOGCOLOR, gRDP.fogColor );
 	float density = 1.0f;
 	gD3DDevWrapper.SetRenderState(D3DRS_FOGDENSITY,   *(uint32 *)(&density));
+	gD3DDevWrapper.SetRenderState( D3DRS_FOGTABLEMODE, D3DFOG_LINEAR );
 #ifdef _XBOX
-	if(options.bUseLinearFog)
-		gD3DDevWrapper.SetRenderState( D3DRS_FOGTABLEMODE, D3DFOG_LINEAR );
-	else
+	if(!options.bUseLinearFog)
 		gD3DDevWrapper.SetRenderState(D3DRS_RANGEFOGENABLE, TRUE);
 #else
-	gD3DDevWrapper.SetRenderState( D3DRS_FOGTABLEMODE, D3DFOG_LINEAR );
+	//gD3DDevWrapper.SetRenderState( D3DRS_FOGTABLEMODE, D3DFOG_LINEAR );
 #endif
 
 	// Dafault is ZBuffer disabled
