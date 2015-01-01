@@ -519,7 +519,7 @@ BOOL LoadGFXDll(char * RspDll) {
 	_VIDEO_LINK_DrawScreen						= _VIDEO_RICE_510_DrawScreen;
 	_VIDEO_LINK_ViStatusChanged					= _VIDEO_RICE_510_ViStatusChanged;
 	_VIDEO_LINK_ViWidthChanged					= _VIDEO_RICE_510_ViWidthChanged;
-	//_VIDEO_LINK_ChangeWindow					= _VIDEO_RICE_510_ChangeWindow;
+	_VIDEO_LINK_ChangeWindow					= _VIDEO_RICE_510_ChangeWindow;
 	
 	//_VIDEO_LINK_ChangeWindow_1_3					= _VIDEO_RICE_510_ChangeWindow;
 	//_VIDEO_LINK_CaptureScreen					= _VIDEO_RICE_510_CaptureScreen;
@@ -555,7 +555,7 @@ BOOL LoadGFXDll(char * RspDll) {
 	_VIDEO_LINK_DrawScreen						= _VIDEO_RICE_531_DrawScreen;
 	_VIDEO_LINK_ViStatusChanged					= _VIDEO_RICE_531_ViStatusChanged;
 	_VIDEO_LINK_ViWidthChanged					= _VIDEO_RICE_531_ViWidthChanged;
-	//_VIDEO_LINK_ChangeWindow					= _VIDEO_RICE_531_ChangeWindow;
+	_VIDEO_LINK_ChangeWindow					= _VIDEO_RICE_531_ChangeWindow;
 	
 	//_VIDEO_LINK_ChangeWindow_1_3					= _VIDEO_RICE_531_ChangeWindow;
 	//_VIDEO_LINK_CaptureScreen					= _VIDEO_RICE_531_CaptureScreen;

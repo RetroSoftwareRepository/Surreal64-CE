@@ -65,7 +65,7 @@ void  _RSP_M64p_GetDllInfo ( PLUGIN_INFO * PluginInfo );
 void  _RSP_M64p_InitiateRSP ( RSP_INFO Rsp_Info, DWORD * CycleCount);
 void  _RSP_M64p_RomClosed (void);
 void  _RSP_M64p_DllConfig (HWND hWnd);
-
+/*
 void  _RSP_CXD4_CloseDLL (void);
 void  _RSP_CXD4_DllAbout ( HWND hParent );
 DWORD _RSP_CXD4_DoRspCycles ( DWORD Cycles );
@@ -73,7 +73,7 @@ void  _RSP_CXD4_GetDllInfo ( PLUGIN_INFO * PluginInfo );
 void  _RSP_CXD4_InitiateRSP ( RSP_INFO Rsp_Info, DWORD * CycleCount);
 void  _RSP_CXD4_RomClosed (void);
 void  _RSP_CXD4_DllConfig (HWND hWnd);
-
+*/
 void   _RSP_CloseDLL (void);
 void   _RSP_DllAbout ( HWND hParent );
 DWORD  _RSP_DoRspCycles ( DWORD Cycles );

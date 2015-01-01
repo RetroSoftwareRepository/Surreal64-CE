@@ -1364,7 +1364,7 @@ void init_whole_mem_func_array(void)
         (uint32) write_mem_flashram_eax_only
 	);
 
-#ifndef _USE_ROM_PAGING // works ok when commented. commented by oDD -Paging?
+#ifndef USE_ROM_PAGING // works ok when commented. commented by oDD -Paging?
 	if(debug_opcode!=0)
 	{
 		init_mem_region_func_array_eax_only
