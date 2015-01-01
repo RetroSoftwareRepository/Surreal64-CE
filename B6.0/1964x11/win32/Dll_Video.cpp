@@ -24,6 +24,20 @@
 #include "../stdafx.h"
 #include <float.h>
 
+#if defined(_VIDEO_1964_11)
+#include <Video1964.h>
+#elif defined(_VIDEO_RICE_510)
+#include <VideoRice510.h>
+#elif defined(_VIDEO_RICE_531)
+#include <VideoRice531.h>
+#elif defined(_VIDEO_RICE_560)
+#include <VideoRice560.h>
+#elif defined(_VIDEO_RICE_611)
+#include <VideoRice611.h>
+#elif defined(_VIDEO_RICE_612)
+#include <VideoRice612.h>
+#endif
+
 uint16		GfxPluginVersion;
 HINSTANCE	hinstLibVideo = NULL;
 GFX_INFO	Gfx_Info;
@@ -62,7 +76,7 @@ void (CALL *_VIDEO_Under_Selecting_Test) (HWND) = NULL;
 void (CALL *_VIDEO_Under_Selecting_About) (HWND) = NULL;
 
 void (CALL *_VIDEO_FrameBufferWrite) (DWORD addr, DWORD size) = NULL;
-void (CALL *_VIDEO_FrameBufferWriteList) (FrameBufferModifyEntry *plist, DWORD size) = NULL;
+//void (CALL *_VIDEO_FrameBufferWriteList) (FrameBufferModifyEntry *plist, DWORD size) = NULL;
 void (CALL *_VIDEO_FrameBufferRead) (DWORD addr) = NULL;
 void (CALL *_VIDEO_GetFrameBufferInfo) (void *pinfo) = NULL;
 void (CALL *_VIDEO_SetOnScreenText) (char *msg) = NULL;

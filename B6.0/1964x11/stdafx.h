@@ -13,7 +13,7 @@
 #ifdef _XBOX
 #include <xtl.h>
 #include <xbox_depp.h>
-#define USE_ROM_PAGING 1 // enable rom paging using temporary file, breaks 007 and conker
+#define USE_ROM_PAGING 1 // enable rom paging using temporary file, breaks 007 and conker for 1.1
 
 #if _MSC_VER > 1200
 #include "xmmintrin.h" //SSE - needed?

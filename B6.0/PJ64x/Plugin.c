@@ -116,7 +116,8 @@ extern void _VIDEO_RICE_560_ShowCFB					(void);
 extern void _VIDEO_RICE_560_SetMaxTextureMem(DWORD mem);
 
 #elif defined(_VIDEO_RICE_611)
-
+#include <VideoRice611.h>
+/*
 extern void _VIDEO_RICE_611_CloseDLL					(void);
 extern void _VIDEO_RICE_611_DllConfig				( HWND hParent );
 extern void _VIDEO_RICE_611_GetDllInfo				( PLUGIN_INFO *PluginInfo);
@@ -139,7 +140,7 @@ extern void _VIDEO_RICE_611_CaptureScreen			(char *);
 extern void _VIDEO_RICE_611_ShowCFB					(void);
 
 extern void _VIDEO_RICE_611_SetMaxTextureMem(DWORD mem);
-
+*/
 #elif defined(_VIDEO_RICE_612)
 #include <VideoRice612.h>
 /*
@@ -611,7 +612,7 @@ BOOL LoadGFXDll(char * RspDll) {
 	_VIDEO_DrawScreen						= _VIDEO_1964_11_DrawScreen;
 	_VIDEO_ViStatusChanged					= _VIDEO_1964_11_ViStatusChanged;
 	_VIDEO_ViWidthChanged					= _VIDEO_1964_11_ViWidthChanged;
-	//_VIDEO_ChangeWindow					= _VIDEO_1964_11_ChangeWindow;
+	_VIDEO_ChangeWindow					= _VIDEO_1964_11_ChangeWindow;
 	
 	_VIDEO_ChangeWindow_1_3					= _VIDEO_1964_11_ChangeWindow;
 	//_VIDEO_CaptureScreen					= _VIDEO_1964_11_CaptureScreen;
@@ -647,7 +648,7 @@ BOOL LoadGFXDll(char * RspDll) {
 	_VIDEO_LINK_DrawScreen						= _VIDEO_RICE_510_DrawScreen;
 	_VIDEO_LINK_ViStatusChanged					= _VIDEO_RICE_510_ViStatusChanged;
 	_VIDEO_LINK_ViWidthChanged					= _VIDEO_RICE_510_ViWidthChanged;
-	//_VIDEO_LINK_ChangeWindow					= _VIDEO_RICE_510_ChangeWindow;
+	_VIDEO_LINK_ChangeWindow					= _VIDEO_RICE_510_ChangeWindow;
 	
 	//_VIDEO_LINK_ChangeWindow_1_3					= _VIDEO_RICE_510_ChangeWindow;
 	//_VIDEO_LINK_CaptureScreen					= _VIDEO_RICE_510_CaptureScreen;
@@ -683,7 +684,7 @@ BOOL LoadGFXDll(char * RspDll) {
 	_VIDEO_LINK_DrawScreen						= _VIDEO_RICE_531_DrawScreen;
 	_VIDEO_LINK_ViStatusChanged					= _VIDEO_RICE_531_ViStatusChanged;
 	_VIDEO_LINK_ViWidthChanged					= _VIDEO_RICE_531_ViWidthChanged;
-	//_VIDEO_LINK_ChangeWindow					= _VIDEO_RICE_531_ChangeWindow;
+	_VIDEO_LINK_ChangeWindow					= _VIDEO_RICE_531_ChangeWindow;
 	
 	//_VIDEO_LINK_ChangeWindow_1_3					= _VIDEO_RICE_531_ChangeWindow;
 	//_VIDEO_LINK_CaptureScreen					= _VIDEO_RICE_531_CaptureScreen;
@@ -753,7 +754,7 @@ BOOL LoadGFXDll(char * RspDll) {
 	_VIDEO_LINK_DrawScreen						= _VIDEO_RICE_611_DrawScreen;
 	_VIDEO_LINK_ViStatusChanged					= _VIDEO_RICE_611_ViStatusChanged;
 	_VIDEO_LINK_ViWidthChanged					= _VIDEO_RICE_611_ViWidthChanged;
-	//_VIDEO_LINK_ChangeWindow					= _VIDEO_RICE_611_ChangeWindow;
+	_VIDEO_LINK_ChangeWindow					= _VIDEO_RICE_611_ChangeWindow;
 
 	//_VIDEO_LINK_ChangeWindow_1_3					= _VIDEO_RICE_611_ChangeWindow;
 	//_VIDEO_LINK_CaptureScreen					= _VIDEO_RICE_611_CaptureScreen;
