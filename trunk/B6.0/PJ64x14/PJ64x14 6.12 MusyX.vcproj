@@ -42,7 +42,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xacteng.lib xboxkrnl.lib xbdm.lib AudioMusyX.lib Input.lib RSP.lib RSPHLE.lib RSPM64P.lib VideoRice612.lib"
-				OutputFile="$(OutDir)/PJ64-612.exe"
+				OutputFile="$(OutDir)/PJ64x14-612M.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\Plugins\lib"
 				IgnoreAllDefaultLibraries="FALSE"
@@ -252,7 +252,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xacteng.lib xboxkrnl.lib xbdm.lib AudioMusyX.lib Input.lib RSP.lib RSPHLE.lib RSPM64P.lib VideoRice612.lib"
-				OutputFile="$(OutDir)/PJ64-612.exe"
+				OutputFile="$(OutDir)/PJ64x14-612M.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\Plugins\lib"
 				GenerateDebugInformation="TRUE"
@@ -321,7 +321,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="xapilib.lib d3d8ltcg.lib d3dx8.lib xgraphicsltcg.lib dsound.lib dmusicltcg.lib xactengltcg.lib xboxkrnl.lib AudioMusyX.lib Input.lib RSP.lib RSPHLE.lib RSPM64P.lib VideoRice612.lib"
-				OutputFile="$(OutDir)/PJ64-612.exe"
+				OutputFile="$(OutDir)/PJ64x14-612M.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\Plugins\lib"
 				GenerateDebugInformation="TRUE"

@@ -202,7 +202,7 @@ extern void _AUDIO_MUSYX_DllConfig			( HWND hParent );
 extern void _AUDIO_MUSYX_GetDllInfo			(PLUGIN_INFO *PluginInfo);
 extern void _AUDIO_MUSYX_AiDacrateChanged	(int SystemType);
 extern void _AUDIO_MUSYX_AiLenChanged		(void);
-extern void _AUDIO_MUSYX_AiReadLength		(void);
+extern DWORD _AUDIO_MUSYX_AiReadLength		(void);
 extern void _AUDIO_MUSYX_AiUpdate			(BOOL Wait);
 extern BOOL _AUDIO_MUSYX_InitiateAudio		(AUDIO_INFO Audio_Info);
 extern void _AUDIO_MUSYX_ProcessAList		(void);
@@ -719,7 +719,7 @@ BOOL LoadGFXDll(char * RspDll) {
 	_VIDEO_LINK_DrawScreen						= _VIDEO_RICE_560_DrawScreen;
 	_VIDEO_LINK_ViStatusChanged					= _VIDEO_RICE_560_ViStatusChanged;
 	_VIDEO_LINK_ViWidthChanged					= _VIDEO_RICE_560_ViWidthChanged;
-	//_VIDEO_LINK_ChangeWindow					= _VIDEO_RICE_560_ChangeWindow;
+	_VIDEO_LINK_ChangeWindow					= _VIDEO_RICE_560_ChangeWindow;
 	
 	//_VIDEO_LINK_ChangeWindow_1_3					= _VIDEO_RICE_560_ChangeWindow;
 	//_VIDEO_LINK_CaptureScreen					= _VIDEO_RICE_560_CaptureScreen;

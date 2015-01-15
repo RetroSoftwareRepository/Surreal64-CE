@@ -42,7 +42,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xacteng.lib xboxkrnl.lib xbdm.lib AudioMusyX.lib Input.lib RSP.lib RSPHLE.lib RSPM64P.lib VideoRice612.lib"
-				OutputFile="$(OutDir)/PJ64-612M.exe"
+				OutputFile="$(OutDir)/PJ64x16-612M.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\Plugins\lib"
 				IgnoreAllDefaultLibraries="FALSE"
@@ -219,7 +219,7 @@
 			IntermediateDirectory="obj\Release"
 			ConfigurationType="1"
 			CharacterSet="2"
-			WholeProgramOptimization="TRUE">
+			WholeProgramOptimization="FALSE">
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="2"
@@ -233,8 +233,8 @@
 				OptimizeForProcessor="2"
 				AdditionalIncludeDirectories="..\Plugins\include\"
 				PreprocessorDefinitions="NDEBUG;_XBOX;EXTERNAL_RELEASE;WIN32;_WIN32;_WINDOWS;__WIN32__;USE_MUSYX;_VIDEO_RICE_612"
-				StringPooling="FALSE"
-				ExceptionHandling="FALSE"
+				StringPooling="TRUE"
+				ExceptionHandling="TRUE"
 				RuntimeLibrary="0"
 				StructMemberAlignment="4"
 				BufferSecurityCheck="FALSE"
@@ -253,7 +253,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xacteng.lib xboxkrnl.lib xbdm.lib AudioMusyX.lib Input.lib RSP.lib RSPHLE.lib RSPM64P.lib VideoRice612.lib"
-				OutputFile="$(OutDir)/PJ64-612M.exe"
+				OutputFile="$(OutDir)/PJ64x16-612M.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\Plugins\lib"
 				GenerateDebugInformation="TRUE"
@@ -290,15 +290,15 @@
 			IntermediateDirectory="obj\Release_LTCG"
 			ConfigurationType="1"
 			CharacterSet="2"
-			WholeProgramOptimization="FALSE">
+			WholeProgramOptimization="TRUE">
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="0"
-				GlobalOptimizations="FALSE"
-				InlineFunctionExpansion="0"
+				Optimization="2"
+				GlobalOptimizations="TRUE"
+				InlineFunctionExpansion="2"
 				EnableIntrinsicFunctions="FALSE"
 				ImproveFloatingPointConsistency="FALSE"
-				FavorSizeOrSpeed="0"
+				FavorSizeOrSpeed="1"
 				OmitFramePointers="TRUE"
 				EnableFiberSafeOptimizations="TRUE"
 				OptimizeForProcessor="2"
@@ -324,7 +324,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="xapilib.lib d3d8ltcg.lib d3dx8.lib xgraphicsltcg.lib dsound.lib dmusicltcg.lib xactengltcg.lib xboxkrnl.lib AudioMusyX.lib Input.lib RSP.lib RSPHLE.lib RSPM64P.lib VideoRice612.lib"
-				OutputFile="$(OutDir)/PJ64-612M.exe"
+				OutputFile="$(OutDir)/PJ64x16-612M.exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\Plugins\lib"
 				GenerateDebugInformation="TRUE"
@@ -520,9 +520,6 @@
 			</File>
 			<File
 				RelativePath=".\CPU Analysis.h">
-			</File>
-			<File
-				RelativePath=".\CPU Log.h">
 			</File>
 			<File
 				RelativePath=".\Cpu.h">
