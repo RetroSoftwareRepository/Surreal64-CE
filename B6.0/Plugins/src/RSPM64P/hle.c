@@ -68,7 +68,7 @@ static void dump_unknown_non_task(struct hle_t* hle, unsigned int sum);
 #endif
 
 /* local variables */
-static const bool FORWARD_AUDIO = true, FORWARD_GFX = true;
+static const bool FORWARD_AUDIO = false, FORWARD_GFX = true;
 
 /* Global functions */
 void hle_init(struct hle_t* hle,

@@ -7,7 +7,7 @@
 #include "../Plugins.h"
 int g_iPagingMethod = _PagingXXX;
 #ifndef DEBUG
-#define USE_OBF
+//#define USE_OBF
 #endif
 #ifdef USE_OBF
 BOOL bUsePaging = FALSE;

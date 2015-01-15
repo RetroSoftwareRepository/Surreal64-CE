@@ -294,6 +294,7 @@ void _AUDIO_MUSYX_AiUpdate (BOOL Wait)
 
 void _AUDIO_MUSYX_CloseDLL (void)
 {
+	/*
 #ifdef THREADED
 	//TerminateThread (handleAudioThread, 0);
 	ExitThread(0);
@@ -313,6 +314,7 @@ DWORD dwStatus;
 		IDirectSound8_Release(lpds);
         lpds = NULL;
 	}
+	*/
 
 
 

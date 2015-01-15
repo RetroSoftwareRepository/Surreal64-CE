@@ -365,6 +365,9 @@
 				RelativePath=".\ConvertImage.h">
 			</File>
 			<File
+				RelativePath="..\..\..\PJ64x\CPU Log.h">
+			</File>
+			<File
 				RelativePath=".\CritSect.h">
 			</File>
 			<File

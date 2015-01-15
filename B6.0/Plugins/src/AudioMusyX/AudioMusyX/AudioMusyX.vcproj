@@ -182,7 +182,7 @@
 				OmitFramePointers="TRUE"
 				EnableFiberSafeOptimizations="TRUE"
 				OptimizeForProcessor="2"
-				PreprocessorDefinitions="NDEBUG;_XBOX;_LIB;LTCG"
+				PreprocessorDefinitions="NDEBUG;_XBOX;_LIB;WIN32;_WINDOWS;BASICAUDIOPLUGIN_EXPORTS;LTCG"
 				StringPooling="TRUE"
 				RuntimeLibrary="0"
 				BufferSecurityCheck="FALSE"
