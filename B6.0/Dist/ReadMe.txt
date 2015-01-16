@@ -17,9 +17,9 @@
                                                                               
 ******************************************************************************
 *   Programmer :.......weinerschnitzel * Language :...C/C++,ASM,DirectX8.1   *
-*   Version :.....................B6.0 * Size :..........147,316,923 bytes   *
-*   Date :....................12/31/14 * Type :...............N64 Emulator   *
-*   Group :........http://EmuXtras.net * OS :...............Microsoft Xbox   *
+*   Version :.....................B6.0 * Size :......................264MB   *
+*   Date :....................01/15/15 * Type :...............N64 Emulator   *
+*   Group :........http://EmuXtras.net * Platform :.........Microsoft Xbox   *
 ******************************************************************************
 *                           http://surreal64ce.sf.net                        *
 ******************************************************************************
@@ -55,6 +55,7 @@
 *    -Software Vertex Clipper as an option for corner cases                  *
 *    -Glide64 LOD fix for correct fog depth                                  *
 *    -Moveword insert matrix fix for SSB                                     *
+*    -Fill_Rect primColor fix for MK64                                       *
 *    -Various renames/refactors and other less noticeable bug fixes          *
 *                                                                            *
 *    --Input Plugin Updates--                                                *

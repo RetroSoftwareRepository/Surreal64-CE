@@ -871,7 +871,7 @@ void DLParser_Process(OSTask * pTask)
 	{
 		CRender::g_pRender->ClearBuffer(true,true);
 		CGraphicsContext::needCleanScene = false;
-#ifdef _XBOX
+#ifdef _DEBUG
 		_VIDEO_DisplayTemporaryMessage("Clear buffer");
 #endif
 	}
@@ -927,7 +927,7 @@ void DLParser_Process(OSTask * pTask)
 	catch(...)
 	{
 		TRACE0("Unknown exception happens in ProcessDList");
-#ifdef _XBOX
+#ifdef _DEBUG
 		_VIDEO_DisplayTemporaryMessage("Unknown exception happens in ProcessDList");
 #endif
 		TriggerDPInterrupt();
