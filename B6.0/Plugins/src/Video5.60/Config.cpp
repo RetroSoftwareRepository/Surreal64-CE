@@ -193,8 +193,8 @@ BufferSettingInfo DirectXRenderBufferSettings[] =
 {
 	"Copy",			1,		D3DSWAPEFFECT_COPY,
 	"Flip (def)",	1,		D3DSWAPEFFECT_FLIP,
-	//"Double Buffer Copy Sync",	1,		D3DSWAPEFFECT_COPY_VSYNC,
-	//"Double Buffer Discard",	1,		D3DSWAPEFFECT_DISCARD,
+	"Double Buffer Copy Sync",	1,		D3DSWAPEFFECT_COPY_VSYNC,
+	"Double Buffer Discard",	1,		D3DSWAPEFFECT_DISCARD,
 	//"Triple Buffer Flip",		2,		D3DSWAPEFFECT_FLIP,
 	//"Quadruple Buffer Flip",	3,		D3DSWAPEFFECT_FLIP,
 	//"Triple Buffer Discard",	2,		D3DSWAPEFFECT_DISCARD,

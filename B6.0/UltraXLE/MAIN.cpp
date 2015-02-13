@@ -504,7 +504,7 @@ void main_thread(void)
     // process optional commands on command line
     if(*startrom)
     {
-        boot(startrom,init.nomemmap);
+        boot(startrom,1);
     }
     else
     {

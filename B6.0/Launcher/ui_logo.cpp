@@ -400,7 +400,8 @@ void DrawSynopsis()
 		//CtrlHeight = 720 - (itemh*3 + 15);
 	}*/
 
-	int iSynopTxtBotPos = ((int)vSynopsis.size() - (iSynopsisLines + 1));
+	int iSynopTxtBotPos = ((int)vSynopsis.size() - (iSynopsisLines+1));
+	if(iSynopTxtBotPos < 0) iSynopTxtBotPos = (int)vSynopsis.size() -1;
 	
 	// lock it at the top and bottom
 	if (iSynopTxtPos < 0) iSynopTxtPos = 0;
@@ -432,7 +433,13 @@ void DrawSynopsis()
 	}*/
 	
 	int iPosY = 0;
-	for (int i = iSynopTxtPos; i <= (iSynopTxtPos + iSynopsisLines); i++)
+	int iLinesToPrint;
+	if((int)vSynopsis.size() < (iSynopsisLines))
+		iLinesToPrint = (int)vSynopsis.size();
+	else
+		iLinesToPrint = iSynopsisLines;
+
+	for (int i = iSynopTxtPos; i <= (iSynopTxtPos + iLinesToPrint); i++)
 	{
 		string szLine (vSynopsis[i]);
 		swprintf (m_currentname,L"%S",szLine.c_str());

@@ -360,7 +360,7 @@ void ResetDefaults()
 
 	DefaultPak = RumblePak;
 	FlickerFilter = 1;
-	TextureMode = 0;
+	TextureMode = 3;
 	VertexMode = 2;
 	VSync = INTERVAL_IMMEDIATE;
 	AntiAliasMode = 0;
