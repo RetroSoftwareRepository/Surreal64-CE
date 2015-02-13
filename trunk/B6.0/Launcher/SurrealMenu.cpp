@@ -157,6 +157,8 @@ extern void CalculateEndCredits();
 extern void DrawCredits();
 extern float FSTxtPos;
 extern int iSynopTxtPos;
+extern int iSynopsisLines;
+extern vector<string> vSynopsis;
 
 void ToggleCredits();
 void ExitToDash();
@@ -496,13 +498,15 @@ void ToggleSynopsis()
 		fWindowVelocity -= (float)((-g_Gamepads->sThumbLY)/32256.0f); // adds .01 at rest
 		if ((fWindowVelocity <= -0.1f || fWindowVelocity >= 0.1f) && XBUtil_Timer(TIMER_GETAPPTIME) > 0.1f) {
 			XBUtil_Timer(TIMER_RESET);
-			iSynopTxtPos -= ((int)(fWindowVelocity * 100.0f) / 10); // 1 to 10
+			if(!((int)vSynopsis.size() < (iSynopsisLines)))
+				iSynopTxtPos -= ((int)(fWindowVelocity * 100.0f) / 10); // 1 to 10
 		}
 		
 		if (g_Gamepads->bPressedAnalogButtons[XINPUT_GAMEPAD_X]) {
 			//if (XBUtil_Timer(TIMER_GETAPPTIME) > 0.1f) {
 				XBUtil_Timer(TIMER_RESET);
-				iSynopTxtPos -= 2;
+				if(!((int)vSynopsis.size() < (iSynopsisLines)))
+					iSynopTxtPos -= 2;
 				bDpadUp = true;
 				bDpadDn = false;
 			//}
@@ -510,13 +514,15 @@ void ToggleSynopsis()
 		else if (bDpadUp && g_Gamepads->bAnalogButtons[XINPUT_GAMEPAD_X]) {
 			if (XBUtil_Timer(TIMER_GETAPPTIME) > 0.1f) {
 				XBUtil_Timer(TIMER_RESET);
-				iSynopTxtPos -= 2;
+				if(!((int)vSynopsis.size() < (iSynopsisLines)))
+					iSynopTxtPos -= 2;
 			}
 		}
 		else if (g_Gamepads->bPressedAnalogButtons[XINPUT_GAMEPAD_A]) {
 			//if (XBUtil_Timer(TIMER_GETAPPTIME) > 0.1f) {
 				XBUtil_Timer(TIMER_RESET);
-				iSynopTxtPos += 2;
+				if(!((int)vSynopsis.size() < (iSynopsisLines)))
+					iSynopTxtPos += 2;
 				bDpadUp = false;
 				bDpadDn = true;
 			//}
@@ -524,19 +530,22 @@ void ToggleSynopsis()
 		else if (bDpadDn && g_Gamepads->bAnalogButtons[XINPUT_GAMEPAD_A]) {
 			if (XBUtil_Timer(TIMER_GETAPPTIME) > 0.1f) {
 				XBUtil_Timer(TIMER_RESET);
-				iSynopTxtPos += 2;
+				if(!((int)vSynopsis.size() < (iSynopsisLines)))
+					iSynopTxtPos += 2;
 			}
 		}
 		else if (g_Gamepads->wButtons & XINPUT_GAMEPAD_DPAD_UP) {
 			if (XBUtil_Timer(TIMER_GETAPPTIME) > 0.1f) {
 				XBUtil_Timer(TIMER_RESET);
-				iSynopTxtPos -= 1;
+				if(!((int)vSynopsis.size() < (iSynopsisLines)))
+					iSynopTxtPos -= 1;
 			}
 		}
 		else if (g_Gamepads->wButtons & XINPUT_GAMEPAD_DPAD_DOWN) {
 			if (XBUtil_Timer(TIMER_GETAPPTIME) > 0.1f) {
 				XBUtil_Timer(TIMER_RESET);
-				iSynopTxtPos += 1;
+				if(!((int)vSynopsis.size() < (iSynopsisLines)))
+					iSynopTxtPos += 1;
 			}
 		}
 		else {
@@ -1289,10 +1298,10 @@ void LaunchMenu(void)
 
 	XLMenu_SetTitle(m_pMainMenu,L"Launch Menu",dwMenuTitleColor);
 
-	XLMenu_AddItem(m_pMainMenu,MITEM_ROUTINE,L"Launch with 1964",Launch1964);
+	XLMenu_AddItem(m_pMainMenu,MITEM_ROUTINE,L"Launch with 1964x085",Launch1964);
 	XLMenu_AddItem(m_pMainMenu,MITEM_ROUTINE,L"Launch with 1964x11",Launch1964x11);
-	XLMenu_AddItem(m_pMainMenu,MITEM_ROUTINE,L"Launch with PJ64x16",PJ64x16Launch);
 	XLMenu_AddItem(m_pMainMenu,MITEM_ROUTINE,L"Launch with PJ64x14",PJ64x14Launch);
+	XLMenu_AddItem(m_pMainMenu,MITEM_ROUTINE,L"Launch with PJ64x16",PJ64x16Launch);
 	//XLMenu_AddItem(m_pMainMenu,MITEM_ROUTINE,L"Launch with Mupen64Plus",M64PLaunch);
 	XLMenu_AddItem(m_pMainMenu,MITEM_ROUTINE,L"Launch with UltraHLE",UltraHLELaunch);
 
@@ -1305,7 +1314,27 @@ void LaunchMenu(void)
 		//Ez0n3 - had to increase this a tad to give the ini time to load
 		Sleep(300); //too fast for ini load
 	}*/
-	m_pMainMenu->curitem = preferedemu; // skip the loop/sleep
+	switch(preferedemu){
+		case _1964x085 : 
+			m_pMainMenu->curitem = 0;
+			break;
+		case _1964x11 : 
+			m_pMainMenu->curitem = 1;
+			break;
+		case _PJ64x14 : 
+			m_pMainMenu->curitem = 2;
+			break;
+		case _PJ64x16 : 
+			m_pMainMenu->curitem = 3;
+			break;
+		case _UltraHLE : 
+			m_pMainMenu->curitem = 4;
+			break;
+		default : 
+			m_pMainMenu->curitem = 1;
+			break;
+	}
+	//m_pMainMenu->curitem = preferedemu; // skip the loop/sleep
 
 	while( XLMenu_CurMenu == m_pMainMenu)
 	{

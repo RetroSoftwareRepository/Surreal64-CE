@@ -203,7 +203,7 @@ void cart_open(char *fname,int memmap)
 
     if(*fname=='!')
     {
-        memmap=1;
+        memmap=0;
         fname++;
     }
 
