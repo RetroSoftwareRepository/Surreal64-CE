@@ -235,14 +235,14 @@ void TakeScreenshot()
 	//This is broken - freakdave
 	
 	//Ez0n3 - remove invalid chars from romname for screenshot path - fixes problem with ss dir using ftp (exists, but not accessible)
-	short romnamess[42];
+	char romnamess[42];
 	for (int i=0;i<=42;i++){
 		if (romname[i]=='<' || romname[i]=='>' || romname[i]=='=' || romname[i]=='?' || romname[i]==':' || romname[i]==';' || romname[i]=='*' || romname[i]=='+' || romname[i]==',' || romname[i]=='/' || romname[i]=='|') romnamess[i] = '_';
-		else if (romname[i]=='\0' || romname[i]=='\t' || romname[i]=='\n' || i>=42) { romnamess[i]='\0'; break; }
+		//else if (romname[i]=='\0' || romname[i]=='\t' || romname[i]=='\n' || i>=42) { romnamess[i]='\0'; break; }
  		else romnamess[i] = romname[i];
 	}
 	for (int i=42;i>0;i--){
-		if (romnamess[i] == ' ') romnamess[i] = '/0';
+		if (romnamess[i]=='\0' || romnamess[i]=='\t' || romnamess[i]=='\n' || romnamess[i] == ' ') romnamess[i] = '\0';
 		else break;
 	}
 
@@ -298,14 +298,24 @@ void TakeScreenshot()
 	//g_pd3dDevice->GetRenderTarget(&surface);
 
 	//Write the ScreenShot
-	XGWriteSurfaceToFile(surface, screen);
+	try{
+		XGWriteSurfaceToFile(surface, screen);
+		surface->Release();
+		m_RenderPanel.Destroy();
+		tookscreenshot=true;
+	}
+	catch(...)
+	{
+#ifdef DEBUG
+	
+	OutputDebugString("Warning! Screenshot failed to save!");
+#endif
+	//Tell XLMenu we took a screenshot so we can exit
+	//tookscreenshot=false;
+	}
 
-	//Release Used parts
-	surface->Release();
-	m_RenderPanel.Destroy();
-
-	//DrawLogo();
-	tookscreenshot=true;
+	
+	
 	
 #ifdef DEBUG
 	OutputDebugString("Writing Screenshot: ");
