@@ -13,6 +13,9 @@
 #include <string.h>
 using namespace std;
 
+extern "C" void __EMU_LoadState(int index);
+extern "C" void __EMU_SaveState(int index);
+
 void GetStateTimestamp(int index, char *timestamp);
 extern "C" void __EMU_GetStateFilename(int index, char *timestamp, int mode);
 void CreateSaveStatePreview(unsigned int index);
@@ -296,7 +299,8 @@ void MainMenu(void)
 		g_pd3dDevice->Present( NULL, NULL, NULL, NULL );
 		if (tookscreenshot) {
 		tookscreenshot=false;
-        XLMenu_Activate(NULL);}
+        XLMenu_Activate(NULL);
+		}
 	}
 	
 	XLMenu_CurRoutine = NULL;
@@ -490,7 +494,7 @@ void CreateSaveStatePreview(unsigned int index)
 	//tex->Release();
 	//tex = NULL;
 	
-	LoadSaveStatePreview(index); // show new one
+	//LoadSaveStatePreview(index); // show new one
 }
 
 bool LoadSaveStatePreview(unsigned int index)
@@ -654,45 +658,75 @@ void LoadStateMenu(void)
 
 void LoadState1()
 {
-	bloadstate[0]=true;
-	bSatesUpdated=true;
-	_VIDEO_DisplayTemporaryMessage("Loaded State 1");
+	try{
+		CreateSaveStatePreview(0);
+		__EMU_LoadState(1);
+		_VIDEO_DisplayTemporaryMessage("Loaded State 1");
+	}
+	catch(...)
+	{
+		_VIDEO_DisplayTemporaryMessage("Load State failed!");
+	}
 	XLMenu_CurRoutine = NULL;
 	XLMenu_CurMenu = NULL;
 }
 
 void LoadState2()
 {
-	bloadstate[1]=true;
-	bSatesUpdated=true;
-	_VIDEO_DisplayTemporaryMessage("Loaded State 2");
+	try{
+		CreateSaveStatePreview(1);
+		__EMU_LoadState(2);
+		_VIDEO_DisplayTemporaryMessage("Loaded State 2");
+	}
+	catch(...)
+	{
+		_VIDEO_DisplayTemporaryMessage("Load State failed!");
+	}
 	XLMenu_CurRoutine = NULL;
 	XLMenu_CurMenu = NULL;
 }
 
 void LoadState3()
 {
-	bloadstate[2]=true;
-	bSatesUpdated=true;
-	_VIDEO_DisplayTemporaryMessage("Loaded State 3");
+	try{
+		CreateSaveStatePreview(2);
+		__EMU_LoadState(3);
+		_VIDEO_DisplayTemporaryMessage("Loaded State 3");
+	}
+	catch(...)
+	{
+		_VIDEO_DisplayTemporaryMessage("Load State failed!");
+	}
 	XLMenu_CurRoutine = NULL;
 	XLMenu_CurMenu = NULL;
 }
 
 void LoadState4()
 {
-	bloadstate[3]=true;
-	bSatesUpdated=true;
-	_VIDEO_DisplayTemporaryMessage("Loaded State 4");
+	try{
+		CreateSaveStatePreview(3);
+		__EMU_LoadState(4);
+		_VIDEO_DisplayTemporaryMessage("Loaded State 4");
+	}
+	catch(...)
+	{
+		_VIDEO_DisplayTemporaryMessage("Load State failed!");
+	}
 	XLMenu_CurRoutine = NULL;
 	XLMenu_CurMenu = NULL;
 }
 
 void LoadState5()
 {
-	bloadstate[4]=true;
-	bSatesUpdated=true;
-	_VIDEO_DisplayTemporaryMessage("Loaded State 5");
+	try{
+		CreateSaveStatePreview(4);
+		__EMU_LoadState(5);
+		_VIDEO_DisplayTemporaryMessage("Loaded State 5");
+	}
+	catch(...)
+	{
+		_VIDEO_DisplayTemporaryMessage("Load State failed!");
+	}
 	XLMenu_CurRoutine = NULL;
 	XLMenu_CurMenu = NULL;
 }
@@ -818,52 +852,77 @@ void SaveStateMenu(void)
 
 void SaveState1()
 {
-	bsavestate[0]=true;
-	bSatesUpdated=true;
-	_VIDEO_DisplayTemporaryMessage("Saved State 1");
+	try{
+		CreateSaveStatePreview(0);
+		__EMU_SaveState(1);
+		_VIDEO_DisplayTemporaryMessage("Saved State 1");
+	}
+	catch(...)
+	{
+		_VIDEO_DisplayTemporaryMessage("Save State failed!");
+	}
 	XLMenu_CurRoutine = NULL;
 	XLMenu_CurMenu = NULL;
-	CreateSaveStatePreview(0);
 }
 
 void SaveState2()
 {
-	bsavestate[1]=true;
-	bSatesUpdated=true;
-	_VIDEO_DisplayTemporaryMessage("Saved State 2");
+	try{
+		CreateSaveStatePreview(1);
+		__EMU_SaveState(2);
+		_VIDEO_DisplayTemporaryMessage("Saved State 2");
+	}
+	catch(...)
+	{
+		_VIDEO_DisplayTemporaryMessage("Save State failed!");
+	}
 	XLMenu_CurRoutine = NULL;
 	XLMenu_CurMenu = NULL;
-	CreateSaveStatePreview(1);
 }
 
 void SaveState3()
 {
-	bsavestate[2]=true;
-	bSatesUpdated=true;
-	_VIDEO_DisplayTemporaryMessage("Saved State 3");
+	try{
+		CreateSaveStatePreview(2);
+		__EMU_SaveState(3);
+		_VIDEO_DisplayTemporaryMessage("Saved State 3");
+	}
+	catch(...)
+	{
+		_VIDEO_DisplayTemporaryMessage("Save State failed!");
+	}
 	XLMenu_CurRoutine = NULL;
 	XLMenu_CurMenu = NULL;
-	CreateSaveStatePreview(2);
 }
 
 void SaveState4()
 {
-	bsavestate[3]=true;
-	bSatesUpdated=true;
-	_VIDEO_DisplayTemporaryMessage("Saved State 4");
+	try{
+		CreateSaveStatePreview(3);
+		__EMU_SaveState(4);
+		_VIDEO_DisplayTemporaryMessage("Saved State 4");
+	}
+	catch(...)
+	{
+		_VIDEO_DisplayTemporaryMessage("Save State failed!");
+	}
 	XLMenu_CurRoutine = NULL;
 	XLMenu_CurMenu = NULL;
-	CreateSaveStatePreview(3);
 }
 
 void SaveState5()
 {
-	bsavestate[4]=true;
-	bSatesUpdated=true;
-	_VIDEO_DisplayTemporaryMessage("Saved State 5");
+	try{
+		CreateSaveStatePreview(4);
+		__EMU_SaveState(5);
+		_VIDEO_DisplayTemporaryMessage("Saved State 5");
+	}
+	catch(...)
+	{
+		_VIDEO_DisplayTemporaryMessage("Save State failed!");
+	}
 	XLMenu_CurRoutine = NULL;
 	XLMenu_CurMenu = NULL;
-	CreateSaveStatePreview(4);
 }
 
 void VideoSettingsMenu(void)
