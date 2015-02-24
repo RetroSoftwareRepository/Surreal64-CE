@@ -8,6 +8,9 @@
 extern void setaddress(char *text,int *addr);
 extern char *param(char **tp);
 extern qword atoq(char *p);
+extern bool bloadstate[5];
+extern bool bsavestate[5];
+extern bool	bSatesUpdated;
 
 // secondary command routine. This is called first so this routine
 // can override commands defined in cmd.c. It should return 1 if
@@ -44,5 +47,15 @@ int command_2(char *p,char *tp)
     }
     else return(0);
     return(1);
+}
+
+extern "C" void __EMU_SaveState(int index){
+	bsavestate[index]=true;
+	bSatesUpdated=true;
+}
+
+extern "C" void __EMU_LoadState(int index){
+	bloadstate[index]=true;
+	bSatesUpdated=true;
 }
 

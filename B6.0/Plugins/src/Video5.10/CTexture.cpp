@@ -29,7 +29,7 @@ BYTE g_ucTempBuffer[1024*1024*2];
 
 CTexture::CTexture(DWORD dwWidth, DWORD dwHeight, bool asRenderTarget) :
 	m_pTexture(NULL),
-	m_dwTextureFmt(TEXTURE_FMT_A8R8G8B8),
+	m_dwTextureFmt(TEXTURE_FMT_A4R4G4B4),
 	m_dwWidth(dwWidth),
 	m_dwHeight(dwHeight),
 	m_dwCreatedTextureWidth(dwWidth),

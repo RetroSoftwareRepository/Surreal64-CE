@@ -36,9 +36,9 @@ bool g_bUseSetTextureMem = true;
 DWORD g_maxTextureMemUsage = (5*1024*1024);
 DWORD g_amountToFree = (512*1024);
 
-#ifndef OLDTXTCACHE
-static const DWORD MEM_KEEP_FREE = (2*1024*1024); // keep 2MB free
-#endif
+//#ifndef OLDTXTCACHE
+static const DWORD MEM_KEEP_FREE = (4*1024*1024); // keep 4MB free
+//#endif
 
 // Returns the first prime greater than or equal to nFirst
 inline LONG GetNextPrime(LONG nFirst)
@@ -265,14 +265,19 @@ void CTextureManager::RecycleAllTextures()
 
 #ifdef OLDTXTCACHE
 			if (g_bUseSetTextureMem)
-				delete pTVictim;
+			{
+				SAFE_DELETE(pTVictim);
+			}
 			else
+			{
 				RecycleTexture(pTVictim);
+			}
 #else
 				delete pTVictim;
 #endif
 		}
 	}
+	m_currentTextureMemUsage = 0;
 }
 
 void CTextureManager::RecheckHiresForAllTextures()
@@ -504,6 +509,7 @@ void CTextureManager::RemoveTexture(TxtrCacheEntry * pEntry)
 			else
 			{
 				RecycleTexture(pEntry);
+				//m_currentTextureMemUsage -= (pEntry->pTexture->m_dwWidth * pEntry->pTexture->m_dwHeight * 4);
 			}
 #endif
 
@@ -516,7 +522,7 @@ void CTextureManager::RemoveTexture(TxtrCacheEntry * pEntry)
 	
 }
 
-#ifndef OLDTXTCACHE
+//#ifndef OLDTXTCACHE
 bool bFreeingTextures = false;
 void CTextureManager::FreeTextures()
 {
@@ -527,15 +533,18 @@ void CTextureManager::FreeTextures()
 	GlobalMemoryStatus(&ms);
 
 	// keep freeing textures till enough memory is free
-	while (ms.dwAvailPhys < MEM_KEEP_FREE && m_pOldestTexture != NULL)
+	while (ms.dwAvailPhys < MEM_KEEP_FREE)
 	{
 		if (!bFreeingTextures) bFreeingTextures = true;
 	
-		TxtrCacheEntry *nextYoungest = m_pOldestTexture->pNextYoungest;
 
-		RemoveTexture(m_pOldestTexture);
+		gTextureManager.CleanUp();
 
-		m_pOldestTexture = nextYoungest;
+		//TxtrCacheEntry *nextYoungest = m_pOldestTexture->pNextYoungest;
+
+		//RemoveTexture(m_pOldestTexture);
+
+		//m_pOldestTexture = nextYoungest;
 		
 		//OutputDebugString("Freeing Texture\n");
 
@@ -544,22 +553,20 @@ void CTextureManager::FreeTextures()
 	
 	bFreeingTextures = false;
 }
-#endif
+//#endif
 
 TxtrCacheEntry * CTextureManager::CreateNewCacheEntry(uint32 dwAddr, uint32 dwWidth, uint32 dwHeight)
 {
 	TxtrCacheEntry * pEntry = NULL;
 
+	uint32 widthToCreate = dwWidth;
+	uint32 heightToCreate = dwHeight;
 
-	// Ez0n3 - old way already
-	if (g_bUseSetTextureMem)
+	DWORD freeUpSize = (widthToCreate * heightToCreate * 4);
+
+	// make sure there is enough room for the new texture by deleting old textures
+	if((m_currentTextureMemUsage + freeUpSize) > g_maxTextureMemUsage)
 	{
-		uint32 widthToCreate = dwWidth;
-		uint32 heightToCreate = dwHeight;
-
-		DWORD freeUpSize = (widthToCreate * heightToCreate * 4) + g_amountToFree;
-
-		// make sure there is enough room for the new texture by deleting old textures
 		while ((m_currentTextureMemUsage + freeUpSize) > g_maxTextureMemUsage && m_pOldestTexture != NULL)
 		{
 			TxtrCacheEntry *nextYoungest = m_pOldestTexture->pNextYoungest;
@@ -570,18 +577,16 @@ TxtrCacheEntry * CTextureManager::CreateNewCacheEntry(uint32 dwAddr, uint32 dwWi
 
 			//OutputDebugString("Freeing Texture\n"); // lots of these
 		}
-
-		//m_currentTextureMemUsage += widthToCreate * heightToCreate * 4;
 	}
 	else
 	{
 #ifdef OLDTXTCACHE
-		// Find a used texture
-		pEntry = ReviveTexture(dwWidth, dwHeight);
+	// Find a used texture
+	pEntry = ReviveTexture(dwWidth, dwHeight);
 #else
-		FreeTextures();
+	FreeTextures();
 #endif
-  }
+	}
 	m_currentTextureMemUsage += (dwWidth * dwHeight * 4);
 	
 

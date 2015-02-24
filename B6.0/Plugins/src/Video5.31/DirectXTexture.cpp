@@ -109,11 +109,11 @@ LPDAEDALUSTEXTURE CDirectXTexture::CreateTexture(DWORD dwWidth, DWORD dwHeight)
 	m_dwHeight					= dwHeight;
 
 	// if texture > 512x512 (eg. 1024x1024) use 16bit
-	if (dwWidth * dwHeight > 0x40000)
+	/*if (dwWidth * dwHeight > 0x40000)
 		m_dwTextureFmt = TEXTURE_FMT_A4R4G4B4;
 	else
 		m_dwTextureFmt = TEXTURE_FMT_A8R8G8B8;
-
+	*/
 	if(m_bAsRenderTarget)
 	{
 		D3DXCheckTextureRequirements(g_pD3DDev, &m_dwCreatedTextureWidth, &m_dwCreatedTextureHeight, &dwNumMaps, D3DUSAGE_RENDERTARGET, &pf, D3DPOOL_DEFAULT);

@@ -254,6 +254,7 @@ void CTextureManager::RecycleAllTextures()
 #endif
 		}
 	}
+	m_currentTextureMemUsage = 0;
 }
 
 void CTextureManager::RecheckHiresForAllTextures()
@@ -508,15 +509,17 @@ void CTextureManager::FreeTextures()
 	GlobalMemoryStatus(&ms);
 
 	// keep freeing textures till enough memory is free
-	while (ms.dwAvailPhys < MEM_KEEP_FREE && m_pOldestTexture != NULL)
+	while (ms.dwAvailPhys < MEM_KEEP_FREE)
 	{
 		if (!bFreeingTextures) bFreeingTextures = true;
+
+		gTextureManager.CleanUp();
 	
-		TxtrCacheEntry *nextYoungest = m_pOldestTexture->pNextYoungest;
+		//TxtrCacheEntry *nextYoungest = m_pOldestTexture->pNextYoungest;
 
-		RemoveTexture(m_pOldestTexture);
+		//RemoveTexture(m_pOldestTexture);
 
-		m_pOldestTexture = nextYoungest;
+		//m_pOldestTexture = nextYoungest;
 		
 		//OutputDebugString("Freeing Texture\n");
 
@@ -533,16 +536,14 @@ TxtrCacheEntry * CTextureManager::CreateNewCacheEntry(uint32 dwAddr, uint32 dwWi
 
 
 	// Ez0n3 - old way already
-	if (g_bUseSetTextureMem)
-	{
-		uint32 widthToCreate = dwWidth;
-		uint32 heightToCreate = dwHeight;
-#ifdef _XBOX
-		D3DFORMAT pf = D3DFMT_A8R8G8B8;
-		D3DXCheckTextureRequirements(g_pD3DDev, &widthToCreate, &heightToCreate, NULL, 0, &pf, D3DPOOL_MANAGED);
-#endif
-		DWORD freeUpSize = (widthToCreate * heightToCreate * 4) + g_amountToFree;
+	uint32 widthToCreate = dwWidth;
+	uint32 heightToCreate = dwHeight;
 
+	DWORD freeUpSize = (widthToCreate * heightToCreate * 4);
+
+	// make sure there is enough room for the new texture by deleting old textures
+	if((m_currentTextureMemUsage + freeUpSize) > g_maxTextureMemUsage)
+	{
 		// make sure there is enough room for the new texture by deleting old textures
 		while ((m_currentTextureMemUsage + freeUpSize) > g_maxTextureMemUsage && m_pOldestTexture != NULL)
 		{

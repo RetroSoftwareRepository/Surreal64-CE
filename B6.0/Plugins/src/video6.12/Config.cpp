@@ -416,7 +416,7 @@ void ReadConfiguration(void)
 		options.bLoadHiResTextures = FALSE;
 		options.bDumpTexturesToFiles = FALSE;
 		options.DirectXDepthBufferSetting = 0;
-		options.colorQuality = TEXTURE_FMT_A8R8G8B8;
+		options.colorQuality = TEXTURE_FMT_A4R4G4B4;
 		options.textureEnhancement = 0;
 		options.textureEnhancementControl = 1; //0
 		options.bSkipFrame = FrameSkip;

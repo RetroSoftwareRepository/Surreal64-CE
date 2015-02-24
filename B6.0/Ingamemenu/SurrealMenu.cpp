@@ -483,12 +483,20 @@ void CreateSaveStatePreview(unsigned int index)
 
 	//copy the backbuffer surface to the texture surface
 	D3DXLoadSurfaceFromSurface(texsurf, NULL, NULL, surf, NULL, NULL, D3DX_DEFAULT, 0);
-	m_RenderPanel.Destroy();
+	
+
+	g_pd3dDevice->Clear(0,NULL,D3DCLEAR_TARGET,0x00000000,0,0);
+	
 	char filename[255];
 	__EMU_GetStateFilename((index+1), filename, 1);
 
 	//write out the preview image
 	XGWriteSurfaceToFile(texsurf, filename);
+
+	//show BG again and erase.
+	m_RenderPanel.Render(0,0);
+	g_pd3dDevice->Present(0, 0, 0, 0);
+	m_RenderPanel.Destroy();
 
 	//release both surfaces
 	texsurf->Release();
@@ -548,6 +556,7 @@ bool LoadSaveStatePreview(unsigned int index)
 
 void LoadStateMenu(void)
 {
+
 	DWORD dwMenuCommand = 0;
 
 	XLMenu_CurRoutine = NULL;
@@ -665,6 +674,17 @@ void LoadStateMenu(void)
 void LoadState1()
 {
 	try{
+		if (pStateTexture) {
+		pStateTexture->Release();
+		pStateTexture = NULL;
+		}
+		ClearIGM();
+	}
+	catch(...)
+	{
+
+	}
+	try{
 		__EMU_LoadState(1);
 	}
 	catch(...)
@@ -678,6 +698,17 @@ void LoadState1()
 
 void LoadState2()
 {
+	try{
+		if (pStateTexture) {
+		pStateTexture->Release();
+		pStateTexture = NULL;
+		}
+		ClearIGM();
+	}
+	catch(...)
+	{
+
+	}
 	try{
 		__EMU_LoadState(2);
 	}
@@ -693,6 +724,17 @@ void LoadState2()
 void LoadState3()
 {
 	try{
+		if (pStateTexture) {
+		pStateTexture->Release();
+		pStateTexture = NULL;
+		}
+		ClearIGM();
+	}
+	catch(...)
+	{
+
+	}
+	try{
 		__EMU_LoadState(3);
 	}
 	catch(...)
@@ -707,6 +749,17 @@ void LoadState3()
 void LoadState4()
 {
 	try{
+		if (pStateTexture) {
+		pStateTexture->Release();
+		pStateTexture = NULL;
+		}
+		ClearIGM();
+	}
+	catch(...)
+	{
+
+	}
+	try{
 		__EMU_LoadState(4);	
 	}
 	catch(...)
@@ -720,6 +773,17 @@ void LoadState4()
 
 void LoadState5()
 {
+	try{
+		if (pStateTexture) {
+		pStateTexture->Release();
+		pStateTexture = NULL;
+		}
+		ClearIGM();
+	}
+	catch(...)
+	{
+
+	}
 	try{
 		__EMU_LoadState(5);
 	}
@@ -854,11 +918,22 @@ void SaveStateMenu(void)
 void SaveState1()
 {
 	try{
-		CreateSaveStatePreview(0);	
+		CreateSaveStatePreview(0);
 	}
 	catch(...)
 	{
 		_VIDEO_DisplayTemporaryMessage("Preview failed!");
+	}
+	try{
+		if (pStateTexture) {
+		pStateTexture->Release();
+		pStateTexture = NULL;
+		}
+		ClearIGM();
+	}
+	catch(...)
+	{
+
 	}
 	try{
 		__EMU_SaveState(1);
@@ -883,6 +958,17 @@ void SaveState2()
 		_VIDEO_DisplayTemporaryMessage("Preview failed!");
 	}
 	try{
+		if (pStateTexture) {
+		pStateTexture->Release();
+		pStateTexture = NULL;
+		}
+		ClearIGM();
+	}
+	catch(...)
+	{
+
+	}
+	try{
 		__EMU_SaveState(2);
 	}
 	catch(...)
@@ -902,6 +988,17 @@ void SaveState3()
 	catch(...)
 	{
 		_VIDEO_DisplayTemporaryMessage("Preview failed!");
+	}
+	try{
+		if (pStateTexture) {
+		pStateTexture->Release();
+		pStateTexture = NULL;
+		}
+		ClearIGM();
+	}
+	catch(...)
+	{
+
 	}
 	try{
 		__EMU_SaveState(3);
@@ -925,6 +1022,17 @@ void SaveState4()
 		_VIDEO_DisplayTemporaryMessage("Preview failed!");
 	}
 	try{
+		if (pStateTexture) {
+		pStateTexture->Release();
+		pStateTexture = NULL;
+		}
+		ClearIGM();
+	}
+	catch(...)
+	{
+
+	}
+	try{
 		__EMU_SaveState(4);
 	}
 	catch(...)
@@ -944,6 +1052,17 @@ void SaveState5()
 	catch(...)
 	{
 		_VIDEO_DisplayTemporaryMessage("Preview failed!");
+	}
+	try{
+		if (pStateTexture) {
+		pStateTexture->Release();
+		pStateTexture = NULL;
+		}
+		ClearIGM();
+	}
+	catch(...)
+	{
+
 	}
 	try{
 		__EMU_SaveState(5);	
