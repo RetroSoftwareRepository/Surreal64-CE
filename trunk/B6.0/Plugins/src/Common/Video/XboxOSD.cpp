@@ -173,7 +173,7 @@ __forceinline void XboxDrawLowMemWarning()
 		//Lock in a loop until its time to exit
 		while(1)
 		{
-			if (GetTickCount() > g_dwTempMessageStart + 1000)
+			if (GetTickCount() > g_dwTempMessageStart + 5000)
 			{
 #ifndef DEBUG
 				XLaunchNewImage("D:\\default.xbe", NULL);

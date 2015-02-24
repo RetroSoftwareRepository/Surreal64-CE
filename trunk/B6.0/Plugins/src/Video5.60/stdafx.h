@@ -108,6 +108,7 @@ void __cdecl MsgInfo (char * Message, ...);
 void __cdecl ErrorMsg (char * Message, ...);
 
 #define MI_INTR_DP          0x00000020  
+#define MI_INTR_SP          0x00000001
 
 extern DWORD g_dwRamSize;
 

@@ -741,7 +741,7 @@ void ReadConfiguration(void)
 		options.bDumpTexturesToFiles = FALSE;
 		options.DirectXDepthBufferSetting = 0;
 		options.OpenglDepthBufferSetting = 16;
-		options.colorQuality = TEXTURE_FMT_A8R8G8B8;
+		options.colorQuality = TEXTURE_FMT_A4R4G4B4;
 		options.textureEnhancement = 0;
 		options.textureEnhancementControl = 1; //0;
 		options.OpenglRenderSetting = OGL_DEVICE;

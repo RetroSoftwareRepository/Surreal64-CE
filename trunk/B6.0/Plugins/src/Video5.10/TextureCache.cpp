@@ -274,6 +274,7 @@ void CTextureCache::DropTextures()
 #endif
 		}
 	}
+	m_currentTextureMemUsage = 0;
 }
 
 
@@ -522,11 +523,13 @@ void CTextureCache::FreeTextures()
 	{
 		if (!bFreeingTextures) bFreeingTextures = true;
 	
-		TextureEntry *nextYoungest = m_pOldestTexture->pNextYoungest;
+		gTextureCache.DropTextures();
 
-		RemoveTextureEntry(m_pOldestTexture);
+		//TextureEntry *nextYoungest = m_pOldestTexture->pNextYoungest;
 
-		m_pOldestTexture = nextYoungest;
+		//RemoveTextureEntry(m_pOldestTexture);
+
+		//m_pOldestTexture = nextYoungest;
 		
 		//OutputDebugString("Freeing Texture\n");
 
@@ -543,11 +546,14 @@ TextureEntry * CTextureCache::CreateEntry(DWORD dwAddress, DWORD dwWidth, DWORD 
 	
 
 	// Ez0n3 - we'll use the old way until freakdave finishes this
-	if (g_bUseSetTextureMem)
-	{
-		DWORD freeUpSize = (dwWidth * dwHeight * 4) + g_amountToFree;
+	uint32 widthToCreate = dwWidth;
+	uint32 heightToCreate = dwHeight;
 
-		// make sure there is enough room for the new texture by deleting old textures
+	DWORD freeUpSize = (widthToCreate * heightToCreate * 4);
+
+	// make sure there is enough room for the new texture by deleting old textures
+	if((m_currentTextureMemUsage + freeUpSize) > g_maxTextureMemUsage)
+	{
 		while ((m_currentTextureMemUsage + freeUpSize) > g_maxTextureMemUsage && m_pOldestTexture != NULL)
 		{
 			TextureEntry *nextYoungest = m_pOldestTexture->pNextYoungest;

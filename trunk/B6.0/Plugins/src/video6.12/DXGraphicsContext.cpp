@@ -272,7 +272,7 @@ __forceinline void CDXGraphicsContext::UpdateFrame(bool swaponly)
 		gTextureManager.FreeTextures();
 #endif
 
-	XboxDrawOSD();
+	
 
 	/*Lock();
 	
@@ -359,7 +359,7 @@ exit:
 #endif
 	
 	Unlock();*/
-
+	XboxDrawOSD();
 	m_pd3dDevice->Present( NULL, NULL, NULL, NULL );
 	status.bScreenIsDrawn = false;
 	if( g_curRomInfo.bForceScreenClear )	needCleanScene = true;

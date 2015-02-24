@@ -1022,19 +1022,44 @@ void DLParser_Process(OSTask * pTask)
 	TriggerDPInterrupt();
 	StopProfiler(PROFILE_ALL);
 	//freakdave
+#ifdef _XBOX
 	if (_INPUT_IsIngameMenuWaiting())
 	{
 		_INPUT_RumblePause(true);
-	
+		
+		try{
+			//gTextureCache.RecycleAllTextures();
+			gTextureCache.DropTextures();
+			RDP_Cleanup();
+			//CRender::g_pRender->ClearBuffer(true,true);
+			//CRender::g_pRender->CleanUp();
+		}
+		catch(...){}
+
+		try{
 		ReInitVirtualDynaMemory(false);
+		}
+		catch(...){}
+		
+		try{
 		RunIngameMenu();
+		}
+		catch(...){}
+
+		
+
 		options.forceTextureFilter=TextureMode;
 		_INPUT_UpdatePaks();//added by freakdave
 		_INPUT_UpdateControllerStates();//added by freakdave
-		ReInitVirtualDynaMemory(true);
 		
+		try{
+		ReInitVirtualDynaMemory(true);
+		}
+		catch(...){}
+
 		_INPUT_RumblePause(false);
 	}
+#endif
 }
 
 //////////////////////////////////////////////////////////

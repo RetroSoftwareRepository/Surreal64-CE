@@ -214,6 +214,10 @@ void ClearIGM(){
 	m_BgPanel.Destroy();
 	m_ControlsPanel.Destroy();
 	
+	
+	// Clear the viewport for any artifacts
+	g_pd3dDevice->Clear(0,NULL,D3DCLEAR_TARGET,0x00000000,0,0);
+
 	// Turn on AA before leaving
 	switch (AntiAliasMode)
 		{

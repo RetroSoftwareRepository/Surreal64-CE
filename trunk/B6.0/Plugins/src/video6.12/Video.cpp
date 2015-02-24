@@ -1120,11 +1120,13 @@ void _VIDEO_RICE_612_SetMaxTextureMem(DWORD mem)
 	if (mem == 0) // auto mem
 	{
 		g_bUseSetTextureMem = false;
+		g_maxTextureMemUsage = 8 * 1024 * 1024;
 	}
 	else // set mem
 	{
 		g_bUseSetTextureMem = true;
 		g_maxTextureMemUsage = mem * 1024 * 1024;
+		
 	}
 }
 

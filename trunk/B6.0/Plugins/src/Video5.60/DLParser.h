@@ -638,6 +638,8 @@ void RDP_GFX_PopDL();
 ULONG ComputeCRC32(ULONG crc, const BYTE *buf, UINT len);
 
 void TriggerDPInterrupt();
+void TriggerSPInterrupt();
+
 uint32 DLParser_CheckUcode(uint32 ucStart, uint32 ucDStart, uint32 ucSize, uint32 ucDSize);
 
 bool IsUsedAsDI(uint32 addr);

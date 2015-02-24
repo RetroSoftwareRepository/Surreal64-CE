@@ -931,6 +931,12 @@ void TriggerDPInterrupt(void)
 	g_GraphicsInfo.CheckInterrupts();
 }
 
+void TriggerSPInterrupt(void)
+{
+	*(g_GraphicsInfo.MI_INTR_REG) |= MI_INTR_SP;
+	g_GraphicsInfo.CheckInterrupts();
+}
+
 /******************************************************************
   Function: FrameBufferWriteList
   Purpose:  This function is called to notify the dll that the

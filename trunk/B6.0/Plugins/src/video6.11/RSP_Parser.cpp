@@ -924,123 +924,47 @@ void DLParser_Process(OSTask * pTask)
 	}
 
 #ifdef _XBOX
-/*	menuWaiting = _INPUT_IsIngameMenuWaiting();
-
-	// output free mem
-	if (g_showDebugInfo && !menuWaiting)
-	{
-		if (g_defaultTrueTypeFont == NULL)
-		{
-			XFONT_OpenDefaultFont(&g_defaultTrueTypeFont);
-			g_defaultTrueTypeFont->SetBkMode(XFONT_OPAQUE);
-			g_defaultTrueTypeFont->SetBkColor(D3DCOLOR_XRGB(0,0,0));
-		}
-
-		static DWORD lastTick = GetTickCount() / 1000;
-		static int lastTickFPS = 0;
-		static int frameCount = 0;
-
-		if (lastTick != GetTickCount() / 1000)
-		{
-			lastTickFPS = frameCount;
-			frameCount = 0;
-			lastTick = GetTickCount() / 1000;
-		}
-
-		frameCount++;
-
-		static MEMORYSTATUS stat;
-		GlobalMemoryStatus(&stat);
-
-		WCHAR buf[255];
-		D3DSurface *pBackBuffer, *pFrontBuffer;
-
-		g_pD3DDev->GetBackBuffer(-1, D3DBACKBUFFER_TYPE_MONO, &pFrontBuffer);
-		g_pD3DDev->GetBackBuffer(0, D3DBACKBUFFER_TYPE_MONO, &pBackBuffer);
-
-		swprintf(buf, L"%.2fMB free - %ifps", stat.dwAvailPhys/(1024.0f*1024.0f), lastTickFPS);
-
-		g_defaultTrueTypeFont->TextOut(pFrontBuffer, buf, (unsigned)-1, 40, 40);
-		g_defaultTrueTypeFont->TextOut(pBackBuffer, buf, (unsigned)-1, 40, 40);
-
-		pFrontBuffer->Release();
-		pBackBuffer->Release();
-	}
-
-	if (g_bTempMessage)
-	{
-		if (g_defaultTrueTypeFont == NULL)
-		{
-			XFONT_OpenDefaultFont(&g_defaultTrueTypeFont);
-			g_defaultTrueTypeFont->SetBkMode(XFONT_OPAQUE);
-			g_defaultTrueTypeFont->SetBkColor(D3DCOLOR_XRGB(0,0,0));
-		}
-
-		if (GetTickCount() > g_dwTempMessageStart + 3000)
-		{
-			g_bTempMessage = FALSE;
-		}
-
-		WCHAR buf[200];
-		D3DSurface *pBackBuffer, *pFrontBuffer;
-
-		memset(buf, 0, sizeof(WCHAR) * 200);
-
-		g_pD3DDev->GetBackBuffer(-1, D3DBACKBUFFER_TYPE_MONO, &pFrontBuffer);
-		g_pD3DDev->GetBackBuffer(0, D3DBACKBUFFER_TYPE_MONO, &pBackBuffer);
-
-		mbstowcs(buf, g_szTempMessage, strlen(g_szTempMessage));
-
-		g_defaultTrueTypeFont->TextOut(pFrontBuffer, buf, (unsigned)-1, 30, (windowSetting.uDisplayHeight - 50));
-		g_defaultTrueTypeFont->TextOut(pBackBuffer, buf, (unsigned)-1, 30, (windowSetting.uDisplayHeight - 50));
-
-		pFrontBuffer->Release();
-		pBackBuffer->Release();
-	}
-
-	if (menuWaiting)
-	{
-		D3DSurface *pBackBuffer;
-		D3DSurface *pTextureSurface;
-
-		g_igmBgTexture.Destroy();
-		g_igmBgTexture.Create(256, 256, D3DFMT_X1R5G5B5);
-
-		g_pD3DDev->GetBackBuffer(-1, D3DBACKBUFFER_TYPE_MONO, &pBackBuffer);
-		g_igmBgTexture.GetTexture()->GetSurfaceLevel(0, &pTextureSurface);
-
-		D3DXLoadSurfaceFromSurface(pTextureSurface, NULL, NULL, pBackBuffer, NULL, NULL, D3DX_FILTER_LINEAR, 0);
-
-		pBackBuffer->Release();
-		pTextureSurface->Release();
-	}*/
-#endif
-
-	CRender::g_pRender->EndRendering();
-
-	if( gRSP.ucode >= 17)
-		TriggerDPInterrupt();
-	TriggerSPInterrupt();
-
-#ifdef _XBOX
-	/*if (menuWaiting)
-	{
-		RunIngameMenu();
-	}*/
 	if (_INPUT_IsIngameMenuWaiting())
 	{
 		_INPUT_RumblePause(true);
-	
+		
+		try{
+			gTextureManager.RecycleAllTextures();
+			gTextureManager.CleanUp();
+			RDP_Cleanup();
+			CRender::g_pRender->ClearBuffer(true,true);
+			CRender::g_pRender->CleanUp();
+		}
+		catch(...){}
+
+		try{
 		ReInitVirtualDynaMemory(false);
+		}
+		catch(...){}
+		
+		try{
 		RunIngameMenu();
+		}
+		catch(...){}
+
+		
+
 		options.forceTextureFilter=TextureMode;
 		_INPUT_UpdatePaks();//added by freakdave
 		_INPUT_UpdateControllerStates();//added by freakdave
-		ReInitVirtualDynaMemory(true);
 		
+		try{
+		ReInitVirtualDynaMemory(true);
+		}
+		catch(...){}
+
 		_INPUT_RumblePause(false);
 	}
 #endif
+	CRender::g_pRender->EndRendering();
+	if( gRSP.ucode >= 17)
+		TriggerDPInterrupt();
+	TriggerSPInterrupt();
 }
 
 //////////////////////////////////////////////////////////
