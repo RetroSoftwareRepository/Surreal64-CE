@@ -210,7 +210,7 @@ void CTextureManager::PurgeOldTextures()
 		}
 	}
 	
-	/*
+
 	// Remove any old textures that haven't been recycled in 1 minute or so
 	// Normally these would be reused
 	TxtrCacheEntry * pPrev;
@@ -241,7 +241,7 @@ void CTextureManager::PurgeOldTextures()
 			pCurr = pNext;
 		}
 	}
-	*/
+
 #else
 	return;
 #endif

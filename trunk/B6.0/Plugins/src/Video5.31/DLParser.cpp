@@ -1030,6 +1030,7 @@ void DLParser_Process(OSTask * pTask)
 		try{
 			//gTextureCache.RecycleAllTextures();
 			gTextureCache.DropTextures();
+			gTextureCache.PurgeOldTextures();
 			RDP_Cleanup();
 			//CRender::g_pRender->ClearBuffer(true,true);
 			//CRender::g_pRender->CleanUp();
