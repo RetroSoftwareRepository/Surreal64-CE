@@ -112,6 +112,7 @@ bool bUseLinFog = FALSE;
 //int RefreshRateInHz = 60;
 float XBOX_CONTROLLER_DEAD_ZONE = 8600; // also change in SurrealMenu.cpp
 float Deadzone = 26;
+float ButtonToAxisThresh = 30;
 int Sensitivity = 10;
 char skinname[32] = "Default";
 
@@ -375,6 +376,7 @@ void ResetDefaults()
 	EnableController4 = true; // this was false in launcher config
 	XBOX_CONTROLLER_DEAD_ZONE = 8600;
 	Deadzone = 26;
+	ButtonToAxisThresh = 30;
 	Sensitivity = 10;
 	videoplugin = _VideoPluginRice560; //2=rice560
 
@@ -547,6 +549,9 @@ int ConfigAppSave2()
 	
 	sprintf(szFloatBuf, "%.6f", Deadzone);
 	ini.SetValue("Settings", "Deadzone", szFloatBuf);
+
+	sprintf(szFloatBuf, "%.6f", ButtonToAxisThresh);
+	ini.SetValue("Settings", "ButtonToAxisThresh", szFloatBuf);
 	
 	// controller config
 	{
@@ -664,6 +669,10 @@ int ConfigAppLoad2()
 	sprintf(szFloatBuf, "%s", ini.GetValue("Settings", "Deadzone", "" ));
 	if (szFloatBuf != "")
 		Deadzone = (float) atof(szFloatBuf);
+
+	sprintf(szFloatBuf, "%s", ini.GetValue("Settings", "ButtonToAxisThresh", "" ));
+	if (szFloatBuf != "")
+		ButtonToAxisThresh = (float) atof(szFloatBuf);
 
 	// controller config
 	{

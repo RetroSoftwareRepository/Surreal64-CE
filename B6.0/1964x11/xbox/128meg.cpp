@@ -83,27 +83,20 @@ void Enable128MegCaching( void )
   long filesize;
 
 #ifdef _XBOX
-  // Verify that we have 128 megs available
-  MEMORYSTATUS memStatus;
-  GlobalMemoryStatus( &memStatus );
-  if( memStatus.dwTotalPhys < (100 * 1024 * 1024) ){
-    g_dwNumFrames = ((loaddw1964PagingMem() * 1024 * 1024) / g_dwPageSize);
-	return;
-  }
-#else //win32
-	g_dwNumFrames = ((4 * 1024 * 1024) / g_dwPageSize); // static 4MB
-	return;
-#endif
-
-
-
-
   fp = fopen(g_temporaryRomPath,"r");
   rewind(fp);
   fseek(fp, 0, SEEK_END);
   filesize = ftell(fp);
   fclose(fp);
 
-  g_dwNumFrames = (DWORD)((filesize) / g_dwPageSize);
+  if(loaddw1964PagingMem() == 0)
+	g_dwNumFrames = (DWORD)((filesize) / g_dwPageSize);
+  else
+	g_dwNumFrames = ((loaddw1964PagingMem() * 1024 * 1024) / g_dwPageSize); 
+
+#else //win32
+	g_dwNumFrames = ((4 * 1024 * 1024) / g_dwPageSize); // static 4MB
+	return;
+#endif
 #endif
 }

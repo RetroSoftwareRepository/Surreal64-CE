@@ -125,6 +125,7 @@ void TogglePJ64PagingMem(bool inc);
 void ControllerSettingsMenu();
 void ToggleSensitivity(bool inc);
 void ToggleDeadzone(bool inc);
+void ToggleButtonToAxisThresh(bool inc);
 //void TogglePak();
 void TogglePak(bool inc);
 void ToggleController1();
@@ -218,6 +219,9 @@ void decSensitivity(){ ToggleSensitivity(false); }
 
 void incDeadzone(){ ToggleDeadzone(true); }
 void decDeadzone(){ ToggleDeadzone(false); }
+
+void incButtonToAxisThresh(){ ToggleButtonToAxisThresh(true); }
+void decButtonToAxisThresh(){ ToggleButtonToAxisThresh(false); }
 
 void incPakPlugin(){ TogglePak(true); }
 void decPakPlugin(){ TogglePak(false); }
@@ -2275,7 +2279,7 @@ void ControllerSettingsMenu()
 
     WCHAR currentname[120];
 
-	m_pSettingsMenu = XLMenu_Init((float)iMainMenuTxtPosX, (float)iMainMenuTxtPosY,7, GetMenuFontAlign(iMainMenuTxtAlign)|MENU_WRAP, NULL);
+	m_pSettingsMenu = XLMenu_Init((float)iMainMenuTxtPosX, (float)iMainMenuTxtPosY,8, GetMenuFontAlign(iMainMenuTxtAlign)|MENU_WRAP, NULL);
 
 	m_pSettingsMenu->itemcolor = dwMenuItemColor;
 	m_pSettingsMenu->parent = m_pMainMenu;
@@ -2300,6 +2304,10 @@ void ControllerSettingsMenu()
 	swprintf(currentname,L"Analog Deadzone : %2.0f%%", Deadzone);
 	XLMenu_AddItem2(m_pSettingsMenu,MITEM_ROUTINE,currentname,incDeadzone,decDeadzone);
 
+	//Button To Axis Threshold
+	swprintf(currentname,L"Button to Axis Threshold : %2.0f%%", ButtonToAxisThresh);
+	XLMenu_AddItem2(m_pSettingsMenu,MITEM_ROUTINE,currentname,incButtonToAxisThresh,decButtonToAxisThresh);
+	
 	//Mempak/RumblePak/NoPak
 	if (DefaultPak == NoPak)
 	{
@@ -2427,6 +2435,33 @@ void ToggleDeadzone(bool inc)
 	XLMenu_CurRoutine = NULL;
 	
 	swprintf(currentname,L"Analog Deadzone: %2.0f%%",Deadzone);
+	XLMenu_SetItemText(&m_pSettingsMenu->items[currentItem], currentname);
+
+	ConfigAppSave2();
+}
+
+void ToggleButtonToAxisThresh(bool inc)
+{
+	WCHAR currentname[120];
+	currentItem = m_pSettingsMenu->curitem;
+	
+
+	if (inc)
+	{
+		ButtonToAxisThresh += 1;
+		if(ButtonToAxisThresh > 100) 
+			ButtonToAxisThresh = 0;
+	}
+	else
+	{
+		ButtonToAxisThresh -= 1;
+		if(ButtonToAxisThresh < 0) 
+			ButtonToAxisThresh = 100;
+	}
+	
+	XLMenu_CurRoutine = NULL;
+	
+	swprintf(currentname,L"Button to Axis Threshold : %2.0f%%",ButtonToAxisThresh);
 	XLMenu_SetItemText(&m_pSettingsMenu->items[currentItem], currentname);
 
 	ConfigAppSave2();
