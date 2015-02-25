@@ -1135,6 +1135,7 @@ void DLParser_Process(OSTask * pTask)
 		
 		try{
 			gTextureCache.DropTextures();
+			gTextureCache.PurgeOldTextures();
 			RDP_Cleanup();
 		}
 		catch(...){}

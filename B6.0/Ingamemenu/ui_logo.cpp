@@ -49,6 +49,7 @@ LPDIRECT3DSURFACE8 surface;
 D3DSURFACE_DESC    surfDesc;
 LPDIRECT3DTEXTURE8 texture;
 LPDIRECT3DSURFACE8 texSurface;
+extern bool bNoPreview;
 //extern LPDIRECT3DDEVICE8 g_pD3DDev;	<- ???
 //extern bool onhd;
 extern bool showdebug;
@@ -66,6 +67,7 @@ extern char skinname[32];
 void InitLogo(void)
 {
   D3DFORMAT TextureFormat = D3DFMT_LIN_A8R8G8B8; // 32bit default
+  bNoPreview = false;
 	
   LoadSkinFile();
 

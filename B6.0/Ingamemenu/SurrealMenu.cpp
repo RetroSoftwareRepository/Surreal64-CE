@@ -20,6 +20,7 @@ void GetStateTimestamp(int index, char *timestamp);
 extern "C" void __EMU_GetStateFilename(int index, char *timestamp, int mode);
 void CreateSaveStatePreview(unsigned int index);
 bool LoadSaveStatePreview(unsigned int index);
+bool bNoPreview = false;
 
 extern void _VIDEO_DisplayTemporaryMessage(const char *msg);
 
@@ -640,7 +641,7 @@ void LoadStateMenu(void)
 		}
 		
 		//@weinersch do your skinning magic here
-		if (bLoadPreview) {
+		if (bLoadPreview && !bNoPreview) {
 		g_pd3dDevice->SetTexture(0, pStateTexture);
 
 		g_pd3dDevice->SetVertexShader(D3DFVF_XYZRHW | D3DFVF_TEX1);
@@ -676,6 +677,7 @@ void LoadStateMenu(void)
 
 void LoadState1()
 {
+	bNoPreview = true;
 	try{
 		if (pStateTexture) {
 		pStateTexture->Release();
@@ -701,6 +703,7 @@ void LoadState1()
 
 void LoadState2()
 {
+	bNoPreview = true;
 	try{
 		if (pStateTexture) {
 		pStateTexture->Release();
@@ -726,6 +729,7 @@ void LoadState2()
 
 void LoadState3()
 {
+	bNoPreview = true;
 	try{
 		if (pStateTexture) {
 		pStateTexture->Release();
@@ -751,6 +755,7 @@ void LoadState3()
 
 void LoadState4()
 {
+	bNoPreview = true;
 	try{
 		if (pStateTexture) {
 		pStateTexture->Release();
@@ -776,6 +781,7 @@ void LoadState4()
 
 void LoadState5()
 {
+	bNoPreview = true;
 	try{
 		if (pStateTexture) {
 		pStateTexture->Release();
@@ -883,7 +889,7 @@ void SaveStateMenu(void)
 
 		//fd: FIXME!
 		//@weinersch do your skinning magic here
-		if (bLoadPreview) {
+		if (bLoadPreview && !bNoPreview) {
 		g_pd3dDevice->SetTexture(0, pStateTexture);
 
 		g_pd3dDevice->SetVertexShader(D3DFVF_XYZRHW | D3DFVF_TEX1);
@@ -920,6 +926,7 @@ void SaveStateMenu(void)
 
 void SaveState1()
 {
+	bNoPreview = true;
 	try{
 		CreateSaveStatePreview(0);
 	}
@@ -953,6 +960,7 @@ void SaveState1()
 
 void SaveState2()
 {
+	bNoPreview = true;
 	try{
 		CreateSaveStatePreview(1);	
 	}
@@ -985,6 +993,7 @@ void SaveState2()
 
 void SaveState3()
 {
+	bNoPreview = true;
 	try{
 		CreateSaveStatePreview(2);	
 	}
@@ -1017,6 +1026,7 @@ void SaveState3()
 
 void SaveState4()
 {
+	bNoPreview = true;
 	try{
 		CreateSaveStatePreview(3);	
 	}
@@ -1049,6 +1059,7 @@ void SaveState4()
 
 void SaveState5()
 {
+	bNoPreview = true;
 	try{
 		CreateSaveStatePreview(4);	
 	}
