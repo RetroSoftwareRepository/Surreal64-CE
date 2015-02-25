@@ -623,6 +623,10 @@ void GenerateCurrentRomOptions()
 	{
 		options.enableHackForGames = HACK_FOR_EXTREME_G2;
 	}
+	else if ((stricmp(g_curRomInfo.szGameName, "QUAKE II") == 0))
+	{
+		options.enableHackForGames = HACK_FOR_QUAKE_2;
+	}
 
 	if( currentRomOptions.N64FrameBufferEmuType == 0 )		currentRomOptions.N64FrameBufferEmuType = defaultRomOptions.N64FrameBufferEmuType;
 	else currentRomOptions.N64FrameBufferEmuType--;

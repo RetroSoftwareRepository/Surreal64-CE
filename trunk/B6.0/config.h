@@ -64,6 +64,7 @@ extern int VertexMode;
 extern float XBOX_CONTROLLER_DEAD_ZONE;
 //#define XBOX_CONTROLLER_DEAD_ZONE 8600
 extern float Deadzone;
+extern float ButtonToAxisThresh;
 extern int Sensitivity;
 extern int DefaultPak;
 extern bool EnableController1;

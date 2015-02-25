@@ -29,14 +29,6 @@ CTextureCache gTextureCache;
 
 BOOL g_bTHMakeTexturesBlue = FALSE;
 BOOL g_bTHDumpTextures = FALSE;
-//freakdave
-//bool g_bUseSetTextureMem = true;
-//DWORD g_maxTextureMemUsage = (5*1024*1024);
-//DWORD g_amountToFree = (512*1024);
-
-//9 would be dwFreeMem but this doesn't work atm - freakdave
-//static const DWORD MEM_KEEP_FREE = (6*1024*1024); 
-//static bool g_bUseSetTextureMem = true;		   // we pretty much always wanna use a set texture mem
 #ifndef OLDTXTCACHE
 static const DWORD MEM_KEEP_FREE = (2*1024*1024); // keep 2MB free
 #endif
@@ -45,7 +37,6 @@ static const DWORD MEM_KEEP_FREE = (2*1024*1024); // keep 2MB free
 // Games seem to be smoother with the old way
 bool g_bUseSetTextureMem = true;
 DWORD g_maxTextureMemUsage = (5*1024*1024);
-DWORD g_amountToFree = (512*1024);
 
 
 
@@ -179,7 +170,9 @@ void CTextureCache::PurgeOldTextures()
 	if (m_pTextureHash == NULL)
 		return;
 
-	if (g_bUseSetTextureMem)
+	// PurgeOldTextures breaks OOT and possibly others
+	// Quake 2 needs it otherwise it leaks pretty bad. 
+	if((stricmp(g_curRomInfo.szGameName, "QUAKE II") != 0))
 		return;
 	
 	static const u32 dwFramesToKill = 5*30;			// 5 secs at 30 fps
@@ -227,6 +220,8 @@ void CTextureCache::PurgeOldTextures()
 			
 			////DBGConsole_Msg(0, "Killing old used texture (%d x %d)", pCurr->dwWidth, pCurr->dwHeight);
 			
+			m_currentTextureMemUsage -= (pCurr->pTexture->m_dwWidth * pCurr->pTexture->m_dwHeight * 2);
+			
 			delete pCurr;
 			
 			// pPrev remains the same
@@ -266,15 +261,20 @@ void CTextureCache::DropTextures()
 			
 #ifdef OLDTXTCACHE
 			if (g_bUseSetTextureMem)
-				delete pTVictim;
+			{
+				m_currentTextureMemUsage -= (pTVictim->pTexture->m_dwWidth * pTVictim->pTexture->m_dwHeight * 2);
+				SAFE_DELETE(pTVictim);
+			}
 			else
-				AddToRecycleList(pTVictim);
+			{
+				RecycleTexture(pTVictim);
+			}
 #else
 				delete pTVictim;
 #endif
 		}
 	}
-	m_currentTextureMemUsage = 0;
+	//m_currentTextureMemUsage = 0;
 }
 
 
@@ -484,7 +484,7 @@ void CTextureCache::RemoveTextureEntry(TextureEntry * pEntry)
 				}
 
 				// decrease the mem usage counter
-				m_currentTextureMemUsage -= (pEntry->pTexture->m_dwWidth * pEntry->pTexture->m_dwHeight * 4);
+				m_currentTextureMemUsage -= (pEntry->pTexture->m_dwWidth * pEntry->pTexture->m_dwHeight * 2);
 			
 				delete pEntry;
 #ifdef OLDTXTCACHE
@@ -549,7 +549,7 @@ TextureEntry * CTextureCache::CreateEntry(DWORD dwAddress, DWORD dwWidth, DWORD 
 	uint32 widthToCreate = dwWidth;
 	uint32 heightToCreate = dwHeight;
 
-	DWORD freeUpSize = (widthToCreate * heightToCreate * 4);
+	DWORD freeUpSize = (widthToCreate * heightToCreate * 2);
 
 	// make sure there is enough room for the new texture by deleting old textures
 	if((m_currentTextureMemUsage + freeUpSize) > g_maxTextureMemUsage)
@@ -576,7 +576,7 @@ TextureEntry * CTextureCache::CreateEntry(DWORD dwAddress, DWORD dwWidth, DWORD 
 		FreeTextures();
 #endif
 	}
-	m_currentTextureMemUsage += (dwWidth * dwHeight * 4);
+	m_currentTextureMemUsage += (dwWidth * dwHeight * 2);
 
 	// new way
 	/*

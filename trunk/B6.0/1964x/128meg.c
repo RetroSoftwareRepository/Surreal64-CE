@@ -70,17 +70,15 @@ void Enable128MegCaching( void )
   // Verify that we have 128 megs available
   MEMORYSTATUS memStatus;
   GlobalMemoryStatus( &memStatus );
-  if( memStatus.dwTotalPhys < (100 * 1024 * 1024) ){
-    g_dwNumFrames = ((loaddw1964PagingMem() * 1024 * 1024) / g_dwPageSize); 
-	return;
+  if( memStatus.dwTotalPhys > (100 * 1024 * 1024) )
+  {
+		// Grab the existing default type
+	READMSRREG( IA32_MTRR_DEF_TYPE, &regVal );
+	  
+		// Set the default to WriteBack (0x06)
+	regVal.LowPart = (regVal.LowPart & ~0xFF) | 0x06;
+	WRITEMSRREG( IA32_MTRR_DEF_TYPE, regVal );
   }
-
-    // Grab the existing default type
-  READMSRREG( IA32_MTRR_DEF_TYPE, &regVal );
-  
-    // Set the default to WriteBack (0x06)
-  regVal.LowPart = (regVal.LowPart & ~0xFF) | 0x06;
-  WRITEMSRREG( IA32_MTRR_DEF_TYPE, regVal );
 
   fp = fopen(g_temporaryRomPath,"r");
   rewind(fp);
@@ -88,5 +86,9 @@ void Enable128MegCaching( void )
   filesize = ftell(fp);
   fclose(fp);
 
-  g_dwNumFrames = (DWORD)((filesize) / g_dwPageSize);
+  if(loaddw1964PagingMem() == 0)
+	g_dwNumFrames = (DWORD)((filesize) / g_dwPageSize);
+  else
+	g_dwNumFrames = ((loaddw1964PagingMem() * 1024 * 1024) / g_dwPageSize); 
+
 }

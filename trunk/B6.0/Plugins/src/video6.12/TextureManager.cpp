@@ -34,7 +34,6 @@ CTextureManager gTextureManager;
 // Games seem to be smoother with the old way
 bool g_bUseSetTextureMem = true;
 DWORD g_maxTextureMemUsage = (5*1024*1024);
-DWORD g_amountToFree = (512*1024);
 
 //#ifndef OLDTXTCACHE
 static const DWORD MEM_KEEP_FREE = (4*1024*1024); // keep 4MB free
@@ -184,8 +183,11 @@ void CTextureManager::PurgeOldTextures()
 	if (m_pCacheTxtrList == NULL)
 		return;
 	
-	if (g_bUseSetTextureMem)
+	// PurgeOldTextures breaks OOT and possibly others
+	// Quake 2 needs it otherwise it leaks pretty bad. 
+	if(options.enableHackForGames != HACK_FOR_QUAKE_2)
 		return;
+
 
 	static const uint32 dwFramesToKill = 5*30;			// 5 secs at 30 fps
 	static const uint32 dwFramesToDelete = 30*30;		// 30 secs at 30 fps
@@ -208,7 +210,7 @@ void CTextureManager::PurgeOldTextures()
 		}
 	}
 	
-	
+	/*
 	// Remove any old textures that haven't been recycled in 1 minute or so
 	// Normally these would be reused
 	TxtrCacheEntry * pPrev;
@@ -227,6 +229,8 @@ void CTextureManager::PurgeOldTextures()
 		{
 			if (pPrev != NULL) pPrev->pNext        = pCurr->pNext;
 			else			   m_pHead = pCurr->pNext;
+
+			m_currentTextureMemUsage -= (pCurr->pTexture->m_dwWidth * pCurr->pTexture->m_dwHeight * 2);
 			
 			delete pCurr;
 			pCurr = pNext;	
@@ -237,6 +241,7 @@ void CTextureManager::PurgeOldTextures()
 			pCurr = pNext;
 		}
 	}
+	*/
 #else
 	return;
 #endif
@@ -266,6 +271,7 @@ void CTextureManager::RecycleAllTextures()
 #ifdef OLDTXTCACHE
 			if (g_bUseSetTextureMem)
 			{
+				m_currentTextureMemUsage -= (pTVictim->pTexture->m_dwWidth * pTVictim->pTexture->m_dwHeight * 2);
 				SAFE_DELETE(pTVictim);
 			}
 			else
@@ -277,7 +283,6 @@ void CTextureManager::RecycleAllTextures()
 #endif
 		}
 	}
-	m_currentTextureMemUsage = 0;
 }
 
 void CTextureManager::RecheckHiresForAllTextures()
@@ -501,7 +506,7 @@ void CTextureManager::RemoveTexture(TxtrCacheEntry * pEntry)
 				}
 
 				// decrease the mem usage counter
-				m_currentTextureMemUsage -= (pEntry->pTexture->m_dwWidth * pEntry->pTexture->m_dwHeight * 4);
+				m_currentTextureMemUsage -= (pEntry->pTexture->m_dwWidth * pEntry->pTexture->m_dwHeight * 2);
 			
 				delete pEntry;
 #ifdef OLDTXTCACHE
@@ -562,7 +567,7 @@ TxtrCacheEntry * CTextureManager::CreateNewCacheEntry(uint32 dwAddr, uint32 dwWi
 	uint32 widthToCreate = dwWidth;
 	uint32 heightToCreate = dwHeight;
 
-	DWORD freeUpSize = (widthToCreate * heightToCreate * 4);
+	DWORD freeUpSize = (widthToCreate * heightToCreate * 2);
 
 	// make sure there is enough room for the new texture by deleting old textures
 	if((m_currentTextureMemUsage + freeUpSize) > g_maxTextureMemUsage)
@@ -587,7 +592,7 @@ TxtrCacheEntry * CTextureManager::CreateNewCacheEntry(uint32 dwAddr, uint32 dwWi
 	FreeTextures();
 #endif
 	}
-	m_currentTextureMemUsage += (dwWidth * dwHeight * 4);
+	m_currentTextureMemUsage += (dwWidth * dwHeight * 2);
 	
 
 #ifdef OLDTXTCACHE
@@ -1392,7 +1397,6 @@ void CTextureManager::Mirror(void *array, uint32 width, uint32 mask, uint32 towi
 	}
 
 }
-
 
 #ifdef _DEBUG
 TxtrCacheEntry * CTextureManager::GetCachedTexture(uint32 tex)
