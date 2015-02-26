@@ -800,7 +800,7 @@ uint32 DLParser_CheckUcode(uint32 ucStart, uint32 ucDStart, uint32 ucSize, uint3
 extern int dlistMtxCount;
 extern bool bHalfTxtScale;
 
-void DLParser_Process(OSTask * pTask)
+void DLParser_Process()
 {
 	static int skipframe=0;
 	BOOL menuWaiting = FALSE;
@@ -811,7 +811,7 @@ void DLParser_Process(OSTask * pTask)
 	if ( CRender::g_pRender == NULL)
 	{
 		TriggerDPInterrupt();
-		TriggerSPInterrupt();
+		//TriggerSPInterrupt();
 		return;
 	}
 
@@ -822,7 +822,7 @@ void DLParser_Process(OSTask * pTask)
 		if(skipframe%2)
 		{
 			TriggerDPInterrupt();
-			TriggerSPInterrupt();
+			//TriggerSPInterrupt();
 			return;
 		}
 	}
@@ -832,11 +832,19 @@ void DLParser_Process(OSTask * pTask)
 		g_pFrameBufferManager->CheckRenderTextureCRCInRDRAM();
 	}
 
-	g_pOSTask = pTask;
+	
+	status.bScreenIsDrawn = true;
 	
 	DebuggerPauseCountN( NEXT_DLIST );
 	status.gRDPTime = timeGetTime();
-	status.gDlistCount++;
+	status.gDlistCount++;	
+
+	OSTask * pTask = (OSTask *)(g_GraphicsInfo.DMEM + 0x0FC0);
+	u32 code_base = (u32)pTask->t.ucode & 0x1fffffff;
+	u32 code_size = pTask->t.ucode_size;
+	u32 data_base = (u32)pTask->t.ucode_data & 0x1fffffff;
+	u32 data_size = pTask->t.ucode_data_size;
+	u32 stack_size = pTask->t.dram_stack_size >> 6;
 
 	if ( lastUcodeInfo.ucStart != (uint32)(pTask->t.ucode) )
 	{
@@ -850,6 +858,7 @@ void DLParser_Process(OSTask * pTask)
 	gDlistStackPointer=0;
 	gDlistStack[gDlistStackPointer].pc = (uint32)pTask->t.data_ptr;
 	gDlistStack[gDlistStackPointer].countdown = MAX_DL_COUNT;
+	
 	DEBUGGER_PAUSE_AT_COND_AND_DUMP_COUNT_N((gDlistStack[gDlistStackPointer].pc == 0 && pauseAtNext && eventToPause==NEXT_UNKNOWN_OP),
 			{DebuggerAppendMsg("Start Task without DLIST: ucode=%08X, data=%08X", (uint32)pTask->t.ucode, (uint32)pTask->t.ucode_data);});
 
@@ -878,6 +887,7 @@ void DLParser_Process(OSTask * pTask)
 
 	SetVIScales();
 	CRender::g_pRender->RenderReset();
+	CRender::g_pRender->ResetMatrices(stack_size);
 	CRender::g_pRender->BeginRendering();
 	CRender::g_pRender->SetViewport(0, 0, windowSetting.uViWidth, windowSetting.uViHeight, 0x3FF);
 	CRender::g_pRender->SetFillMode(options.bWinFrameMode? RICE_FILLMODE_WINFRAME : RICE_FILLMODE_SOLID);
