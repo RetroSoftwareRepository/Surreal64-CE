@@ -21,15 +21,20 @@ rem	CONFIG START
 	  goto DIE
 	)
 	
-	:: using all-in-one solution instead to cut down on compile time
-	:: set SOL_LIST=("Surreal64 CE.sln" Project510.sln Project531.sln Project560.sln Project611.sln Project612.sln)
-	set SOL_LIST=(Build.sln)
+	:: using separate solutions instead to ensure objects aren't contaminated.
+	set SOL_MAIN=("Surreal64 CE.sln")
+ 	set SOL_P510=(Project510.sln)
+	set SOL_P531=(Project531.sln)
+	set SOL_P560=(Project560.sln)
+	set SOL_P611=(Project611.sln)
+	set SOL_P612=(Project612.sln)
 
-	set XBE_1964x085_LIST=(1964x085-510.xbe 1964x085-510M.xbe 1964x085-531.xbe 1964x085-531M.xbe 1964x085-560.xbe 1964x085-560M.xbe 1964x085-611.xbe 1964x085-611M.xbe 1964x085-612.xbe 1964x085-612M.xbe)
-	set XBE_1964x11_LIST=(1964x11-510.xbe 1964x11-510M.xbe 1964x11-531.xbe 1964x11-531M.xbe 1964x11-560.xbe 1964x11-560M.xbe 1964x11-611.xbe 1964x11-611M.xbe 1964x11-612.xbe 1964x11-612M.xbe)
-	set XBE_PJ64x14_LIST=(PJ64x14-510.xbe PJ64x14-510M.xbe PJ64x14-531.xbe PJ64x14-531M.xbe PJ64x14-560.xbe PJ64x14-560M.xbe PJ64x14-611.xbe PJ64x14-611M.xbe PJ64x14-612.xbe PJ64x14-612M.xbe)
-	set XBE_PJ64x16_LIST=(PJ64x16-510.xbe PJ64x16-510M.xbe PJ64x16-531.xbe PJ64x16-531M.xbe PJ64x16-560.xbe PJ64x16-560M.xbe PJ64x16-611.xbe PJ64x16-611M.xbe PJ64x16-612.xbe PJ64x16-612M.xbe)
-	set XBE_LNCH_LIST=(default.xbe UltraHLE.xbe)
+	set XBE_SOL_P510_LIST=(1964x085-510.xbe 1964x085-510M.xbe 1964x11-510.xbe 1964x11-510M.xbe PJ64x14-510.xbe PJ64x14-510M.xbe PJ64x16-510.xbe PJ64x16-510M.xbe)
+	set XBE_SOL_P531_LIST=(1964x085-531.xbe 1964x085-531M.xbe 1964x11-531.xbe 1964x11-531M.xbe PJ64x14-531.xbe PJ64x14-531M.xbe PJ64x16-531.xbe PJ64x16-531M.xbe)
+	set XBE_SOL_P560_LIST=(1964x085-560.xbe 1964x085-560M.xbe 1964x11-560.xbe 1964x11-560M.xbe PJ64x14-560.xbe PJ64x14-560M.xbe PJ64x16-560.xbe PJ64x16-560M.xbe)
+	set XBE_SOL_P611_LIST=(1964x085-611.xbe 1964x085-611M.xbe 1964x11-611.xbe 1964x11-611M.xbe PJ64x14-611.xbe PJ64x14-611M.xbe PJ64x16-611.xbe PJ64x16-611M.xbe)
+	set XBE_SOL_P612_LIST=(1964x085-612.xbe 1964x085-612M.xbe 1964x11-612.xbe 1964x11-612M.xbe PJ64x14-612.xbe PJ64x14-612M.xbe PJ64x16-612.xbe PJ64x16-612M.xbe)
+	set XBE_SOL_MAIN_LIST=(UltraHLE.xbe default.xbe)
 	
 	goto PROMPT_MODE
 
@@ -72,41 +77,145 @@ rem ---------------------------------------------
 	ECHO Compiling Solution(s) [%MODE% mode]
 	ECHO ------------------------------
 	
-	for %%i in %SOL_LIST% do (
+	rmdir preBUILD /S /Q
+	md preBUILD
+	
+	rmdir %MODE% /S /Q
+	md %MODE%
+
+	for %%i in %SOL_P510% do (
 		ECHO Cleaning...
 		%NET% %%i /clean %MODE%
 	)
 
-	for %%i in %SOL_LIST% do (
+	for %%i in %SOL_P510% do (
 		ECHO Compiling...
 		%NET% %%i /build %MODE%
 	)
 
-	for %%i in %XBE_1964x085_LIST% do IF NOT EXIST %MODE%\%%i (
+	for %%i in %XBE_SOL_P510_LIST% do IF NOT EXIST %MODE%\%%i (
 		ECHO ----
 		echo %%i failed to build!
 		set ERROR=1
 	)
-	for %%i in %XBE_1964x11_LIST% do IF NOT EXIST %MODE%\%%i (
+	
+	xcopy %MODE%\*.xbe preBUILD
+
+
+	rmdir %MODE% /S /Q
+	md %MODE%
+
+	for %%i in %SOL_P531% do (
+		ECHO Cleaning...
+		%NET% %%i /clean %MODE%
+	)
+
+	for %%i in %SOL_P531% do (
+		ECHO Compiling...
+		%NET% %%i /build %MODE%
+	)
+	
+	for %%i in %XBE_SOL_P531_LIST% do IF NOT EXIST %MODE%\%%i (
 		ECHO ----
 		echo %%i failed to build!
 		set ERROR=1
 	)
-	for %%i in %XBE_PJ64x14_LIST% do IF NOT EXIST %MODE%\%%i (
+
+	xcopy %MODE%\*.xbe preBUILD
+
+
+	rmdir %MODE% /S /Q
+	md %MODE%
+
+	for %%i in %SOL_P560% do (
+		ECHO Cleaning...
+		%NET% %%i /clean %MODE%
+	)
+
+	for %%i in %SOL_P560% do (
+		ECHO Compiling...
+		%NET% %%i /build %MODE%
+	)
+
+	for %%i in %XBE_SOL_P560_LIST% do IF NOT EXIST %MODE%\%%i (
 		ECHO ----
 		echo %%i failed to build!
 		set ERROR=1
 	)
-	for %%i in %XBE_PJ64x16_LIST% do IF NOT EXIST %MODE%\%%i (
+
+	xcopy %MODE%\*.xbe preBUILD
+
+
+	rmdir %MODE% /S /Q
+	md %MODE%
+
+	for %%i in %SOL_P611% do (
+		ECHO Cleaning...
+		%NET% %%i /clean %MODE%
+	)
+
+	for %%i in %SOL_P611% do (
+		ECHO Compiling...
+		%NET% %%i /build %MODE%
+	)
+
+	for %%i in %XBE_SOL_P611_LIST% do IF NOT EXIST %MODE%\%%i (
 		ECHO ----
 		echo %%i failed to build!
 		set ERROR=1
 	)
-	for %%i in %XBE_LNCH_LIST% do IF NOT EXIST %MODE%\%%i (
+
+	xcopy %MODE%\*.xbe preBUILD
+
+
+	rmdir %MODE% /S /Q
+	md %MODE%
+
+	for %%i in %SOL_P612% do (
+		ECHO Cleaning...
+		%NET% %%i /clean %MODE%
+	)
+
+	for %%i in %SOL_P612% do (
+		ECHO Compiling...
+		%NET% %%i /build %MODE%
+	)
+
+	for %%i in %XBE_SOL_P612_LIST% do IF NOT EXIST %MODE%\%%i (
 		ECHO ----
 		echo %%i failed to build!
 		set ERROR=1
 	)
+
+	xcopy %MODE%\*.xbe preBUILD
+
+
+	rmdir %MODE% /S /Q
+	md %MODE%
+
+	for %%i in %SOL_MAIN% do (
+		ECHO Cleaning...
+		%NET% %%i /clean %MODE%
+	)
+
+	for %%i in %SOL_MAIN% do (
+		ECHO Compiling...
+		%NET% %%i /build %MODE%
+	)
+
+	for %%i in %XBE_SOL_MAIN_LIST% do IF NOT EXIST %MODE%\%%i (
+		ECHO ----
+		echo %%i failed to build!
+		set ERROR=1
+	)
+
+	xcopy %MODE%\*.xbe preBUILD
+
+
+	rmdir %MODE% /S /Q
+	md %MODE%
+
+rem---------------------------------------------------------------------
 	if %ERROR%==1 (
 		set DIETEXT="Build Failed! (See BuildLog.htm(s) for details)"
 		goto DIE
@@ -126,7 +235,7 @@ rem ---------------------------------------------
 	Echo Desktop.ini>>exclude.txt
 	Echo exclude.txt>>exclude.txt
 	
-	xcopy %MODE%\*.xbe BUILD /EXCLUDE:exclude.txt
+	xcopy preBUILD\*.xbe BUILD /EXCLUDE:exclude.txt
 	
 	if %DIST%==1 (
 		ECHO Copying Dist... [this can take a while]
@@ -151,7 +260,12 @@ rem ---------------------------------------------
 	
 	ECHO ------------------------------
 	ECHO Cleaning...
-	for %%i in %SOL_LIST% do %NET% %%i /clean %MODE%
+	for %%i in %SOL_P510% do %NET% %%i /clean %MODE%
+	for %%i in %SOL_P531% do %NET% %%i /clean %MODE%
+	for %%i in %SOL_P560% do %NET% %%i /clean %MODE%
+	for %%i in %SOL_P611% do %NET% %%i /clean %MODE%
+	for %%i in %SOL_P612% do %NET% %%i /clean %MODE%
+	for %%i in %SOL_MAIN% do %NET% %%i /clean %MODE%
 	ECHO Done!
 	ECHO ------------------------------
 	
