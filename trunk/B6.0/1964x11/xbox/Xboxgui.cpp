@@ -82,21 +82,21 @@ extern "C" {
 
 char emuname[256];
 
-void __EMU_SaveState(int index)
+extern "C" void __EMU_SaveState(int index)
 {
 	char buf[_MAX_PATH];
 	sprintf(buf, "%s%08x\\%08X-%08X-%02X.%i", g_szPathSaves, currentromoptions.crc1, currentromoptions.crc1, currentromoptions.crc2, currentromoptions.countrycode, index);
 	FileIO_ExportPJ64State(buf);
 }
 
-void __EMU_LoadState(int index)
+extern "C" void __EMU_LoadState(int index)
 {
 	char buf[_MAX_PATH];
 	sprintf(buf, "%s%08x\\%08X-%08X-%02X.%i", g_szPathSaves, currentromoptions.crc1, currentromoptions.crc1, currentromoptions.crc2, currentromoptions.countrycode, index);
 	FileIO_ImportPJ64State(buf);
 }
 
-void __EMU_GetStateFilename(int index, char *filename, int mode)
+extern "C" void __EMU_GetStateFilename(int index, char *filename, int mode)
 {
 	if(mode == 0){
 		sprintf(filename, "%s%08x\\%08X-%08X-%02X.%i", g_szPathSaves, currentromoptions.crc1, currentromoptions.crc1, currentromoptions.crc2, currentromoptions.countrycode, index);
