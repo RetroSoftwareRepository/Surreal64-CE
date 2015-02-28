@@ -690,7 +690,9 @@ void LoadState1()
 
 	}
 	try{
-		__EMU_LoadState(1);
+		bloadstate[1]=true;
+		bSatesUpdated=true;
+		//__EMU_LoadState(1);
 	}
 	catch(...)
 	{
@@ -716,7 +718,9 @@ void LoadState2()
 
 	}
 	try{
-		__EMU_LoadState(2);
+		bloadstate[2]=true;
+		bSatesUpdated=true;
+		//__EMU_LoadState(2);
 	}
 	catch(...)
 	{
@@ -742,7 +746,9 @@ void LoadState3()
 
 	}
 	try{
-		__EMU_LoadState(3);
+		bloadstate[3]=true;
+		bSatesUpdated=true;
+		//__EMU_LoadState(3);
 	}
 	catch(...)
 	{
@@ -768,7 +774,9 @@ void LoadState4()
 
 	}
 	try{
-		__EMU_LoadState(4);	
+		bloadstate[4]=true;
+		bSatesUpdated=true;
+		//__EMU_LoadState(4);	
 	}
 	catch(...)
 	{
@@ -794,7 +802,9 @@ void LoadState5()
 
 	}
 	try{
-		__EMU_LoadState(5);
+		bloadstate[5]=true;
+		bSatesUpdated=true;
+		//__EMU_LoadState(5);
 	}
 	catch(...)
 	{
@@ -946,7 +956,9 @@ void SaveState1()
 
 	}
 	try{
-		__EMU_SaveState(1);
+		bsavestate[1]=true;
+		bSatesUpdated=true;
+		//__EMU_SaveState(1);
 	}
 	catch(...)
 	{
@@ -980,7 +992,9 @@ void SaveState2()
 
 	}
 	try{
-		__EMU_SaveState(2);
+		bsavestate[2]=true;
+		bSatesUpdated=true;
+		//__EMU_SaveState(2);
 	}
 	catch(...)
 	{
@@ -1013,7 +1027,9 @@ void SaveState3()
 
 	}
 	try{
-		__EMU_SaveState(3);
+		bsavestate[3]=true;
+		bSatesUpdated=true;
+		//__EMU_SaveState(3);
 	}
 	catch(...)
 	{
@@ -1046,7 +1062,9 @@ void SaveState4()
 
 	}
 	try{
-		__EMU_SaveState(4);
+		bsavestate[4]=true;
+		bSatesUpdated=true;
+		//__EMU_SaveState(4);
 	}
 	catch(...)
 	{
@@ -1079,7 +1097,9 @@ void SaveState5()
 
 	}
 	try{
-		__EMU_SaveState(5);	
+		bsavestate[5]=true;
+		bSatesUpdated=true;
+		//__EMU_SaveState(5);	
 	}
 	catch(...)
 	{
