@@ -427,7 +427,7 @@ void ResetRom(void)
 void GetStateTimestamp(int index, char *timestamp)
 {
 	char filename[255];
-	__EMU_GetStateFilename(index, filename, 0);
+		__EMU_GetStateFilename(index, filename, 1); // Check for Screenie instead, not sure why savefiles show as empty.
 
 	struct _stat buf;
 	if(_stat(filename, &buf ) != 0) {
