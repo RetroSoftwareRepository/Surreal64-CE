@@ -89,20 +89,21 @@ extern void _AUDIO_MUSYX_AiUpdate(BOOL Wait);
 extern BOOL _AUDIO_MUSYX_InitiateAudio (AUDIO_INFO Audio_Info);
 extern void _AUDIO_MUSYX_ProcessAList(void);
 extern void _AUDIO_MUSYX_AudioBoost (BOOL Boost);
-#elif defined(USE_M64PAUDIO)
+#else
+/* This plgun only cooperates with 1964x11, partially
 // mupen 1.5 audio
-extern void _AUDIO_M64P_CloseDLL (void);
+//extern void _AUDIO_M64P_CloseDLL (void);
 extern void _AUDIO_M64P_RomClosed(void);
-extern void _AUDIO_M64P_DllConfig ( HWND hParent );
-extern void _AUDIO_M64P_GetDllInfo(PLUGIN_INFO *PluginInfo);
+//extern void _AUDIO_M64P_DllConfig ( HWND hParent );
+//extern void _AUDIO_M64P_GetDllInfo(PLUGIN_INFO *PluginInfo);
 extern void _AUDIO_M64P_AiDacrateChanged(int SystemType);
 extern void _AUDIO_M64P_AiLenChanged(void);
-extern void _AUDIO_M64P_AiReadLength(void);
-extern void _AUDIO_M64P_AiUpdate(BOOL Wait);
+//extern void _AUDIO_M64P_AiReadLength(void);
+//extern void _AUDIO_M64P_AiUpdate(BOOL Wait);
 extern BOOL _AUDIO_M64P_InitiateAudio (AUDIO_INFO Audio_Info);
 extern void _AUDIO_M64P_ProcessAList(void);
-extern void _AUDIO_M64P_AudioBoost (BOOL Boost);
-#else
+//extern void _AUDIO_M64P_AudioBoost (BOOL Boost);
+*/
 
 //freakdave - JttL
 extern void _AUDIO_JTTL_CloseDLL (void);
@@ -271,27 +272,28 @@ BOOL LoadAudioDll(void) {
 		
 		_AUDIO_LINK_AudioBoost		 	= _AUDIO_MUSYX_AudioBoost;
 	}
-#elif defined(USE_M64PAUDIO)
-	//if (g_iAudioPlugin == _AudioPluginM64p) // so it doesn't break for now
+#else
+/* This plugin only cooperates with 1964x11, partially
+	if (g_iAudioPlugin == _AudioPluginM64P) // so it doesn't break for now
 	{
 		// Mupen 1.5 Audio plugin
 		_AUDIO_LINK_AiDacrateChanged 	= _AUDIO_M64P_AiDacrateChanged;
 		_AUDIO_LINK_AiLenChanged	 	= _AUDIO_M64P_AiLenChanged;
-		_AUDIO_LINK_AiReadLength	 	= _AUDIO_M64P_AiReadLength;
-		_AUDIO_LINK_AiUpdate		 	= _AUDIO_M64P_AiUpdate;
-		_AUDIO_LINK_CloseDLL		 	= _AUDIO_M64P_CloseDLL;
+		//_AUDIO_LINK_AiReadLength	 	= _AUDIO_M64P_AiReadLength;
+		//_AUDIO_LINK_AiUpdate		 	= _AUDIO_M64P_AiUpdate;
+		//_AUDIO_LINK_CloseDLL		 	= _AUDIO_M64P_CloseDLL;
 		//_AUDIO_LINK_DllAbout		 	= _AUDIO_M64P_DllAbout;
-		_AUDIO_LINK_DllConfig		 	= _AUDIO_M64P_DllConfig;
+		//_AUDIO_LINK_DllConfig		 	= _AUDIO_M64P_DllConfig;
 		//_AUDIO_LINK_DllTest			 	= _AUDIO_M64P_DllTest;
-		_AUDIO_LINK_GetDllInfo		 	= _AUDIO_M64P_GetDllInfo;
+		//_AUDIO_LINK_GetDllInfo		 	= _AUDIO_M64P_GetDllInfo;
 		_AUDIO_LINK_InitiateAudio	 	= _AUDIO_M64P_InitiateAudio;
 		_AUDIO_LINK_ProcessAList	 	= _AUDIO_M64P_ProcessAList;
 		_AUDIO_LINK_RomClosed		 	= _AUDIO_M64P_RomClosed;
 		//_AUDIO_LINK_ProcessAListCountCycles = _AUDIO_MUSYX_ProcessAListCountCycles;
 		
-		_AUDIO_LINK_AudioBoost		 	= _AUDIO_M64P_AudioBoost;
+		//_AUDIO_LINK_AudioBoost		 	= _AUDIO_M64P_AudioBoost;
 	}
-#else
+*/
 
 	if (g_iAudioPlugin == _AudioPluginNone)
 	{

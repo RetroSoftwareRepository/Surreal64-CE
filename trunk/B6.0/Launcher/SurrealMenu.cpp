@@ -266,7 +266,7 @@ string GetAudioPluginName(int p_iAudioPlugin)
 		case _AudioPluginJttl : szAudioPlugin = "JttL"; break;
 		case _AudioPluginAzimer : szAudioPlugin = "Azimer"; break;
 		case _AudioPluginMusyX : szAudioPlugin = "MusyX"; break;
-		//case _AudioPluginM64P : szAudioPlugin = "M64Plus"; break;
+		case _AudioPluginM64P : szAudioPlugin = "M64Plus"; break;
 		//case _AudioPluginMissing : 
 		default : szAudioPlugin = "JttL"; break;//freakdave - set JttL plugin as default
 	}	
@@ -798,12 +798,13 @@ void SettingsMenu(void)
 	XLMenu_AddItem2(m_pSettingsMenu,MITEM_ROUTINE,currentname,incRSPPlugin,decRSPPlugin);
 	
 	// RSP Audio Enable
-	if (bUseRspAudio)
-		swprintf(currentname,L"Enable RSP Audio : Yes");
+	
+	if (!bUseRspAudio)
+		swprintf(currentname,L"Send ALists to Audio Plugin : Yes");
 	else
-		swprintf(currentname,L"Enable RSP Audio : No");	
+		swprintf(currentname,L"Send ALists to Audio Plugin : No");	
 	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,currentname,ToggleRSPAudio);
-
+	
 	// Rom Paging Method
 	/*if (usePageOriginal)
 		swprintf(currentname,L"Rom Paging Method : 1.0");
@@ -895,12 +896,16 @@ void ToggleAudioPlugin(bool inc)
 		iAudioPlugin++;
 		if(iAudioPlugin == _AudioPluginLleRsp)//Skip LLE RSP Audio
 			iAudioPlugin++;
+		if((iAudioPlugin == _AudioPluginM64P) && (preferedemu != _1964x11))//Skip HLE RSP when not using 1964x11
+			iAudioPlugin++;
 		if (iAudioPlugin > (_AudioPluginMissing - 1)) iAudioPlugin=0;
 	}
 	else
 	{
 		iAudioPlugin--;
 		if(iAudioPlugin == _AudioPluginLleRsp)//Skip LLE RSP Audio
+			iAudioPlugin--;
+		if((iAudioPlugin == _AudioPluginM64P) && (preferedemu != _1964x11))
 			iAudioPlugin--;
 		if (iAudioPlugin < 0) iAudioPlugin=(_AudioPluginMissing - 1);
 	}
@@ -910,6 +915,17 @@ void ToggleAudioPlugin(bool inc)
 	// audio plugins
 	swprintf(currentname, L"Audio Plugin : %S", GetAudioPluginName(iAudioPlugin).c_str());
 	XLMenu_SetItemText(&m_pSettingsMenu->items[currentItem], currentname);
+
+	if ((iAudioPlugin == _AudioPluginM64P) && (preferedemu == _1964x11)) {
+
+        iRspPlugin = _RSPPluginM64P;		
+		swprintf(currentname, L"RSP Plugin : M64Plus HLE");
+		XLMenu_SetItemText(&m_pSettingsMenu->items[(currentItem + 1)], currentname);
+
+		bUseRspAudio  = false;
+		swprintf(currentname, L"Send ALists to Audio Plugin : Yes");
+		XLMenu_SetItemText(&m_pSettingsMenu->items[(currentItem + 2)], currentname);
+	}
 }
 
 // RSP plugin toggle
@@ -931,7 +947,10 @@ void ToggleRSPPlugin(bool inc)
 	}
 	
 	if (!EmuDoesNoRsp(preferedemu) && iRspPlugin == _RSPPluginNone) iRspPlugin++;
-	
+
+	if ((iAudioPlugin == _AudioPluginM64P) && (preferedemu == _1964x11))
+		iRspPlugin = _RSPPluginM64P;
+
 	XLMenu_CurRoutine = NULL;
 	
 	// rsp plugins
@@ -941,7 +960,7 @@ void ToggleRSPPlugin(bool inc)
 	// Disable RSP Audio if we aren't using an RSP plugin that supports it
 	if (!RspDoesAlist(iRspPlugin)) {
 		bUseRspAudio  = false;
-		swprintf(currentname, L"Enable RSP Audio : No");
+		swprintf(currentname, L"Send ALists to Audio Plugin : Yes");
 		XLMenu_SetItemText(&m_pSettingsMenu->items[(currentItem + 1)], currentname);
 	}
 }
@@ -952,14 +971,16 @@ void ToggleRSPAudio()
 	
 	// Only change RSP Audio if we are using an RSP plugin that supports it
 	if(RspDoesAlist(iRspPlugin))
-	bUseRspAudio = !bUseRspAudio;
+		bUseRspAudio = !bUseRspAudio;
+	if((preferedemu == _1964x11) && (iAudioPlugin == _AudioPluginM64P))
+		bUseRspAudio = false;
 	
 	XLMenu_CurRoutine = NULL;
 
-	if (bUseRspAudio)
-		XLMenu_SetItemText(&m_pSettingsMenu->items[currentItem], L"Enable RSP Audio : Yes");
+	if (!bUseRspAudio)
+		XLMenu_SetItemText(&m_pSettingsMenu->items[currentItem], L"Send ALists to Audio Plugin : Yes");
 	else
-		XLMenu_SetItemText(&m_pSettingsMenu->items[currentItem], L"Enable RSP Audio : No");
+		XLMenu_SetItemText(&m_pSettingsMenu->items[currentItem], L"Send ALists to Audio Plugin : No");
 
 		
 	ConfigAppSave2();	
@@ -1029,6 +1050,7 @@ void ToggleVideoPlugin(bool inc)
 void ToggleEmulator(bool inc)
 {	
 	bool bUpdateRsp = false;
+	bool bUpdateAudioPlugin = false;
 	
     WCHAR currentname[120];
 	currentItem = m_pSettingsMenu->curitem;
@@ -1038,6 +1060,9 @@ void ToggleEmulator(bool inc)
 		
 		if (!EmuDoesNoRsp(preferedemu) && iRspPlugin==_RSPPluginNone) //PJ64 needs RSP 
 			bUpdateRsp = true;
+		if((preferedemu != _1964x11) && (iAudioPlugin == _AudioPluginM64P)) // Only allow AudioM64P with 1964x11
+			bUpdateAudioPlugin = true;
+
 
 		if (preferedemu > (_None - 1)) preferedemu=0;
 	}
@@ -1047,6 +1072,8 @@ void ToggleEmulator(bool inc)
 		
 		if(!EmuDoesNoRsp(preferedemu) && iRspPlugin==_RSPPluginNone) //PJ64 needs RSP
 			bUpdateRsp = true;
+		if((preferedemu != _1964x11) && (iAudioPlugin == _AudioPluginM64P)) // Only allow AudioM64P with 1964x11
+			bUpdateAudioPlugin = true;
 			
 		if (preferedemu < 0) preferedemu=(_None - 1);
 	}
@@ -1063,6 +1090,13 @@ void ToggleEmulator(bool inc)
 		// rsp plugins
 		swprintf(currentname, L"RSP Plugin : %S", GetRspPluginName(iRspPlugin).c_str());
 		XLMenu_SetItemText(&m_pSettingsMenu->items[(currentItem + 3)], currentname); // too dependant on position but can't get it to update any other way - bandaid
+	}
+	// Only allow AudioM64P with 1964x11
+	if(bUpdateAudioPlugin){
+		iAudioPlugin=_AudioPluginJttl;
+		swprintf(currentname, L"Audio Plugin : %S", GetAudioPluginName(iAudioPlugin).c_str());
+		XLMenu_SetItemText(&m_pSettingsMenu->items[(currentItem + 2)], currentname); // too dependant on position but can't get it to update any other way - bandaid
+
 	}
 }
 

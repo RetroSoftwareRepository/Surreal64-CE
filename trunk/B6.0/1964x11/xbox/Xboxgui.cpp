@@ -166,7 +166,7 @@ void __cdecl main()
 	}
 	
 	loadinis(); // Ez0n3 - diff than fd - missing
-	sprintf(emuname,"1964x");
+	sprintf(emuname,"1964x 1.1");
 	
 	GetPathSaves(g_szPathSaves);
 

@@ -836,7 +836,7 @@ VOID __cdecl main()
 	//freakdave - check for 128mb
 	//PhysRam128();
 
-    sprintf(emuname,"Project64x");
+    sprintf(emuname,"Project64x 1.4");
 	
 	GetPathSaves(g_szPathSaves);
 

@@ -169,7 +169,7 @@
 				EnableFiberSafeOptimizations="TRUE"
 				OptimizeForProcessor="2"
 				AdditionalIncludeDirectories="..\Common\SDL\SDL\include;libsamplerate-0.1.7\src"
-				PreprocessorDefinitions="_XBOX;NDEBUG;_LIB"
+				PreprocessorDefinitions="_XBOX;NDEBUG;_LIB;"
 				IgnoreStandardIncludePath="FALSE"
 				StringPooling="TRUE"
 				ExceptionHandling="FALSE"
