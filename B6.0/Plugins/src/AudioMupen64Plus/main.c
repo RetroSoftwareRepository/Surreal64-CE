@@ -60,12 +60,12 @@
    Decreasing this value will reduce audio latency but requires a faster PC to avoid
    choppiness. Increasing this will increase audio latency but reduce the chance of
    drop-outs. The default value 10240 gives a 232ms maximum A/V delay at 44.1khz */
-#define PRIMARY_BUFFER_TARGET 10240
+#define PRIMARY_BUFFER_TARGET 8192
 
 /* Size of secondary buffer, in output samples. This is the requested size of SDL's
    hardware buffer, and the size of the mix buffer for doing SDL volume control. The
    SDL documentation states that this should be a power of two between 512 and 8192. */
-#define SECONDARY_BUFFER_SIZE 2048
+#define SECONDARY_BUFFER_SIZE 512
 
 /* This sets default frequency what is used if rom doesn't want to change it.
    Probably only game that needs this is Zelda: Ocarina Of Time Master Quest 
@@ -84,8 +84,8 @@
 /* local variables */
 static void (*l_DebugCallback)(void *, int, const char *) = NULL;
 static void *l_DebugCallContext = NULL;
-static int l_PluginInit = 0;
-static int l_PausedForSync = 1; /* Audio is started in paused state after SDL initialization */
+static int l_PluginInit = 1;
+static int l_PausedForSync = 0; /* Audio is started in paused state after SDL initialization */
 //static m64p_handle l_ConfigAudio;
 
 enum resampler_type {
@@ -129,7 +129,7 @@ static enum resampler_type Resample = RESAMPLER_TRIVIAL;
 static int ResampleQuality = 3;
 // volume to scale the audio by, range of 0..100
 // if muted, this holds the volume when not muted
-static int VolPercent = 80;
+static int VolPercent = 100;
 // how much percent to increment/decrement volume by
 static int VolDelta = 5;
 // the actual volume passed into SDL, range of 0..SDL_MIX_MAXVOLUME
@@ -518,13 +518,13 @@ static int resample(unsigned char *input, int input_avail, int oldsamplerate, un
         {
             if(_src) free(_src);
             _src_len = input_avail*2;
-            _src = malloc(_src_len);
+            _src = (float*)malloc(_src_len);
         }
         if (_dest_len < output_needed*2 && output_needed > 0)
         {
             if(_dest) free(_dest);
             _dest_len = output_needed*2;
-            _dest = malloc(_dest_len);
+            _dest = (float*)malloc(_dest_len);
         }
         memset(_src,0,_src_len);
         memset(_dest,0,_dest_len);
@@ -1017,3 +1017,8 @@ const char * _AUDIO_M64P_VolumeGetString(void)
     return VolumeString;
 }
 
+void _AUDIO_M64P_AudioBoost (BOOL Boost)
+{
+	//bAudioBoostJttL = Boost;
+	SDL_AudioBoost(Boost ? 1 : 0);
+}

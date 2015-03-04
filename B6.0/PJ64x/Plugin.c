@@ -210,7 +210,7 @@ extern void _AUDIO_MUSYX_AudioBoost			(BOOL Boost);
 #else
 
 // mupen 1.5 audio
-/*
+/* This plugin only cooperates with 1964x11, partially
 //extern void _AUDIO_M64P_CloseDLL			(void);
 extern void _AUDIO_M64P_RomClosed			(void);
 //extern void _AUDIO_M64P_DllConfig			( HWND hParent );
@@ -400,7 +400,7 @@ BOOL LoadAudioDll(void) {
 		_AUDIO_LINK_AudioBoost		 	= _AUDIO_MUSYX_AudioBoost;
 	}
 #else
-	/*
+	/* This plugin only cooperates with 1964x11, partially
 	if (g_iAudioPlugin == _AudioPluginM64P) // so it doesn't break for now
 	{
 		// Mupen 1.5 Audio plugin

@@ -232,7 +232,7 @@ BOOL LoadRSPPlugin(char * libname)
 	g_iRspPlugin = _RSPPluginHLE;
 	g_bUseRspAudio = FALSE;
 #elif defined(_RSP_M64P_HLE)
-	g_iRspPlugin = _RSPPluginM64p;
+	g_iRspPlugin = _RSPPluginM64P;
 #elif defined(_RSP_PJ64_LLE)
 	g_iRspPlugin = _RSPPluginLLE;
 #else
@@ -255,7 +255,7 @@ BOOL LoadRSPPlugin(char * libname)
 #endif //_RSP_HACK_HLE
 
 #if defined(_RSP_M64P_HLE)
-	case _RSPPluginM64p :
+	case _RSPPluginM64P :
 		RSPVersion							= 0x0101;
 		//_RSPCloseDLL						= _RSP_M64p_CloseDLL;
 		_DoRspCycles						= _RSP_M64p_DoRspCycles;

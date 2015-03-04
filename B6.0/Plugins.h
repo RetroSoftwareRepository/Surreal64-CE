@@ -40,7 +40,7 @@ enum AudioPlugins
 	_AudioPluginJttl,
 	_AudioPluginAzimer,
 	_AudioPluginMusyX,
-	//_AudioPluginM64P,
+	_AudioPluginM64P,
 	_AudioPluginMissing
 };
 

@@ -40,7 +40,7 @@ enum AudioPlugins
 	_AudioPluginJttl,
 	_AudioPluginAzimer,
 	_AudioPluginMusyX,
-	_AudioPluginDaedalus,
+	_AudioPluginM64P,
 	_AudioPluginMissing
 };
 
@@ -55,7 +55,7 @@ enum RSPPlugins
 	_RSPPluginNone,
 	_RSPPluginLLE,
 	_RSPPluginHLE,
-	_RSPPluginM64p,
+	_RSPPluginM64P,
 	_RSPPluginMissing
 };
 

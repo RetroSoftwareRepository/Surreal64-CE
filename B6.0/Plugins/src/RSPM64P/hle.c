@@ -171,7 +171,6 @@ static void rsp_break(struct hle_t* hle, unsigned int setbits)
 static void forward_gfx_task(struct hle_t* hle)
 {
     HleProcessDlistList(hle->user_defined);
-    *hle->dpc_status &= ~DP_STATUS_FREEZE;
 }
 
 static bool try_fast_audio_dispatching(struct hle_t* hle)
@@ -326,12 +325,11 @@ static void normal_task_dispatching(struct hle_t* hle)
 
 static void non_task_dispatching(struct hle_t* hle)
 {
-    const unsigned int sum = sum_bytes(hle->imem, 0x1000 >> 1);
+    const unsigned int sum = sum_bytes(hle->imem, 44);
 
-    switch (sum) {
-    /* CIC x105 ucode (used during boot of CIC x105 games) */
-    case 0x9e2: /* CIC 6105 */
-    case 0x9f2: /* CIC 7105 */
+    if (sum == 0x9e2)
+    {
+        /* CIC x105 ucode (used during boot of CIC x105 games) */
         cicx105_ucode(hle);
         return;
     }

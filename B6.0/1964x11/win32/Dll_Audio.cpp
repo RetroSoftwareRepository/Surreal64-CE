@@ -84,7 +84,7 @@ BOOL LoadAudioPlugin(char *libname)
 #elif defined(_AUDIO_JTTL)
 	g_iAudioPlugin = _AudioPluginJttl;
 #elif defined(_AUDIO_M64P)
-	g_iAudioPlugin = _AudioPluginM64p;
+	g_iAudioPlugin = _AudioPluginM64P;
 #elif defined(_AUDIO_MUSYX)
 	g_iAudioPlugin = _AudioPluginMusyX;
 #elif defined(_AUDIO_NONE)
@@ -175,18 +175,18 @@ BOOL LoadAudioPlugin(char *libname)
 #endif //_AUDIO_JTTL
 
 #if defined(_AUDIO_M64P)
-	case _AudioPluginM64p :
+	case _AudioPluginM64P :
 		_AUDIO_RomClosed		 			= _AUDIO_M64P_RomClosed;
-		_AUDIO_DllClose		 				= _AUDIO_M64P_CloseDLL;
+		//_AUDIO_DllClose		 				= _AUDIO_M64P_CloseDLL;
 		//_AUDIO_DllConfig		 			= _AUDIO_M64P_DllConfig;
-		_AUDIO_About		 				= _AUDIO_M64P_DllAbout;
+		//_AUDIO_About		 				= _AUDIO_M64P_DllAbout;
 		//_AUDIO_Test			 			= _AUDIO_M64P_DllTest;
-		_AUDIO_GetDllInfo		 			= _AUDIO_M64P_GetDllInfo;
+		//_AUDIO_GetDllInfo		 			= _AUDIO_M64P_GetDllInfo;
 		_AUDIO_Initialize	 				= _AUDIO_M64P_InitiateAudio;
 		_AUDIO_AiDacrateChanged 			= _AUDIO_M64P_AiDacrateChanged;
 		_AUDIO_AiLenChanged	 				= _AUDIO_M64P_AiLenChanged;
-		_AUDIO_AiReadLength	 				= _AUDIO_M64P_AiReadLength;
-		_AUDIO_AiUpdate		 				= _AUDIO_M64P_AiUpdate;
+		//_AUDIO_AiReadLength	 				= _AUDIO_M64P_AiReadLength;
+		//_AUDIO_AiUpdate		 				= _AUDIO_M64P_AiUpdate;
 		_AUDIO_ProcessAList	 				= _AUDIO_M64P_ProcessAList;
 		//_AUDIO_ProcessAList_Count_Cycles	= _AUDIO_M64P_ProcessAListCountCycles;
 		//_AUDIO_IsMusyX					= _AUDIO_M64P_IsMusyX;

@@ -40,7 +40,7 @@ BOOL	CoreDoingAIUpdate = TRUE;
 #if defined(USE_MUSYX)
 int g_iAudioPlugin = _AudioPluginMusyX; // set default to musyx
 #elif defined(USE_M64PAUDIO)
-int g_iAudioPlugin = _AudioPluginM64p; // set default to m64p
+int g_iAudioPlugin = _AudioPluginM64P; // set default to m64p
 #else
 int g_iAudioPlugin = _AudioPluginJttl; // set default to jttl
 #endif
@@ -95,19 +95,20 @@ BOOL LoadAudioPlugin()
 		
 		_AUDIO_LINK_AudioBoost		 	= _AUDIO_MUSYX_AudioBoost;
 	}
-#elif defined(USE_M64PAUDIO)
-	//if (g_iAudioPlugin == _AudioPluginM64p) // so it doesn't break for now
+#else
+/* This plugin only cooperates with 1964x11, partially.
+	if (g_iAudioPlugin == _AudioPluginM64P) // so it doesn't break for now
 	{
 		// Mupen 1.5 Audio plugin
 		_AUDIO_LINK_AiDacrateChanged 	= _AUDIO_M64P_AiDacrateChanged;
 		_AUDIO_LINK_AiLenChanged	 	= _AUDIO_M64P_AiLenChanged;
-		_AUDIO_LINK_AiReadLength	 	= _AUDIO_M64P_AiReadLength;
-		_AUDIO_LINK_AiUpdate		 	= _AUDIO_M64P_AiUpdate;
-		_AUDIO_LINK_CloseDLL		 	= _AUDIO_M64P_CloseDLL;
-		_AUDIO_LINK_DllAbout		 	= _AUDIO_M64P_DllAbout;
-		_AUDIO_LINK_DllConfig		 	= _AUDIO_M64P_DllConfig;
-		_AUDIO_LINK_DllTest			 	= _AUDIO_M64P_DllTest;
-		_AUDIO_LINK_GetDllInfo		 	= _AUDIO_M64P_GetDllInfo;
+		//_AUDIO_LINK_AiReadLength	 	= _AUDIO_M64P_AiReadLength;
+		//_AUDIO_LINK_AiUpdate		 	= _AUDIO_M64P_AiUpdate;
+		//_AUDIO_LINK_CloseDLL		 	= _AUDIO_M64P_CloseDLL;
+		//_AUDIO_LINK_DllAbout		 	= _AUDIO_M64P_DllAbout;
+		//_AUDIO_LINK_DllConfig		 	= _AUDIO_M64P_DllConfig;
+		//_AUDIO_LINK_DllTest			 	= _AUDIO_M64P_DllTest;
+		//_AUDIO_LINK_GetDllInfo		 	= _AUDIO_M64P_GetDllInfo;
 		_AUDIO_LINK_InitiateAudio	 	= _AUDIO_M64P_InitiateAudio;
 		_AUDIO_LINK_ProcessAList	 	= _AUDIO_M64P_ProcessAList;
 		_AUDIO_LINK_RomClosed		 	= _AUDIO_M64P_RomClosed;
@@ -115,7 +116,7 @@ BOOL LoadAudioPlugin()
 		
 		_AUDIO_LINK_AudioBoost		 	= _AUDIO_M64P_AudioBoost;
 	}
-#else
+*/
 
 	if (g_iAudioPlugin == _AudioPluginNone)
 	{

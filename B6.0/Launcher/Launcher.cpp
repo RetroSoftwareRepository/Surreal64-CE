@@ -29,7 +29,7 @@
 #include "musicmanager.h"
 #include "Panel.h"
 
-#define VERSION L"Surreal64 CE (B6.0)"
+#define VERSION L"Surreal64 CE (B6.1)"
 
 
 //weinerschnitzel Skin Control

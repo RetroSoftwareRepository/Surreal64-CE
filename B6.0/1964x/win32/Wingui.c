@@ -197,7 +197,7 @@ void __cdecl main()
 	}
 
 	loadinis();
-	sprintf(emuname,"1964x");
+	sprintf(emuname,"1964x 0.85");
 	
 	GetPathSaves(g_szPathSaves);
 
