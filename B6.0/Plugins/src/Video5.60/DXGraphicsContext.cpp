@@ -172,10 +172,8 @@ __forceinline void CDXGraphicsContext::UpdateFrame(bool swaponly)
 		}
 	}*/
 
-#ifndef OLDTXTCACHE
-	if (!g_bUseSetTextureMem)
+	//if (!g_bUseSetTextureMem)
 		gTextureManager.FreeTextures();
-#endif
 
 	XboxDrawOSD();
 /*

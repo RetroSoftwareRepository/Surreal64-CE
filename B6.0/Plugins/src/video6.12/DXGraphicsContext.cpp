@@ -267,10 +267,10 @@ __forceinline void CDXGraphicsContext::UpdateFrame(bool swaponly)
 		CRender::g_pRender->EndRendering();
 	}
 	
-#ifndef OLDTXTCACHE
-	if (!g_bUseSetTextureMem)
+//#ifndef OLDTXTCACHE
+	//if (!g_bUseSetTextureMem)
 		gTextureManager.FreeTextures();
-#endif
+//#endif
 
 	
 

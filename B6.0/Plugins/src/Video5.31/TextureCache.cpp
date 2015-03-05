@@ -29,9 +29,9 @@ CTextureCache gTextureCache;
 extern RecentCIInfo* g_uRecentCIInfoPtrs[];
 BOOL g_bTHMakeTexturesBlue = FALSE;
 BOOL g_bTHDumpTextures = FALSE;
-#ifndef OLDTXTCACHE
+
 static const DWORD MEM_KEEP_FREE = (2*1024*1024); // keep 2MB free
-#endif
+
 
 // Ez0n3 - lets revert until freakdave finishes this ( "Default Max Video Mem" would change "g_maxTextureMemUsage", but it's static instead - unsure why)
 // Games seem to be smoother with the old way
@@ -132,7 +132,7 @@ CTextureCache::~CTextureCache()
 		}
 	}
 #endif
-
+	m_currentTextureMemUsage	= 0;
 	delete []m_pTextureHash;
 	m_pTextureHash = NULL;	
 
@@ -174,7 +174,7 @@ HRESULT CTextureCache::InvalidateDeviceObjects()
 		}
 	}
 #endif
-
+	m_currentTextureMemUsage = 0;
 	return S_OK;
 }
 
@@ -187,8 +187,16 @@ void CTextureCache::PurgeOldTextures()
 	
 	// PurgeOldTextures breaks OOT and possibly others
 	// Quake 2 needs it otherwise it leaks pretty bad. 
-	if(options.enableHackForGames != HACK_FOR_QUAKE_2)
+	if(!g_bUseSetTextureMem)
+	{
+		gTextureManager.CleanUp();
+		m_currentTextureMemUsage = 0;
 		return;
+	}
+	else if(options.enableHackForGames != HACK_FOR_QUAKE_2)
+	{
+		return;
+	}
 
 	static const u32 dwFramesToKill = 5*30;			// 5 secs at 30 fps
 	static const u32 dwFramesToDelete = 30*30;		// 30 secs at 30 fps
@@ -274,89 +282,23 @@ void CTextureCache::DropTextures()
 			dwTotalUses += pTVictim->dwUses;
 			dwCount++;
 			
-#ifdef OLDTXTCACHE
-			if (g_bUseSetTextureMem)
-			{
-				m_currentTextureMemUsage -= (pTVictim->pTexture->m_dwWidth * pTVictim->pTexture->m_dwHeight * 2);
-				SAFE_DELETE(pTVictim);
-			}
-			else
-			{
-				RecycleTexture(pTVictim);
-			}
-#else
-				delete pTVictim;
-#endif
+			m_currentTextureMemUsage -= (pTVictim->pTexture->m_dwWidth * pTVictim->pTexture->m_dwHeight * 2);
+				
+			delete pTVictim;
 		}
 	}
-	//m_currentTextureMemUsage = 0;
 }
 
 
 // Add to the recycle list
 void CTextureCache::AddToRecycleList(TextureEntry *pEntry)
 {
-#ifdef OLDTXTCACHE
-	if (g_bUseSetTextureMem)
-		return;
-
-	if( CDeviceBuilder::GetGeneralDeviceType() == OGL_DEVICE )
-	{
-		// Fix me, why I can not reuse the texture in OpenGL,
-		// how can I unload texture from video card memory for OpenGL
-		delete pEntry;
-		return;
-	}
-
-	if (pEntry->pTexture == NULL)
-	{
-		// No point in saving!
-		delete pEntry;
-	}
-	else
-	{
-		// Add to the list
-		pEntry->pNext = m_pFirstUsedSurface;
-		SAFE_DELETE(pEntry->pMirroredTexture);
-		m_pFirstUsedSurface = pEntry;
-	}
-#else
 	return;
-#endif
 }
 
 // Search for a texture of the specified dimensions to recycle
 TextureEntry * CTextureCache::ReviveUsedTexture( u32 width, u32 height )
 {
-#ifdef OLDTXTCACHE
-	if (g_bUseSetTextureMem)
-		return NULL;
-
-	TextureEntry * pPrev;
-	TextureEntry * pCurr;
-	
-	pPrev = NULL;
-	pCurr = m_pFirstUsedSurface;
-	
-	while (pCurr)
-	{
-		if (pCurr->ti.WidthToCreate == width &&
-			pCurr->ti.HeightToCreate == height)
-		{
-			// Remove from list
-			if (pPrev != NULL) pPrev->pNext        = pCurr->pNext;
-			else			   m_pFirstUsedSurface = pCurr->pNext;
-			
-			////DBGConsole_Msg(0, "Reviving used texture (%d x %d)", dwWidth, dwHeight);
-			// Initialize any fields:
-			return pCurr;
-		}
-		
-		pPrev = pCurr;
-		pCurr = pCurr->pNext;
-	}
-#endif
-	
 	return NULL;
 }
 
@@ -370,11 +312,6 @@ u32 CTextureCache::Hash(u32 dwValue)
 
 void CTextureCache::MakeTextureYoungest(TextureEntry *pEntry)
 {
-#ifdef OLDTXTCACHE
-	if (!g_bUseSetTextureMem)
-		return;
-#endif
-
 	if (pEntry == m_pYoungestTexture)
 		return;
 
@@ -486,31 +423,21 @@ void CTextureCache::RemoveTextureEntry(TextureEntry * pEntry)
 
 			
 			// Ez0n3 - we'll use the old way until freakdave finishes this
-#ifdef OLDTXTCACHE
-			if (g_bUseSetTextureMem)
+			// remove the texture from the age list
+			if (pEntry->pNextYoungest != NULL)
 			{
-#endif
-				// remove the texture from the age list
-				if (pEntry->pNextYoungest != NULL)
-				{
-					pEntry->pNextYoungest->pLastYoungest = pEntry->pLastYoungest;
-				}
-				if (pEntry->pLastYoungest != NULL)
-				{
-					pEntry->pLastYoungest->pNextYoungest = pEntry->pNextYoungest;
-				}
+				pEntry->pNextYoungest->pLastYoungest = pEntry->pLastYoungest;
+			}
+			if (pEntry->pLastYoungest != NULL)
+			{
+				pEntry->pLastYoungest->pNextYoungest = pEntry->pNextYoungest;
+			}
 
-				// decrease the mem usage counter
-				m_currentTextureMemUsage -= (pEntry->pTexture->m_dwWidth * pEntry->pTexture->m_dwHeight * 2);
-			
-				delete pEntry;
-#ifdef OLDTXTCACHE
-			}
-			else
-			{
-				AddToRecycleList(pEntry);
-			}
-#endif
+			// decrease the mem usage counter
+			m_currentTextureMemUsage -= (pEntry->pTexture->m_dwWidth * pEntry->pTexture->m_dwHeight * 2);
+		
+			delete pEntry;
+
 			break;
 		}
 
@@ -524,37 +451,20 @@ void CTextureCache::RemoveTextureEntry(TextureEntry * pEntry)
 	}
 }
 
-#ifndef OLDTXTCACHE
-bool bFreeingTextures = false;
 void CTextureCache::FreeTextures()
 {
-	if(bFreeingTextures)
-		return;
-		
 	MEMORYSTATUS ms;
 	GlobalMemoryStatus(&ms);
 
-	// keep freeing textures till enough memory is free
-	while (ms.dwAvailPhys < MEM_KEEP_FREE && m_pOldestTexture != NULL)
+	// Clear all textures if memory is low
+	if (ms.dwAvailPhys < MEM_KEEP_FREE)
 	{
-		if (!bFreeingTextures) bFreeingTextures = true;
-	
+		gTextureCache.PurgeOldTextures();
 		gTextureCache.DropTextures();
-
-		//TextureEntry *nextYoungest = m_pOldestTexture->pNextYoungest;
-
-		//RemoveTextureEntry(m_pOldestTexture);
-
-		//m_pOldestTexture = nextYoungest;
-		
-		//OutputDebugString("Freeing Texture\n");
-
-		GlobalMemoryStatus(&ms);
+		m_currentTextureMemUsage = 0;
 	}
-	
-	bFreeingTextures = false;
 }
-#endif
+
 
 TextureEntry * CTextureCache::CreateEntry(DWORD dwAddress, DWORD dwWidth, DWORD dwHeight)
 {
@@ -565,8 +475,10 @@ TextureEntry * CTextureCache::CreateEntry(DWORD dwAddress, DWORD dwWidth, DWORD 
 
 	DWORD freeUpSize = (widthToCreate * heightToCreate * 2);
 
+	FreeTextures();
+
 	// make sure there is enough room for the new texture by deleting old textures
-	if((m_currentTextureMemUsage + freeUpSize) > g_maxTextureMemUsage)
+	if((g_bUseSetTextureMem) && ((m_currentTextureMemUsage + freeUpSize) > g_maxTextureMemUsage))
 	{
 		while ((m_currentTextureMemUsage + freeUpSize) > g_maxTextureMemUsage && m_pOldestTexture != NULL)
 		{
@@ -581,14 +493,14 @@ TextureEntry * CTextureCache::CreateEntry(DWORD dwAddress, DWORD dwWidth, DWORD 
 
 		//m_currentTextureMemUsage += dwWidth * dwHeight * 4;
 	}
+	else if((!g_bUseSetTextureMem) && ((m_currentTextureMemUsage + freeUpSize) > g_maxTextureMemUsage) && (options.enableHackForGames != HACK_FOR_QUAKE_2))
+	{
+		gTextureCache.DropTextures();
+		m_currentTextureMemUsage = 0;
+	}
 	else
 	{
-#ifdef OLDTXTCACHE
-		// Find a used texture
 		pEntry = ReviveUsedTexture(dwWidth, dwHeight);
-#else
-		FreeTextures();
-#endif
 	}
 	m_currentTextureMemUsage += (dwWidth * dwHeight * 2);
 	

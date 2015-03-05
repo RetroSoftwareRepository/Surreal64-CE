@@ -173,10 +173,8 @@ __forceinline void CDirectXGraphicsContext::UpdateFrame(bool swaponly)
 
 	CGraphicsContext::UpdateFrameBufferBeforeUpdateFrame();
 	
-#ifndef OLDTXTCACHE
-	if (!g_bUseSetTextureMem)
+	//if (!g_bUseSetTextureMem)
 		gTextureCache.FreeTextures();
-#endif
 
 	XboxDrawOSD();
 

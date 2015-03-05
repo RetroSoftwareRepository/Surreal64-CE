@@ -1,12 +1,20 @@
 #include "stdafx_video.h"
 #include "..\..\..\..\config.h"
+#define XFONT_TRUETYPE
+#define XFONT_LEFT                      0
+#define XFONT_RIGHT                     2
+#define XFONT_CENTER                    6
 
+#define XFONT_TOP                       0
+#define XFONT_BOTTOM                    8
+#define XFONT_BASELINE                  24
 #include <xbfont.h>
 #include <xfont.h>
 
-#define XFONT_TRUETYPE
+
 #define DEBUGLINES 10
-#define DEBUGSPACING 20
+#define DEBUGSIZE 20
+#define DEBUGHDSIZE 30
 
 
 extern BOOL g_bTempMessage;
@@ -86,6 +94,7 @@ void XboxDrawOSD()
 		}
 
 		sprintf(emuinfo,"%s",emuname);
+		/*
 		if (strlen(emuvidname)) {
 			char tmp[128];
 			sprintf(tmp," %s",emuvidname); // prepend a space
@@ -95,7 +104,7 @@ void XboxDrawOSD()
 			char tmp[128];
 			sprintf(tmp," %s",emuresname); // prepend a space
 			strcat(emuinfo,tmp);
-		}
+		}*/
 	}
 
 	XboxDrawLowMemWarning();
@@ -148,18 +157,26 @@ __forceinline void XboxDrawLowMemWarning()
 			g_pd3dDevice->SetBackBufferScale( 0.5f, 1.0f );
 		}
 
+		DWORD dwFontCacheSize = 16 * 1024;
 		// Draw Temp Message
 		if (g_defaultTrueTypeFont == NULL)
 		{
-			XFONT_OpenDefaultFont(&g_defaultTrueTypeFont);
+			
+			//XFONT_OpenDefaultFont(&g_defaultTrueTypeFont);
+			XFONT_OpenTrueTypeFont( L"D:\\media\\font.ttf", dwFontCacheSize, &g_defaultTrueTypeFont );
+			XFONT_SetTextAntialiasLevel( g_defaultTrueTypeFont, 0);
+			g_defaultTrueTypeFont->SetTextColor(D3DCOLOR_ARGB(255,255,165,0)), 
 			g_defaultTrueTypeFont->SetBkMode(XFONT_OPAQUE);
-			g_defaultTrueTypeFont->SetBkColor(D3DCOLOR_XRGB(0,0,0));
+			g_defaultTrueTypeFont->SetBkColor(D3DCOLOR_ARGB(100,0,0,0));
 		}
 
 		D3DSurface *pBackBuffer, *pFrontBuffer;
 
 		g_pd3dDevice->GetBackBuffer(-1, D3DBACKBUFFER_TYPE_MONO, &pFrontBuffer);
 		g_pd3dDevice->GetBackBuffer(0, D3DBACKBUFFER_TYPE_MONO, &pBackBuffer);
+
+		// Align Top Left
+		XFONT_SetTextAlignment(g_defaultTrueTypeFont, XFONT_TOP | XFONT_LEFT);
 
 		g_defaultTrueTypeFont->TextOut(pFrontBuffer, szMemWarning, (unsigned)-1, 30, (iWindowHeight - 50));
 		g_defaultTrueTypeFont->TextOut(pBackBuffer, szMemWarning, (unsigned)-1, 30, (iWindowHeight - 50));
@@ -208,78 +225,44 @@ __forceinline void XboxDrawDebugInfo()
 	WCHAR debugemu[256];
 	swprintf(debugemu,L"%S",emuinfo);
 
+	WCHAR debugvideo[256];
+	switch (videoplugin)
+	{
+		case _VideoPluginRice510: swprintf(debugvideo,L"Rice Daedalus 5.10"); break;
+		case _VideoPluginRice531: swprintf(debugvideo,L"Rice Daedalus 5.31"); break;
+		case _VideoPluginRice560: swprintf(debugvideo,L"Rice Video 5.60"); break;
+		case _VideoPluginRice611: swprintf(debugvideo,L"Rice Video 6.11"); break;
+		case _VideoPluginRice612: swprintf(debugvideo,L"Rice Video 6.12"); break;
+	}
 	//check audio plugins
 	WCHAR debugaudio[256];
 	switch (iAudioPlugin)
 	{
-		case _AudioPluginNone:		swprintf(debugaudio,L"Audio Plugin: None");		break;
-		case _AudioPluginLleRsp:	swprintf(debugaudio,L"Audio Plugin: LLE RSP");	break;
-		case _AudioPluginBasic:		swprintf(debugaudio,L"Audio Plugin: Basic");	break;
-		case _AudioPluginJttl:		swprintf(debugaudio,L"Audio Plugin: JttL");		break;
-		case _AudioPluginAzimer:	swprintf(debugaudio,L"Audio Plugin: Azimer");	break;
-		case _AudioPluginMusyX:		swprintf(debugaudio,L"Audio Plugin: MusyX");	break;
-		case _AudioPluginM64P:		swprintf(debugaudio,L"Audio Plugin: Mupen64 RSP");	break;
+		case _AudioPluginNone:		swprintf(debugaudio,L"NUll Audio Plugin");		break;
+		case _AudioPluginLleRsp:	swprintf(debugaudio,L"Using LLE RSP Audio");	break;
+		case _AudioPluginBasic:		swprintf(debugaudio,L"Basic Audio");	break;
+		case _AudioPluginJttl:		swprintf(debugaudio,L"JttL Audio 1.2");		break;
+		case _AudioPluginAzimer:	swprintf(debugaudio,L"Azimer Audio 0.55");	break;
+		case _AudioPluginMusyX:		swprintf(debugaudio,L"1964Audio 2.6");	break;
+		case _AudioPluginM64P:		swprintf(debugaudio,L"Using HLE RSP Audio");	break;
 	}
 
 	//check RSP plugins
 	WCHAR debugrsp[256];
 	switch (iRspPlugin)
 	{
-		case _RSPPluginNone:	swprintf(debugrsp,L"RSP Plugin: None");		break;
-		case _RSPPluginLLE:		swprintf(debugrsp,L"RSP Plugin: LLE");		break;
-		case _RSPPluginHLE:		swprintf(debugrsp,L"RSP Plugin: HLE");		break;
-		case _RSPPluginM64P:	swprintf(debugrsp,L"RSP Plugin: Mupen64");	break;
+		case _RSPPluginNone:	swprintf(debugrsp,L"No RSP Plugin");		break;
+		case _RSPPluginLLE:		swprintf(debugrsp,L"LLE RSP Recompiler");		break;
+		case _RSPPluginHLE:		swprintf(debugrsp,L"HLE RSP Lite");		break;
+		case _RSPPluginM64P:	swprintf(debugrsp,L"Mupen64Plus-RSP-HLE");	break;
 	}
 
-	//check Default Paks
-	WCHAR debugpak[256];
-	switch (DefaultPak)
-	{
-		case 1:		swprintf(debugpak,L"Current Pak: None");		break;
-		case 2:		swprintf(debugpak,L"Current Pak: Memory Pak");	break;
-		case 3:		swprintf(debugpak,L"Current Pak: Rumble Pak");	break;
-	}
-
-	//Check VSYNC
-	WCHAR debugvsync[256];
-	switch (VSync)
-	{
-		case 0:		swprintf(debugvsync,L"VSync: No");		break; //L"VSYNC: INTERVAL_IMMEDIATE");
-		case 1:		swprintf(debugvsync,L"VSync: Yes");		break; //L"VSYNC: INTERVAL_ONE");
-		case 2:		swprintf(debugvsync,L"VSync: Auto");	break; //L"VSYNC: INTERVAL_ONE_OR_IMMEDIATE");
-	}
-
-	//Check FrameSkip
-	WCHAR debugframeskip[256];
-	if(FrameSkip){
-		swprintf(debugframeskip,L"Skip Frames: Yes");
-	}else{
-		swprintf(debugframeskip,L"Skip Frames: No");
-	}
-
-	WCHAR debugpaging[256];
-	switch (iPagingMethod)
-	{
-		case _PagingXXX: 	swprintf(debugpaging,L"Page: XXX"); break;
-		case _PagingS10: 	swprintf(debugpaging,L"Page: 1.0"); break;
-	}
 	
-	WCHAR debugaa[256];
-	switch (AntiAliasMode)
-	{
-		case 0:		swprintf(debugaa,L"AntiAliasing: None");		break;
-		case 1:		swprintf(debugaa,L"AntiAliasing: Edge");		break;
-		case 2:		swprintf(debugaa,L"AntiAliasing: 2x Linear");	break;
-		case 3:		swprintf(debugaa,L"AntiAliasing: 2x Quincunx");	break;
-		case 4:		swprintf(debugaa,L"AntiAliasing: 4x Linear");	break;
-		case 5:		swprintf(debugaa,L"AntiAliasing: 4x Gaussian");	break;
-	}
 	
 	if (bIsUltra) {
-		swprintf(debugaudio,		L"Audio Plugin: NA");
-		swprintf(debugrsp,			L"RSP Plugin: NA");
-		swprintf(debugframeskip,	L"Skip Frames: NA");
-		swprintf(debugpaging,		L"Page: NA");
+		swprintf(debugvideo,		L"");
+		swprintf(debugaudio,		L"");
+		swprintf(debugrsp,			L"");
 	}
 
 	// Flick AA off before drawing Debug Info
@@ -294,10 +277,17 @@ __forceinline void XboxDrawDebugInfo()
 		g_pd3dDevice->SetBackBufferScale( 0.5f, 1.0f );
 	}
 	
+	DWORD dwFontCacheSize = 16 * 1024;
 	if (g_defaultTrueTypeFont == NULL)
 	{
-		XFONT_OpenDefaultFont(&g_defaultTrueTypeFont);
-		g_defaultTrueTypeFont->SetBkMode(XFONT_TRANSPARENT);
+		//XFONT_OpenDefaultFont(&g_defaultTrueTypeFont);
+		XFONT_OpenTrueTypeFont( L"D:\\media\\font.ttf", dwFontCacheSize, &g_defaultTrueTypeFont );
+		if(bEnableHDTV)
+			XFONT_SetTextAntialiasLevel( g_defaultTrueTypeFont, 2);
+		else
+			XFONT_SetTextAntialiasLevel( g_defaultTrueTypeFont, 0);
+		g_defaultTrueTypeFont->SetTextColor(D3DCOLOR_ARGB(255,255,165,0)),
+		g_defaultTrueTypeFont->SetBkMode(XFONT_OPAQUE);
 		g_defaultTrueTypeFont->SetBkColor(D3DCOLOR_ARGB(100,0,0,0));
 	}
 
@@ -306,10 +296,37 @@ __forceinline void XboxDrawDebugInfo()
 	g_pd3dDevice->GetBackBuffer(-1, D3DBACKBUFFER_TYPE_MONO, &pFrontBuffer);
 	g_pd3dDevice->GetBackBuffer(0, D3DBACKBUFFER_TYPE_MONO, &pBackBuffer);
 
-	g_defaultTrueTypeFont->SetTextHeight(14);
+	if(bEnableHDTV)
+	g_defaultTrueTypeFont->SetTextHeight(DEBUGHDSIZE);
+	else
+	g_defaultTrueTypeFont->SetTextHeight(DEBUGSIZE);
 	g_defaultTrueTypeFont->SetTextAntialiasLevel(g_defaultTrueTypeFont->GetTextAntialiasLevel());
 
-	for(int NumDebugLines = 1; NumDebugLines <= DEBUGLINES; NumDebugLines++){
+	// Align Top Left
+	XFONT_SetTextAlignment(g_defaultTrueTypeFont, XFONT_TOP | XFONT_LEFT);
+	for(int NumDebugLines = 1; NumDebugLines <= 4; NumDebugLines++){
+
+		WCHAR buf[200];
+		
+		switch(NumDebugLines)
+		{
+			case 1	: swprintf(buf, debugemu);			break;
+			case 2	: swprintf(buf, debugvideo);			break;
+			case 3	: swprintf(buf, debugaudio);		break;
+			case 4	: swprintf(buf, debugrsp);			break;
+		}
+
+		if(bEnableHDTV){
+		g_defaultTrueTypeFont->TextOut(pFrontBuffer, buf, (unsigned)-1, 30, ((DEBUGHDSIZE * NumDebugLines) + 15 ) );
+		g_defaultTrueTypeFont->TextOut(pBackBuffer,	 buf, (unsigned)-1, 30, ((DEBUGHDSIZE * NumDebugLines) + 15 ) );
+		}else{
+		g_defaultTrueTypeFont->TextOut(pFrontBuffer, buf, (unsigned)-1, 30, ((DEBUGSIZE * NumDebugLines) + 15 ) );
+		g_defaultTrueTypeFont->TextOut(pBackBuffer,	 buf, (unsigned)-1, 30, ((DEBUGSIZE * NumDebugLines) + 15 ) );
+		}	
+	}
+
+	XFONT_SetTextAlignment(g_defaultTrueTypeFont, XFONT_TOP | XFONT_RIGHT);
+	for(int NumDebugLines = 1; NumDebugLines <= 2; NumDebugLines++){
 
 		WCHAR buf[200];
 		
@@ -317,19 +334,14 @@ __forceinline void XboxDrawDebugInfo()
 		{
 			case 1	: swprintf(buf, szMemStatus);		break;
 			case 2	: swprintf(buf,	str);				break;
-			case 3	: swprintf(buf, debugemu);			break;
-			case 4	: swprintf(buf, debugaudio);		break;
-			case 5	: swprintf(buf, debugrsp);			break;
-			case 6	: swprintf(buf, debugpak);			break;
-			case 7	: swprintf(buf, debugvsync);			break;
-			case 8	: swprintf(buf, debugframeskip);		break;
-			case 9	: swprintf(buf, debugpaging);		break;
-			case 10	: swprintf(buf, debugaa);			break;
 		}
-
-		g_defaultTrueTypeFont->TextOut(pFrontBuffer, buf, (unsigned)-1, 30, ((DEBUGSPACING * NumDebugLines) + 15 ) );
-		g_defaultTrueTypeFont->TextOut(pBackBuffer,	 buf, (unsigned)-1, 30, ((DEBUGSPACING * NumDebugLines) + 15 ) );
-
+		if(bEnableHDTV){
+		g_defaultTrueTypeFont->TextOut(pFrontBuffer, buf, (unsigned)-1, 1250, ((DEBUGHDSIZE * NumDebugLines) + 15 ) );
+		g_defaultTrueTypeFont->TextOut(pBackBuffer,	 buf, (unsigned)-1, 1250, ((DEBUGHDSIZE * NumDebugLines) + 15 ) );
+		}else{
+		g_defaultTrueTypeFont->TextOut(pFrontBuffer, buf, (unsigned)-1, 610, ((DEBUGSIZE * NumDebugLines) + 15 ) );
+		g_defaultTrueTypeFont->TextOut(pBackBuffer,	 buf, (unsigned)-1, 610, ((DEBUGSIZE * NumDebugLines) + 15 ) );
+		}
 	}
 
 	pFrontBuffer->Release();
@@ -350,12 +362,16 @@ __forceinline void XboxDrawTemporaryMessage()
 		g_pd3dDevice->SetRenderState( D3DRS_MULTISAMPLEMODE, D3DMULTISAMPLEMODE_1X );
 		g_pd3dDevice->SetBackBufferScale( 0.5f, 1.0f );
 	}
-
+	
+	DWORD dwFontCacheSize = 16 * 1024;
 	if (g_defaultTrueTypeFont == NULL)
 	{
-		XFONT_OpenDefaultFont(&g_defaultTrueTypeFont);
+		//XFONT_OpenDefaultFont(&g_defaultTrueTypeFont);
+		XFONT_OpenTrueTypeFont( L"D:\\media\\font.ttf", dwFontCacheSize, &g_defaultTrueTypeFont );
+		XFONT_SetTextAntialiasLevel( g_defaultTrueTypeFont, 0);
+		g_defaultTrueTypeFont->SetTextColor(D3DCOLOR_ARGB(255,255,165,0)),
 		g_defaultTrueTypeFont->SetBkMode(XFONT_OPAQUE);
-		g_defaultTrueTypeFont->SetBkColor(D3DCOLOR_XRGB(0,0,0));
+		g_defaultTrueTypeFont->SetBkColor(D3DCOLOR_ARGB(100,0,0,0));
 	}
 
 	if (GetTickCount() > g_dwTempMessageStart + 3000)
@@ -374,6 +390,9 @@ __forceinline void XboxDrawTemporaryMessage()
 	g_pd3dDevice->GetBackBuffer(0, D3DBACKBUFFER_TYPE_MONO, &pBackBuffer);
 
 	mbstowcs(buf, g_szTempMessage, strlen(g_szTempMessage));
+
+	// Align Top Left
+	XFONT_SetTextAlignment(g_defaultTrueTypeFont, XFONT_TOP | XFONT_LEFT);
 
 	g_defaultTrueTypeFont->TextOut(pFrontBuffer, buf, (unsigned)-1, 30, (iWindowHeight - 50));
 	g_defaultTrueTypeFont->TextOut(pBackBuffer, buf, (unsigned)-1, 30, (iWindowHeight - 50));

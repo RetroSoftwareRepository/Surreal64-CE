@@ -228,9 +228,7 @@ public:
 
 	HRESULT InvalidateDeviceObjects();
 	
-#ifndef OLDTXTCACHE
 	void FreeTextures();
-#endif
 	
 #ifdef DEBUGGING_ENABLED
 	TextureEntry * GetCachedTexture(u32 tex);
