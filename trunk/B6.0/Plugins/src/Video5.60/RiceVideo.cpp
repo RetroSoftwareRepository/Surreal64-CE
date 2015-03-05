@@ -1038,6 +1038,7 @@ void _VIDEO_RICE_560_SetMaxTextureMem(DWORD mem) // supposed to be double unders
 	if (mem == 0) // auto mem
 	{
 		g_bUseSetTextureMem = false;
+		g_maxTextureMemUsage = 2 * 1024 * 1024;
 	}
 	else // set mem
 	{
