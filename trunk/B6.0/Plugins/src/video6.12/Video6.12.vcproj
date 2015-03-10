@@ -294,6 +294,9 @@
 				RelativePath=".\GraphicsContext.cpp">
 			</File>
 			<File
+				RelativePath=".\Microcode.cpp">
+			</File>
+			<File
 				RelativePath=".\Render.cpp">
 			</File>
 			<File
@@ -423,6 +426,9 @@
 			</File>
 			<File
 				RelativePath=".\interp.h">
+			</File>
+			<File
+				RelativePath=".\Microcode.h">
 			</File>
 			<File
 				RelativePath=".\RDP_Texture.h">

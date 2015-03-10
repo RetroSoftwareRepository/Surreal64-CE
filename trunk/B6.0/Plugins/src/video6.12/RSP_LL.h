@@ -27,7 +27,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //*****************************************************************************
 //
 //*****************************************************************************
-void DLParser_RSP_Last_Legion_0x80(Gfx *gfx)
+void DLParser_RSP_Last_Legion_0x80(MicroCodeCommand command)
 {
 	gDlistStack[gDlistStackPointer].pc += 16;
 	LOG_UCODE("DLParser_RSP_Last_Legion_0x80");
@@ -36,22 +36,22 @@ void DLParser_RSP_Last_Legion_0x80(Gfx *gfx)
 //*****************************************************************************
 //
 //*****************************************************************************
-void DLParser_RSP_Last_Legion_0x00(Gfx *gfx)
+void DLParser_RSP_Last_Legion_0x00(MicroCodeCommand command)
 {
 	LOG_UCODE("DLParser_RSP_Last_Legion_0x00");
 	gDlistStack[gDlistStackPointer].pc += 16;
 
-	if( (gfx->words.cmd0) == 0 && (gfx->words.cmd1) )
+	if( (command.inst.cmd0) == 0 && (command.inst.cmd1) )
 	{
-		uint32 newaddr = RSPSegmentAddr((gfx->words.cmd1));
+		uint32 newaddr = RSPSegmentAddr((command.inst.cmd1));
 		if( newaddr >= g_dwRamSize )
 		{
 			RDP_GFX_PopDL();
 			return;
 		}
 
-		uint32 pc1 = *(uint32 *)(g_pRDRAMu8 + newaddr+8*1+4);
-		uint32 pc2 = *(uint32 *)(g_pRDRAMu8 + newaddr+8*4+4);
+		uint32 pc1 = *(uint32 *)(g_pu8RamBase + newaddr+8*1+4);
+		uint32 pc2 = *(uint32 *)(g_pu8RamBase + newaddr+8*4+4);
 		pc1 = RSPSegmentAddr(pc1);
 		pc2 = RSPSegmentAddr(pc2);
 
@@ -70,13 +70,13 @@ void DLParser_RSP_Last_Legion_0x00(Gfx *gfx)
 			gDlistStack[gDlistStackPointer].countdown = MAX_DL_COUNT;
 		}
 	}
-	else if( (gfx->words.cmd1) == 0 )
+	else if( (command.inst.cmd1) == 0 )
 	{
 		RDP_GFX_PopDL();
 	}
 	else
 	{
-		RSP_RDP_Nothing(gfx);
+		RSP_RDP_Nothing(command);
 		RDP_GFX_PopDL();
 	}
 }
@@ -84,28 +84,27 @@ void DLParser_RSP_Last_Legion_0x00(Gfx *gfx)
 //*****************************************************************************
 //
 //*****************************************************************************
-void DLParser_TexRect_Last_Legion(Gfx *gfx)
+void DLParser_TexRect_Last_Legion(MicroCodeCommand command)
 {
-	if( !status.bCIBufferIsRendered ) g_pFrameBufferManager->ActiveTextureBuffer();
-
-	status.primitiveType = PRIM_TEXTRECT;
+	if( !status.bCIBufferIsRendered )
+		g_pFrameBufferManager->ActiveTextureBuffer();
 
 	// This command used 128bits, and not 64 bits. This means that we have to look one 
 	// Command ahead in the buffer, and update the PC.
 	uint32 dwPC = gDlistStack[gDlistStackPointer].pc;		// This points to the next instruction
-	uint32 dwCmd2 = *(uint32 *)(g_pRDRAMu8 + dwPC);
-	uint32 dwCmd3 = *(uint32 *)(g_pRDRAMu8 + dwPC+4);
+	uint32 dwCmd2 = *(uint32 *)(g_pu8RamBase + dwPC);
+	uint32 dwCmd3 = *(uint32 *)(g_pu8RamBase + dwPC+4);
 
 	gDlistStack[gDlistStackPointer].pc += 8;
 
 
-	LOG_UCODE("0x%08x: %08x %08x", dwPC, *(uint32 *)(g_pRDRAMu8 + dwPC+0), *(uint32 *)(g_pRDRAMu8 + dwPC+4));
+	LOG_UCODE("0x%08x: %08x %08x", dwPC, *(uint32 *)(g_pu8RamBase + dwPC+0), *(uint32 *)(g_pu8RamBase + dwPC+4));
 
-	uint32 dwXH		= (((gfx->words.cmd0)>>12)&0x0FFF)/4;
-	uint32 dwYH		= (((gfx->words.cmd0)    )&0x0FFF)/4;
-	uint32 tileno	= ((gfx->words.cmd1)>>24)&0x07;
-	uint32 dwXL		= (((gfx->words.cmd1)>>12)&0x0FFF)/4;
-	uint32 dwYL		= (((gfx->words.cmd1)    )&0x0FFF)/4;
+	uint32 dwXH		= (((command.inst.cmd0)>>12)&0x0FFF)/4;
+	uint32 dwYH		= (((command.inst.cmd0)    )&0x0FFF)/4;
+	uint32 tileno	= ((command.inst.cmd1)>>24)&0x07;
+	uint32 dwXL		= (((command.inst.cmd1)>>12)&0x0FFF)/4;
+	uint32 dwYL		= (((command.inst.cmd1)    )&0x0FFF)/4;
 
 
 	if( (int)dwXL >= gRDP.scissor.right || (int)dwYL >= gRDP.scissor.bottom || (int)dwXH < gRDP.scissor.left || (int)dwYH < gRDP.scissor.top )
@@ -170,7 +169,7 @@ void DLParser_TexRect_Last_Legion(Gfx *gfx)
 	}
 	else
 	{
-		if( status.bHandleN64RenderTexture && //status.bDirectWriteIntoRDRAM && 
+		if( status.bHandleN64RenderTexture &&
 			g_pRenderTextureInfo->CI_Info.dwFormat == gRDP.tiles[tileno].dwFormat && 
 			g_pRenderTextureInfo->CI_Info.dwSize == gRDP.tiles[tileno].dwSize && 
 			gRDP.tiles[tileno].dwFormat == TXT_FMT_CI && gRDP.tiles[tileno].dwSize == TXT_SIZE_8b )
@@ -195,12 +194,9 @@ void DLParser_TexRect_Last_Legion(Gfx *gfx)
 					TexRectToFrameBuffer_8b(dwXL, dwYL, dwXH, dwYH, t0u0, t0v0, t0u1, t0v1, tileno);
 				}
 
-				if( !status.bDirectWriteIntoRDRAM )
-				{
-					CRender::g_pRender->TexRect(dwXL, dwYL, dwXH, dwYH, fS0, fT0, fDSDX, fDTDY);
+				CRender::g_pRender->TexRect(dwXL, dwYL, dwXH, dwYH, fS0, fT0, fDSDX, fDTDY);
 
-					status.dwNumTrisRendered += 2;
-				}
+				status.dwNumTrisRendered += 2;
 			}
 		}
 		else

@@ -134,40 +134,23 @@ void CRender::ResetMatrices(uint32 size)
 
 void CRender::SetProjection(const Matrix & mat, bool bPush, bool bReplace) 
 {
-	if (bPush)
+	if (gRSP.projectionMtxTop >= (RICE_MATRIX_STACK-1) && bPush)
 	{
-		if (gRSP.projectionMtxTop >= (RICE_MATRIX_STACK-1))
-		{
-			TRACE0("Pushing past proj stack limits!");
-		}
-		else
-			gRSP.projectionMtxTop++;
+		TRACE0("Pushing past proj stack limits!");
+	}
+	else if (bPush)
+		gRSP.projectionMtxTop++;
 
-		if (bReplace)
-		{
-			// Load projection matrix
-			gRSP.projectionMtxs[gRSP.projectionMtxTop] = mat;
-		}
-		else
-		{
-			gRSP.projectionMtxs[gRSP.projectionMtxTop] = mat * gRSP.projectionMtxs[gRSP.projectionMtxTop-1];
-		}
-		
+	if (bReplace)
+	{
+		// Load projection matrix
+		gRSP.projectionMtxs[gRSP.projectionMtxTop] = mat;
 	}
 	else
 	{
-		if (bReplace)
-		{
-			// Load projection matrix
-			gRSP.projectionMtxs[gRSP.projectionMtxTop] = mat;
-		}
-		else
-		{
-			gRSP.projectionMtxs[gRSP.projectionMtxTop] = mat * gRSP.projectionMtxs[gRSP.projectionMtxTop];
-		}
-
+		gRSP.projectionMtxs[gRSP.projectionMtxTop] = bPush ? mat * gRSP.projectionMtxs[gRSP.projectionMtxTop - 1] : mat * gRSP.projectionMtxs[gRSP.projectionMtxTop];
 	}
-	
+
 	gRSP.bMatrixIsUpdated = true;
 
 	DumpMatrix(mat,"Set Projection Matrix");
@@ -237,11 +220,11 @@ void CRender::SetWorldView(const Matrix & mat, bool bPush, bool bReplace)
 }
 
 
-void CRender::PopWorldView()
+void CRender::PopWorldView(u32 num)
 {
-	if (gRSP.modelViewMtxTop > 0)
+	if (gRSP.modelViewMtxTop > (num-1))
 	{
-		gRSP.modelViewMtxTop--;
+		gRSP.modelViewMtxTop-=num;
 		gRSPmodelViewTop = gRSP.modelviewMtxs[gRSP.modelViewMtxTop];
 		if( options.enableHackForGames == HACK_REVERSE_XY_COOR )
 		{
@@ -316,7 +299,6 @@ void CRender::SetCombinerAndBlender()
 void CRender::RenderReset()
 {
 	UpdateClipRectangle();
-	//ResetMatrices(uint32 size);
 	SetZBias(0);
 	gRSP.numVertices = 0;
 	gRSP.maxVertexID = 0;
@@ -360,15 +342,16 @@ bool CRender::FillRect(LONG nX0, LONG nY0, LONG nX1, LONG nY1, uint32 dwColor)
 	bool res=true;
 
 	/*
-	// I don't know why this does not work for OpenGL
+	//CHECKME if statement was previously disabled
+	*/
 	if( gRDP.otherMode.cycle_type == CYCLE_TYPE_FILL && nX0 == 0 && nY0 == 0 && ((nX1==windowSetting.uViWidth && nY1==windowSetting.uViHeight)||(nX1==windowSetting.uViWidth-1 && nY1==windowSetting.uViHeight-1)) )
 	{
 		CGraphicsContext::g_pGraphicsContext->Clear(CLEAR_COLOR_BUFFER,dwColor);
 	}
 	else
-	*/
+
 	{
-		BOOL m_savedZBufferFlag = gRSP.bZBufferEnabled;	// Save ZBuffer state
+		//BOOL m_savedZBufferFlag = gRSP.bZBufferEnabled;	// Save ZBuffer state
 		ZBufferEnable( FALSE );
 
 		m_fillRectVtx[0].x = ViewPortTranslatei_x(nX0);
@@ -382,20 +365,25 @@ bool CRender::FillRect(LONG nX0, LONG nY0, LONG nX1, LONG nY1, uint32 dwColor)
 		{
 			ZBufferEnable(FALSE);
 		}
+		else
+		{
+			//dwColor = PostProcessDiffuseColor(0);
+			dwColor = PostProcessDiffuseColor(gRDP.primitiveColor);
+		}
 
 		float depth = (gRDP.otherMode.depth_source == 1 ? gRDP.fPrimitiveDepth : 0 );
 
 		ApplyRDPScissor();
 		TurnFogOnOff(false);
 		res = RenderFillRect(dwColor, depth);
-		TurnFogOnOff(gRSP.bFogEnabled);
+		TurnFogOnOff(gRDP.tnl.Fog);
 #ifdef _OLDCLIPPER
 		ApplyScissorWithClipRatio();// Rice 5.60
 #endif
 
 		if( gRDP.otherMode.cycle_type  >= CYCLE_TYPE_COPY )
 		{
-			ZBufferEnable(gRSP.bZBufferEnabled);
+			ZBufferEnable(gRDP.tnl.Zbuffer);
 		}
 	}
 
@@ -827,11 +815,12 @@ bool CRender::TexRect(LONG nX0, LONG nY0, LONG nX1, LONG nY1, float fS0, float f
 	ApplyScissorWithClipRatio(); //Rice 5.60
 #endif
 	}
-	TurnFogOnOff(gRSP.bFogEnabled);
+
+	TurnFogOnOff(gRDP.tnl.Fog);
 
 	if( gRDP.otherMode.cycle_type  >= CYCLE_TYPE_COPY || !gRDP.otherMode.z_cmp  )
 	{
-		ZBufferEnable(gRSP.bZBufferEnabled);
+		ZBufferEnable(gRDP.tnl.Zbuffer);
 	}
 
 	DEBUGGER_PAUSE_AT_COND_AND_DUMP_COUNT_N((eventToPause == NEXT_FLUSH_TRI || eventToPause == NEXT_TEXTRECT), {
@@ -866,7 +855,7 @@ bool CRender::TexRectFlip(LONG nX0, LONG nY0, LONG nX1, LONG nY1, float fS0, flo
 	PrepareTextures();
 
 	// Save ZBuffer state
-	m_savedZBufferFlag = gRSP.bZBufferEnabled;
+	//m_savedZBufferFlag = gRSP.bZBufferEnabled;
 	if( gRDP.otherMode.depth_source == 0 )	ZBufferEnable( FALSE );
 
 	float widthDiv = g_textures[gRSP.curTile].m_fTexWidth;
@@ -925,10 +914,10 @@ bool CRender::TexRectFlip(LONG nX0, LONG nY0, LONG nX1, LONG nY1, float fS0, flo
 #endif
 	bool res = RenderTexRect();
 
-	TurnFogOnOff(gRSP.bFogEnabled);
+	TurnFogOnOff(gRDP.tnl.Fog);
 
 	// Restore state
-	ZBufferEnable( m_savedZBufferFlag );
+	ZBufferEnable( gRDP.tnl.Zbuffer );
 
 	DEBUGGER_PAUSE_AT_COND_AND_DUMP_COUNT_N((eventToPause == NEXT_FLUSH_TRI || eventToPause == NEXT_TEXTRECT), {
 		DebuggerAppendMsg("TexRectFlip: tile=%d, X0=%d, Y0=%d, X1=%d, Y1=%d,\nfS0=%f, fT0=%f, nfS1=%f, fT1=%f\n",
@@ -1104,11 +1093,11 @@ void CRender::SetTextureScale(int dwTile,  float fScaleX, float fScaleY)
 
 void CRender::SetFogFlagForNegativeW()
 {
-	if( !gRSP.bFogEnabled )	return;
+	if( !gRDP.tnl.Fog )	return;
 
-	m_bFogStateSave = gRSP.bFogEnabled;
+	m_bFogStateSave = gRDP.tnl.Fog;
 
-	bool flag=gRSP.bFogEnabled;
+	bool flag=gRDP.tnl.Fog;
 	
 	for (uint32 i = 0; i < gRSP.numVertices; i++) 
 	{
@@ -1121,7 +1110,7 @@ void CRender::SetFogFlagForNegativeW()
 
 void CRender::RestoreFogFlag()
 {
-	if( !gRSP.bFogEnabled )	return;
+	if( !gRDP.tnl.Fog )	return;
 	TurnFogOnOff(m_bFogStateSave);
 }
 
@@ -1233,7 +1222,7 @@ bool CRender::DrawTriangles()
 		}
 	}
 
-	if( !gRDP.bFogEnableInBlender && gRSP.bFogEnabled )
+	if( !gRDP.bFogEnableInBlender && gRDP.tnl.Fog )
 	{
 		TurnFogOnOff(false);
 	}
@@ -1333,9 +1322,9 @@ bool CRender::DrawTriangles()
 	{
 		ZBufferEnable(FALSE);
 	}
-#ifdef _OLDCLIPPER
+//#ifdef _OLDCLIPPER
 	ApplyScissorWithClipRatio(); //Rice 5.60
-#endif
+//#endif
 
 	if( g_curRomInfo.bZHack )
 	{
@@ -1356,7 +1345,7 @@ bool CRender::DrawTriangles()
 		if( logCombiners ) m_pColorCombiner->DisplayMuxString();
 	});
 
-	if( !gRDP.bFogEnableInBlender && gRSP.bFogEnabled )
+	if( !gRDP.bFogEnableInBlender && gRDP.tnl.Fog )
 	{
 		TurnFogOnOff(true);
 	}
@@ -1977,7 +1966,7 @@ void CRender::InitOtherModes(void)					// Set other modes not covered by color c
 	}
 
 	if( options.enableHackForGames == HACK_FOR_SOUTH_PARK_RALLY && m_Mux == 0x00121824ff33ffff &&
-		gRSP.bCullFront && gRDP.otherMode.aa_en && gRDP.otherMode.z_cmp && gRDP.otherMode.z_upd )
+		gRDP.tnl.TriCull && gRDP.otherMode.aa_en && gRDP.otherMode.z_cmp && gRDP.otherMode.z_upd)
 	{
 		SetZCompare(FALSE);
 	}

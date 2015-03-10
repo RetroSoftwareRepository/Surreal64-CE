@@ -206,6 +206,8 @@ extern bool bloadstate[MAX_SAVE_STATES];
 extern bool bsavestate[MAX_SAVE_STATES];
 extern "C" void __EMU_SaveState(int index);
 extern "C" void __EMU_LoadState(int index);
+extern "C" BOOL __EMU_Pause(void);
+extern "C" void __EMU_Resume(void);
 extern bool bSatesUpdated;
 
 __forceinline void CDXGraphicsContext::UpdateFrame(bool swaponly)
@@ -217,12 +219,29 @@ __forceinline void CDXGraphicsContext::UpdateFrame(bool swaponly)
 		
 		for (int i=0; i<MAX_SAVE_STATES; i++) {
 			if (bloadstate[i]) {
+				try{
+				//__EMU_Pause();
+				}
+				catch(...){};
+				
+				try{
 				__EMU_LoadState(i+1);
+				}
+				catch(...){};
+
+				try{
+				//__EMU_Resume();
+				}
+				catch(...){};
+
 				bloadstate[i]=false;
 				break;
 			}
 			else if (bsavestate[i]) {
+				try{
 				__EMU_SaveState(i+1);
+				}
+				catch(...){};
 				bsavestate[i]=false;
 				break;
 			}

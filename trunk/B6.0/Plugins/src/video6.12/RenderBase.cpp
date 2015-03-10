@@ -149,6 +149,7 @@ float				gRSPfFogDivider;
 
 uint32			gRSPnumLights;
 Light	gRSPlights[16];
+LightOld	gRSPlightsOld[16];
 #if _MSC_VER > 1200
 __declspec(align(16)) Matrix	gRSPworldProjectTransported;
 __declspec(align(16)) Matrix	gRSPworldProject;
@@ -162,7 +163,7 @@ Matrix	gRSPmodelViewTop;
 Matrix	gRSPmodelViewTopTranspose;
 Matrix	dkrMatrixTransposed;
 #endif
-N64Light		gRSPn64lights[16];
+N64LightOld		gRSPn64lightsOld[16];
 
 
 void (*ProcessVertexData)(uint32 dwAddr, uint32 dwV0, uint32 dwNum)=NULL;
@@ -554,7 +555,7 @@ void InitRenderBase()
 		ProcessVertexData = ProcessVertexDataSSE;
 	}
 
-	gRSPfFogMin = gRSP.fFogMul = gRSP.fFogOffset = gRSPfFogMax = 0.0f;
+	gRSPfFogMin = gRSPfFogMax = 0.0f;
 	windowSetting.fMultX = windowSetting.fMultY = 2.0f;
 	windowSetting.vpLeftW = windowSetting.vpTopW = 0;
 	windowSetting.vpRightW = windowSetting.vpWidthW = 640;
@@ -568,7 +569,7 @@ void InitRenderBase()
 	gRDP.scissor.left=gRDP.scissor.top=0;
 	gRDP.scissor.right=gRDP.scissor.bottom=640;
 	
-	gRSP.bLightingEnable = gRSP.bTextureGen = false;
+	//gRSP.bLightingEnable = gRSP.bTextureGen = false;
 	gRSP.curTile=gRSPnumLights=gRSP.ambientLightColor=gRSP.ambientLightIndex= 0;
 	gRSP.fAmbientLightR=gRSP.fAmbientLightG=gRSP.fAmbientLightB=0;
 	gRSP.projectionMtxTop = gRSP.modelViewMtxTop = 0;
@@ -576,10 +577,7 @@ void InitRenderBase()
 	gRDP.fPrimitiveDepth = 0;
 	gRSP.numVertices = 0;
 	gRSP.maxVertexID = 0;
-	gRSP.bCullFront=false;
-	gRSP.bCullBack=true;
-	gRSP.bFogEnabled=gRDP.bFogEnableInBlender=false;
-	gRSP.bZBufferEnabled=true;
+	gRDP.bFogEnableInBlender=false;
 	gRSP.shadeMode=SHADE_SMOOTH;
 	gRDP.keyR=gRDP.keyG=gRDP.keyB=gRDP.keyA=gRDP.keyRGB=gRDP.keyRGBA = 0;
 	gRDP.fKeyA = 0;
@@ -614,14 +612,14 @@ void InitRenderBase()
 	gRSP.real_clip_ratio_posx = 1;
 	gRSP.real_clip_ratio_posy = 1;
 
-	gRDP.geometryMode	= 0;
-	gRDP.otherModeL		= 0;
-	gRDP.otherModeH		= 0;
+	gRDP.tnl._u32	= 0;
+	gRDP.otherMode.L		= 0;
+	gRDP.otherMode.H		= 0;
 	gRDP.fillColor		= 0xFFFFFFFF;
 	gRDP.originalFillColor	=0;
 
 	gRSP.ucode		= 1;
-	gRSP.vertexMult = 10;
+	//gRSP.vertexMult = 10; //Do much?
 	gRSP.bNearClip	= false;
 	gRSP.bRejectVtx	= false;
 
@@ -639,7 +637,7 @@ void InitRenderBase()
 	for( i=0; i<MAX_VERTS; i++ )
 		g_vtxNonTransformed[i].w = 1;
 
-	memset(gRSPn64lights, 0, sizeof(N64Light)*16);
+	memset(gRSPn64lightsOld, 0, sizeof(N64LightOld)*16);
 }
 
 void SetFogMinMax(float fMin, float fMax, float fMul, float fOffset)
@@ -657,7 +655,7 @@ void SetFogMinMax(float fMin, float fMax, float fMul, float fOffset)
 		gRSPfFogMax = fMax/500-1;
 	}
 
-	gRSPfFogDivider = 220/(gRSPfFogMax-gRSPfFogMin); //CHECKME 255 replace with 220, Aristotle claimed to of improved fog rendering and this is the only real thing that has changed?
+	gRSPfFogDivider = 255/(gRSPfFogMax-gRSPfFogMin); //CHECKME 255 replace with 220, Aristotle claimed to of improved fog rendering and this is the only real thing that has changed?
 	CRender::g_pRender->SetFogMinMax(fMin, fMax);
 /*
 	gRSPfFogMin = max(0,-gRSP.fFogOffset/gRSP.fFogMul);
@@ -712,7 +710,7 @@ void InitVertexTextureConstants()
 
 void TexGen(float &s, float &t)
 {
-	if (gRDP.geometryMode & G_TEXTURE_GEN_LINEAR)
+	if (gRDP.tnl.TexGenLin)
 	{   
 		s = acosf(g_normal.x) / 3.14f;
 		t = acosf(g_normal.y) / 3.14f;
@@ -769,50 +767,34 @@ void ComputeLOD(bool openGL)
 bool bHalfTxtScale=false;
 extern uint32 lastSetTile;
 
-void InitVertex(uint32 dwV, uint32 vtxIndex, bool bTexture, bool openGL)
+void InitVertex(uint32 dwV, uint32 vtxIndex, bool bTexture)
 {
 	VTX_DUMP(TRACE2("Init vertex (%d) to vtx buf[%d]:", dwV, vtxIndex));
 
 	TLITVERTEX &v = g_vtxBuffer[vtxIndex];
 
 	VTX_DUMP(TRACE4("  Trans: x=%f, y=%f, z=%f, w=%f",  g_vtxTransformed[dwV].x,g_vtxTransformed[dwV].y,g_vtxTransformed[dwV].z,g_vtxTransformed[dwV].w));
-	if( openGL )
-	{
-		g_vtxProjected5[vtxIndex][0] = g_vtxTransformed[dwV].x;
-		g_vtxProjected5[vtxIndex][1] = g_vtxTransformed[dwV].y;
-		g_vtxProjected5[vtxIndex][2] = g_vtxTransformed[dwV].z;
-		g_vtxProjected5[vtxIndex][3] = g_vtxTransformed[dwV].w;
-		g_vtxProjected5[vtxIndex][4] = g_vecProjected[dwV].z;
-
-		if( g_vtxTransformed[dwV].w < 0 )	g_vtxProjected5[vtxIndex][4] = 0;
-		g_vtxIndex[vtxIndex] = vtxIndex;
-	}
-
-	if( !openGL || options.bOGLVertexClipper == TRUE )
-	{
-		v.x = g_vecProjected[dwV].x*gRSP.vtxXMul+gRSP.vtxXAdd;
+	v.x = g_vecProjected[dwV].x*gRSP.vtxXMul+gRSP.vtxXAdd;
 		v.y = g_vecProjected[dwV].y*gRSP.vtxYMul+gRSP.vtxYAdd;
 		v.z = (g_vecProjected[dwV].z + 1.0f) * 0.5f;	// DirectX minZ=0, maxZ=1
 		//v.z = g_vecProjected[dwV].z;	// DirectX minZ=0, maxZ=1
 		v.rhw = g_vecProjected[dwV].w;
 		VTX_DUMP(TRACE4("  Proj : x=%f, y=%f, z=%f, rhw=%f",  v.x,v.y,v.z,v.rhw));
 
-		if( gRSP.bProcessSpecularColor )
-		{
-			v.dcSpecular = CRender::g_pRender->PostProcessSpecularColor();
-			if( gRSP.bFogEnabled )
-			{
-				v.dcSpecular &= 0x00FFFFFF;
-				uint32	fogFct = 0xFF-(uint8)((g_fFogCoord[dwV]-gRSPfFogMin)*gRSPfFogDivider);
-				v.dcSpecular |= (fogFct<<24);
-			}
-		}
-		else if( gRSP.bFogEnabled )
+	if( gRSP.bProcessSpecularColor )
+	{
+		v.dcSpecular = CRender::g_pRender->PostProcessSpecularColor();
+		if( gRDP.tnl.Fog )
 		{
 			v.dcSpecular &= 0x00FFFFFF;
 			uint32	fogFct = 0xFF-(uint8)((g_fFogCoord[dwV]-gRSPfFogMin)*gRSPfFogDivider);
 			v.dcSpecular |= (fogFct<<24);
 		}
+	}
+	else if( gRDP.tnl.Fog )
+	{
+		uint32	fogFct = 0xFF-(uint8)((g_fFogCoord[dwV]-gRSPfFogMin)*gRSPfFogDivider);
+		v.dcSpecular = (fogFct<<24);
 	}
 	VTX_DUMP(TRACE2("  (U,V): %f, %f",  g_fVtxTxtCoords[dwV].x,g_fVtxTxtCoords[dwV].y));
 
@@ -836,19 +818,11 @@ void InitVertex(uint32 dwV, uint32 vtxIndex, bool bTexture, bool openGL)
 		v.dcDiffuse = g_dwVtxDifColor[dwV];
 	}
 
-	if( openGL )
-	{
-		g_oglVtxColors[vtxIndex][0] = v.r;
-		g_oglVtxColors[vtxIndex][1] = v.g;
-		g_oglVtxColors[vtxIndex][2] = v.b;
-		g_oglVtxColors[vtxIndex][3] = v.a;
-	}
-
 	if( bTexture )
 	{
 		// If the vert is already lit, then there is no normal (and hence we can't generate tex coord)
 		// Only scale if not generated automatically
-		if (gRSP.bTextureGen && gRSP.bLightingEnable)
+		if (gRDP.tnl.TexGen && gRDP.tnl.Light)
 		{
 			// Correction for texGen result
 			float u0,u1,v0,v1;
@@ -910,7 +884,7 @@ void InitVertex(uint32 dwV, uint32 vtxIndex, bool bTexture, bool openGL)
 	{
 		if( CRender::g_pRender->IsTexel1Enable() && CRender::g_pRender->m_pColorCombiner->m_pDecodedMux->isUsed(MUX_LODFRAC) )
 		{
-			ComputeLOD(openGL);
+			ComputeLOD(0);
 		}
 		else
 		{
@@ -921,27 +895,28 @@ void InitVertex(uint32 dwV, uint32 vtxIndex, bool bTexture, bool openGL)
 	VTX_DUMP(TRACE2("  DIF(%08X), SPE(%08X)",   v.dcDiffuse, v.dcSpecular));
 	VTX_DUMP(TRACE0(""));
 }
-
-uint32 LightVert(D3DXVECTOR4 & norm, int vidx)
+uint32 LightVertOld(D3DXVECTOR4 & norm, int vidx)
 {
 	float fCosT;
 
 	// Do ambient
-	register float r = gRSP.fAmbientLightR;
-	register float g = gRSP.fAmbientLightG;
-	register float b = gRSP.fAmbientLightB;
+	float r = gRSP.fAmbientLightR;
+	float g = gRSP.fAmbientLightG;
+	float b = gRSP.fAmbientLightB;
 
 	if( options.enableHackForGames != HACK_FOR_ZELDA_MM )
 	{
 		for (register unsigned int l=0; l < gRSPnumLights; l++)
 		{
-			fCosT = norm.x*gRSPlights[l].tx + norm.y*gRSPlights[l].ty + norm.z*gRSPlights[l].tz; 
+			fCosT = norm.x*gRSPlightsOld[l].tx + norm.y*gRSPlightsOld[l].ty + norm.z*gRSPlightsOld[l].tz; 
 
-			if (fCosT > 0 )
+			//fCosT = norm.x*gRSPlights[l].direction.x + norm.y*gRSPlights[l].direction.y + norm.z*gRSPlights[l].direction.z;
+
+			if (fCosT > 0.0f)
 			{
-				r += gRSPlights[l].fr * fCosT;
-				g += gRSPlights[l].fg * fCosT;
-				b += gRSPlights[l].fb * fCosT;
+				r += gRSPlightsOld[l].fr * fCosT;
+				g += gRSPlightsOld[l].fg * fCosT;
+				b += gRSPlightsOld[l].fb * fCosT;
 			}
 		}
 	}
@@ -952,16 +927,17 @@ uint32 LightVert(D3DXVECTOR4 & norm, int vidx)
 
 		for (register unsigned int l=0; l < gRSPnumLights; l++)
 		{
-			if( gRSPlights[l].range == 0 )
+			if( gRSPlightsOld[l].range == 0 )
 			{
 				// Regular directional light
-				fCosT = norm.x*gRSPlights[l].x + norm.y*gRSPlights[l].y + norm.z*gRSPlights[l].z; 
+				fCosT = norm.x*gRSPlightsOld[l].x + norm.y*gRSPlightsOld[l].y + norm.z*gRSPlightsOld[l].z; 
+				//fCosT = norm.x*gRSPlights[l].direction.x + norm.y*gRSPlights[l].direction.y + norm.z*gRSPlights[l].direction.z;
 
 				if (fCosT > 0 )
 				{
-					r += gRSPlights[l].fr * fCosT;
-					g += gRSPlights[l].fg * fCosT;
-					b += gRSPlights[l].fb * fCosT;
+					r += gRSPlightsOld[l].fr * fCosT;
+					g += gRSPlightsOld[l].fg * fCosT;
+					b += gRSPlightsOld[l].fb * fCosT;
 				}
 			}
 			else //if( (gRSPlights[l].col&0x00FFFFFF) != 0x00FFFFFF )
@@ -973,8 +949,8 @@ uint32 LightVert(D3DXVECTOR4 & norm, int vidx)
 					transformed = true;
 				}
 
-				D3DXVECTOR3 dir(gRSPlights[l].x - v.x, gRSPlights[l].y - v.y, gRSPlights[l].z - v.z);
-				//D3DXVECTOR3 dir(v.x-gRSPlights[l].x, v.y-gRSPlights[l].y, v.z-gRSPlights[l].z);
+				D3DXVECTOR3 dir(gRSPlightsOld[l].x - v.x, gRSPlightsOld[l].y - v.y, gRSPlightsOld[l].z - v.z);
+				//D3DXVECTOR3 dir(v.x-gRSPlightsOld[l].x, v.y-gRSPlightsOld[l].y, v.z-gRSPlightsOld[l].z);
 				float d2 = sqrtf(dir.x*dir.x+dir.y*dir.y+dir.z*dir.z);
 				dir.x /= d2;
 				dir.y /= d2;
@@ -989,9 +965,9 @@ uint32 LightVert(D3DXVECTOR4 & norm, int vidx)
 					f = 1 - min(f,1);
 					fCosT *= f*f;
 
-					r += gRSPlights[l].fr * fCosT;
-					g += gRSPlights[l].fg * fCosT;
-					b += gRSPlights[l].fb * fCosT;
+					r += gRSPlightsOld[l].fr * fCosT;
+					g += gRSPlightsOld[l].fg * fCosT;
+					b += gRSPlightsOld[l].fb * fCosT;
 				}
 
 			}
@@ -1004,25 +980,59 @@ uint32 LightVert(D3DXVECTOR4 & norm, int vidx)
 	return ((0xff000000)|(((uint32)r)<<16)|(((uint32)g)<<8)|((uint32)b));
 }
 
-uint32 LightVertNew(D3DXVECTOR4 & norm)
+
+uint32 LightVert(D3DXVECTOR4 & norm)
 {
-	float fCosT;
-
 	// Do ambient
-	register float r = gRSP.fAmbientLightR;
-	register float g = gRSP.fAmbientLightG;
-	register float b = gRSP.fAmbientLightB;
+	float r = gRSPlights[gRSP.ambientLightIndex].colour.r;
+	float g = gRSPlights[gRSP.ambientLightIndex].colour.g;
+	float b = gRSPlights[gRSP.ambientLightIndex].colour.b;
 
-
-	for (register unsigned int l=0; l < gRSPnumLights; l++)
+	for (unsigned int l=0; l < gRSPnumLights; l++)
 	{
-		fCosT = norm.x*gRSPlights[l].x + norm.y*gRSPlights[l].y + norm.z*gRSPlights[l].z; 
+		// Regular directional light
+		float fCosT = norm.x*gRSPlights[l].direction.x + norm.y*gRSPlights[l].direction.y + norm.z*gRSPlights[l].direction.z;
 
-		if (fCosT > 0 )
+		if (fCosT > 0.0f)
 		{
-			r += gRSPlights[l].fr * fCosT;
-			g += gRSPlights[l].fg * fCosT;
-			b += gRSPlights[l].fb * fCosT;
+			r += gRSPlights[l].colour.fr * fCosT;
+			g += gRSPlights[l].colour.fg * fCosT;
+			b += gRSPlights[l].colour.fb * fCosT;
+		}
+	}
+
+	if (r > 255) r = 255;
+	if (g > 255) g = 255;
+	if (b > 255) b = 255;
+	return ((0xff000000)|(((uint32)r)<<16)|(((uint32)g)<<8)|((uint32)b));
+}
+
+uint32 LightPointVert(D3DXVECTOR4 & w)
+{
+	// Do ambient
+	float r = gRSPlights[gRSP.ambientLightIndex].colour.r;
+	float g = gRSPlights[gRSP.ambientLightIndex].colour.g;
+	float b = gRSPlights[gRSP.ambientLightIndex].colour.b;
+
+	for (unsigned int l = 0; l < gRSPnumLights; l++)
+	{
+		if (gRSPlights[l].SkipIfZero)
+		{
+			// Regular directional light
+			D3DXVECTOR3 dir(gRSPlights[l].Position.x - w.x, gRSPlights[l].Position.y - w.y, gRSPlights[l].Position.z - w.z);
+
+			float light_qlen = D3DXVec3LengthSq(&dir);
+			float light_llen = sqrtf(light_qlen);
+
+			float at = gRSPlights[l].ca + gRSPlights[l].la * light_llen + gRSPlights[l].qa * light_qlen;
+			if (at > 0.0f)
+			{
+				float fCosT = 1.0f / at;
+				r += gRSPlights[l].colour.fr * fCosT;
+				g += gRSPlights[l].colour.fg * fCosT;
+				b += gRSPlights[l].colour.fb * fCosT;
+			}
+
 		}
 	}
 
@@ -1056,8 +1066,8 @@ loopback:
 		jae			breakout;
 		mov			eax,ecx;
 		imul		eax,0x48;
-		movups		xmm5, DWORD PTR gRSPlights[eax];		// Light Dir
-		movups		xmm1, DWORD PTR gRSPlights[0x18][eax];	// Light color
+		movups		xmm5, DWORD PTR gRSPlightsOld[eax];		// Light Dir
+		movups		xmm1, DWORD PTR gRSPlightsOld[0x18][eax];	// Light color
 		mulps       xmm5, xmm4;					// Lightdir * normals
 
 		movlhps		xmm0,xmm5;
@@ -1115,10 +1125,10 @@ loopback:
 		jae			breakout;
 		mov			eax,ecx;
 		//imul		eax,0x28;
-		//movups		xmm5, DWORD PTR gRSPlights[eax];	// Light Dir
+		//movups		xmm5, DWORD PTR gRSPlightsOld[eax];	// Light Dir
 		imul		eax,0x48;
-		movups		xmm5, DWORD PTR gRSPlights[0x28][eax];	// Light Dir (transformed)
-		movups		xmm1, DWORD PTR gRSPlights[0x18][eax];	// Light color
+		movups		xmm5, DWORD PTR gRSPlightsOld[0x28][eax];	// Light Dir (transformed)
+		movups		xmm1, DWORD PTR gRSPlightsOld[0x18][eax];	// Light color
 		mulps       xmm5, xmm4;					// Lightdir * normals
 
 		movlhps		xmm0,xmm5;
@@ -1163,7 +1173,7 @@ breakout:
 
 inline void ReplaceAlphaWithFogFactor(int i)
 {
-	if( gRDP.geometryMode & G_FOG )
+	if( gRDP.tnl.Fog )
 	{
 		// Use fog factor to replace vertex alpha
 		if( g_vecProjected[i].z > 1 )
@@ -1208,7 +1218,7 @@ void ProcessVertexDataSSE(uint32 dwAddr, uint32 dwV0, uint32 dwNum)
 	//			- g_dwVtxDifColor[i]			-> vertex color
 	//			- g_fVtxTxtCoords[i]				-> vertex texture cooridinates
 
-	FiddledVtx * pVtxBase = (FiddledVtx*)(g_pRDRAMu8 + dwAddr);
+	FiddledVtx * pVtxBase = (FiddledVtx*)(g_pu8RamBase + dwAddr);
 	g_pVtxBase = pVtxBase;
 
 	uint32 i;
@@ -1224,7 +1234,7 @@ void ProcessVertexDataSSE(uint32 dwAddr, uint32 dwV0, uint32 dwNum)
 
 		SSEVec3Transform(i);
 
-		if( gRSP.bFogEnabled )
+		if( gRDP.tnl.Fog )
 		{
 			g_fFogCoord[i] = g_vecProjected[i].z;
 			if( g_vecProjected[i].w < 0 || g_vecProjected[i].z < 0 || g_fFogCoord[i] < gRSPfFogMin )
@@ -1270,22 +1280,35 @@ step3:
 
 		RSP_Vtx_Clipping(i);
 
-		if( gRSP.bLightingEnable )
+		if( gRDP.tnl.Light )
 		{
 			g_normal.x = (float)vert.norma.nx;
 			g_normal.y = (float)vert.norma.ny;
 			g_normal.z = (float)vert.norma.nz;
 
 			SSEVec3TransformNormal();
-			if( options.enableHackForGames != HACK_FOR_ZELDA_MM )
+			//Vec3TransformNormal(g_normal, gRSPmodelViewTop);
+			if (status.isSSEEnabled && ( options.enableHackForGames != HACK_FOR_ZELDA_MM ))
+				//(( options.enableHackForGames != HACK_FOR_ZELDA_MM ) &&
+				//( options.enableHackForGames != HACK_FOR_CONKER ))
+			{
+				//SSEVec3TransformNormal();
 				g_dwVtxDifColor[i] = SSELightVert();
+			}
+			else if(status.isSSEEnabled && options.enableHackForGames == HACK_FOR_ZELDA_MM )
+			{
+				g_dwVtxDifColor[i] = LightVertOld(g_normal,i);
+			}
 			else
-				g_dwVtxDifColor[i] = LightVert(g_normal,i);
+			{
+				//Vec3TransformNormal(g_normal, gRSPmodelViewTop);
+				g_dwVtxDifColor[i] = LightVert(g_normal);
+			}
 			*(((uint8*)&(g_dwVtxDifColor[i]))+3) = vert.rgba.a;	// still use alpha from the vertex
 		}
 		else
 		{
-			if( (gRDP.geometryMode & G_SHADE) == 0 && gRSP.ucode < 5 )	//Shade is disabled
+			if( (gRDP.tnl.Shade) == 0 && gRSP.ucode < 5 )	//Shade is disabled
 			{
 				//FLAT shade
 				g_dwVtxDifColor[i] = gRDP.primitiveColor;
@@ -1309,7 +1332,7 @@ step3:
 
 		// If the vert is already lit, then there is no normal (and hence we
 		// can't generate tex coord)
-		if (gRSP.bTextureGen && gRSP.bLightingEnable )
+		if (gRDP.tnl.TexGen && gRDP.tnl.Light )
 		{
 			TexGen(g_fVtxTxtCoords[i].x, g_fVtxTxtCoords[i].y);
 		}
@@ -1342,7 +1365,7 @@ void ProcessVertexDataNoSSE(uint32 dwAddr, uint32 dwV0, uint32 dwNum)
 	//			- g_dwVtxDifColor[i]			-> vertex color
 	//			- g_fVtxTxtCoords[i]				-> vertex texture cooridinates
 
-	FiddledVtx * pVtxBase = (FiddledVtx*)(g_pRDRAMu8 + dwAddr);
+	FiddledVtx * pVtxBase = (FiddledVtx*)(g_pu8RamBase + dwAddr);
 	g_pVtxBase = pVtxBase;
 
 	uint32 i;
@@ -1372,7 +1395,7 @@ void ProcessVertexDataNoSSE(uint32 dwAddr, uint32 dwV0, uint32 dwNum)
 			g_vecProjected[i].z = g_vtxTransformed[i].z * g_vecProjected[i].w;
 		}
 
-		if( gRSP.bFogEnabled )
+		if( gRDP.tnl.Fog )
 		{
 			g_fFogCoord[i] = g_vecProjected[i].z;
 			if( g_vecProjected[i].w < 0 || g_vecProjected[i].z < 0 || g_fFogCoord[i] < gRSPfFogMin )
@@ -1391,30 +1414,55 @@ void ProcessVertexDataNoSSE(uint32 dwAddr, uint32 dwV0, uint32 dwNum)
 
 		RSP_Vtx_Clipping(i);
 
-		if( gRSP.bLightingEnable )
+		if( gRDP.tnl.Light )
 		{
 			g_normal.x = (float)vert.norma.nx;
 			g_normal.y = (float)vert.norma.ny;
 			g_normal.z = (float)vert.norma.nz;
 
+			
 			Vec3TransformNormal(g_normal, gRSPmodelViewTop);
-			g_dwVtxDifColor[i] = LightVert(g_normal,i);
+			//else
+			//{
+				if (gRDP.tnl.PointLight && !status.isSSEEnabled)
+				{
+					g_dwVtxDifColor[i] = LightPointVert(D3DXVECTOR4(vert.x,vert.y,vert.z, 1.0f));
+				}
+				else
+				{
+					if(status.isSSEEnabled)
+					//if((( options.enableHackForGames != HACK_FOR_ZELDA_MM ) &&
+					//	( options.enableHackForGames != HACK_FOR_CONKER ))) //Hack for SSE & new lighting
+					{
+						g_dwVtxDifColor[i] = LightVertOld(g_normal , i);
+					}
+					else
+					{
+						//Vec3TransformNormal(g_normal, gRSPmodelViewTop);
+						g_dwVtxDifColor[i] = LightVert(g_normal);
+					}
+
+				}
+			//}
 			*(((uint8*)&(g_dwVtxDifColor[i]))+3) = vert.rgba.a;	// still use alpha from the vertex
 		}
 		else
 		{
-			if( (gRDP.geometryMode & G_SHADE) == 0 && gRSP.ucode < 5 )	//Shade is disabled
+			if( (gRDP.tnl.Shade) == 0 && gRSP.ucode < 5 )	//Shade is disabled
 			{
 				//FLAT shade
 				g_dwVtxDifColor[i] = gRDP.primitiveColor;
 			}
 			else
 			{
+/*
 				register IColor &color = *(IColor*)&g_dwVtxDifColor[i];
 				color.b = vert.rgba.r;
 				color.g = vert.rgba.g;
 				color.r = vert.rgba.b;
 				color.a = vert.rgba.a;
+*/
+			g_dwVtxDifColor[i] = COLOR_RGBA(vert.rgba.r, vert.rgba.g, vert.rgba.b, vert.rgba.a);
 			}
 		}
 
@@ -1429,7 +1477,7 @@ void ProcessVertexDataNoSSE(uint32 dwAddr, uint32 dwV0, uint32 dwNum)
 
 		// If the vert is already lit, then there is no normal (and hence we
 		// can't generate tex coord)
-		if (gRSP.bTextureGen && gRSP.bLightingEnable )
+		if (gRDP.tnl.TexGen && gRDP.tnl.Light )
 		{
 			TexGen(g_fVtxTxtCoords[i].x, g_fVtxTxtCoords[i].y);
 		}
@@ -1446,33 +1494,22 @@ void ProcessVertexDataNoSSE(uint32 dwAddr, uint32 dwV0, uint32 dwNum)
 
 bool PrepareTriangle(uint32 dwV0, uint32 dwV1, uint32 dwV2)
 {
-	if( status.isVertexShaderEnabled || status.bUseHW_T_L )
-	{
-		g_vtxIndex[gRSP.numVertices++] = dwV0;
-		g_vtxIndex[gRSP.numVertices++] = dwV1;
-		g_vtxIndex[gRSP.numVertices++] = dwV2;
-		status.dwNumTrisRendered++;
-		gRSP.maxVertexID = max(gRSP.maxVertexID,max(dwV0,max(dwV1,dwV2)));
-	}
-	else
-	{
-		SP_Timing(SP_Each_Triangle);
+	bool textureFlag = (CRender::g_pRender->IsTextureEnabled() || gRSP.ucode == 6 );
 
-		bool textureFlag = (CRender::g_pRender->IsTextureEnabled() || gRSP.ucode == 6 );
-		bool openGL = CDeviceBuilder::m_deviceGeneralType == OGL_DEVICE;
+	InitVertex(dwV0, gRSP.numVertices, textureFlag);
+	InitVertex(dwV1, gRSP.numVertices+1, textureFlag);
+	InitVertex(dwV2, gRSP.numVertices+2, textureFlag);
 
-		InitVertex(dwV0, gRSP.numVertices, textureFlag, openGL);
-		InitVertex(dwV1, gRSP.numVertices+1, textureFlag, openGL);
-		InitVertex(dwV2, gRSP.numVertices+2, textureFlag, openGL);
-
-		gRSP.numVertices += 3;
-		status.dwNumTrisRendered++;
-	}
-
+	gRSP.numVertices += 3;
+	status.dwNumTrisRendered++;
 	return true;
 }
-bool AddTri(u32 v0, u32 v1, u32 v2)
+
+bool AddTri(u32 v0, u32 v1, u32 v2, bool bTri4)
 {
+	if(bTri4 && v0 == v1)
+		return false; // Cull empty tris
+
 	if (IsTriangleVisible(v0, v1, v2))
 	{
 		if (CRender::g_pRender->IsTextureEnabled())
@@ -1493,10 +1530,6 @@ bool AddTri(u32 v0, u32 v1, u32 v2)
 // Returns FALSE if it is clipped
 bool IsTriangleVisible(uint32 dwV0, uint32 dwV1, uint32 dwV2)
 {
-	//return true;	//fix me
-
-	if( status.isVertexShaderEnabled || status.bUseHW_T_L )	return true;	// We won't have access to transformed vertex data
-
 	DEBUGGER_ONLY_IF( (!debuggerEnableTestTris || !debuggerEnableCullFace), {return TRUE;});
     
 #ifdef _DEBUG
@@ -1509,7 +1542,7 @@ bool IsTriangleVisible(uint32 dwV0, uint32 dwV1, uint32 dwV2)
 	// 3 vertices, it means that all three x, y or z lie outside of
 	// the current viewing volume.
 	// Currently disabled - still seems a bit dodgy
-	if ((gRSP.bCullFront || gRSP.bCullBack) && gRDP.otherMode.zmode != 3)
+	if ((gRDP.tnl.TriCull || gRDP.tnl.CullBack) && gRDP.otherMode.zmode != 3)
 	{
 		D3DXVECTOR4 & v0 = g_vecProjected[dwV0];
 		D3DXVECTOR4 & v1 = g_vecProjected[dwV1];
@@ -1531,12 +1564,12 @@ bool IsTriangleVisible(uint32 dwV0, uint32 dwV1, uint32 dwV2)
 			/*
 			*/
 
-			if (fDirection < 0 && gRSP.bCullBack)
+			if (fDirection < 0 && gRDP.tnl.CullBack)
 			{
 				status.dwNumTrisClipped++;
 				return false;
 			}
-			else if (fDirection > 0 && gRSP.bCullFront)
+			else if (fDirection > 0 && gRDP.tnl.TriCull)
 			{
 				status.dwNumTrisClipped++;
 				return false;
@@ -1692,7 +1725,7 @@ void ProcessVertexDataDKR(uint32 dwAddr, uint32 dwV0, uint32 dwNum)
 {
 	UpdateCombinedMatrix();
 
-	uint32 pVtxBase = uint32(g_pRDRAMu8 + dwAddr);
+	uint32 pVtxBase = uint32(g_pu8RamBase + dwAddr);
 	g_pVtxBase = (FiddledVtx*)pVtxBase;
 
 	Matrix &matWorldProject(gRSP.DKRMatrixes[gDKRCMatrixIndex]);
@@ -1727,7 +1760,7 @@ void ProcessVertexDataDKR(uint32 dwAddr, uint32 dwV0, uint32 dwNum)
 		//if( status.isSSEEnabled )
 		//	SSEVec3TransformDKR(g_vtxTransformed[i], g_vtxNonTransformed[i]);
 		//else
-			D3DXVec3Transform(&g_vtxTransformed[i], (D3DXVECTOR3*)&g_vtxNonTransformed[i], &matWorldProject);	// Convert to w=1
+		D3DXVec3Transform(&g_vtxTransformed[i], (D3DXVECTOR3*)&g_vtxNonTransformed[i], &matWorldProject);	// Convert to w=1
 
 		if( gDKRVtxCount == 0 && dwNum==1 )
 		{
@@ -1754,7 +1787,7 @@ void ProcessVertexDataDKR(uint32 dwAddr, uint32 dwV0, uint32 dwNum)
 		VTX_DUMP(TRACE5("vtx %d: %f, %f, %f, %f", i, 
 			g_vtxTransformed[i].x,g_vtxTransformed[i].y,g_vtxTransformed[i].z,g_vtxTransformed[i].w));
 
-		if( gRSP.bFogEnabled )
+		if( gRDP.tnl.Fog )
 		{
 			g_fFogCoord[i] = g_vecProjected[i].z;
 			if( g_vecProjected[i].w < 0 || g_vecProjected[i].z < 0 || g_fFogCoord[i] < gRSPfFogMin )
@@ -1771,17 +1804,24 @@ void ProcessVertexDataDKR(uint32 dwAddr, uint32 dwV0, uint32 dwNum)
 		s8 b = (s8)(wB >> 8);
 		s8 a = (s8)(wB);
 
-		if (gRSP.bLightingEnable)
+		if (gRDP.tnl.Light)
 		{
 			g_normal.x = (char)r; //norma.nx;
 			g_normal.y = (char)g; //norma.ny;
 			g_normal.z = (char)b; //norma.nz;
 
-			Vec3TransformNormal(g_normal, matWorldProject)
-			if( status.isSSEEnabled )
+				Vec3TransformNormal(g_normal, gRSPmodelViewTop);
+				if(status.isSSEEnabled)
+					//(( options.enableHackForGames != HACK_FOR_ZELDA_MM ) &&
+					//( options.enableHackForGames != HACK_FOR_CONKER ))
+				{
+				//SSEVec3TransformNormal();
 				g_dwVtxDifColor[i] = SSELightVert();
-			else
-				g_dwVtxDifColor[i] = LightVert(g_normal,i);
+				}
+				else{
+				//Vec3TransformNormal(g_normal, matWorldProject)
+				g_dwVtxDifColor[i] = LightVert(g_normal);
+				}
 		}
 		else
 		{
@@ -1811,7 +1851,7 @@ void ProcessVertexDataPD(uint32 dwAddr, uint32 dwV0, uint32 dwNum)
 {
 	UpdateCombinedMatrix();
 
-	N64VtxPD * pVtxBase = (N64VtxPD*)(g_pRDRAMu8 + dwAddr);
+	N64VtxPD * pVtxBase = (N64VtxPD*)(g_pu8RamBase + dwAddr);
 	g_pVtxBase = (FiddledVtx*)pVtxBase;	// Fix me
 
 	for (uint32 i = dwV0; i < dwV0 + dwNum; i++)
@@ -1840,19 +1880,23 @@ void ProcessVertexDataPD(uint32 dwAddr, uint32 dwV0, uint32 dwNum)
 
 		RSP_Vtx_Clipping(i);
 
-		uint8 *addr = g_pRDRAMu8+dwPDCIAddr+ (vert.cidx&0xFF);
+		uint8 *addr = g_pu8RamBase+dwPDCIAddr+ (vert.cidx&0xFF);
 		uint32 a = addr[0];
 		uint32 r = addr[3];
 		uint32 g = addr[2];
 		uint32 b = addr[1];
 
-		if( gRSP.bLightingEnable )
+		if( gRDP.tnl.Light )
 		{
 			g_normal.x = (char)r;
 			g_normal.y = (char)g;
 			g_normal.z = (char)b;
 
-			if( status.isSSEEnabled )
+			//Vec3TransformNormal(g_normal, gRSPmodelViewTop);
+
+			if(status.isSSEEnabled)
+				//(( options.enableHackForGames != HACK_FOR_ZELDA_MM ) &&
+				//( options.enableHackForGames != HACK_FOR_CONKER ))
 			{
 				SSEVec3TransformNormal();
 				g_dwVtxDifColor[i] = SSELightVert();
@@ -1860,13 +1904,13 @@ void ProcessVertexDataPD(uint32 dwAddr, uint32 dwV0, uint32 dwNum)
 			else
 			{
 				Vec3TransformNormal(g_normal, gRSPmodelViewTop);
-				g_dwVtxDifColor[i] = LightVert(g_normal,i);
+				g_dwVtxDifColor[i] = LightVert(g_normal);
 			}
 			*(((uint8*)&(g_dwVtxDifColor[i]))+3) = (uint8)a;	// still use alpha from the vertex
 		}
 		else
 		{
-			if( (gRDP.geometryMode & G_SHADE) == 0 && gRSP.ucode < 5 )	//Shade is disabled
+			if( (gRDP.tnl.Shade) == 0 && gRSP.ucode < 5 )	//Shade is disabled
 			{
 				g_dwVtxDifColor[i] = gRDP.primitiveColor;
 			}
@@ -1884,7 +1928,7 @@ void ProcessVertexDataPD(uint32 dwAddr, uint32 dwV0, uint32 dwNum)
 		ReplaceAlphaWithFogFactor(i);
 
 		VECTOR2 & t = g_fVtxTxtCoords[i];
-		if (gRSP.bTextureGen && gRSP.bLightingEnable )
+		if (gRDP.tnl.TexGen && gRDP.tnl.Light )
 		{
 			// Not sure if we should transform the normal here
 			//Matrix & matWV = gRSP.projectionMtxs[gRSP.projectionMtxTop];
@@ -1919,9 +1963,10 @@ void ProcessVertexDataConker(uint32 dwAddr, uint32 dwV0, uint32 dwNum)
 {
 	UpdateCombinedMatrix();
 
-	FiddledVtx * pVtxBase = (FiddledVtx*)(g_pRDRAMu8 + dwAddr);
+	FiddledVtx * pVtxBase = (FiddledVtx*)(g_pu8RamBase + dwAddr);
 	g_pVtxBase = pVtxBase;
-	short *vertexColoraddr = (short*)(g_pRDRAMu8+dwConkerVtxZAddr);
+	
+	short *vertexColoraddr = (short*)(g_pu8RamBase+dwConkerVtxZAddr);
 
 	uint32 i;
 	for (i = dwV0; i < dwV0 + dwNum; i++)
@@ -1961,21 +2006,44 @@ void ProcessVertexDataConker(uint32 dwAddr, uint32 dwV0, uint32 dwNum)
 
 		RSP_Vtx_Clipping(i);
 
-		if( gRSP.bLightingEnable )
+		if( gRDP.tnl.Light )
 		{
 			{
-				uint32 r= ((gRSP.ambientLightColor>>16)&0xFF);
-				uint32 g= ((gRSP.ambientLightColor>> 8)&0xFF);
-				uint32 b= ((gRSP.ambientLightColor    )&0xFF);
-				for( uint32 k=1; k<=gRSPnumLights; k++)
+				uint32 r= 0;
+				uint32 g= 0;
+				uint32 b= 0;
+				if(status.isSSEEnabled)
 				{
-					r += gRSPlights[k].r;
-					g += gRSPlights[k].g;
-					b += gRSPlights[k].b;
+					r= ((gRSP.ambientLightColor>>16)&0xFF);
+					g= ((gRSP.ambientLightColor>> 8)&0xFF);
+					b= ((gRSP.ambientLightColor    )&0xFF);
+
+					for( uint32 k=1; k<=gRSPnumLights; k++)
+					{
+						r += gRSPlightsOld[k].r;
+						g += gRSPlightsOld[k].g;
+						b += gRSPlightsOld[k].b;
+					}
 				}
-				if( r>255 ) r=255;
-				if( g>255 ) g=255;
-				if( b>255 ) b=255;
+				else
+				{
+					r= gRSPlights[gRSP.ambientLightIndex].colour.r;
+					g= gRSPlights[gRSP.ambientLightIndex].colour.g;
+					b= gRSPlights[gRSP.ambientLightIndex].colour.b;
+
+					for( uint32 k=1; k<=gRSPnumLights; k++)
+					{
+						r += gRSPlights[k].colour.r;
+						g += gRSPlights[k].colour.g;
+						b += gRSPlights[k].colour.b;
+					}
+				}
+				if( r>255 ) 
+					r=255;
+				if( g>255 ) 
+					g=255;
+				if( b>255 )
+					b=255;
 				r *= vert.rgba.r ;
 				g *= vert.rgba.g ;
 				b *= vert.rgba.b ;
@@ -1989,10 +2057,14 @@ void ProcessVertexDataConker(uint32 dwAddr, uint32 dwV0, uint32 dwNum)
 			}
 
 			*(((uint8*)&(g_dwVtxDifColor[i]))+3) = vert.rgba.a;	// still use alpha from the vertex
+//TEXTURE
+			g_vtxTransformed[i].x = (float)vert.tu;
+			g_vtxTransformed[i].y = (float)vert.tv;
+
 		}
 		else
 		{
-			if( (gRDP.geometryMode & G_SHADE) == 0 && gRSP.ucode < 5 )	//Shade is disabled
+			if( (gRDP.tnl.Shade) == 0 && gRSP.ucode < 5 )	//Shade is disabled
 			{
 				g_dwVtxDifColor[i] = gRDP.primitiveColor;
 			}
@@ -2015,11 +2087,11 @@ void ProcessVertexDataConker(uint32 dwAddr, uint32 dwV0, uint32 dwNum)
 
 		// If the vert is already lit, then there is no normal (and hence we
 		// can't generate tex coord)
-		if (gRSP.bTextureGen && gRSP.bLightingEnable )
+		if (gRDP.tnl.TexGen && gRDP.tnl.Light )
 		{
-				g_normal.x = (float)*(char*)(g_pRDRAMu8+ (((i<<1)+0)^3)+dwConkerVtxZAddr);
-				g_normal.y = (float)*(char*)(g_pRDRAMu8+ (((i<<1)+1)^3)+dwConkerVtxZAddr);
-				g_normal.z = (float)*(char*)(g_pRDRAMu8+ (((i<<1)+2)^3)+dwConkerVtxZAddr);
+				g_normal.x = (float)*(char*)(g_pu8RamBase+ (((i<<1)+0)^3)+dwConkerVtxZAddr);
+				g_normal.y = (float)*(char*)(g_pu8RamBase+ (((i<<1)+1)^3)+dwConkerVtxZAddr);
+				g_normal.z = (float)*(char*)(g_pu8RamBase+ (((i<<1)+2)^3)+dwConkerVtxZAddr);
 				Vec3TransformNormal(g_normal, gRSPmodelViewTop);
 				TexGen(g_fVtxTxtCoords[i].x, g_fVtxTxtCoords[i].y);
 		}
@@ -2065,8 +2137,8 @@ void ProcessVertexData_Rogue_Squadron(uint32 dwXYZAddr, uint32 dwColorAddr, uint
 	uint32 dwV0 = 0;
 	uint32 dwNum = (dwXYZCmd&0xFF00)>>10;
 
-	RS_Vtx_XYZ * pVtxXYZBase = (RS_Vtx_XYZ*)(g_pRDRAMu8 + dwXYZAddr);
-	RS_Vtx_Color * pVtxColorBase = (RS_Vtx_Color*)(g_pRDRAMu8 + dwColorAddr);
+	RS_Vtx_XYZ * pVtxXYZBase = (RS_Vtx_XYZ*)(g_pu8RamBase + dwXYZAddr);
+	RS_Vtx_Color * pVtxColorBase = (RS_Vtx_Color*)(g_pu8RamBase + dwColorAddr);
 
 	uint32 i;
 	for (i = dwV0; i < dwV0 + dwNum; i++)
@@ -2103,13 +2175,17 @@ void ProcessVertexData_Rogue_Squadron(uint32 dwXYZAddr, uint32 dwColorAddr, uint
 
 		RSP_Vtx_Clipping(i);
 
-		if( gRSP.bLightingEnable )
+		if( gRDP.tnl.Light )
 		{
 			g_normal.x = (float)vertcolors.nx;
 			g_normal.y = (float)vertcolors.ny;
 			g_normal.z = (float)vertcolors.nz;
 
-			if( status.isSSEEnabled )
+			//Vec3TransformNormal(g_normal, gRSPmodelViewTop);
+			
+			if(status.isSSEEnabled)
+				//( options.enableHackForGames != HACK_FOR_ZELDA_MM ) &&
+				//( options.enableHackForGames != HACK_FOR_CONKER ))
 			{
 				SSEVec3TransformNormal();
 				g_dwVtxDifColor[i] = SSELightVert();
@@ -2117,13 +2193,13 @@ void ProcessVertexData_Rogue_Squadron(uint32 dwXYZAddr, uint32 dwColorAddr, uint
 			else
 			{
 				Vec3TransformNormal(g_normal, gRSPmodelViewTop);
-				g_dwVtxDifColor[i] = LightVert(g_normal,i);
+				g_dwVtxDifColor[i] = LightVert(g_normal);
 			}
 			*(((uint8*)&(g_dwVtxDifColor[i]))+3) = vertcolors.a;	// still use alpha from the vertex
 		}
 		else
 		{
-			if( (gRDP.geometryMode & G_SHADE) == 0 && gRSP.ucode < 5 )	//Shade is disabled
+			if( (gRDP.tnl.Shade) == 0 && gRSP.ucode < 5 )	//Shade is disabled
 			{
 				g_dwVtxDifColor[i] = gRDP.primitiveColor;
 			}
@@ -2146,7 +2222,7 @@ void ProcessVertexData_Rogue_Squadron(uint32 dwXYZAddr, uint32 dwColorAddr, uint
 
 		// If the vert is already lit, then there is no normal (and hence we
 		// can't generate tex coord)
-		if (gRSP.bTextureGen && gRSP.bLightingEnable && g_textures[gRSP.curTile].m_bTextureEnable )
+		if (gRDP.tnl.TexGen && gRDP.tnl.Light && g_textures[gRSP.curTile].m_bTextureEnable )
 		{
 			TexGen(g_fVtxTxtCoords[i].x, g_fVtxTxtCoords[i].y);
 		}
@@ -2162,50 +2238,83 @@ void ProcessVertexData_Rogue_Squadron(uint32 dwXYZAddr, uint32 dwColorAddr, uint
 	DEBUGGER_PAUSE_AND_DUMP(NEXT_VERTEX_CMD,{TRACE0("Paused at Vertex Cmd");});
 }
 
-void SetLightCol(uint32 dwLight, uint32 dwCol)
+void SetLightColOld(uint32 dwLight, uint32 dwCol)
 {
-	gRSPlights[dwLight].r = (uint8)((dwCol >> 24)&0xFF);
-	gRSPlights[dwLight].g = (uint8)((dwCol >> 16)&0xFF);
-	gRSPlights[dwLight].b = (uint8)((dwCol >>  8)&0xFF);
-	gRSPlights[dwLight].a = 255;	// Ignore light alpha
-	gRSPlights[dwLight].fr = (float)gRSPlights[dwLight].r;
-	gRSPlights[dwLight].fg = (float)gRSPlights[dwLight].g;
-	gRSPlights[dwLight].fb = (float)gRSPlights[dwLight].b;
-	gRSPlights[dwLight].fa = 255;	// Ignore light alpha
+	gRSPlightsOld[dwLight].r = (uint8)((dwCol >> 24)&0xFF);
+	gRSPlightsOld[dwLight].g = (uint8)((dwCol >> 16)&0xFF);
+	gRSPlightsOld[dwLight].b = (uint8)((dwCol >>  8)&0xFF);
+	gRSPlightsOld[dwLight].a = 255;	// Ignore light alpha
+	gRSPlightsOld[dwLight].fr = (float)gRSPlightsOld[dwLight].r;
+	gRSPlightsOld[dwLight].fg = (float)gRSPlightsOld[dwLight].g;
+	gRSPlightsOld[dwLight].fb = (float)gRSPlightsOld[dwLight].b;
+	gRSPlightsOld[dwLight].fa = 255;	// Ignore light alpha
 
 	//TRACE1("Set light %d color", dwLight);
+//	LIGHT_DUMP(TRACE2("Set Light %d color: %08X", dwLight, dwCol));
+}
 
-	if( status.isVertexShaderEnabled )
-	{
-		float c[4] = {gRSPlights[dwLight].r/255.0f, gRSPlights[dwLight].g/255.0f, gRSPlights[dwLight].b/255.0f, gRSPlights[dwLight].a/255.0f};
-		g_pD3DDev->SetVertexShaderConstant( CV_LIGHT0_AMBIENT+dwLight, &c[0], 1 );
-	}
+void SetLightCol(uint32 dwLight, u8 r, u8 g, u8 b)
+{
+	
+	gRSPlights[dwLight].SkipIfZero = (r + g + b);
+	gRSPlights[dwLight].colour.r = r;
+	gRSPlights[dwLight].colour.g = g;
+	gRSPlights[dwLight].colour.b = b;
+	gRSPlights[dwLight].colour.a = 255;	// Ignore light alpha
+	gRSPlights[dwLight].colour.fr = (float)gRSPlights[dwLight].colour.r;
+	gRSPlights[dwLight].colour.fg = (float)gRSPlights[dwLight].colour.g;
+	gRSPlights[dwLight].colour.fb = (float)gRSPlights[dwLight].colour.b;
+	gRSPlights[dwLight].colour.fa = 255;	// Ignore light alpha
 
-	LIGHT_DUMP(TRACE2("Set Light %d color: %08X", dwLight, dwCol));
+	//TRACE1("Set light %d color", dwLight);
+//	LIGHT_DUMP(TRACE2("Set Light %d color: %08X", dwLight, dwCol));
 }
 
 void SetLightDirection(uint32 dwLight, float x, float y, float z, float range)
 {
-	//gRSP.bLightIsUpdated = true;
-
-	//gRSPlights[dwLight].ox = x;
-	//gRSPlights[dwLight].oy = y;
-	//gRSPlights[dwLight].oz = z;
-
-	register float w = range == 0 ? (float)sqrt(x*x+y*y+z*z) : 1;
-	//register float w = (float)sqrt(x*x+y*y+z*z);
-
-	gRSPlights[dwLight].x = x/w;
-	gRSPlights[dwLight].y = y/w;
-	gRSPlights[dwLight].z = z/w;
-	gRSPlights[dwLight].range = range;
-	
-	if( status.isVertexShaderEnabled && dwLight>0 )
+	if(status.isSSEEnabled)
 	{
-		g_pD3DDev->SetVertexShaderConstant( CV_LIGHT1_DIRECTION+dwLight, &(gRSPlights[dwLight].x), 1 );
+		float w = range == 0 ? (float)sqrt(x*x+y*y+z*z) : 1;
+
+		gRSPlightsOld[dwLight].x = x/w;
+		gRSPlightsOld[dwLight].y = y/w;
+		gRSPlightsOld[dwLight].z = z/w;
+		gRSPlightsOld[dwLight].range = range;
+	}
+	else
+	{
+
+		float w =  sqrt(x*x + y*y + z*z);
+
+		gRSPlights[dwLight].direction.x = x/w;
+		gRSPlights[dwLight].direction.y = y/w;
+		gRSPlights[dwLight].direction.z = z/w;
+		gRSPlights[dwLight].direction.range = range;
 	}
 
-	DEBUGGER_PAUSE_AND_DUMP(NEXT_SET_LIGHT,TRACE5("Set Light %d dir: %.4f, %.4f, %.4f, %.4f", dwLight, x, y, z, range));
+	DEBUGGER_PAUSE_AND_DUMP(NEXT_SET_LIGHT,TRACE4("Set Light %d dir: %.4f, %.4f, %.4f, %.4f", dwLight, x, y, z, range));
+}
+
+void SetLightPosition(uint32 dwLight, float x, float y, float z, float w)
+{
+	gRSPlights[dwLight].Position.x = x;
+	gRSPlights[dwLight].Position.y = y;
+	gRSPlights[dwLight].Position.z = z;
+	gRSPlights[dwLight].Position.w = w;
+}
+
+void SetLightCBFD(uint32 dwLight, short nonzero)
+{
+	gRSPlights[dwLight].Iscale = (float)(nonzero << 12);
+	gRSPlights[dwLight].SkipIfZero = gRSPlights[dwLight].SkipIfZero&&nonzero;
+}
+
+
+void SetLightEx(uint32 dwLight, float ca, float la, float qa)
+{
+	gRSPlights[dwLight].ca = ca / 16.0f;
+	gRSPlights[dwLight].la = la / 65535.0f;
+	gRSPlights[dwLight].qa = qa / (8.0f*65535.0f);
 }
 
 static float maxS0, maxT0;
@@ -2296,20 +2405,9 @@ void HackZ(std::vector<D3DXVECTOR3>& points)
 
 void HackZAll()
 {
-	if( CDeviceBuilder::m_deviceGeneralType == DIRECTX_DEVICE )
+	for( uint32 i=0; i<gRSP.numVertices; i++)
 	{
-		for( uint32 i=0; i<gRSP.numVertices; i++)
-		{
-			g_vtxBuffer[i].z = HackZ(g_vtxBuffer[i].z);
-		}
-	}
-	else
-	{
-		for( uint32 i=0; i<gRSP.numVertices; i++)
-		{
-			float w = g_vtxProjected5[i][3];
-			g_vtxProjected5[i][2] = HackZ(g_vtxProjected5[i][2]/w)*w;
-		}
+		g_vtxBuffer[i].z = HackZ(g_vtxBuffer[i].z);
 	}
 }
 
@@ -2781,7 +2879,7 @@ bool Interp1Pt(D3DXVECTOR3 &v, TLITVERTEX &v1, TLITVERTEX &v2, TLITVERTEX &v3, T
 
 
 	out.dcSpecular = v2.dcSpecular; //fix me here
-	if( gRSP.bFogEnabled )
+	if( gRDP.tnl.Fog )
 	{
 		float f1 = (v1.dcSpecular>>24)*v1.rhw;
 		float f2 = (v2.dcSpecular>>24)*v2.rhw;

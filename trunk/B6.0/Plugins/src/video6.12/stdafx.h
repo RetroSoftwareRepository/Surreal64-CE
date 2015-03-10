@@ -175,9 +175,9 @@ void __cdecl ErrorMsg (char * Message, ...);
 
 extern uint32 g_dwRamSize;
 
-extern uint32 * g_pRDRAMu32;
-extern signed char* g_pRDRAMs8;
-extern unsigned char *g_pRDRAMu8;
+extern uint32 * g_pu32RamBase;
+extern signed char* g_ps8RamBase;
+extern unsigned char *g_pu8RamBase;
 
 extern GFX_INFO g_GraphicsInfo;
 

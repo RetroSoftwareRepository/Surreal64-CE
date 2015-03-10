@@ -25,9 +25,9 @@ char generalText[256];
 GFX_INFO g_GraphicsInfo;
 
 uint32 g_dwRamSize = 0x400000;
-uint32* g_pRDRAMu32 = NULL;
-signed char *g_pRDRAMs8 = NULL;
-unsigned char *g_pRDRAMu8 = NULL;
+uint32* g_pu32RamBase = NULL;
+signed char *g_ps8RamBase = NULL;
+unsigned char *g_pu8RamBase = NULL;
 
 CCritSect g_CritialSection;
 
@@ -835,10 +835,10 @@ FUNC_TYPE(BOOL) NAME_DEFINE(InitiateGFX)(GFX_INFO Gfx_Info)
 	windowSetting.bDisplayFullscreen = FALSE;
 	memcpy(&g_GraphicsInfo, &Gfx_Info, sizeof(GFX_INFO));
 	
-	g_pRDRAMu8			= Gfx_Info.RDRAM;
-	g_pRDRAMu32			= (uint32*)Gfx_Info.RDRAM;
-	g_pRDRAMs8			= (signed char *)Gfx_Info.RDRAM;
-
+	g_pu8RamBase			= Gfx_Info.RDRAM;
+	g_pu32RamBase			= (uint32*)Gfx_Info.RDRAM;
+	g_ps8RamBase			= (signed char *)Gfx_Info.RDRAM;
+	
 	windowSetting.fViWidth = 320;
 	windowSetting.fViHeight = 240;
 	status.ToToggleFullScreen = FALSE;
