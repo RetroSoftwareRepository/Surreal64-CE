@@ -22,31 +22,32 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 uint32 dwConkerVtxZAddr=0;
 
 extern void ProcessVertexDataConker(uint32 dwAddr, uint32 dwV0, uint32 dwNum);
-void RSP_Vtx_Conker(Gfx *gfx)
+void RSP_Vtx_Conker(MicroCodeCommand command)
 {
-	uint32 dwAddr = RSPSegmentAddr((gfx->words.cmd1));
-	uint32 dwVEnd   = ((gfx->words.cmd0		 )&0xFFF)/2;
-	uint32 dwN      = ((gfx->words.cmd0 >> 12)&0xFFF);
+	uint32 dwAddr = RSPSegmentAddr((command.inst.cmd1));
+	uint32 dwVEnd   = ((command.inst.cmd0 >> 1 )&0x7F);
+	uint32 dwN      = ((command.inst.cmd0 >> 12)&0xFFF);
 	uint32 dwV0		= dwVEnd - dwN;
 
 	LOG_UCODE("    Vtx: Address 0x%08x, vEnd: %d, v0: %d, Num: %d", dwAddr, dwVEnd, dwV0, dwN);
 
 	ProcessVertexDataConker(dwAddr, dwV0, dwN);
+
+#ifdef _DEBUG
 	status.dwNumVertices += dwN;
 	DisplayVertexInfo(dwAddr, dwV0, dwN);
+#endif
 }
 
-void RSP_Tri4_Conker(Gfx *gfx)
+void RSP_Tri4_Conker(MicroCodeCommand command)
 {
-	uint32 w0 = gfx->words.cmd0;
-	uint32 w1 = gfx->words.cmd1;
-
-	status.primitiveType = PRIM_TRI2;
+	uint32 w0 = command.inst.cmd0;
+	uint32 w1 = command.inst.cmd1;
 
 	// While the next command pair is Tri2, add vertices
 	uint32 dwPC = gDlistStack[gDlistStackPointer].pc;
 
-	bool bTrisAdded = FALSE;
+	bool bTrisAdded = false;
 
 	do {
 		LOG_UCODE("    Conker Tri4: 0x%08x 0x%08x", w0, w1);
@@ -75,8 +76,8 @@ void RSP_Tri4_Conker(Gfx *gfx)
 
 		bTrisAdded |= AddTri(idx[9], idx[10], idx[11]);
 
-		w0 = *(uint32 *)(g_pRDRAMu8 + dwPC+0);
-		w1 = *(uint32 *)(g_pRDRAMu8 + dwPC+4);
+		w0 = *(uint32 *)(g_pu8RamBase + dwPC+0);
+		w1 = *(uint32 *)(g_pu8RamBase + dwPC+4);
 		dwPC += 8;
 
 #ifdef _DEBUG
@@ -99,7 +100,7 @@ void RDP_GFX_Force_Vertex_Z_Conker(uint32 dwAddr)
 {
 	VTX_DUMP( 
 	{
-		s8 * pcBase = g_pRDRAMs8 + (dwAddr&(g_dwRamSize-1));
+		s8 * pcBase = g_ps8RamBase + (dwAddr&(g_dwRamSize-1));
 		uint32 * pdwBase = (uint32 *)pcBase;
 		LONG i;
 
@@ -114,10 +115,10 @@ void RDP_GFX_Force_Vertex_Z_Conker(uint32 dwAddr)
 	DEBUGGER_PAUSE_AND_DUMP(NEXT_VERTEX_CMD,{TRACE0("Paused at RDP_GFX_Force_Matrix_Conker Cmd");});
 }
 
-void RSP_MoveMem_Conker(Gfx *gfx)
+void RSP_MoveMem_Conker(MicroCodeCommand command)
 {
-	uint32 dwType = gfx->words.cmd0 & 0xFE;
-	uint32 dwAddr = RSPSegmentAddr(gfx->words.cmd1);
+	uint32 dwType = command.inst.cmd0 & 0xFE;
+	uint32 dwAddr = RSPSegmentAddr(command.inst.cmd1);
 
 	switch (dwType)
 	{
@@ -130,63 +131,75 @@ void RSP_MoveMem_Conker(Gfx *gfx)
 	case RSP_GBI2_MV_MEM__LIGHT:
 		{
 			LOG_UCODE("    MoveMem Light Conker");
-			uint32 dwOffset2 = ((gfx->words.cmd0) >> 5) & 0x3FFF;
-			if( dwOffset2 >= 0x30 )
+			uint32 dwOffset2 = ((command.inst.cmd0) >> 5) & 0x3FFF;
+			uint32 light_index = (dwOffset2 / 48);
+			if(status.isSSEEnabled)
 			{
-				uint32 dwLight = (dwOffset2 - 0x30)/0x30;
-				LOG_UCODE("    Light %d:", dwLight);
-				RSP_MoveMemLight(dwLight, dwAddr);
+				if( dwOffset2 >= 0x30 )
+				{
+					uint32 dwLight = (dwOffset2 - 0x30)/0x30;
+					LOG_UCODE("    Light %d:", dwLight);
+					//N64Light *light = (N64Light*)(g_pu8RamBase + dwAddr);
+					RSP_MoveMemLightOld(dwLight, dwAddr);
+				}
 			}
 			else
 			{
-				// fix me
-				//TRACE0("Check me in DLParser_MoveMem_Conker - MoveMem Light");
+				if (light_index < 2)
+				{
+					return;
+				}
+				light_index -= 2;
+
+				N64Light *light = (N64Light*)(g_pu8RamBase + dwAddr);
+				RSP_MoveMemLight(light_index, light);
 			}
+	
 			DEBUGGER_PAUSE_AND_DUMP_COUNT_N( NEXT_SET_LIGHT, 
 			{
-				DebuggerAppendMsg("RSP_MoveMemLight: %d, Addr=%08X, cmd0=%08X", dwLight, dwAddr, (gfx->words.cmd0));
+				DebuggerAppendMsg("RSP_MoveMemLight: Addr=%08X, cmd0=%08X", dwAddr, (command.inst.cmd0));
 				TRACE0("Pause after MoveMemLight");
 			});
 		}
 		break;
 	default:
-		RSP_GBI2_MoveMem(gfx);
+		RSP_GBI2_MoveMem(command);
 		break;
 	}
 }
 
-void RSP_Quad_Conker (Gfx *gfx)
+void RSP_Quad_Conker (MicroCodeCommand command)
 {
-	if ((gfx->words.cmd0 & 0x00FFFFFF) == 0x2F)
+	if ((command.inst.cmd0 & 0x00FFFFFF) == 0x2F)
 	{
-		uint32 command = gfx->words.cmd0>>24;
-		if (command == 0x6)
+		uint32 p_command = command.inst.cmd0>>24;
+		if (p_command == 0x6)
 		{
-			RSP_S2DEX_SPObjLoadTxSprite(gfx);
+			RSP_S2DEX_SPObjLoadTxSprite(command);
 			return;
 		}
-		if (command == 0x7)
+		if (p_command == 0x7)
 		{
-			RSP_S2DEX_SPObjLoadTxSprite(gfx);
+			RSP_S2DEX_SPObjLoadTxSprite(command);
 			return;
 		}
 	}
-	uint32 v0 = ((gfx->words.cmd0 >> 17) & 0x7F);
-	uint32 v1 = ((gfx->words.cmd0 >> 9) & 0x7F);
-	uint32 v2 = ((gfx->words.cmd0 >> 1) & 0x7F);
+	uint32 v0 = ((command.inst.cmd0 >> 17) & 0x7F);
+	uint32 v1 = ((command.inst.cmd0 >> 9) & 0x7F);
+	uint32 v2 = ((command.inst.cmd0 >> 1) & 0x7F);
 	PrepareTriangle(v0,v1,v2);
 }
 
-void RSP_MoveWord_Conker(Gfx *gfx)
+void RSP_MoveWord_Conker(MicroCodeCommand command)
 {
-	uint32 dwType   = ((gfx->words.cmd0) >> 16) & 0xFF;
+	uint32 dwType   = ((command.inst.cmd0) >> 16) & 0xFF;
 	if( dwType != RSP_MOVE_WORD_NUMLIGHT )
 	{
-		RSP_GBI2_MoveWord(gfx);
+		RSP_GBI2_MoveWord(command);
 	}
 	else
 	{
-		uint32 dwNumLights = ((gfx->words.cmd1)/48);
+		uint32 dwNumLights = ((command.inst.cmd1)/48);
 		LOG_UCODE("Conker RSP_MOVE_WORD_NUMLIGHT: %d", dwNumLights);
 		gRSP.ambientLightIndex = dwNumLights+1;
 		SetNumLights(dwNumLights);

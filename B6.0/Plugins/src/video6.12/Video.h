@@ -60,18 +60,6 @@ extern WindowSettingStruct windowSetting;
 
 typedef enum 
 {
-	PRIM_TRI1,
-	PRIM_TRI2,
-	PRIM_TRI3,
-	PRIM_DMA_TRI,
-	PRIM_LINE3D,
-	PRIM_TEXTRECT,
-	PRIM_TEXTRECTFLIP,
-	PRIM_FILLRECT,
-} PrimitiveType;
-
-typedef enum 
-{
 	RSP_SCISSOR,
 	RDP_SCISSOR,
 	UNKNOWN_SCISSOR,
@@ -101,16 +89,11 @@ typedef struct {
 	BOOL	ToToggleFullScreen;
 	bool	bDisableFPS;
 
-	bool	bUseModifiedUcodeMap;
-	bool	ucodeHasBeenSet;
-	bool	bUcodeIsKnown;
-
 	uint32	curRenderBuffer;
 	uint32	curDisplayBuffer;
 	uint32	curVIOriginReg;
 	CurScissorType  curScissor;
 
-	PrimitiveType primitiveType;
 	uint32	lastPurgeTimeTime;		// Time textures were last purged
 
 	bool	UseLargerTile[2];		// This is a speed up for large tile loading,

@@ -36,7 +36,7 @@ void RDP_GFX_DumpVtxInfoDKR(uint32 dwAddr, uint32 dwV0, uint32 dwN)
 		uint32 dwV;
 		LONG i;
 
-		short * psSrc = (short *)(g_pRDRAMu8 + dwAddr);
+		short * psSrc = (short *)(g_pu8RamBase + dwAddr);
 
 		i = 0;
 		for (dwV = dwV0; dwV < dwV0 + dwN; dwV++)
@@ -65,7 +65,7 @@ void RDP_GFX_DumpVtxInfoDKR(uint32 dwAddr, uint32 dwV0, uint32 dwN)
 		}
 
 
-		uint16 * pwSrc = (uint16 *)(g_pRDRAMu8 + dwAddr);
+		uint16 * pwSrc = (uint16 *)(g_pu8RamBase + dwAddr);
 		i = 0;
 		for (dwV = dwV0; dwV < dwV0 + dwN; dwV++)
 		{
@@ -85,13 +85,13 @@ void RDP_GFX_DumpVtxInfoDKR(uint32 dwAddr, uint32 dwV0, uint32 dwN)
 //*****************************************************************************
 //
 //*****************************************************************************
-void RSP_Vtx_DKR(Gfx *gfx)
+void RSP_Vtx_DKR(MicroCodeCommand command)
 {
-	uint32 dwAddr = (gfx->words.cmd1) + gDKRVtxAddr;
-	uint32 dwV0 = (((gfx->words.cmd0) >> 9 )&0x1F);
-	uint32 dwN  = (((gfx->words.cmd0) >>19 )&0x1F)+1;
+	uint32 address = command.inst.cmd1 + gDKRVtxAddr;
+	uint32 num_verts  = ((command.inst.cmd0 >>19 )&0x1F)+1;
+	uint32 v0_idx = 0;
 
-	if( gfx->words.cmd0 & 0x00010000 )
+	if( command.inst.cmd0 & 0x00010000 )
 	{
 		if( gDKRBillBoard )
 			gDKRVtxCount = 1;
@@ -101,58 +101,54 @@ void RSP_Vtx_DKR(Gfx *gfx)
 		gDKRVtxCount = 0;
 	}
 
-	dwV0 += gDKRVtxCount;
+	v0_idx = ((command.inst.cmd0 >> 9) & 0x1F) + gDKRVtxCount;
 
-	LOG_UCODE("    Address 0x%08x, v0: %d, Num: %d", dwAddr, dwV0, dwN);
-	DEBUGGER_ONLY_IF( (pauseAtNext && (eventToPause==NEXT_VERTEX_CMD||eventToPause==NEXT_MATRIX_CMD)), {DebuggerAppendMsg("DKR Vtx: Cmd0=%08X, Cmd1=%08X", (gfx->words.cmd0), (gfx->words.cmd1));});
+	LOG_UCODE("    Address 0x%08x, v0: %d, Num: %d", address, v0_idx, num_verts);
+	DEBUGGER_ONLY_IF( (pauseAtNext && (eventToPause==NEXT_VERTEX_CMD||eventToPause==NEXT_MATRIX_CMD)), {DebuggerAppendMsg("DKR Vtx: Cmd0=%08X, Cmd1=%08X", (command.inst.cmd0), (command.inst.cmd1));});
 
-	VTX_DUMP(TRACE2("Vtx_DKR, cmd0=%08X cmd1=%08X", (gfx->words.cmd0), (gfx->words.cmd1)));
-	VTX_DUMP(TRACE2("Vtx_DKR, v0=%d n=%d", dwV0, dwN));
-
-	if (dwV0 >= 32)		dwV0 = 31;
+	if (v0_idx >= 32)		v0_idx = 31;
 	
-	if ((dwV0 + dwN) > 32)
+	if ((v0_idx + num_verts) > 32)
 	{
 		WARNING(TRACE0("Warning, attempting to load into invalid vertex positions"));
-		dwN = 32 - dwV0;
+		num_verts = 32 - v0_idx;
 	}
 
 	// Check that address is valid...
-	if ((dwAddr + (dwN*16)) > g_dwRamSize)
+	if ((address + (num_verts*16)) > g_dwRamSize)
 	{
-		WARNING(TRACE1("ProcessVertexData: Address out of range (0x%08x)", dwAddr));
+		WARNING(TRACE1("ProcessVertexData: Address out of range (0x%08x)", address));
 	}
 	else
 	{
-		ProcessVertexDataDKR(dwAddr, dwV0, dwN);
+		ProcessVertexDataDKR(address, v0_idx, num_verts);
 
-		status.dwNumVertices += dwN;
-
-		RDP_GFX_DumpVtxInfoDKR(dwAddr, dwV0, dwN);
+#ifdef _DEBUG
+		status.dwNumVertices += num_verts;
+		RDP_GFX_DumpVtxInfoDKR(address, v0_idx, num_verts);
+#endif
 	}
 }
 
 //*****************************************************************************
 //
 //*****************************************************************************
-void RSP_DL_In_MEM_DKR(Gfx *gfx)
+void RSP_DL_In_MEM_DKR(MicroCodeCommand command)
 {
 	// This cmd is likely to execute number of ucode at the given address
 	gDlistStackPointer++;
-	gDlistStack[gDlistStackPointer].pc = gfx->words.cmd1;
-	gDlistStack[gDlistStackPointer].countdown = (((gfx->words.cmd0)>>16)&0xFF);
+	gDlistStack[gDlistStackPointer].pc = command.inst.cmd1;
+	gDlistStack[gDlistStackPointer].countdown = (command.inst.cmd0 >> 16) & 0xFF;
 }
 
 //*****************************************************************************
 //
 //*****************************************************************************
-void RSP_Mtx_DKR(Gfx *gfx)
+void RSP_Mtx_DKR(MicroCodeCommand command)
 {	
-	uint32 dwAddr = RSPSegmentAddr((gfx->words.cmd1));
-	uint32 dwCommand = ((gfx->words.cmd0)>>16)&0xFF;
-	uint32 dwLength  = ((gfx->words.cmd0))    &0xFFFF;
-
-	dwAddr = (gfx->words.cmd1)+RSPSegmentAddr(gDKRMatrixAddr);
+	uint32 dwAddr = (command.inst.cmd1)+RSPSegmentAddr(gDKRMatrixAddr);
+	uint32 dwCommand = ((command.inst.cmd0)>>16)&0xFF;
+	uint32 dwLength  = ((command.inst.cmd0))    &0xFFFF;
 
 	bool mul=false;
 	int index;
@@ -215,9 +211,6 @@ void RSP_Mtx_DKR(Gfx *gfx)
 		mat = matToLoad;
 	}
 
-	if( status.isSSEEnabled )
-		D3DXMatrixTranspose(&dkrMatrixTransposed, &mat);
-
 	DEBUGGER_IF_DUMP(logMatrix,TRACE3("DKR Matrix: cmd=0x%X, idx = %d, mul=%d", dwCommand, index, mul));
 	LOG_UCODE("    DKR Loading Mtx: %d, command=%d", index, dwCommand);
 	DEBUGGER_PAUSE_AND_DUMP(NEXT_MATRIX_CMD,{TRACE0("Paused at DKR Matrix Cmd");});
@@ -228,24 +221,24 @@ void RSP_Mtx_DKR(Gfx *gfx)
 //*****************************************************************************
 //
 //*****************************************************************************
-void RSP_MoveWord_DKR(Gfx *gfx)
+void RSP_MoveWord_DKR(MicroCodeCommand command)
 {
-	SP_Timing(RSP_GBI1_MoveWord);
-
-	switch ((gfx->words.cmd0) & 0xFF)
+	switch ((command.inst.cmd0) & 0xFF)
 	{
 	case RSP_MOVE_WORD_NUMLIGHT:
-		gDKRBillBoard = (gfx->words.cmd1)&0x1 ? true : false;
+		gDKRBillBoard = (command.inst.cmd1) & 0x1;
 		LOG_UCODE("    gDKRBillBoard = %d", gDKRBillBoard);
-		DEBUGGER_PAUSE_AND_DUMP_COUNT_N(NEXT_MATRIX_CMD, {DebuggerAppendMsg("DKR Moveword, select gRSP.DKRBillBoard %s, cmd0=%08X, cmd1=%08X", gDKRBillBoard?"true":"false", (gfx->words.cmd0), (gfx->words.cmd1));});
+		DEBUGGER_PAUSE_AND_DUMP_COUNT_N(NEXT_MATRIX_CMD, {DebuggerAppendMsg("DKR Moveword, select gRSP.DKRBillBoard %s, cmd0=%08X, cmd1=%08X", gDKRBillBoard?"true":"false", (command.inst.cmd0), (command.inst.cmd1));});
 		break;
+
 	case RSP_MOVE_WORD_LIGHTCOL:
-		gDKRCMatrixIndex = ((gfx->words.cmd1)>>6)&0x7;
+		gDKRCMatrixIndex = (command.inst.cmd1 >> 6) & 0x7;
 		LOG_UCODE("    gDKRCMatrixIndex = %d", gDKRCMatrixIndex);
-		DEBUGGER_PAUSE_AND_DUMP_COUNT_N(NEXT_MATRIX_CMD, {DebuggerAppendMsg("DKR Moveword, select matrix %d, cmd0=%08X, cmd1=%08X", gDKRCMatrixIndex, (gfx->words.cmd0), (gfx->words.cmd1));});
+		DEBUGGER_PAUSE_AND_DUMP_COUNT_N(NEXT_MATRIX_CMD, {DebuggerAppendMsg("DKR Moveword, select matrix %d, cmd0=%08X, cmd1=%08X", gDKRCMatrixIndex, (command.inst.cmd0), (command.inst.cmd1));});
 		break;
+
 	default:
-		RSP_GBI1_MoveWord(gfx);
+		RSP_GBI1_MoveWord(command);
 		break;
 	}
 
@@ -254,10 +247,10 @@ void RSP_MoveWord_DKR(Gfx *gfx)
 //*****************************************************************************
 //
 //*****************************************************************************
-void DLParser_Set_Addr_DKR(Gfx *gfx)
+void DLParser_Set_Addr_DKR(MicroCodeCommand command)
 {
-	gDKRMatrixAddr = gfx->words.cmd0 & 0x00FFFFFF;
-	gDKRVtxAddr = RSPSegmentAddr(gfx->words.cmd1 & 0x00FFFFFF);
+	gDKRMatrixAddr = command.inst.cmd0 & 0x00FFFFFF;
+	gDKRVtxAddr = RSPSegmentAddr(command.inst.cmd1 & 0x00FFFFFF);
 	gDKRVtxCount=0;
 }
 
@@ -265,11 +258,13 @@ void DLParser_Set_Addr_DKR(Gfx *gfx)
 //
 //*****************************************************************************
 //DKR: 00229BA8: 05710080 001E4AF0 CMD G_DMATRI  Triangles 9 at 801E4AF0
-void RSP_DMA_Tri_DKR(Gfx *gfx)
+void RSP_DMA_Tri_DKR(MicroCodeCommand command)
 {
-	u32 dwAddr = RSPSegmentAddr(gfx->words.cmd1);
-	u32 dwNum = (((gfx->words.cmd0) &  0xFFF0) >>4 );
-	TriDKR *tri = (TriDKR*)&g_pRDRAMu32[ dwAddr >> 2];
+	u32 dwAddr = RSPSegmentAddr(command.inst.cmd1);
+	u32 dwNum = (((command.inst.cmd0) &  0xFFF0) >>4 );
+
+	//Unlike normal tri ucodes, this has the tri's stored in rdram
+	TriDKR *tri = (TriDKR*)&g_pu32RamBase[ dwAddr >> 2];
 
 	if( dwAddr+16*dwNum >= g_dwRamSize )
 	{
@@ -277,22 +272,18 @@ void RSP_DMA_Tri_DKR(Gfx *gfx)
 		return;
 	}
 
-	TRI_DUMP(TRACE2("DMATRI, addr=%08X, Cmd0=%08X\n", dwAddr, (gfx->words.cmd0)));
+	TRI_DUMP(TRACE2("DMATRI, addr=%08X, Cmd0=%08X\n", dwAddr, (command.inst.cmd0)));
 
 	bool bTrisAdded = false;
 
-	status.primitiveType = PRIM_DMA_TRI;
-
 	for (u32 i = 0; i < dwNum; i++)
 	{
-		
 		uint32 dwV0 = tri->v0;
 		uint32 dwV1 = tri->v1;
 		uint32 dwV2 = tri->v2;
-
 		CRender::g_pRender->SetCullMode(!(tri->flag & 0x40), false);
 
-		TRI_DUMP(TRACE5("DMATRI: %d, %d, %d (%08X-%08X)", dwV0,dwV1,dwV2,(gfx->words.cmd0),(gfx->words.cmd1)));
+		TRI_DUMP(TRACE5("DMATRI: %d, %d, %d (%08X-%08X)", dwV0,dwV1,dwV2,(command.inst.cmd0),(command.inst.cmd1)));
 
 		DEBUG_DUMP_VERTEXES("DmaTri", dwV0, dwV1, dwV2);
 		LOG_UCODE("   Tri: %d,%d,%d", dwV0, dwV1, dwV2);
@@ -315,7 +306,6 @@ void RSP_DMA_Tri_DKR(Gfx *gfx)
 		bTrisAdded = true;
 		PrepareTriangle(dwV0, dwV1, dwV2);
 		tri++;
-
 	}
 
 	if (bTrisAdded)	
@@ -328,16 +318,16 @@ void RSP_DMA_Tri_DKR(Gfx *gfx)
 //*****************************************************************************
 //
 //*****************************************************************************
-void RSP_Vtx_Gemini(Gfx *gfx)
+void RSP_Vtx_Gemini(MicroCodeCommand command)
 {
-	uint32 dwAddr = RSPSegmentAddr((gfx->words.cmd1));
-	uint32 dwV0 =  (((gfx->words.cmd0)>>9)&0x1F);
-	uint32 dwN  = (((gfx->words.cmd0) >>19 )&0x1F);
+	uint32 dwAddr = RSPSegmentAddr((command.inst.cmd1));
+	uint32 dwV0 =  (((command.inst.cmd0)>>9)&0x1F);
+	uint32 dwN  = (((command.inst.cmd0) >>19 )&0x1F);
 
 	LOG_UCODE("    Address 0x%08x, v0: %d, Num: %d", dwAddr, dwV0, dwN);
-	DEBUGGER_ONLY_IF( (pauseAtNext && (eventToPause==NEXT_VERTEX_CMD||eventToPause==NEXT_MATRIX_CMD)), {DebuggerAppendMsg("DKR Vtx: Cmd0=%08X, Cmd1=%08X", (gfx->words.cmd0), (gfx->words.cmd1));});
+	DEBUGGER_ONLY_IF( (pauseAtNext && (eventToPause==NEXT_VERTEX_CMD||eventToPause==NEXT_MATRIX_CMD)), {DebuggerAppendMsg("DKR Vtx: Cmd0=%08X, Cmd1=%08X", (command.inst.cmd0), (command.inst.cmd1));});
 
-	VTX_DUMP(TRACE2("Vtx_DKR, cmd0=%08X cmd1=%08X", (gfx->words.cmd0), (gfx->words.cmd1)));
+	VTX_DUMP(TRACE2("Vtx_DKR, cmd0=%08X cmd1=%08X", (command.inst.cmd0), (command.inst.cmd1)));
 
 	if (dwV0 >= 32)
 		dwV0 = 31;
@@ -351,7 +341,7 @@ void RSP_Vtx_Gemini(Gfx *gfx)
 
 	//if( dwAddr == 0 || dwAddr < 0x2000)
 	{
-		dwAddr = (gfx->words.cmd1)+RSPSegmentAddr(gDKRVtxAddr);
+		dwAddr = (command.inst.cmd1)+RSPSegmentAddr(gDKRVtxAddr);
 	}
 
 	// Check that address is valid...
@@ -363,9 +353,10 @@ void RSP_Vtx_Gemini(Gfx *gfx)
 	{
 		ProcessVertexDataDKR(dwAddr, dwV0, dwN);
 
+#ifdef _DEBUG
 		status.dwNumVertices += dwN;
-
 		RDP_GFX_DumpVtxInfoDKR(dwAddr, dwV0, dwN);
+#endif
 	}
 }
 

@@ -116,8 +116,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define RDP_TEXRECT_FLIP	0xe5
 #define RDP_TEXRECT			0xe4
 
-
-
+// Overloaded for sprite microcode
+#define G_GBI1_SPRITE2D_SCALEFLIP    0xbe
+#define G_GBI1_SPRITE2D_DRAW         0xbd
+#define G_GBI1_SPRITE2D_BASE	9
 
 #define RSP_ZELDA_MTX_MODELVIEW		0x00
 #define RSP_ZELDA_MTX_PROJECTION	0x04
@@ -170,7 +172,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define TLUT_FMT_RGBA16			(2 << RSP_SETOTHERMODE_SHIFT_TEXTLUT)
 #define TLUT_FMT_IA16			(3 << RSP_SETOTHERMODE_SHIFT_TEXTLUT)
 
-// RSP_SETOTHERMODE_H gSetTextureFilter 
+// RSP_SETOTHERMODE_H gSet
+
 #define RDP_TFILTER_POINT		(0 << RSP_SETOTHERMODE_SHIFT_TEXTFILT)
 #define RDP_TFILTER_AVERAGE		(3 << RSP_SETOTHERMODE_SHIFT_TEXTFILT)
 #define RDP_TFILTER_BILERP		(2 << RSP_SETOTHERMODE_SHIFT_TEXTFILT)
@@ -285,13 +288,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // an immediate word will be stored.
 //
 //
-#define RSP_MOVE_WORD_MATRIX		0x00	// NOTE: also used by movemem 
+#define RSP_MOVE_WORD_MATRIX	0x00	// NOTE: also used by movemem 
 #define RSP_MOVE_WORD_NUMLIGHT	0x02
 #define RSP_MOVE_WORD_CLIP		0x04
 #define RSP_MOVE_WORD_SEGMENT	0x06
 #define RSP_MOVE_WORD_FOG		0x08
 #define RSP_MOVE_WORD_LIGHTCOL	0x0a
-#define	RSP_MOVE_WORD_POINTS		0x0c
+#define	RSP_MOVE_WORD_POINTS	0x0c
 #define	RSP_MOVE_WORD_PERSPNORM	0x0e
 
 //
@@ -364,27 +367,6 @@ typedef union {
 #define MAX_DL_STACK_SIZE	32
 #define MAX_DL_COUNT		1000000
 
-typedef struct {
-	bool	used;
-	uint32	crc_size;
-	uint32	crc_800;
-	uint32	ucode;
-	uint32	minor_ver;
-	uint32	variant;
-	char	rspstr[200];
-	
-	uint32	ucStart;
-	uint32	ucSize;
-	uint32	ucDStart;
-	uint32	ucDSize;
-	uint32	ucCRC;
-	uint32	ucDWORD1;
-	uint32	ucDWORD2;
-	uint32	ucDWORD3;
-	uint32	ucDWORD4;
-} UcodeInfo;
-
-
 typedef struct
 {
 	uint32		ucode;
@@ -439,42 +421,19 @@ struct LoadCmdInfo
 	unsigned int dxt	:12;
 };
 
-#ifndef _XBOX
-typedef struct {
-	uint32 dwFormat;
-	uint32 dwSize;
-	BOOL  bSetBy;
-
-	uint32 dwLoadAddress;
-	uint32 dwTotalWords;
-	uint32 dxt;
-	BOOL  bSwapped;
-
-	uint32 dwWidth;
-	uint32 dwLine;
-
-	int sl;
-	int sh;
-	int tl;
-	int th;
-
-	uint32 dwTmem;
-} TMEMLoadMapInfo;
-#endif
-
 typedef struct {	// This is in Intel format
-  uint32 SourceImagePointer;
-  uint32 TlutPointer;
+  uint32 address; 
+  uint32 tlut;
 
-  short SubImageWidth;
+  short width;
   short Stride;
 
-  char  SourceImageBitSize;
-  char  SourceImageType;
-  short SubImageHeight;
+  char  size;
+  char  format;
+  short height;
 
-  short SourceImageOffsetT;
-  short SourceImageOffsetS;
+  short imageY;
+  short imageX;
 
   char	dummy[4]; 
 } SpriteStruct;			//Converted Sprint struct in Intel format
@@ -551,7 +510,13 @@ typedef struct
 
 		};
 		uint64			_u64;
-		uint32			_u32[2];
+
+		struct
+		{
+			u32	L;
+			u32	H;
+		};
+
 	};
 } RDP_OtherMode;
 
@@ -585,18 +550,18 @@ typedef struct
 
 // Mask down to 0x003FFFFF?
 #define RSPSegmentAddr(seg) ( gRSP.segments[((seg)>>24)&0x0F] + ((seg)&0x00FFFFFF) )
-#define RDRAM_UWORD(addr)	(*(uint32 *)((addr)+g_pRDRAMu8))
-#define RDRAM_SWORD(addr)	(*(s32 *)((addr)+g_pRDRAMu8))
-#define RDRAM_UHALF(addr)	(*(uint16 *)(((addr)^2)+g_pRDRAMu8))
-#define RDRAM_SHALF(addr)	(*(short *)(((addr)^2)+g_pRDRAMu8))
-#define RDRAM_UBYTE(addr)	(*(uint8 *)(((addr)^3)+g_pRDRAMu8))
-#define RDRAM_SBYTE(addr)	(*(s8 *)(((addr)^3)+g_pRDRAMu8))
-#define pRDRAM_UWORD(addr)	((uint32 *)((addr)+g_pRDRAMu8))
-#define pRDRAM_SWORD(addr)	((s32 *)((addr)+g_pRDRAMu8))
-#define pRDRAM_UHALF(addr)	((uint16 *)(((addr)^2)+g_pRDRAMu8))
-#define pRDRAM_SHALF(addr)	((short *)(((addr)^2)+g_pRDRAMu8))
-#define pRDRAM_UBYTE(addr)	((uint8 *)(((addr)^3)+g_pRDRAMu8))
-#define pRDRAM_SBYTE(addr)	((s8 *)(((addr)^3)+g_pRDRAMu8))
+#define RDRAM_UWORD(addr)	(*(uint32 *)((addr)+g_pu8RamBase))
+#define RDRAM_SWORD(addr)	(*(s32 *)((addr)+g_pu8RamBase))
+#define RDRAM_UHALF(addr)	(*(uint16 *)(((addr)^2)+g_pu8RamBase))
+#define RDRAM_SHALF(addr)	(*(short *)(((addr)^2)+g_pu8RamBase))
+#define RDRAM_UBYTE(addr)	(*(uint8 *)(((addr)^3)+g_pu8RamBase))
+#define RDRAM_SBYTE(addr)	(*(s8 *)(((addr)^3)+g_pu8RamBase))
+#define pRDRAM_UWORD(addr)	((uint32 *)((addr)+g_pu8RamBase))
+#define pRDRAM_SWORD(addr)	((s32 *)((addr)+g_pu8RamBase))
+#define pRDRAM_UHALF(addr)	((uint16 *)(((addr)^2)+g_pu8RamBase))
+#define pRDRAM_SHALF(addr)	((short *)(((addr)^2)+g_pu8RamBase))
+#define pRDRAM_UBYTE(addr)	((uint8 *)(((addr)^3)+g_pu8RamBase))
+#define pRDRAM_SBYTE(addr)	((s8 *)(((addr)^3)+g_pu8RamBase))
 
 extern uint16 g_wRDPTlut[];
 extern const char *textluttype[4];
@@ -624,13 +589,14 @@ void RDP_DLParser_Process(void);
 void PrepareTextures();
 void RDP_InitRenderState();
 void DisplayVertexInfo(uint32 dwAddr, uint32 dwV0, uint32 dwN);
-void RSP_MoveMemLight(uint32 dwLight, uint32 dwAddr);
+void RSP_MoveMemLight(uint32 dwLight, const N64Light *light);
+void RSP_MoveMemLightOld(uint32 dwLight, uint32 dwAddr);
 void RSP_MoveMemViewport(uint32 dwAddr);
 void RDP_NOIMPL_WARN(LPCTSTR op);
 void RSP_GFX_Force_Matrix(uint32 dwAddr);
+inline void DLParser_FetchNextCommand(MicroCodeCommand *p_command); 
 void RSP_GFX_InitGeometryMode();
 void RSP_SetUcode(int ucode, uint32 ucStart=0, uint32 ucDStart=0, uint32 cdSize=0);
-uint32 CalcalateCRC(uint32* srcPtr, uint32 srcSize);
 void RDP_GFX_PopDL();
 
 extern Matrix matToLoad;
@@ -639,8 +605,6 @@ void LoadMatrix(uint32 addr);
 ULONG ComputeCRC32(ULONG crc, const uint8 *buf, UINT len);
 
 void TriggerDPInterrupt();
-void TriggerSPInterrupt();
-uint32 DLParser_CheckUcode(uint32 ucStart, uint32 ucDStart, uint32 ucSize, uint32 ucDSize);
 
 bool IsUsedAsDI(uint32 addr);
 
