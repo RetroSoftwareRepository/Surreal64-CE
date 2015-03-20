@@ -26,7 +26,7 @@ void DLParser_RDPHalf1_GoldenEye(MicroCodeCommand command)
 		return;
 
 	PrepareTextures();
-	CRender::g_pRender->SetCombinerAndBlender();
+	//CRender::g_pRender->SetCombinerAndBlender();
 
 	uint32 dwPC = gDlistStack[gDlistStackPointer].pc;		// This points to the next instruction
 

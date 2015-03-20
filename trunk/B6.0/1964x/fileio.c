@@ -1623,11 +1623,21 @@ void FileIO_ImportPJ64State(const char *filename)
 		}
 	}
 
+	Build_Whole_Direct_TLB_Lookup_Table();
+
+
 	fread(gMS_PIF, 0x40, 1, stream);
 	fread(gMS_RDRAM, rdram_size, 1, stream);
 	fread(gMS_SP_MEM, MEMORY_SIZE_SPMEM, 1, stream);
 
 	fclose(stream);
+
+	if(currentromoptions.Code_Check == CODE_CHECK_PROTECT_MEMORY)
+	{
+		UnprotectAllBlocks();
+	}
+
+	DoOthersAfterLoadState();
 }
 
 /*
@@ -1670,6 +1680,7 @@ void FileIO_ExportPJ64State(const char *filename)
 
 	fwrite(header, 64, 1, stream);
 
+	gHWS_COP0Reg[COUNT] = Get_COUNT_Register();	//Refresh the COUNT register
 	fwrite(&gHWS_COP0Reg[COUNT], sizeof(DWORD), 1, stream);
 	fwrite(&gHWS_pc, sizeof(DWORD), 1, stream);
 	fwrite(&gHWS_GPR, 256, 1, stream);

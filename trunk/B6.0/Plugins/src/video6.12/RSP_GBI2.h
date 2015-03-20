@@ -251,6 +251,7 @@ void RSP_GBI2_Tri1(MicroCodeCommand command)
 
 		if (bTrisAdded)	
 		{
+			CRender::g_pRender->SetCombinerAndBlender();
 			CRender::g_pRender->DrawTriangles();
 		}
 
@@ -311,6 +312,7 @@ void RSP_GBI2_Tri2(MicroCodeCommand command)
 
 		if (bTrisAdded)	
 		{
+			CRender::g_pRender->SetCombinerAndBlender();
 			CRender::g_pRender->DrawTriangles();
 		}
 
@@ -364,6 +366,7 @@ void RSP_GBI2_Line3D(MicroCodeCommand command)
 
 		if (bTrisAdded)	
 		{
+			CRender::g_pRender->SetCombinerAndBlender();
 			CRender::g_pRender->DrawTriangles();
 		}
 

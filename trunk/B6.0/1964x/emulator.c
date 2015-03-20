@@ -21,6 +21,8 @@
 
 #include <xtl.h>
 
+extern void FileIO_ExportPJ64State(const char * filename);
+extern void FileIO_ImportPJ64State(const char * filename);
 #include <process.h>
 #include "globals.h"
 #include "debug_option.h"
@@ -634,6 +636,7 @@ uint32	HardwareStart = (uint32) & gHardwareState + 128;
  =======================================================================================================================
  =======================================================================================================================
  */
+//int bTriggerState = 0;
 void RunTheRegCacheWithoutOpcodeDebugger(void)
 {
 	/*
@@ -644,7 +647,30 @@ void RunTheRegCacheWithoutOpcodeDebugger(void)
 	__asm mov ebp, HardwareStart
 	while(emustatus.Emu_Keep_Running)
 	{
+		char buf[260];
+		//LoadAfter = 0; // needs to be 0 to boot but breaks states.
 _DoOtherTask:
+	
+		//Do this for RunTheRegCacheWithoutOpcodeDebugger() too
+			/*if (LoadAfter == 1)
+			{	
+				sprintf(buf, "%s%08x\\%08X-%08X-%02X.%i", g_szPathSaves, currentromoptions.crc1, currentromoptions.crc1, currentromoptions.crc2, currentromoptions.countrycode, stateindex);
+				FileIO_ImportPJ64State(buf);
+				Init_Count_Down_Counters();
+				RefreshDynaDuringGamePlay();
+				LoadAfter = 0;
+			}
+
+			if (LoadAfter == 2)
+			{
+				sprintf(buf, "%s%08x\\%08X-%08X-%02X.%i", g_szPathSaves, currentromoptions.crc1, currentromoptions.crc1, currentromoptions.crc2, currentromoptions.countrycode, stateindex);
+				FileIO_ExportPJ64State(buf);
+				FileIO_ImportPJ64State(buf); // Necessary...
+				Init_Count_Down_Counters();
+				RefreshDynaDuringGamePlay();
+				LoadAfter = 0;
+			}*/
+
 		Block = (uint8 *) *g_LookupPtr;
 		if(Block != NULL && g_pc_is_rdram) 
 			Dyna_Check_Codes();
@@ -758,9 +784,37 @@ void RunTheRegCacheNoCheck(void)
 {
 	__asm mov ebp, HardwareStart
 
+	
+
 	while(emustatus.Emu_Keep_Running)
 	{
+		char buf[260];
+		LoadAfter = 0;
 _NextBlock:
+		
+		// Usually load here
+		//if(bTriggerState){
+			if (LoadAfter == 1)
+			{	
+				sprintf(buf, "%s%08x\\%08X-%08X-%02X.%i", g_szPathSaves, currentromoptions.crc1, currentromoptions.crc1, currentromoptions.crc2, currentromoptions.countrycode, stateindex);
+				FileIO_ImportPJ64State(buf);
+				Init_Count_Down_Counters();
+				RefreshDynaDuringGamePlay();
+				//LoadAfter = 0; // needs to be commented to boot??
+			}
+		//}
+		//if(bTriggerState){
+			if (LoadAfter == 2)
+			{
+				sprintf(buf, "%s%08x\\%08X-%08X-%02X.%i", g_szPathSaves, currentromoptions.crc1, currentromoptions.crc1, currentromoptions.crc2, currentromoptions.countrycode, stateindex);
+				FileIO_ExportPJ64State(buf);
+				FileIO_ImportPJ64State(buf); // Necessary...
+				Init_Count_Down_Counters();
+				RefreshDynaDuringGamePlay();
+				//LoadAfter = 0; // needs to be commented to boot??
+			}	
+		//}
+		
 		__asm
 		{
 l1:			mov eax, g_LookupPtr

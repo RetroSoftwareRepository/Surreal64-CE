@@ -448,6 +448,7 @@ void ProcessMessages (void) {
 	}
 }
 */
+extern BOOL LoadControllerDll(void);
 void DoSomething ( void ) {
 	if (CPU_Action.CloseCPU) { 
 		//CoUninitialize();
@@ -516,6 +517,7 @@ void DoSomething ( void ) {
 	if (CPU_Action.RestoreState) {
 		CPU_Action.RestoreState = FALSE;
 		Machine_LoadState();
+		LoadControllerDll(); // hack for states made with 1964
 	}
 	if (CPU_Action.DoInterrupt == TRUE) { CPU_Action.DoSomething = TRUE; }
 }

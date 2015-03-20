@@ -88,6 +88,7 @@ void RSP_Quad3d_ShadowOfEmpire(MicroCodeCommand command)
 
 	if (bTrisAdded)	
 	{
+		CRender::g_pRender->SetCombinerAndBlender();
 		CRender::g_pRender->DrawTriangles();
 	}
 
@@ -129,6 +130,7 @@ void RSP_Tri1_ShadowOfEmpire(MicroCodeCommand command)
 
 	if (bTrisAdded)	
 	{
+		CRender::g_pRender->SetCombinerAndBlender();
 		CRender::g_pRender->DrawTriangles();
 	}
 }

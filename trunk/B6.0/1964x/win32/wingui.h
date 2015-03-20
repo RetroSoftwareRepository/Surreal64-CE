@@ -113,5 +113,7 @@ extern void __EMU_GetStateFilename(int index, char *filename, int mode);
 extern BOOL PathFileExists(const char *pszPath);
 
 extern char g_szPathSaves[256];
+extern int LoadAfter;
+extern int stateindex;
 
 #endif

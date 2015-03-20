@@ -1103,7 +1103,7 @@ void ToggleEmulator(bool inc)
 void ToggleMaxVideoMem(bool inc)
 {
 	// Ez0n3 - we'll use the old one until freakdave finishes this
-	int maxVideoMem = 10;
+	int maxVideoMem = 32;
 	
     WCHAR currentname[120];
 	currentItem = m_pSettingsMenu->curitem;

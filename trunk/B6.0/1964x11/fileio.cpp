@@ -1686,7 +1686,7 @@ void FileIO_ImportPJ64State(const char *filename)
 		return;
 	}
 
-	TRACE1("Export PJ64 state: %s", filename);
+	TRACE1("Import PJ64 state: %s", filename);
 
 	fread(&dummy, sizeof(DWORD), 1, stream);
 	fread(&rdram_size, sizeof(DWORD), 1, stream);
@@ -1777,11 +1777,7 @@ void FileIO_ImportPJ64State(const char *filename)
 			gMS_TLB[i].EntryLo0 &= 0xFFFFFFFE;
 		}
 	}
-#ifdef _XBOX
-	fread(gMS_PIF, 0x40, 1, stream);
-	fread(gMS_RDRAM, rdram_size, 1, stream);
-	fread(gMS_SP_MEM, MEMORY_SIZE_SPMEM, 1, stream);
-#else
+
 	Build_Whole_Direct_TLB_Lookup_Table();
 
 
@@ -1797,7 +1793,6 @@ void FileIO_ImportPJ64State(const char *filename)
 	}
 
 	DoOthersAfterLoadState();
-#endif
 }
 
 /*

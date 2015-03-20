@@ -24,6 +24,7 @@
 #include <xbapp.h>
 #include <xbresource.h>
 #include <xbfont.h>
+#include <time.h>
 #include "../ingamemenu/xlmenu.h"
 #include "128meg.h"
 #include "musicmanager.h"
@@ -163,9 +164,14 @@ private:
 	void MoveCursor();
 	CIoSupport m_IOSupport;
 };
-
+bool seedRand = 1;
 VOID __cdecl main()
 {
+	if(seedRand){
+		seedRand = 0;
+		srand( time(NULL) ); // seed a real random number
+	}
+
 	CXBoxSample	xbApp;
 	if(	FAILED(	xbApp.Create() ) )
 		return;
@@ -174,6 +180,7 @@ VOID __cdecl main()
 	fGameSelect	= 0.0f;
 	fCursorPos = 0.0f;
 	fMaxCount =	0.0f;
+	
 }
 
 CXBoxSample::CXBoxSample() 

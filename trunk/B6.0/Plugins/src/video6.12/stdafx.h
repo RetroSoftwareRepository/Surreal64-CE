@@ -120,8 +120,6 @@
 #include "DirectXDecodedMux.h"
 
 #include "blender.h"
-#include "DirectXBlender.h"
-
 
 #include "combiner.h"
 #include "GeneralCombiner.h"

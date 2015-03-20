@@ -18,6 +18,7 @@ bool bEnableHDTV = false; // Set to false (640x480 default)
 bool bFullScreen = false;//true;	// When Using HDTV render to whole screen
 									// This setting is unused at the moment, we are talking
 									// about aspect ratio here. UHLE defaults to 4:3 even in HD
+int XboxPitch = 2;
 									
 extern "C" void loadinis();
 extern "C" int loaddwPJ64PagingMem();
@@ -370,6 +371,7 @@ void ResetDefaults()
 	bEnableHDTV = false;
 	bFullScreen = false;
 	bUseLinFog = false;
+	XboxPitch = 2;
 	EnableController1 = true;
 	EnableController2 = true;
 	EnableController3 = true; // this was false in launcher config
@@ -535,6 +537,7 @@ int ConfigAppSave2()
 	ini.SetBoolValue("Settings", "SoftDisplayFilter", SoftDisplayFilter);
 	ini.SetBoolValue("Settings", "FrameSkip", FrameSkip);
 	ini.SetBoolValue("Settings", "LinearFog", bUseLinFog);
+	ini.SetLongValue("Settings", "XboxPitch", XboxPitch);
 	ini.SetBoolValue("Settings", "EnableController1", EnableController1);
 	ini.SetBoolValue("Settings", "EnableController2", EnableController2);
 	ini.SetBoolValue("Settings", "EnableController3", EnableController3);
@@ -655,6 +658,7 @@ int ConfigAppLoad2()
 	SoftDisplayFilter = ini.GetBoolValue("Settings", "SoftDisplayFilter", SoftDisplayFilter );
 	FrameSkip = ini.GetBoolValue("Settings", "FrameSkip", FrameSkip );
 	bUseLinFog = ini.GetBoolValue("Settings", "LinearFog", bUseLinFog );
+	XboxPitch = ini.GetLongValue("Settings", "XboxPitch", XboxPitch );
 	EnableController1 = ini.GetBoolValue("Settings", "EnableController1", EnableController1 );
 	EnableController2 = ini.GetBoolValue("Settings", "EnableController2", EnableController2 );
 	EnableController3 = ini.GetBoolValue("Settings", "EnableController3", EnableController3 );

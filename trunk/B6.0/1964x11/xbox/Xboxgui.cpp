@@ -43,6 +43,10 @@ HANDLE				StopEmulatorEvent = NULL;
 HANDLE				ResumeEmulatorEvent = NULL;
 HANDLE				PauseEmulatorEvent = NULL;
 
+int					stateindex = 0;
+bool				LoadAfter = false;
+bool				bTriggerState = false;
+
 void					UpdateCIC(void);
 
 extern HANDLE	AudioThreadStopEvent;
@@ -84,16 +88,24 @@ char emuname[256];
 
 extern "C" void __EMU_SaveState(int index)
 {
-	char buf[_MAX_PATH];
-	sprintf(buf, "%s%08x\\%08X-%08X-%02X.%i", g_szPathSaves, currentromoptions.crc1, currentromoptions.crc1, currentromoptions.crc2, currentromoptions.countrycode, index);
-	FileIO_ExportPJ64State(buf);
+	bTriggerState = true;
+	LoadAfter = false;
+	stateindex = index;
+
+	CPUNeedToCheckInterrupt = TRUE;
+	CPUNeedToDoOtherTask = TRUE;
+	Set_Check_Interrupt_Timer_Event();
 }
 
 extern "C" void __EMU_LoadState(int index)
 {
-	char buf[_MAX_PATH];
-	sprintf(buf, "%s%08x\\%08X-%08X-%02X.%i", g_szPathSaves, currentromoptions.crc1, currentromoptions.crc1, currentromoptions.crc2, currentromoptions.countrycode, index);
-	FileIO_ImportPJ64State(buf);
+	bTriggerState = true;
+	LoadAfter = true;
+	stateindex = index;
+
+	CPUNeedToCheckInterrupt = TRUE;
+	CPUNeedToDoOtherTask = TRUE;
+	Set_Check_Interrupt_Timer_Event();	
 }
 
 extern "C" void __EMU_GetStateFilename(int index, char *filename, int mode)

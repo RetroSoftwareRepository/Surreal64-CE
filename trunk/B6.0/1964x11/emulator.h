@@ -108,6 +108,9 @@ void	CPU_Task_To_String(char *str);
 void    RefreshDynaDuringGamePlay(void);
 
 #ifdef _XBOX
+extern int stateindex;
+extern bool						LoadAfter;
+extern bool						bTriggerState;
 #define INTERPRETER_DEBUG_INSTRUCTION(inst)
 #define DYNA_DEBUG_INSTRUCTION(inst)
 #define DYNA_LOG_INSTRUCTION
