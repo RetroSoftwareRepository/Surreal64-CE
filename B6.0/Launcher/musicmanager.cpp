@@ -121,8 +121,6 @@ HRESULT CMusicManager::Initialize()
 	else
 		SelectSong( 0 );
 
-	srand( GetTickCount() );
-
 	// Allocate sample data buffer
 	m_pSampleData = new BYTE[ ( PACKET_COUNT + EXTRA_PACKETS ) * PACKET_SIZE ];
 	if( !m_pSampleData ) {

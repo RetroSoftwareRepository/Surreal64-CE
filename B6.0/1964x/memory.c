@@ -214,17 +214,21 @@ void FreeVirtualDynaMemory(void)
 }
 
 // GogoAckman - free up 8Mb for the menu, had a hard time to find this mem_decommit :P
-void ReInitVirtualDynaMemory(boolean charge)
+BOOL ReInitVirtualDynaMemory(boolean charge)
 {
 	FILE *fp;
+	BOOL isComplete = 0; 
 
 	if (!charge) {
 		if(dyna_RecompCode != NULL){
+			DeleteFile("Z:\\codetemp.dat");
 			fp=fopen("Z:\\codetemp.dat","wb");
 			//fp=fopen("T:\\Data\\codetemp.dat","wb");
 			fwrite(dyna_RecompCode,g_dwRecompCodeSize ,sizeof(uint8),fp);
 			VirtualFree(dyna_RecompCode, g_dwRecompCodeSize, MEM_DECOMMIT);
-		    fclose(fp);}
+		    fclose(fp);
+			isComplete = 1;
+		}
 	}
 	else {
 		fp=fopen("Z:\\codetemp.dat","rb");
@@ -235,7 +239,10 @@ void ReInitVirtualDynaMemory(boolean charge)
 		fclose(fp);
 		DeleteFile("Z:\\codetemp.dat");
 		//DeleteFile("T:\\Data\\codetemp.dat");
+		isComplete = 1;
 	}
+
+	return isComplete;
 }
 
 /*

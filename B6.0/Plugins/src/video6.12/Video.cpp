@@ -62,6 +62,16 @@ char g_szTempMessage[100];
 //XFONT *g_defaultTrueTypeFont = NULL;
 extern bool g_bUseSetTextureMem;
 extern DWORD g_maxTextureMemUsage;
+
+#include "../../../config.h"
+extern bool bloadstate[MAX_SAVE_STATES];
+extern bool bsavestate[MAX_SAVE_STATES];
+extern "C" void __EMU_SaveState(int index);
+extern "C" void __EMU_LoadState(int index);
+extern bool bSatesUpdated;
+
+bool bSatesUpdated2 = false;
+char tempmsg[260]; 
 #endif
 //---------------------------------------------------------------------------------------
 
@@ -783,7 +793,47 @@ FUNC_TYPE(void) NAME_DEFINE(UpdateScreen) (void)
 		WaitForSingleObject( threadFinished, INFINITE );
 	}
 #else
-	 UpdateScreenStep2();
+	UpdateScreenStep2();
+#endif
+
+#ifdef _XBOX
+	if(bSatesUpdated2)
+	{
+		_VIDEO_DisplayTemporaryMessage(tempmsg);
+		bSatesUpdated2=false;
+	}
+
+	if(bSatesUpdated)
+	{
+	bSatesUpdated=false;
+	bSatesUpdated2=true;
+	
+		for (int i=0; i<MAX_SAVE_STATES; i++) 
+		{
+			if (bloadstate[i]) 
+			{
+				try{
+					__EMU_LoadState(i+1);
+				}catch(...){};
+
+				sprintf(tempmsg, "Loaded State %d", i+1);
+				bloadstate[i]=false;
+				
+				break;
+			}
+			else if (bsavestate[i]) 
+			{
+				try{
+					__EMU_SaveState(i+1);
+				}catch(...){};
+
+				sprintf(tempmsg, "Saved State %d", i+1);
+				bsavestate[i]=false;
+
+				break;
+			}
+		}
+	}
 #endif
 }
 

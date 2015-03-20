@@ -127,6 +127,7 @@ void ToggleTextureFilter(bool inc);
 void ToggleSoftDisplayFilter();
 void ToggleFrameSkip();
 void ToggleFogMode();
+void ToggleXboxPitch();
 void ToggleSensitivity(bool inc);
 void ToggleDeadzone(bool inc);
 void ToggleButtonToAxisThresh(bool inc);
@@ -186,6 +187,7 @@ void decPakPlugin(){ TogglePak(false); }
 extern bool showdebug;
 extern bool bEnableHDTV;
 extern bool bFullScreen;
+extern int XboxPitch;
 
 enum Pak
 {
@@ -677,140 +679,95 @@ void LoadStateMenu(void)
 
 void LoadState1()
 {
+	// Prevent preview texture from loading and clean up
 	bNoPreview = true;
-	try{
-		if (pStateTexture) {
+	if (pStateTexture) {
 		pStateTexture->Release();
 		pStateTexture = NULL;
-		}
-		ClearIGM();
 	}
-	catch(...)
-	{
+	ClearIGM();
 
-	}
-	try{
-		bloadstate[1]=true;
-		bSatesUpdated=true;
-		//__EMU_LoadState(1);
-	}
-	catch(...)
-	{
-		_VIDEO_DisplayTemporaryMessage("Load State failed!");
-	}
-	_VIDEO_DisplayTemporaryMessage("Loaded State 1");
+	// Seed a Load State
+	bSatesUpdated=true;
+	bloadstate[1]=true;
+
+	// Disable Menu to exit
 	XLMenu_CurRoutine = NULL;
 	XLMenu_CurMenu = NULL;
 }
 
 void LoadState2()
 {
+	// Prevent preview texture from loading and clean up
 	bNoPreview = true;
-	try{
-		if (pStateTexture) {
+	if (pStateTexture) {
 		pStateTexture->Release();
 		pStateTexture = NULL;
-		}
-		ClearIGM();
 	}
-	catch(...)
-	{
+	ClearIGM();
 
-	}
-	try{
-		bloadstate[2]=true;
-		bSatesUpdated=true;
-		//__EMU_LoadState(2);
-	}
-	catch(...)
-	{
-		_VIDEO_DisplayTemporaryMessage("Load State failed!");
-	}
-	_VIDEO_DisplayTemporaryMessage("Loaded State 2");
+	// Seed a Load State
+	bSatesUpdated=true;
+	bloadstate[2]=true;
+	
+	// Disable Menu to exit
 	XLMenu_CurRoutine = NULL;
 	XLMenu_CurMenu = NULL;
 }
 
 void LoadState3()
 {
+	// Prevent preview texture from loading and clean up
 	bNoPreview = true;
-	try{
-		if (pStateTexture) {
+	if (pStateTexture) {
 		pStateTexture->Release();
 		pStateTexture = NULL;
-		}
-		ClearIGM();
 	}
-	catch(...)
-	{
+	ClearIGM();
 
-	}
-	try{
-		bloadstate[3]=true;
-		bSatesUpdated=true;
-		//__EMU_LoadState(3);
-	}
-	catch(...)
-	{
-		_VIDEO_DisplayTemporaryMessage("Load State failed!");
-	}
-	_VIDEO_DisplayTemporaryMessage("Loaded State 3");
+	// Seed a Load State
+	bSatesUpdated=true;
+	bloadstate[3]=true;
+	
+	// Disable Menu to exit
 	XLMenu_CurRoutine = NULL;
 	XLMenu_CurMenu = NULL;
 }
 
 void LoadState4()
 {
+	// Prevent preview texture from loading and clean up
 	bNoPreview = true;
-	try{
-		if (pStateTexture) {
+	if (pStateTexture) {
 		pStateTexture->Release();
 		pStateTexture = NULL;
-		}
-		ClearIGM();
 	}
-	catch(...)
-	{
+	ClearIGM();
 
-	}
-	try{
-		bloadstate[4]=true;
-		bSatesUpdated=true;
-		//__EMU_LoadState(4);	
-	}
-	catch(...)
-	{
-		_VIDEO_DisplayTemporaryMessage("Load State failed!");
-	}
-	_VIDEO_DisplayTemporaryMessage("Loaded State 4");
+	// Seed a Load State
+	bSatesUpdated=true;
+	bloadstate[4]=true;
+	
+	// Disable Menu to exit
 	XLMenu_CurRoutine = NULL;
 	XLMenu_CurMenu = NULL;
 }
 
 void LoadState5()
 {
+	// Prevent preview texture from loading and clean up
 	bNoPreview = true;
-	try{
-		if (pStateTexture) {
+	if (pStateTexture) {
 		pStateTexture->Release();
 		pStateTexture = NULL;
-		}
-		ClearIGM();
 	}
-	catch(...)
-	{
+	ClearIGM();
 
-	}
-	try{
-		bloadstate[5]=true;
-		bSatesUpdated=true;
-		//__EMU_LoadState(5);
-	}
-	catch(...)
-	{
-		_VIDEO_DisplayTemporaryMessage("Load State failed!");
-	}
-	_VIDEO_DisplayTemporaryMessage("Loaded State 5");
+	// Seed a Load State
+	bSatesUpdated=true;
+	bloadstate[5]=true;
+	
+	// Disable Menu to exit
 	XLMenu_CurRoutine = NULL;
 	XLMenu_CurMenu = NULL;
 }
@@ -936,176 +893,110 @@ void SaveStateMenu(void)
 
 void SaveState1()
 {
+	// Create a small screenshot.
+	CreateSaveStatePreview(0);
+	
+	// Prevent preview texture from loading on exit and clean up
 	bNoPreview = true;
-	try{
-		CreateSaveStatePreview(0);
-	}
-	catch(...)
-	{
-		_VIDEO_DisplayTemporaryMessage("Preview failed!");
-	}
-	try{
-		if (pStateTexture) {
+	if (pStateTexture) {
 		pStateTexture->Release();
 		pStateTexture = NULL;
-		}
-		ClearIGM();
 	}
-	catch(...)
-	{
+	ClearIGM();
+	
+	// Seed a Save State
+	bSatesUpdated=true;
+	bsavestate[1]=true;
 
-	}
-	try{
-		bsavestate[1]=true;
-		bSatesUpdated=true;
-		//__EMU_SaveState(1);
-	}
-	catch(...)
-	{
-		_VIDEO_DisplayTemporaryMessage("Save State failed!");
-	}
-	_VIDEO_DisplayTemporaryMessage("Saved State 1");
+	// Disable Menu to exit
 	XLMenu_CurRoutine = NULL;
 	XLMenu_CurMenu = NULL;
-	
 }
 
 void SaveState2()
 {
+	// Create a small screenshot.
+	CreateSaveStatePreview(1);
+	
+	// Prevent preview texture from loading on exit and clean up
 	bNoPreview = true;
-	try{
-		CreateSaveStatePreview(1);	
-	}
-	catch(...)
-	{
-		_VIDEO_DisplayTemporaryMessage("Preview failed!");
-	}
-	try{
-		if (pStateTexture) {
+	if (pStateTexture) {
 		pStateTexture->Release();
 		pStateTexture = NULL;
-		}
-		ClearIGM();
 	}
-	catch(...)
-	{
-
-	}
-	try{
-		bsavestate[2]=true;
-		bSatesUpdated=true;
-		//__EMU_SaveState(2);
-	}
-	catch(...)
-	{
-		_VIDEO_DisplayTemporaryMessage("Save State failed!");
-	}
-	_VIDEO_DisplayTemporaryMessage("Saved State 2");
+	ClearIGM();
+	
+	// Seed a Save State
+	bSatesUpdated=true;
+	bsavestate[2]=true;
+	
+	// Disable Menu to exit
 	XLMenu_CurRoutine = NULL;
 	XLMenu_CurMenu = NULL;
 }
 
 void SaveState3()
 {
+	// Create a small screenshot.
+	CreateSaveStatePreview(2);
+	
+	// Prevent preview texture from loading on exit and clean up
 	bNoPreview = true;
-	try{
-		CreateSaveStatePreview(2);	
-	}
-	catch(...)
-	{
-		_VIDEO_DisplayTemporaryMessage("Preview failed!");
-	}
-	try{
-		if (pStateTexture) {
+	if (pStateTexture) {
 		pStateTexture->Release();
 		pStateTexture = NULL;
-		}
-		ClearIGM();
 	}
-	catch(...)
-	{
+	ClearIGM();
+	
+	// Seed a Save State
+	bSatesUpdated=true;
+	bsavestate[3]=true;
 
-	}
-	try{
-		bsavestate[3]=true;
-		bSatesUpdated=true;
-		//__EMU_SaveState(3);
-	}
-	catch(...)
-	{
-		_VIDEO_DisplayTemporaryMessage("Save State failed!");
-	}
-	_VIDEO_DisplayTemporaryMessage("Saved State 3");
+	// Disable Menu to exit
 	XLMenu_CurRoutine = NULL;
 	XLMenu_CurMenu = NULL;
 }
 
 void SaveState4()
 {
+	// Create a small screenshot.
+	CreateSaveStatePreview(3);
+	
+	// Prevent preview texture from loading on exit and clean up
 	bNoPreview = true;
-	try{
-		CreateSaveStatePreview(3);	
-	}
-	catch(...)
-	{
-		_VIDEO_DisplayTemporaryMessage("Preview failed!");
-	}
-	try{
-		if (pStateTexture) {
+	if (pStateTexture) {
 		pStateTexture->Release();
 		pStateTexture = NULL;
-		}
-		ClearIGM();
 	}
-	catch(...)
-	{
+	ClearIGM();
+	
+	// Seed a Save State
+	bSatesUpdated=true;
+	bsavestate[4]=true;
 
-	}
-	try{
-		bsavestate[4]=true;
-		bSatesUpdated=true;
-		//__EMU_SaveState(4);
-	}
-	catch(...)
-	{
-		_VIDEO_DisplayTemporaryMessage("Save State failed!");
-	}
-	_VIDEO_DisplayTemporaryMessage("Saved State 4");
+	// Disable Menu to exit
 	XLMenu_CurRoutine = NULL;
 	XLMenu_CurMenu = NULL;
 }
 
 void SaveState5()
 {
+	// Create a small screenshot.
+	CreateSaveStatePreview(4);
+	
+	// Prevent preview texture from loading on exit and clean up
 	bNoPreview = true;
-	try{
-		CreateSaveStatePreview(4);	
-	}
-	catch(...)
-	{
-		_VIDEO_DisplayTemporaryMessage("Preview failed!");
-	}
-	try{
-		if (pStateTexture) {
+	if (pStateTexture) {
 		pStateTexture->Release();
 		pStateTexture = NULL;
-		}
-		ClearIGM();
 	}
-	catch(...)
-	{
+	ClearIGM();
+	
+	// Seed a Save State
+	bSatesUpdated=true;
+	bsavestate[5]=true;
 
-	}
-	try{
-		bsavestate[5]=true;
-		bSatesUpdated=true;
-		//__EMU_SaveState(5);	
-	}
-	catch(...)
-	{
-		_VIDEO_DisplayTemporaryMessage("Save State failed!");
-	}
-	_VIDEO_DisplayTemporaryMessage("Saved State 5");
+	// Disable Menu to exit
 	XLMenu_CurRoutine = NULL;
 	XLMenu_CurMenu = NULL;
 }
@@ -1120,7 +1011,7 @@ void VideoSettingsMenu(void)
 
     WCHAR currentname[120];
 
-	m_pSettingsMenu = XLMenu_Init((float)iIGMMenuTxtPosX,(float)iIGMMenuTxtPosY,6, GetMenuFontAlign(iIGMMenuTxtAlign)|MENU_WRAP, NULL);
+	m_pSettingsMenu = XLMenu_Init((float)iIGMMenuTxtPosX,(float)iIGMMenuTxtPosY,7, GetMenuFontAlign(iIGMMenuTxtAlign)|MENU_WRAP, NULL);
 
 	m_pSettingsMenu->itemcolor = dwMenuItemColor;
 	m_pSettingsMenu->parent = m_pMainMenu;
@@ -1165,6 +1056,17 @@ void VideoSettingsMenu(void)
 	else 
 	swprintf(currentname,L"Fog Mode : Linear");
 	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,currentname,ToggleFogMode);
+
+	//Texture Depth
+	if (XboxPitch == 2){
+	swprintf(currentname,L"Texture Depth : 16bit");
+	}
+	else{
+	swprintf(currentname,L"Texture Depth : 32bit");
+	XboxPitch = 4;
+	}
+	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,currentname,ToggleXboxPitch);
+
 
 	XLMenu_Activate(m_pSettingsMenu);
 
@@ -1258,6 +1160,26 @@ void ToggleFogMode()
 	swprintf(currentname,L"Fog Mode : Range");
 	else 
 	swprintf(currentname,L"Fog Mode : Linear");
+	XLMenu_SetItemText(&m_pSettingsMenu->items[currentItem], currentname);
+
+	ConfigAppSave2();
+}
+
+void ToggleXboxPitch()
+{
+    WCHAR currentname[120];
+	currentItem = m_pSettingsMenu->curitem;
+		
+	XLMenu_CurRoutine = NULL;
+	
+	if(XboxPitch == 2){
+		XboxPitch = 4;
+		swprintf(currentname,L"Texture Depth : 32bit");
+	}
+	else if(XboxPitch == 4){
+		XboxPitch = 2;
+		swprintf(currentname,L"Texture Depth : 16bit");
+	}
 	XLMenu_SetItemText(&m_pSettingsMenu->items[currentItem], currentname);
 
 	ConfigAppSave2();

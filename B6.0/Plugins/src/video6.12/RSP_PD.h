@@ -79,11 +79,6 @@ void RSP_Tri4_PD(MicroCodeCommand command)
 					InitVertexTextureConstants();
 				}
 
-				if( !bTrisAdded )
-				{
-					CRender::g_pRender->SetCombinerAndBlender();
-				}
-
 				bTrisAdded = true;
 				PrepareTriangle(v0, v2, v1);
 			}
@@ -103,6 +98,7 @@ void RSP_Tri4_PD(MicroCodeCommand command)
 
 	if (bTrisAdded)	
 	{
+		CRender::g_pRender->SetCombinerAndBlender();
 		CRender::g_pRender->DrawTriangles();
 	}
 

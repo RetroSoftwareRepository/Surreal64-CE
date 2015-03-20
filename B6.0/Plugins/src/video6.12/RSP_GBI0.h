@@ -183,6 +183,7 @@ void RSP_GBI0_Tri4(MicroCodeCommand command)
 
 	if (bTrisAdded)	
 	{
+		CRender::g_pRender->SetCombinerAndBlender();
 		CRender::g_pRender->DrawTriangles();
 	}
 	

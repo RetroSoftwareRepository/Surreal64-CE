@@ -80,6 +80,9 @@ long					OnOpcodeDebuggerCommands(HWND hWnd, UINT message, WPARAM wParam, LPARAM
 void					OnFreshRomList();
 void					DisableNetplayMemu();
 
+int LoadAfter = 0;
+int stateindex = 0;
+
 /*//weinerschnitzel - lets do this for rom paging now
 // Ez0n3 - determine if the current phys ram is greater than 100MB
 extern int	RAM_IS_128 = 0; //assume we are 64mb
@@ -113,16 +116,22 @@ BOOL MessageBox(HWND hWnd, LPCTSTR lpText, LPCTSTR lpCaption, UINT uType)
 
 void __EMU_SaveState(int index)
 {
-	char buf[_MAX_PATH];
-	sprintf(buf, "%s%08x\\%08X-%08X-%02X.%i", g_szPathSaves, currentromoptions.crc1, currentromoptions.crc1, currentromoptions.crc2, currentromoptions.countrycode, index);
-	FileIO_ExportPJ64State(buf);
+	LoadAfter = 2;
+	stateindex = index;
+
+	CPUNeedToCheckInterrupt = TRUE;
+	CPUNeedToDoOtherTask = TRUE;
+	Set_Check_Interrupt_Timer_Event();
 }
 
 void __EMU_LoadState(int index)
 {
-	char buf[_MAX_PATH];
-	sprintf(buf, "%s%08x\\%08X-%08X-%02X.%i", g_szPathSaves, currentromoptions.crc1, currentromoptions.crc1, currentromoptions.crc2, currentromoptions.countrycode, index);
-	FileIO_ImportPJ64State(buf);
+	LoadAfter = 1;
+	stateindex = index;
+
+	CPUNeedToCheckInterrupt = TRUE;
+	CPUNeedToDoOtherTask = TRUE;
+	Set_Check_Interrupt_Timer_Event();
 }
 
 void __EMU_GetStateFilename(int index, char *filename, int mode)

@@ -29,12 +29,10 @@ public:
 	virtual CRender * CreateRender(void)=0;
 	virtual CTexture * CreateTexture(uint32 dwWidth, uint32 dwHeight, TextureUsage usage = AS_NORMAL)=0;
 	virtual CColorCombiner * CreateColorCombiner(CRender *pRender)=0;
-	virtual CBlender * CreateAlphaBlender(CRender *pRender)=0;
 
 	void DeleteGraphicsContext(void);
 	void DeleteRender(void);
 	void DeleteColorCombiner(void);
-	void DeleteAlphaBlender(void);
 
 	static void DeleteBuilder(void);
 	static CDeviceBuilder* GetBuilder(void);
@@ -53,7 +51,6 @@ protected:
 	CRender* m_pRender;
 	CGraphicsContext* m_pGraphicsContext;
 	CColorCombiner* m_pColorCombiner;
-	CBlender* m_pAlphaBlender;
 };
 
 #ifndef _XBOX
@@ -65,7 +62,6 @@ public:
 	CRender * CreateRender(void);
 	CTexture * CreateTexture(uint32 dwWidth, uint32 dwHeight, TextureUsage usage = AS_NORMAL);
 	CColorCombiner * CreateColorCombiner(CRender *pRender);
-	CBlender * CreateAlphaBlender(CRender *pRender);
 
 protected:
 	OGLDeviceBuilder() {};
@@ -82,7 +78,6 @@ public:
 	CRender * CreateRender(void);
 	CTexture * CreateTexture(uint32 dwWidth, uint32 dwHeight, TextureUsage usage = AS_NORMAL);
 	CColorCombiner * CreateColorCombiner(CRender *pRender);
-	CBlender * CreateAlphaBlender(CRender *pRender);
 
 protected:
 	DirectXDeviceBuilder() {};

@@ -125,8 +125,7 @@ void CDeviceBuilder::DeleteBuilder(void)
 CDeviceBuilder::CDeviceBuilder() :
 	m_pRender(NULL),
 	m_pGraphicsContext(NULL),
-	m_pColorCombiner(NULL),
-	m_pAlphaBlender(NULL)
+	m_pColorCombiner(NULL)
 {
 }
 
@@ -135,7 +134,6 @@ CDeviceBuilder::~CDeviceBuilder()
 	DeleteGraphicsContext();
 	DeleteRender();
 	DeleteColorCombiner();
-	DeleteAlphaBlender();
 }
 
 void CDeviceBuilder::DeleteGraphicsContext(void)
@@ -165,15 +163,6 @@ void CDeviceBuilder::DeleteColorCombiner(void)
 	{
 		delete m_pColorCombiner;
 		m_pColorCombiner = NULL;
-	}
-}
-
-void CDeviceBuilder::DeleteAlphaBlender(void)
-{
-	if( m_pAlphaBlender != NULL )
-	{
-		delete m_pAlphaBlender;
-		m_pAlphaBlender = NULL;
 	}
 }
 
@@ -502,17 +491,6 @@ CColorCombiner * DirectXDeviceBuilder::CreateColorCombiner(CRender *pRender)
 	}
 
 	return m_pColorCombiner;
-}
-
-CBlender * DirectXDeviceBuilder::CreateAlphaBlender(CRender *pRender)
-{
-	if( m_pAlphaBlender == NULL )
-	{
-		m_pAlphaBlender = new CDirectXBlender(pRender);
-		SAFE_CHECK(m_pAlphaBlender);
-	}
-
-	return m_pAlphaBlender;
 }
 
 

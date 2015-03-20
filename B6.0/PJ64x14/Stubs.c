@@ -955,7 +955,7 @@ void __EMU_GetStateFilename(int index, char *filename, int mode)
 }
 
 // GogoAckman - free up 4Mb for the menu
-void __fastcall ReInitVirtualDynaMemory(boolean charge)
+BOOL __fastcall ReInitVirtualDynaMemory(boolean charge)
 {
 
 	// Ez0n3 - i don't think this should free up g_dwNumFrames (PJ64PagingMem) for menu - what if it's a 128MB sys and g_dwNumFrames = entire rom??!!
@@ -969,14 +969,17 @@ void __fastcall ReInitVirtualDynaMemory(boolean charge)
 	// see what happens...
 	
 	FILE *fp;
+	BOOL isComplete = 0;
 
 	if (!charge) {
 		if(XBOXRecompCode != NULL){
+			DeleteFile("Z:\\codetemp.dat");
 			fp=fopen("Z:\\codetemp.dat","wb");
 			//fp=fopen("T:\\Data\\codetemp.dat","wb");
 			fwrite(XBOXRecompCode,g_dwNormalCompileBufferSize ,sizeof(uint8),fp);
 			VirtualFree(XBOXRecompCode, g_dwNormalCompileBufferSize, MEM_DECOMMIT);
 		    fclose(fp);
+			isComplete = 1;
 		}
 	}
 	else {
@@ -988,7 +991,10 @@ void __fastcall ReInitVirtualDynaMemory(boolean charge)
 		fclose(fp);
 		DeleteFile("Z:\\codetemp.dat");
 		//DeleteFile("T:\\Data\\codetemp.dat");
+		isComplete = 1;
 	}
+
+	return isComplete;
 	
 /*
 	FILE *fp;

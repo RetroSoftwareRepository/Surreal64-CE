@@ -60,7 +60,6 @@ public:
 	BOOL	m_bBlendModeValid;
 
 	CColorCombiner *m_pColorCombiner;
-	CBlender *m_pAlphaBlender;
 	
 	
 	virtual ~CRender();

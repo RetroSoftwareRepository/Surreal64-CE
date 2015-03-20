@@ -298,7 +298,7 @@ void RSP_DMA_Tri_DKR(MicroCodeCommand command)
 		CRender::g_pRender->SetVtxTextureCoord(dwV1, tri->s1, tri->t1);
 		CRender::g_pRender->SetVtxTextureCoord(dwV2, tri->s2, tri->t2);
 
-		if( !bTrisAdded )
+		if( !bTrisAdded ) //meow
 		{
 			CRender::g_pRender->SetCombinerAndBlender();
 		}
@@ -310,6 +310,7 @@ void RSP_DMA_Tri_DKR(MicroCodeCommand command)
 
 	if (bTrisAdded)	
 	{
+		CRender::g_pRender->SetCombinerAndBlender();
 		CRender::g_pRender->DrawTriangles();
 	}
 	gDKRVtxCount=0;

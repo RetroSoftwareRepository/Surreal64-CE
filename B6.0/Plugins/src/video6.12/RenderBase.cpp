@@ -1286,22 +1286,23 @@ step3:
 			g_normal.y = (float)vert.norma.ny;
 			g_normal.z = (float)vert.norma.nz;
 
-			SSEVec3TransformNormal();
+			//SSEVec3TransformNormal();
 			//Vec3TransformNormal(g_normal, gRSPmodelViewTop);
 			if (status.isSSEEnabled && ( options.enableHackForGames != HACK_FOR_ZELDA_MM ))
 				//(( options.enableHackForGames != HACK_FOR_ZELDA_MM ) &&
 				//( options.enableHackForGames != HACK_FOR_CONKER ))
 			{
-				//SSEVec3TransformNormal();
+				SSEVec3TransformNormal();
 				g_dwVtxDifColor[i] = SSELightVert();
 			}
 			else if(status.isSSEEnabled && options.enableHackForGames == HACK_FOR_ZELDA_MM )
 			{
+				SSEVec3TransformNormal();
 				g_dwVtxDifColor[i] = LightVertOld(g_normal,i);
 			}
 			else
 			{
-				//Vec3TransformNormal(g_normal, gRSPmodelViewTop);
+				Vec3TransformNormal(g_normal, gRSPmodelViewTop);
 				g_dwVtxDifColor[i] = LightVert(g_normal);
 			}
 			*(((uint8*)&(g_dwVtxDifColor[i]))+3) = vert.rgba.a;	// still use alpha from the vertex

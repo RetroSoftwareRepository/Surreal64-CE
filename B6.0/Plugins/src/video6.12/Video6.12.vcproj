@@ -264,9 +264,6 @@
 				RelativePath=".\DeviceBuilder.cpp">
 			</File>
 			<File
-				RelativePath=".\DirectXBlender.cpp">
-			</File>
-			<File
 				RelativePath=".\DirectXCombiner.cpp">
 			</File>
 			<File
@@ -387,9 +384,6 @@
 			</File>
 			<File
 				RelativePath=".\DeviceBuilder.h">
-			</File>
-			<File
-				RelativePath=".\DirectXBlender.h">
 			</File>
 			<File
 				RelativePath=".\DirectXCombiner.h">

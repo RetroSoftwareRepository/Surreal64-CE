@@ -157,7 +157,7 @@ bool CTextureManager::CleanUp()
 		{
 			TxtrCacheEntry * pVictim = m_pHead;
 			m_pHead = pVictim->pNext;
-			m_currentTextureMemUsage -= (pVictim->pTexture->m_dwWidth * pVictim->pTexture->m_dwHeight * 2);
+			m_currentTextureMemUsage -= (pVictim->pTexture->m_dwWidth * pVictim->pTexture->m_dwHeight * XboxPitch);
 			delete pVictim;
 		}
 	}
@@ -229,7 +229,7 @@ void CTextureManager::PurgeOldTextures()
 			if (pPrev != NULL) pPrev->pNext        = pCurr->pNext;
 			else			   m_pHead = pCurr->pNext;
 
-			m_currentTextureMemUsage -= (pCurr->pTexture->m_dwWidth * pCurr->pTexture->m_dwHeight * 2);
+			m_currentTextureMemUsage -= (pCurr->pTexture->m_dwWidth * pCurr->pTexture->m_dwHeight * XboxPitch);
 			
 			delete pCurr;
 			pCurr = pNext;	
@@ -267,7 +267,7 @@ void CTextureManager::RecycleAllTextures()
 			dwTotalUses += pTVictim->dwUses;
 			dwCount++;
 
-			m_currentTextureMemUsage -= (pTVictim->pTexture->m_dwWidth * pTVictim->pTexture->m_dwHeight * 2);
+			m_currentTextureMemUsage -= (pTVictim->pTexture->m_dwWidth * pTVictim->pTexture->m_dwHeight * XboxPitch);
 			delete pTVictim;
 
 		}
@@ -432,7 +432,7 @@ void CTextureManager::RemoveTexture(TxtrCacheEntry * pEntry)
 				}
 
 				// decrease the mem usage counter
-				m_currentTextureMemUsage -= (pEntry->pTexture->m_dwWidth * pEntry->pTexture->m_dwHeight * 2);
+				m_currentTextureMemUsage -= (pEntry->pTexture->m_dwWidth * pEntry->pTexture->m_dwHeight * XboxPitch);
 			
 				delete pEntry;
 
@@ -472,7 +472,7 @@ TxtrCacheEntry * CTextureManager::CreateNewCacheEntry(uint32 dwAddr, uint32 dwWi
 	uint32 widthToCreate = dwWidth;
 	uint32 heightToCreate = dwHeight;
 
-	DWORD freeUpSize = (widthToCreate * heightToCreate * 2);
+	DWORD freeUpSize = (widthToCreate * heightToCreate * XboxPitch);
 
 	FreeTextures(); // make sure memory is in a safe zone
 
@@ -499,7 +499,7 @@ TxtrCacheEntry * CTextureManager::CreateNewCacheEntry(uint32 dwAddr, uint32 dwWi
 	{
 	pEntry = ReviveTexture(dwWidth, dwHeight);
 	}
-	m_currentTextureMemUsage += (dwWidth * dwHeight * 2);
+	m_currentTextureMemUsage += (dwWidth * dwHeight * XboxPitch);
 	
 
 #ifdef OLDTXTCACHE

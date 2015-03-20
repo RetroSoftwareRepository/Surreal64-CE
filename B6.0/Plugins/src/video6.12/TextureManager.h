@@ -250,5 +250,5 @@ extern void DumpCachedTexture(TxtrCacheEntry &entry);
 // reinstate max video mem
 extern bool g_bUseSetTextureMem;
 extern DWORD g_maxTextureMemUsage;
-
+extern int XboxPitch;
 #endif

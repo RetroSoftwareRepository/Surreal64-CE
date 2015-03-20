@@ -170,18 +170,22 @@ void FreeVirtualDynaMemory(void)
 }
 
 #ifdef _XBOX //free mem for igm
-extern "C" void ReInitVirtualDynaMemory(boolean charge)
+extern "C" BOOL ReInitVirtualDynaMemory(boolean charge)
 {
 	FILE *fp;
+	bool isComplete = 0;
 
 	if (!charge) {
 		if(dyna_RecompCode != NULL){
+			DeleteFile("Z:\\codetemp.dat");
 			fp=fopen("Z:\\codetemp.dat","wb");
 			//fp=fopen("T:\\Data\\codetemp.dat","wb");
 			//fwrite(dyna_RecompCode,g_dwRecompCodeSize ,sizeof(char),fp);
 			fwrite(dyna_RecompCode,g_dwRecompCodeSize ,sizeof(uint8),fp);
 			VirtualFree(dyna_RecompCode, g_dwRecompCodeSize, MEM_DECOMMIT);
-		    fclose(fp);}
+		    fclose(fp);
+			isComplete = 1;
+		}
 	}
 	else {
 		fp=fopen("Z:\\codetemp.dat","rb");
@@ -194,7 +198,10 @@ extern "C" void ReInitVirtualDynaMemory(boolean charge)
 		fclose(fp);
 		DeleteFile("Z:\\codetemp.dat");
 		//DeleteFile("T:\\Data\\codetemp.dat");
+		isComplete = 1;
 	}
+
+	return isComplete;
 }
 #endif
 

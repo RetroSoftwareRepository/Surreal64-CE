@@ -90,6 +90,7 @@ void RSP_Tri4_Conker(MicroCodeCommand command)
 
 	if (bTrisAdded)	
 	{
+		CRender::g_pRender->SetCombinerAndBlender();
 		CRender::g_pRender->DrawTriangles();
 	}
 
@@ -126,6 +127,7 @@ void RSP_MoveMem_Conker(MicroCodeCommand command)
 		{
 			LOG_UCODE("    DLParser_MoveMem_Conker");
 			RDP_GFX_Force_Vertex_Z_Conker(dwAddr);
+			//gAuxAddr = address;		//Conker VtxZ address
 		}
 		break;
 	case RSP_GBI2_MV_MEM__LIGHT:
@@ -153,6 +155,8 @@ void RSP_MoveMem_Conker(MicroCodeCommand command)
 
 				N64Light *light = (N64Light*)(g_pu8RamBase + dwAddr);
 				RSP_MoveMemLight(light_index, light);
+				SetLightPosition( light_index, light->x, light->y, light->z , light->w);
+				SetLightCBFD( light_index, light->nonzero);
 			}
 	
 			DEBUGGER_PAUSE_AND_DUMP_COUNT_N( NEXT_SET_LIGHT, 

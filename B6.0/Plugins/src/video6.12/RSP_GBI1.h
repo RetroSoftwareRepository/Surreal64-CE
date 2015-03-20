@@ -116,6 +116,7 @@ void RSP_GBI1_Tri2(MicroCodeCommand command)
 
 	if (bTrisAdded)	
 	{
+		CRender::g_pRender->SetCombinerAndBlender();
 		CRender::g_pRender->DrawTriangles();
 	}
 
@@ -472,7 +473,7 @@ void RSP_GBI1_Line3D(MicroCodeCommand command)
 		uint32 dwWidth  = command.gbi1line3d.v2;
 		uint32 dwFlag	= command.gbi1line3d.v3/gRSP.vertexMult;	
 		
-		CRender::g_pRender->SetCombinerAndBlender();
+		CRender::g_pRender->SetCombinerAndBlender(); //meow
 
 		status.dwNumTrisRendered++;
 
@@ -504,6 +505,7 @@ void RSP_GBI1_Line3D(MicroCodeCommand command)
 
 		if (bTrisAdded)	
 		{
+			CRender::g_pRender->SetCombinerAndBlender();
 			CRender::g_pRender->DrawTriangles();
 		}
 	}
@@ -880,6 +882,7 @@ void RSP_GBI1_Tri1(MicroCodeCommand command)
 
 	if (bTrisAdded)	
 	{
+		CRender::g_pRender->SetCombinerAndBlender();
 		CRender::g_pRender->DrawTriangles();
 	}
 

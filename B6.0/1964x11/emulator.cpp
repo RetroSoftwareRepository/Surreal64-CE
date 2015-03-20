@@ -23,6 +23,9 @@
 #include "cheatcode.h"
 #ifdef _XBOX
 //#include "rompaging.h"
+extern bool bTriggerState;
+extern bool LoadAfter;
+extern int stateindex;
 #else //win32
 
 #include "romlist.h"
@@ -176,6 +179,7 @@ BOOL PauseEmulator(void)
 	CPU_Task_To_String(generalmessage);
 	TRACE1("Try to pause, CPU is busy doing: %s", generalmessage);
 
+#ifndef _XBOX
 	while(!emustatus.Emu_Is_Paused && emustatus.Emu_Is_Running)
 	{
 		WindowMsgLoop();
@@ -185,7 +189,6 @@ BOOL PauseEmulator(void)
 		Sleep(50);
 	}
 
-#ifndef _XBOX
 	if (!MenuCausedPause)
 	{
 		sprintf(generalmessage, "%s - %s", gui.szWindowTitle, TranslateStringByString("Paused"));
@@ -754,7 +757,8 @@ void (__stdcall StartAIInterruptThread)(void* pVoid)
 
 /*
  =======================================================================================================================
-    Use in CPU thread, will pausing emu and wait for resume ? =======================================================================================================================
+    Call from within execution, Pause and then load state.
+ =======================================================================================================================
  */
 void PauseEmulating(void)
 {
@@ -856,11 +860,36 @@ void RunTheRegCacheWithoutOpcodeDebugger(void)
 	 * __asm pushad // nono. This causes stack overflow in Minimize size compiler
 	 * option.
 	 */
-
+	char buf[260];
 	__asm mov ebp, HardwareStart
 	while(emustatus.Emu_Keep_Running)
 	{
 _DoOtherTask:
+
+	//Do this for RunTheRegCacheWithoutOpcodeDebugger() too
+	if(bTriggerState){
+		if (LoadAfter)
+		{	
+			sprintf(buf, "%s%08x\\%08X-%08X-%02X.%i", g_szPathSaves, currentromoptions.crc1, currentromoptions.crc1, currentromoptions.crc2, currentromoptions.countrycode, stateindex);
+			FileIO_ImportPJ64State(buf);
+			Init_Count_Down_Counters();
+			RefreshDynaDuringGamePlay();
+			bTriggerState = false;
+		}
+	}
+	if(bTriggerState){
+		if (!LoadAfter)
+		{
+			sprintf(buf, "%s%08x\\%08X-%08X-%02X.%i", g_szPathSaves, currentromoptions.crc1, currentromoptions.crc1, currentromoptions.crc2, currentromoptions.countrycode, stateindex);
+			FileIO_ExportPJ64State(buf);
+			FileIO_ImportPJ64State(buf); // Necessary...
+			Init_Count_Down_Counters();
+			RefreshDynaDuringGamePlay();
+			bTriggerState = false;
+		}	
+	}
+	
+
 		Block = (uint8 *) *r.r_.g_LookupPtr;
 		if(Block != NULL && r.r_.g_pc_is_rdram) 
 			Dyna_Check_Codes();
@@ -906,10 +935,33 @@ static void RunTheRegCacheNoCheck(void)
 	__asm align 16
     
 
-    
+    char buf[260];
 	while(emustatus.Emu_Keep_Running)
 	{
 _NextBlock:
+
+	// Usually load here
+	if(bTriggerState){
+		if (LoadAfter)
+		{	
+			sprintf(buf, "%s%08x\\%08X-%08X-%02X.%i", g_szPathSaves, currentromoptions.crc1, currentromoptions.crc1, currentromoptions.crc2, currentromoptions.countrycode, stateindex);
+			FileIO_ImportPJ64State(buf);
+			Init_Count_Down_Counters();
+			RefreshDynaDuringGamePlay();
+			bTriggerState = false;
+		}
+	}
+	if(bTriggerState){
+		if (!LoadAfter)
+		{
+			sprintf(buf, "%s%08x\\%08X-%08X-%02X.%i", g_szPathSaves, currentromoptions.crc1, currentromoptions.crc1, currentromoptions.crc2, currentromoptions.countrycode, stateindex);
+			FileIO_ExportPJ64State(buf);
+			FileIO_ImportPJ64State(buf); // Necessary...
+			Init_Count_Down_Counters();
+			RefreshDynaDuringGamePlay();
+			bTriggerState = false;
+		}	
+	}
 		__asm
 		{
 l1:        mov eax, r.r_.g_LookupPtr
