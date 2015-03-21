@@ -44,8 +44,7 @@ HANDLE				ResumeEmulatorEvent = NULL;
 HANDLE				PauseEmulatorEvent = NULL;
 
 int					stateindex = 0;
-bool				LoadAfter = false;
-bool				bTriggerState = false;
+int				DoState = DO_NOT_DO_PJ64_STATE;
 
 void					UpdateCIC(void);
 
@@ -88,8 +87,7 @@ char emuname[256];
 
 extern "C" void __EMU_SaveState(int index)
 {
-	bTriggerState = true;
-	LoadAfter = false;
+	DoState = SAVE_1964_CREATED_PJ64_STATE;
 	stateindex = index;
 
 	CPUNeedToCheckInterrupt = TRUE;
@@ -99,8 +97,12 @@ extern "C" void __EMU_SaveState(int index)
 
 extern "C" void __EMU_LoadState(int index)
 {
-	bTriggerState = true;
-	LoadAfter = true;
+	//deprecated
+}
+
+extern "C" void __EMU_Load1964State(int index)
+{
+	DoState = LOAD_1964_CREATED_PJ64_STATE;
 	stateindex = index;
 
 	CPUNeedToCheckInterrupt = TRUE;
@@ -108,6 +110,17 @@ extern "C" void __EMU_LoadState(int index)
 	Set_Check_Interrupt_Timer_Event();	
 }
 
+extern "C" void __EMU_LoadPJ64State(int index)
+{
+	DoState = LOAD_PJ64_CREATED_PJ64_STATE;
+	stateindex = index;
+
+	CPUNeedToCheckInterrupt = TRUE;
+	CPUNeedToDoOtherTask = TRUE;
+	Set_Check_Interrupt_Timer_Event();	
+}
+
+// Shouldn't be used anymore, unless UHLE uses video plugins
 extern "C" void __EMU_GetStateFilename(int index, char *filename, int mode)
 {
 	if(mode == 0){
@@ -115,6 +128,30 @@ extern "C" void __EMU_GetStateFilename(int index, char *filename, int mode)
 	}
 	else if(mode == 1){
 		sprintf(filename, "%s%08x\\%08X-%08X-%02X.%i.bmp", g_szPathSaves, currentromoptions.crc1, currentromoptions.crc1, currentromoptions.crc2, currentromoptions.countrycode, index);
+	}
+	
+	return;
+}
+
+extern "C" void __EMU_Get1964StateFilename(int index, char *filename, int mode)
+{
+	if(mode == 0){
+		sprintf(filename, "%s%08x\\%08X-%08X-%02X.%i.1964", g_szPathSaves, currentromoptions.crc1, currentromoptions.crc1, currentromoptions.crc2, currentromoptions.countrycode, index);
+	}
+	else if(mode == 1){
+		sprintf(filename, "%s%08x\\%08X-%08X-%02X.%i.1964.bmp", g_szPathSaves, currentromoptions.crc1, currentromoptions.crc1, currentromoptions.crc2, currentromoptions.countrycode, index);
+	}
+	
+	return;
+}
+
+extern "C" void __EMU_GetPJ64StateFilename(int index, char *filename, int mode)
+{
+	if(mode == 0){
+		sprintf(filename, "%s%08x\\%08X-%08X-%02X.%i.pj64", g_szPathSaves, currentromoptions.crc1, currentromoptions.crc1, currentromoptions.crc2, currentromoptions.countrycode, index);
+	}
+	else if(mode == 1){
+		sprintf(filename, "%s%08x\\%08X-%08X-%02X.%i.pj64.bmp", g_szPathSaves, currentromoptions.crc1, currentromoptions.crc1, currentromoptions.crc2, currentromoptions.countrycode, index);
 	}
 	
 	return;

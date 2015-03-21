@@ -136,4 +136,7 @@ extern char generalText[];
 
 void SetVIScales();
 
+extern void _VIDEO_DisplayTemporaryMessage(const char *msg);
+
+
 #endif

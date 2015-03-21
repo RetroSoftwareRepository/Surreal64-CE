@@ -35,6 +35,8 @@ typedef struct
 } Frame;
 
 extern void __EMU_GetStateFilename(int index, char *filename, int mode);
+extern void __EMU_Get1964StateFilename(int index, char *filename, int mode);
+extern void __EMU_GetPJ64StateFilename(int index, char *filename, int mode);
 #pragma warning( disable : 4099 )  // Disable missing debug warnings
 //extern Frame *g_frameTable;
 //extern uint8 *g_memory;

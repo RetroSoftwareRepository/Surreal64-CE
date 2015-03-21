@@ -160,32 +160,9 @@ void CDXGraphicsContext::Clear(ClearFlag dwFlags, uint32 color, float depth)
 //
 //*****************************************************************************
 extern RECT frameWriteByCPURect;
-extern bool bloadstate[MAX_SAVE_STATES];
-extern bool bsavestate[MAX_SAVE_STATES];
-extern "C" void __EMU_SaveState(int index);
-extern "C" void __EMU_LoadState(int index);
-extern bool bSatesUpdated;
-
 __forceinline void CDXGraphicsContext::UpdateFrame(bool swaponly)
 {
 	//HRESULT hr; //unreferenced
-
-	if (bSatesUpdated) {
-		bSatesUpdated = false;
-		
-		for (int i=0; i<MAX_SAVE_STATES; i++) {
-			if (bloadstate[i]) {
-				__EMU_LoadState(i+1);
-				bloadstate[i]=false;
-				break;
-			}
-			else if (bsavestate[i]) {
-				__EMU_SaveState(i+1);
-				bsavestate[i]=false;
-				break;
-			}
-		}
-	}
 
 	status.gFrameCount++;
 

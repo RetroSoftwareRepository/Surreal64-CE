@@ -109,8 +109,7 @@ void    RefreshDynaDuringGamePlay(void);
 
 #ifdef _XBOX
 extern int stateindex;
-extern bool						LoadAfter;
-extern bool						bTriggerState;
+extern int DoState;
 #define INTERPRETER_DEBUG_INSTRUCTION(inst)
 #define DYNA_DEBUG_INSTRUCTION(inst)
 #define DYNA_LOG_INSTRUCTION

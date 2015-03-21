@@ -938,11 +938,24 @@ void __EMU_SaveState(int index)
 
 void __EMU_LoadState(int index)
 {
-	SaveStateIndex = index;
-	CPU_Action.DoSomething = TRUE;
-	CPU_Action.RestoreState = TRUE;
+	//deprecated
 }
 
+void __EMU_Load1964State(int index)
+{
+	SaveStateIndex = index;
+	CPU_Action.DoSomething = TRUE;
+	CPU_Action.Restore1964State = TRUE;
+}
+
+void __EMU_LoadPJ64State(int index)
+{
+	SaveStateIndex = index;
+	CPU_Action.DoSomething = TRUE;
+	CPU_Action.RestorePJ64State = TRUE;
+}
+
+// Shouldn't be used anymore, unless UHLE uses video plugins
 void __EMU_GetStateFilename(int index, char *filename, int mode)
 {
 	if(mode == 0){
@@ -950,6 +963,28 @@ void __EMU_GetStateFilename(int index, char *filename, int mode)
 	}
 	else if(mode == 1){
 		sprintf(filename, "%s%08X\\%08X-%08X-%02X.%i.bmp", g_szPathSaves, *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x14)), *((BYTE *)(RomHeader + 0x3D)), index);
+	}
+	return;
+}
+
+void __EMU_Get1964StateFilename(int index, char *filename, int mode)
+{
+	if(mode == 0){
+		sprintf(filename, "%s%08X\\%08X-%08X-%02X.%i.1964", g_szPathSaves, *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x14)), *((BYTE *)(RomHeader + 0x3D)), index);
+	}
+	else if(mode == 1){
+		sprintf(filename, "%s%08X\\%08X-%08X-%02X.%i.1964.bmp", g_szPathSaves, *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x14)), *((BYTE *)(RomHeader + 0x3D)), index);
+	}
+	return;
+}
+
+void __EMU_GetPJ64StateFilename(int index, char *filename, int mode)
+{
+	if(mode == 0){
+		sprintf(filename, "%s%08X\\%08X-%08X-%02X.%i.pj64", g_szPathSaves, *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x14)), *((BYTE *)(RomHeader + 0x3D)), index);
+	}
+	else if(mode == 1){
+		sprintf(filename, "%s%08X\\%08X-%08X-%02X.%i.pj64.bmp", g_szPathSaves, *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x14)), *((BYTE *)(RomHeader + 0x3D)), index);
 	}
 	return;
 }

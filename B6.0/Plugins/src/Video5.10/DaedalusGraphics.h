@@ -110,6 +110,6 @@ typedef struct {
 } PluginStatus;
 
 extern PluginStatus status;
-
+extern void _VIDEO_DisplayTemporaryMessage(const char *msg);
 
 #endif

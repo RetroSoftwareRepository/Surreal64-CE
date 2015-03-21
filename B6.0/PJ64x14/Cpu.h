@@ -50,7 +50,8 @@ typedef struct {
 	BOOL CheckInterrupts;
 	BOOL Pause;
 	BOOL SaveState;
-	BOOL RestoreState;
+	BOOL RestorePJ64State;
+	BOOL Restore1964State;
 	BOOL DoInterrupt;
 	BOOL Stepping;
 } CPU_ACTION;

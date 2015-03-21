@@ -13,13 +13,19 @@
 #include <string.h>
 using namespace std;
 
-extern "C" void __EMU_LoadState(int index);
 extern "C" void __EMU_SaveState(int index);
 
-void GetStateTimestamp(int index, char *timestamp);
+extern "C" void __EMU_LoadState(int index);
+extern "C" void __EMU_Load1964State(int index);
+extern "C" void __EMU_LoadPJ64State(int index);
+
 extern "C" void __EMU_GetStateFilename(int index, char *timestamp, int mode);
+extern "C" void __EMU_Get1964StateFilename(int index, char *timestamp, int mode);
+extern "C" void __EMU_GetPJ64StateFilename(int index, char *timestamp, int mode);
+
+void GetStateTimestamp(int index, int emulator, char *timestamp);
 void CreateSaveStatePreview(unsigned int index);
-bool LoadSaveStatePreview(unsigned int index);
+bool LoadSaveStatePreview(unsigned int index, int emulator);
 bool bNoPreview = false;
 
 extern void _VIDEO_DisplayTemporaryMessage(const char *msg);
@@ -147,7 +153,18 @@ void ControllerMenu();
 extern void ChangeControl();
 
 // Load-Save state
-
+void Load1964StateMenu();
+void Load1964State1();
+void Load1964State2();
+void Load1964State3();
+void Load1964State4();
+void Load1964State5();
+void LoadPJ64StateMenu();
+void LoadPJ64State1();
+void LoadPJ64State2();
+void LoadPJ64State3();
+void LoadPJ64State4();
+void LoadPJ64State5();
 void LoadStateMenu();
 void LoadState1();
 void LoadState2();
@@ -162,6 +179,8 @@ void SaveState4();
 void SaveState5();
 bool bloadstate[MAX_SAVE_STATES]; //5
 bool bsavestate[MAX_SAVE_STATES]; //5
+bool bload1964state[MAX_SAVE_STATES]; //5
+bool bloadPJ64state[MAX_SAVE_STATES]; //5
 bool bSatesUpdated = false;
 
 extern void CalculateEndCredits();
@@ -245,7 +264,10 @@ void MainMenu(void)
 	if (iIGMStateScreenH > 512/*256*/)
 		iIGMStateScreenH = 512/*256*/;
 	
-	m_pMainMenu = XLMenu_Init((float)iIGMMenuTxtPosX,(float)iIGMMenuTxtPosY,12, GetMenuFontAlign(iIGMMenuTxtAlign)|MENU_WRAP,NULL);
+	if(preferedemu == _UltraHLE) // 12 Menu Items for UHLE for State Menus
+		m_pMainMenu = XLMenu_Init((float)iIGMMenuTxtPosX,(float)iIGMMenuTxtPosY,12, GetMenuFontAlign(iIGMMenuTxtAlign)|MENU_WRAP,NULL);
+	else						 // 13 Menu Items for 1964/PJ64 State Menus
+		m_pMainMenu = XLMenu_Init((float)iIGMMenuTxtPosX,(float)iIGMMenuTxtPosY,13, GetMenuFontAlign(iIGMMenuTxtAlign)|MENU_WRAP,NULL);
 
 	m_pMainMenu->itemcolor = dwMenuItemColor;
 	m_pMainMenu->parent = NULL;
@@ -279,7 +301,14 @@ void MainMenu(void)
 
 	XLMenu_SetTitle(m_pMainMenu,L"Main Menu",dwMenuTitleColor);
 
+	if(preferedemu == _UltraHLE)
 	XLMenu_AddItem(m_pMainMenu,MITEM_ROUTINE,L"Load State",LoadStateMenu);
+	else
+	{
+		XLMenu_AddItem(m_pMainMenu,MITEM_ROUTINE,L"Load 1964 State",Load1964StateMenu);
+		XLMenu_AddItem(m_pMainMenu,MITEM_ROUTINE,L"Load PJ64 State",LoadPJ64StateMenu);
+	}
+
 	XLMenu_AddItem(m_pMainMenu,MITEM_ROUTINE,L"Save State",SaveStateMenu);
 	if (showdebug) 
 	XLMenu_AddItem(m_pMainMenu,MITEM_ROUTINE,L"Show Debug info : on",ShowDebug);
@@ -426,10 +455,15 @@ void ResetRom(void)
 	XLaunchNewImage(szLaunchXBE, NULL);
 }
 
-void GetStateTimestamp(int index, char *timestamp)
+void GetStateTimestamp(int index, int emulator, char *timestamp)
 {
 	char filename[255];
+	if(preferedemu == _UltraHLE)
 		__EMU_GetStateFilename(index, filename, 1); // Check for Screenie instead, not sure why savefiles show as empty.
+	else if(emulator == 1)
+		__EMU_Get1964StateFilename(index, filename, 1);
+	else if(emulator == 2)
+		__EMU_GetPJ64StateFilename(index, filename, 1);
 
 	struct _stat buf;
 	if(_stat(filename, &buf ) != 0) {
@@ -494,7 +528,13 @@ void CreateSaveStatePreview(unsigned int index)
 	g_pd3dDevice->Clear(0,NULL,D3DCLEAR_TARGET,0x00000000,0,0);
 	
 	char filename[255];
-	__EMU_GetStateFilename((index+1), filename, 1);
+	if(preferedemu == _UltraHLE)
+		__EMU_GetStateFilename((index+1), filename, 1);
+	else if((preferedemu == _1964x11)||(preferedemu == _1964x085))
+		__EMU_Get1964StateFilename((index+1), filename, 1);
+	else if((preferedemu == _PJ64x16)||(preferedemu == _PJ64x14))
+		__EMU_GetPJ64StateFilename((index+1), filename, 1);
+	
 
 	//write out the preview image
 	XGWriteSurfaceToFile(texsurf, filename);
@@ -517,7 +557,7 @@ void CreateSaveStatePreview(unsigned int index)
 	//LoadSaveStatePreview(index); // show new one
 }
 
-bool LoadSaveStatePreview(unsigned int index)
+bool LoadSaveStatePreview(unsigned int index, int emulator)
 {
 	if (pStateTexture) {
 		pStateTexture->Release();
@@ -526,7 +566,12 @@ bool LoadSaveStatePreview(unsigned int index)
 	
 	//load our texture from file
 	char filename[255];
-	__EMU_GetStateFilename((index+1), filename, 1);
+	if(preferedemu == _UltraHLE)
+		__EMU_GetStateFilename((index+1), filename, 1);
+	else if(emulator == 1)
+		__EMU_Get1964StateFilename((index+1), filename, 1);
+	else if(emulator == 2)
+		__EMU_GetPJ64StateFilename((index+1), filename, 1);
 	
 	int iScreenWidth = 0;
 	int iScreenHeight = 0;
@@ -559,7 +604,387 @@ bool LoadSaveStatePreview(unsigned int index)
 	
 	return true;
 }
+void LoadPJ64StateMenu(void)
+{
 
+	DWORD dwMenuCommand = 0;
+
+	XLMenu_CurRoutine = NULL;
+	XLMenu_CurMenu = NULL;
+	XLMenu_SetFont(&m_Font);
+
+	m_pSettingsMenu = XLMenu_Init((float)iIGMMenuTxtPosX,(float)iIGMMenuTxtPosY,MAX_SAVE_STATES, GetMenuFontAlign(iIGMMenuTxtAlign)|MENU_WRAP, NULL);
+
+	m_pSettingsMenu->itemcolor = dwMenuItemColor;
+	m_pSettingsMenu->parent = m_pMainMenu;
+
+	XLMenu_SetTitle(m_pSettingsMenu,L"Load PJ64 State",dwMenuTitleColor);
+
+	char timestamp[256];
+	WCHAR currentname[256];
+	
+	GetStateTimestamp(1, 2, timestamp);
+	swprintf(currentname,L"%S",timestamp);
+	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,currentname,LoadPJ64State1);
+	
+	GetStateTimestamp(2, 2, timestamp);
+	swprintf(currentname,L"%S",timestamp);
+	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,currentname,LoadPJ64State2);
+	
+	GetStateTimestamp(3, 2, timestamp);
+	swprintf(currentname,L"%S",timestamp);
+	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,currentname,LoadPJ64State3);
+	
+	GetStateTimestamp(4, 2, timestamp);
+	swprintf(currentname,L"%S",timestamp);
+	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,currentname,LoadPJ64State4);
+
+	GetStateTimestamp(5, 2, timestamp);
+	swprintf(currentname,L"%S",timestamp);
+	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,currentname,LoadPJ64State5);
+
+	XLMenu_Activate(m_pSettingsMenu);
+
+	bool bLoadPreview = false;
+	
+	int selected = m_pSettingsMenu->curitem;
+	bLoadPreview = LoadSaveStatePreview(selected, 2); // just the 1st one
+
+	while( XLMenu_CurMenu == m_pSettingsMenu)
+	{
+		DrawLogo();
+		dwMenuCommand = getAllGamepadsCommand(&gamepad);
+		XLMenu_Routine(dwMenuCommand);
+		
+		// update preview on change
+		if (selected != m_pSettingsMenu->curitem) {
+			selected = m_pSettingsMenu->curitem;
+			
+			bLoadPreview = LoadSaveStatePreview(selected, 2);
+		}
+		
+		//@weinersch do your skinning magic here
+		if (bLoadPreview && !bNoPreview) {
+		g_pd3dDevice->SetTexture(0, pStateTexture);
+
+		g_pd3dDevice->SetVertexShader(D3DFVF_XYZRHW | D3DFVF_TEX1);
+		g_pd3dDevice->Begin(D3DPT_QUADLIST);
+		g_pd3dDevice->SetVertexData2f( D3DVSDE_TEXCOORD0, 0.0f, 0.0f );
+		g_pd3dDevice->SetVertexData4f( D3DVSDE_VERTEX, (float)iIGMStateScreenX,  (float)iIGMStateScreenY, 0.0f, 1.0f );
+
+		g_pd3dDevice->SetVertexData2f( D3DVSDE_TEXCOORD0, 1.0f, 0.0f );
+		g_pd3dDevice->SetVertexData4f( D3DVSDE_VERTEX, (float)(iIGMStateScreenX + iIGMStateScreenW/*iScreenWidth*/),  (float)iIGMStateScreenY,    0.0f, 1.0f );
+
+		g_pd3dDevice->SetVertexData2f( D3DVSDE_TEXCOORD0, 1.0f, 1.0f );
+		g_pd3dDevice->SetVertexData4f( D3DVSDE_VERTEX, (float)(iIGMStateScreenX + iIGMStateScreenW/*iScreenWidth*/), (float)(iIGMStateScreenY + iIGMStateScreenH/*iScreenHeight*/),    0.0f, 1.0f );
+
+		g_pd3dDevice->SetVertexData2f( D3DVSDE_TEXCOORD0, 0.0f, 1.0f );
+		g_pd3dDevice->SetVertexData4f( D3DVSDE_VERTEX, (float)iIGMStateScreenX, (float)(iIGMStateScreenY + iIGMStateScreenH/*iScreenHeight*/), 0.0f, 1.0f );
+		g_pd3dDevice->End();
+
+		g_pd3dDevice->SetTexture(0, NULL);
+		}
+
+		g_pd3dDevice->Present( NULL, NULL, NULL, NULL );
+	}
+
+	if (pStateTexture) {
+		pStateTexture->Release();
+		pStateTexture = NULL;
+	}
+
+	if (m_pSettingsMenu){
+		XLMenu_Delete(m_pSettingsMenu);
+	}
+}
+
+void LoadPJ64State1()
+{
+	// Prevent preview texture from loading and clean up
+	bNoPreview = true;
+	if (pStateTexture) {
+		pStateTexture->Release();
+		pStateTexture = NULL;
+	}
+	ClearIGM();
+
+	// Seed a Load State
+	bSatesUpdated=true;
+	bloadPJ64state[1]=true;
+
+	// Disable Menu to exit
+	XLMenu_CurRoutine = NULL;
+	XLMenu_CurMenu = NULL;
+}
+
+void LoadPJ64State2()
+{
+	// Prevent preview texture from loading and clean up
+	bNoPreview = true;
+	if (pStateTexture) {
+		pStateTexture->Release();
+		pStateTexture = NULL;
+	}
+	ClearIGM();
+
+	// Seed a Load State
+	bSatesUpdated=true;
+	bloadPJ64state[2]=true;
+	
+	// Disable Menu to exit
+	XLMenu_CurRoutine = NULL;
+	XLMenu_CurMenu = NULL;
+}
+
+void LoadPJ64State3()
+{
+	// Prevent preview texture from loading and clean up
+	bNoPreview = true;
+	if (pStateTexture) {
+		pStateTexture->Release();
+		pStateTexture = NULL;
+	}
+	ClearIGM();
+
+	// Seed a Load State
+	bSatesUpdated=true;
+	bloadPJ64state[3]=true;
+	
+	// Disable Menu to exit
+	XLMenu_CurRoutine = NULL;
+	XLMenu_CurMenu = NULL;
+}
+
+void LoadPJ64State4()
+{
+	// Prevent preview texture from loading and clean up
+	bNoPreview = true;
+	if (pStateTexture) {
+		pStateTexture->Release();
+		pStateTexture = NULL;
+	}
+	ClearIGM();
+
+	// Seed a Load State
+	bSatesUpdated=true;
+	bloadPJ64state[4]=true;
+	
+	// Disable Menu to exit
+	XLMenu_CurRoutine = NULL;
+	XLMenu_CurMenu = NULL;
+}
+
+void LoadPJ64State5()
+{
+	// Prevent preview texture from loading and clean up
+	bNoPreview = true;
+	if (pStateTexture) {
+		pStateTexture->Release();
+		pStateTexture = NULL;
+	}
+	ClearIGM();
+
+	// Seed a Load State
+	bSatesUpdated=true;
+	bloadPJ64state[5]=true;
+	
+	// Disable Menu to exit
+	XLMenu_CurRoutine = NULL;
+	XLMenu_CurMenu = NULL;
+}
+
+
+void Load1964StateMenu(void)
+{
+
+	DWORD dwMenuCommand = 0;
+
+	XLMenu_CurRoutine = NULL;
+	XLMenu_CurMenu = NULL;
+	XLMenu_SetFont(&m_Font);
+
+	m_pSettingsMenu = XLMenu_Init((float)iIGMMenuTxtPosX,(float)iIGMMenuTxtPosY,MAX_SAVE_STATES, GetMenuFontAlign(iIGMMenuTxtAlign)|MENU_WRAP, NULL);
+
+	m_pSettingsMenu->itemcolor = dwMenuItemColor;
+	m_pSettingsMenu->parent = m_pMainMenu;
+
+	XLMenu_SetTitle(m_pSettingsMenu,L"Load 1964 State",dwMenuTitleColor);
+
+	char timestamp[256];
+	WCHAR currentname[256];
+	
+	GetStateTimestamp(1, 1, timestamp);
+	swprintf(currentname,L"%S",timestamp);
+	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,currentname,Load1964State1);
+	
+	GetStateTimestamp(2, 1, timestamp);
+	swprintf(currentname,L"%S",timestamp);
+	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,currentname,Load1964State2);
+	
+	GetStateTimestamp(3, 1, timestamp);
+	swprintf(currentname,L"%S",timestamp);
+	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,currentname,Load1964State3);
+	
+	GetStateTimestamp(4, 1, timestamp);
+	swprintf(currentname,L"%S",timestamp);
+	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,currentname,Load1964State4);
+
+	GetStateTimestamp(5, 1, timestamp);
+	swprintf(currentname,L"%S",timestamp);
+	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,currentname,Load1964State5);
+
+	XLMenu_Activate(m_pSettingsMenu);
+
+	bool bLoadPreview = false;
+	
+	int selected = m_pSettingsMenu->curitem;
+	bLoadPreview = LoadSaveStatePreview(selected, 1); // just the 1st one
+
+	while( XLMenu_CurMenu == m_pSettingsMenu)
+	{
+		DrawLogo();
+		dwMenuCommand = getAllGamepadsCommand(&gamepad);
+		XLMenu_Routine(dwMenuCommand);
+		
+		// update preview on change
+		if (selected != m_pSettingsMenu->curitem) {
+			selected = m_pSettingsMenu->curitem;
+			
+			bLoadPreview = LoadSaveStatePreview(selected, 1);
+		}
+		
+		//@weinersch do your skinning magic here
+		if (bLoadPreview && !bNoPreview) {
+		g_pd3dDevice->SetTexture(0, pStateTexture);
+
+		g_pd3dDevice->SetVertexShader(D3DFVF_XYZRHW | D3DFVF_TEX1);
+		g_pd3dDevice->Begin(D3DPT_QUADLIST);
+		g_pd3dDevice->SetVertexData2f( D3DVSDE_TEXCOORD0, 0.0f, 0.0f );
+		g_pd3dDevice->SetVertexData4f( D3DVSDE_VERTEX, (float)iIGMStateScreenX,  (float)iIGMStateScreenY, 0.0f, 1.0f );
+
+		g_pd3dDevice->SetVertexData2f( D3DVSDE_TEXCOORD0, 1.0f, 0.0f );
+		g_pd3dDevice->SetVertexData4f( D3DVSDE_VERTEX, (float)(iIGMStateScreenX + iIGMStateScreenW/*iScreenWidth*/),  (float)iIGMStateScreenY,    0.0f, 1.0f );
+
+		g_pd3dDevice->SetVertexData2f( D3DVSDE_TEXCOORD0, 1.0f, 1.0f );
+		g_pd3dDevice->SetVertexData4f( D3DVSDE_VERTEX, (float)(iIGMStateScreenX + iIGMStateScreenW/*iScreenWidth*/), (float)(iIGMStateScreenY + iIGMStateScreenH/*iScreenHeight*/),    0.0f, 1.0f );
+
+		g_pd3dDevice->SetVertexData2f( D3DVSDE_TEXCOORD0, 0.0f, 1.0f );
+		g_pd3dDevice->SetVertexData4f( D3DVSDE_VERTEX, (float)iIGMStateScreenX, (float)(iIGMStateScreenY + iIGMStateScreenH/*iScreenHeight*/), 0.0f, 1.0f );
+		g_pd3dDevice->End();
+
+		g_pd3dDevice->SetTexture(0, NULL);
+		}
+
+		g_pd3dDevice->Present( NULL, NULL, NULL, NULL );
+	}
+
+	if (pStateTexture) {
+		pStateTexture->Release();
+		pStateTexture = NULL;
+	}
+
+	if (m_pSettingsMenu){
+		XLMenu_Delete(m_pSettingsMenu);
+	}
+}
+
+void Load1964State1()
+{
+	// Prevent preview texture from loading and clean up
+	bNoPreview = true;
+	if (pStateTexture) {
+		pStateTexture->Release();
+		pStateTexture = NULL;
+	}
+	ClearIGM();
+
+	// Seed a Load State
+	bSatesUpdated=true;
+	bload1964state[1]=true;
+
+	// Disable Menu to exit
+	XLMenu_CurRoutine = NULL;
+	XLMenu_CurMenu = NULL;
+}
+
+void Load1964State2()
+{
+	// Prevent preview texture from loading and clean up
+	bNoPreview = true;
+	if (pStateTexture) {
+		pStateTexture->Release();
+		pStateTexture = NULL;
+	}
+	ClearIGM();
+
+	// Seed a Load State
+	bSatesUpdated=true;
+	bload1964state[2]=true;
+	
+	// Disable Menu to exit
+	XLMenu_CurRoutine = NULL;
+	XLMenu_CurMenu = NULL;
+}
+
+void Load1964State3()
+{
+	// Prevent preview texture from loading and clean up
+	bNoPreview = true;
+	if (pStateTexture) {
+		pStateTexture->Release();
+		pStateTexture = NULL;
+	}
+	ClearIGM();
+
+	// Seed a Load State
+	bSatesUpdated=true;
+	bload1964state[3]=true;
+	
+	// Disable Menu to exit
+	XLMenu_CurRoutine = NULL;
+	XLMenu_CurMenu = NULL;
+}
+
+void Load1964State4()
+{
+	// Prevent preview texture from loading and clean up
+	bNoPreview = true;
+	if (pStateTexture) {
+		pStateTexture->Release();
+		pStateTexture = NULL;
+	}
+	ClearIGM();
+
+	// Seed a Load State
+	bSatesUpdated=true;
+	bload1964state[4]=true;
+	
+	// Disable Menu to exit
+	XLMenu_CurRoutine = NULL;
+	XLMenu_CurMenu = NULL;
+}
+
+void Load1964State5()
+{
+	// Prevent preview texture from loading and clean up
+	bNoPreview = true;
+	if (pStateTexture) {
+		pStateTexture->Release();
+		pStateTexture = NULL;
+	}
+	ClearIGM();
+
+	// Seed a Load State
+	bSatesUpdated=true;
+	bload1964state[5]=true;
+	
+	// Disable Menu to exit
+	XLMenu_CurRoutine = NULL;
+	XLMenu_CurMenu = NULL;
+}
+
+
+// Left for UltraHLE
 void LoadStateMenu(void)
 {
 
@@ -574,61 +999,38 @@ void LoadStateMenu(void)
 	m_pSettingsMenu->itemcolor = dwMenuItemColor;
 	m_pSettingsMenu->parent = m_pMainMenu;
 
-	XLMenu_SetTitle(m_pSettingsMenu,L"Load State",dwMenuTitleColor);
+	XLMenu_SetTitle(m_pSettingsMenu,L"Load 1964 State",dwMenuTitleColor);
 
-  	/*XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,L"Load State 1",LoadState1);
-  	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,L"Load State 2",LoadState2);
-  	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,L"Load State 3",LoadState3);
-  	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,L"Load State 4",LoadState4);
-  	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,L"Load State 5",LoadState5);*/
-	
 	char timestamp[256];
 	WCHAR currentname[256];
 	
-	GetStateTimestamp(1, timestamp);
+	GetStateTimestamp(1, 0, timestamp);
 	swprintf(currentname,L"%S",timestamp);
 	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,currentname,LoadState1);
-	//LoadSaveStatePreview(0);
 	
-	GetStateTimestamp(2, timestamp);
+	GetStateTimestamp(2, 0, timestamp);
 	swprintf(currentname,L"%S",timestamp);
 	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,currentname,LoadState2);
-	//LoadSaveStatePreview(1);
 	
-	GetStateTimestamp(3, timestamp);
+	GetStateTimestamp(3, 0, timestamp);
 	swprintf(currentname,L"%S",timestamp);
 	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,currentname,LoadState3);
-	//LoadSaveStatePreview(2);
 	
-	GetStateTimestamp(4, timestamp);
+	GetStateTimestamp(4, 0, timestamp);
 	swprintf(currentname,L"%S",timestamp);
 	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,currentname,LoadState4);
-	//LoadSaveStatePreview(3);
 
-	GetStateTimestamp(5, timestamp);
+	GetStateTimestamp(5, 0, timestamp);
 	swprintf(currentname,L"%S",timestamp);
 	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,currentname,LoadState5);
-	//LoadSaveStatePreview(4);
 
 	XLMenu_Activate(m_pSettingsMenu);
 
 	bool bLoadPreview = false;
 	
-	//int selected = 0;
 	int selected = m_pSettingsMenu->curitem;
-	bLoadPreview = LoadSaveStatePreview(selected); // just the 1st one
-/*
-	int iScreenWidth = 0;
-	int iScreenHeight = 0;
-	
-	if (iIGMStateScreenW > iIGMStateScreenH) {
-		iScreenWidth = iIGMStateScreenW;
-		iScreenHeight = iIGMStateScreenW;
-	} else {
-		iScreenWidth = iIGMStateScreenH;
-		iScreenHeight = iIGMStateScreenH;
-	}
-*/
+	bLoadPreview = LoadSaveStatePreview(selected, 0); // just the 1st one
+
 	while( XLMenu_CurMenu == m_pSettingsMenu)
 	{
 		DrawLogo();
@@ -639,7 +1041,7 @@ void LoadStateMenu(void)
 		if (selected != m_pSettingsMenu->curitem) {
 			selected = m_pSettingsMenu->curitem;
 			
-			bLoadPreview = LoadSaveStatePreview(selected);
+			bLoadPreview = LoadSaveStatePreview(selected, 0);
 		}
 		
 		//@weinersch do your skinning magic here
@@ -796,28 +1198,37 @@ void SaveStateMenu(void)
 
 	char timestamp[256];
 	WCHAR currentname[256];
+
+	int emu;
+
+	if(preferedemu == _UltraHLE)
+		emu = 0;
+	else if((preferedemu == _1964x11)||(preferedemu == _1964x085))
+		emu = 1;
+	else if((preferedemu == _PJ64x16)||(preferedemu == _PJ64x14))
+		emu = 2;
 	
-	GetStateTimestamp(1, timestamp);
+	GetStateTimestamp(1, emu, timestamp);
 	swprintf(currentname,L"%S",timestamp);
 	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,currentname,SaveState1);
 	//LoadSaveStatePreview(0);
 	
-	GetStateTimestamp(2, timestamp);
+	GetStateTimestamp(2, emu, timestamp);
 	swprintf(currentname,L"%S",timestamp);
 	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,currentname,SaveState2);
 	//LoadSaveStatePreview(1);
 
-	GetStateTimestamp(3, timestamp);
+	GetStateTimestamp(3, emu, timestamp);
 	swprintf(currentname,L"%S",timestamp);
 	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,currentname,SaveState3);
 	//LoadSaveStatePreview(2);
 
-	GetStateTimestamp(4, timestamp);
+	GetStateTimestamp(4, emu, timestamp);
 	swprintf(currentname,L"%S",timestamp);
 	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,currentname,SaveState4);
 	//LoadSaveStatePreview(3);
 
-	GetStateTimestamp(5, timestamp);
+	GetStateTimestamp(5, emu, timestamp);
 	swprintf(currentname,L"%S",timestamp);
 	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,currentname,SaveState5);
 	//LoadSaveStatePreview(4);
@@ -828,7 +1239,7 @@ void SaveStateMenu(void)
 	
 	//int selected = 0;
 	int selected = m_pSettingsMenu->curitem;
-	bLoadPreview = LoadSaveStatePreview(selected); // just the 1st one
+	bLoadPreview = LoadSaveStatePreview(selected, emu); // just the 1st one
 /*
 	int iScreenWidth = 0;
 	int iScreenHeight = 0;
@@ -851,7 +1262,7 @@ void SaveStateMenu(void)
 		if (selected != m_pSettingsMenu->curitem) {
 			selected = m_pSettingsMenu->curitem;
 			
-			bLoadPreview = LoadSaveStatePreview(selected);
+			bLoadPreview = LoadSaveStatePreview(selected, emu);
 		}
 
 		//fd: FIXME!
@@ -951,7 +1362,7 @@ void SaveState3()
 	// Seed a Save State
 	bSatesUpdated=true;
 	bsavestate[3]=true;
-
+	
 	// Disable Menu to exit
 	XLMenu_CurRoutine = NULL;
 	XLMenu_CurMenu = NULL;

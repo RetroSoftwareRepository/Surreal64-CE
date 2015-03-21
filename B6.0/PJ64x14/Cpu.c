@@ -52,7 +52,8 @@ HANDLE hCPU;
 
 uint8 *tmpBuf = NULL;
 
-BOOL Machine_LoadState (void);
+BOOL Machine_LoadPJ64State (void);
+BOOL Machine_Load1964State (void);
 BOOL Machine_SaveState (void);
 
 char *TimeName[MaxTimers] = { "CompareTimer","SiTimer","PiTimer","ViTimer" };
@@ -469,9 +470,13 @@ void DoSomething ( void ) {
 			CPU_Action.DoSomething = TRUE;
 		}
 	}
-	if (CPU_Action.RestoreState) {
-		CPU_Action.RestoreState = FALSE;
-		Machine_LoadState();
+	if (CPU_Action.RestorePJ64State) {
+		CPU_Action.RestorePJ64State = FALSE;
+		Machine_LoadPJ64State();
+	}
+	if (CPU_Action.Restore1964State) {
+		CPU_Action.Restore1964State = FALSE;
+		Machine_Load1964State();
 		LoadControllerDll(); // hack for states made with 1964
 	}
 	if (CPU_Action.DoInterrupt == TRUE) { CPU_Action.DoSomething = TRUE; }
@@ -543,7 +548,7 @@ InterruptsDisabled:
 	ExitThread(0);
 }
 
-BOOL Machine_LoadState(void) {
+BOOL Machine_LoadPJ64State(void) {
 	char /*Directory[255],*/ FileName[255], ZipFile[255], LoadHeader[64], String[100];
 	char drive[_MAX_DRIVE] ,dir[_MAX_DIR], ext[_MAX_EXT];
 	DWORD dwRead, Value, count, SaveRDRAMSize;
@@ -551,7 +556,7 @@ BOOL Machine_LoadState(void) {
 	HANDLE hSaveFile;
 	//unzFile file;
 
-	sprintf(FileName, "%s%08X\\%08X-%08X-%02X.%i", g_szPathSaves, *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x14)), *((BYTE *)(RomHeader + 0x3D)), SaveStateIndex);
+	sprintf(FileName, "%s%08X\\%08X-%08X-%02X.%i.pj64", g_szPathSaves, *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x14)), *((BYTE *)(RomHeader + 0x3D)), SaveStateIndex);
 
 	/*if (strlen(LoadFileName) == 0) {
 		strcpy(Directory,"T:\\");
@@ -808,6 +813,270 @@ BOOL Machine_LoadState(void) {
 	return TRUE;
 }
  
+BOOL Machine_Load1964State(void) {
+	char /*Directory[255],*/ FileName[255], ZipFile[255], LoadHeader[64], String[100];
+	char drive[_MAX_DRIVE] ,dir[_MAX_DIR], ext[_MAX_EXT];
+	DWORD dwRead, Value, count, SaveRDRAMSize;
+	BOOL LoadedZipFile = FALSE;
+	HANDLE hSaveFile;
+	//unzFile file;
+
+	sprintf(FileName, "%s%08X\\%08X-%08X-%02X.%i.1964", g_szPathSaves, *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x14)), *((BYTE *)(RomHeader + 0x3D)), SaveStateIndex);
+
+	/*if (strlen(LoadFileName) == 0) {
+		strcpy(Directory,"T:\\");
+		sprintf(FileName,"%s%s",Directory,RomName);
+		sprintf(ZipFile,"%s.zip",FileName);
+	} else {
+		strcpy(FileName,LoadFileName);
+		strcpy(ZipFile,LoadFileName);
+	}*/
+
+	/*file = unzOpen(ZipFile);
+	if (file != NULL) {
+	    unz_file_info info;
+		char zname[132];
+		int port = 0;
+
+		port = unzGoToFirstFile(file);
+		while (port == UNZ_OK && LoadedZipFile == FALSE) {
+			unzGetCurrentFileInfo(file, &info, zname, 128, NULL,0, NULL,0);
+		    if (unzLocateFile(file, zname, 1) != UNZ_OK ) {
+				unzClose(file);
+				port = -1;
+				continue;
+			}
+			if( unzOpenCurrentFile(file) != UNZ_OK ) {
+				unzClose(file);
+				port = -1;
+				continue;
+			}
+			unzReadCurrentFile(file,&Value,4);
+			if (Value != 0x23D8A6C8) { 
+				unzCloseCurrentFile(file);
+				continue; 
+			}
+			unzReadCurrentFile(file,&SaveRDRAMSize,sizeof(SaveRDRAMSize));	
+			unzReadCurrentFile(file,LoadHeader,0x40);			
+			//Check header
+			if (memcmp(LoadHeader,ROM,0x40) != 0) {
+				 
+
+				//result = MessageBox(hMainWindow,"Header of ROM image running is different then one in save state\n\nAre you sure you want to load?",
+				//	"Error",MB_YESNO|MB_ICONQUESTION|MB_DEFBUTTON2);
+				//if (result == IDNO) { return FALSE; }
+			}
+
+			if (CPU_Type == CPU_SyncCores) {
+				DWORD OldProtect;
+
+				VirtualProtect(N64MEM,RdramSize,PAGE_READWRITE,&OldProtect);
+				VirtualProtect(N64MEM + 0x04000000,0x2000,PAGE_READWRITE,&OldProtect);
+				VirtualProtect(SyncMemory,RdramSize,PAGE_READWRITE,&OldProtect);
+				VirtualProtect(SyncMemory + 0x04000000,0x2000,PAGE_READWRITE,&OldProtect);	
+			}
+			if (CPU_Type != CPU_Interpreter) { 
+				ResetRecompCode(); 
+			}
+
+			Timers.CurrentTimerType = -1;
+			Timers.Timer = 0;
+			for (count = 0; count < MaxTimers; count ++) { Timers.Active[count] = FALSE; }
+
+			//fix rdram size
+			if (SaveRDRAMSize != RdramSize) {
+				if (RdramSize == 0x400000) { 
+					if (VirtualAlloc(N64MEM + 0x400000, 0x400000, MEM_COMMIT, PAGE_READWRITE)==NULL) {
+						DisplayError("Failed to Extend memory to 8mb");
+						ExitThread(0);
+					}
+					if (VirtualAlloc((BYTE *)XBOXJumpTable + 0x400000, 0x400000, MEM_COMMIT, PAGE_READWRITE)==NULL) {
+						DisplayError("Failed to Extend Jump Table to 8mb");
+						ExitThread(0);
+					}
+					if (VirtualAlloc((BYTE *)XBOXDelaySlotTable + (0x400000 >> 0xA), (0x400000 >> 0xA), MEM_COMMIT, PAGE_READWRITE)==NULL) {
+						DisplayError("Failed to Extend Delay Slot Table to 8mb");
+						ExitThread(0);
+					}
+				} else {
+					VirtualFree(N64MEM + 0x400000, 0x400000,MEM_DECOMMIT);
+					VirtualFree((BYTE *)XBOXJumpTable + 0x400000, 0x400000,MEM_DECOMMIT);
+					VirtualFree((BYTE *)XBOXDelaySlotTable + (0x400000 >> 0xA), (0x400000 >> 0xA),MEM_DECOMMIT);
+				}
+			}
+			RdramSize = SaveRDRAMSize;
+			unzReadCurrentFile(file,&Value,sizeof(Value));
+			ChangeTimer(ViTimer,Value);
+			unzReadCurrentFile(file,&PROGRAM_COUNTER,sizeof(PROGRAM_COUNTER));
+			unzReadCurrentFile(file,GPR,sizeof(_int64)*32);
+			unzReadCurrentFile(file,FPR,sizeof(_int64)*32);
+			unzReadCurrentFile(file,CP0,sizeof(DWORD)*32);
+			unzReadCurrentFile(file,FPCR,sizeof(DWORD)*32);
+			unzReadCurrentFile(file,&HI,sizeof(_int64));
+			unzReadCurrentFile(file,&LO,sizeof(_int64));
+			unzReadCurrentFile(file,RegRDRAM,sizeof(DWORD)*10);
+			unzReadCurrentFile(file,RegSP,sizeof(DWORD)*10);
+			unzReadCurrentFile(file,RegDPC,sizeof(DWORD)*10);
+			unzReadCurrentFile(file,RegMI,sizeof(DWORD)*4);
+			unzReadCurrentFile(file,RegVI,sizeof(DWORD)*14);
+			unzReadCurrentFile(file,RegAI,sizeof(DWORD)*6);
+			unzReadCurrentFile(file,RegPI,sizeof(DWORD)*13);
+			unzReadCurrentFile(file,RegRI,sizeof(DWORD)*8);
+			unzReadCurrentFile(file,RegSI,sizeof(DWORD)*4);
+			unzReadCurrentFile(file,tlb,sizeof(TLB)*32);
+			unzReadCurrentFile(file,PIF_Ram,0x40);
+			unzReadCurrentFile(file,RDRAM,RdramSize);
+			unzReadCurrentFile(file,DMEM,0x1000);
+			unzReadCurrentFile(file,IMEM,0x1000);
+			unzCloseCurrentFile(file);
+			unzClose(file);
+			LoadedZipFile = TRUE;
+			_splitpath( ZipFile, drive, dir, ZipFile, ext );
+			sprintf(FileName,"%s%s",ZipFile,ext);
+		}
+	}*/
+	//if (!LoadedZipFile) {
+		
+		hSaveFile = CreateFile(FileName,GENERIC_WRITE | GENERIC_READ, FILE_SHARE_READ,NULL,OPEN_EXISTING,
+			FILE_ATTRIBUTE_NORMAL | FILE_FLAG_RANDOM_ACCESS, NULL);
+		if (hSaveFile == INVALID_HANDLE_VALUE) {
+			_splitpath( FileName, drive, dir, ZipFile, ext );
+			sprintf(String,"Unable to load save state %s%s",ZipFile,ext);
+			//SendMessage( hStatusWnd, SB_SETTEXT, 0, (LPARAM)String );
+			return FALSE;
+		}	
+		SetFilePointer(hSaveFile,0,NULL,FILE_BEGIN);	
+		ReadFile( hSaveFile,&Value,sizeof(Value),&dwRead,NULL);
+		if (Value != 0x23D8A6C8) { return FALSE; }
+		ReadFile( hSaveFile,&SaveRDRAMSize,sizeof(SaveRDRAMSize),&dwRead,NULL);	
+		ReadFile( hSaveFile,LoadHeader,0x40,&dwRead,NULL);	
+
+		//Check header
+		if (memcmp(LoadHeader,RomHeader,0x40) != 0) {
+			 
+			//result = MessageBox(hMainWindow,"Header of ROM image running is different then one in save state\n\nAre you sure you want to load?",
+			//	"Error",MB_YESNO|MB_ICONQUESTION|MB_DEFBUTTON2);
+			//if (result == IDNO) { return FALSE; }
+		}
+
+		if (CPU_Type == CPU_SyncCores) {
+			DWORD OldProtect;
+
+			VirtualProtect(N64MEM,RdramSize,PAGE_READWRITE,&OldProtect);
+			VirtualProtect(N64MEM + 0x04000000,0x2000,PAGE_READWRITE,&OldProtect);
+			VirtualProtect(SyncMemory,RdramSize,PAGE_READWRITE,&OldProtect);
+			VirtualProtect(SyncMemory + 0x04000000,0x2000,PAGE_READWRITE,&OldProtect);	
+		}
+		if (CPU_Type != CPU_Interpreter) { 
+			ResetRecompCode(); 
+		}
+
+		Timers.CurrentTimerType = -1;
+		Timers.Timer = 0;
+		for (count = 0; count < MaxTimers; count ++) { Timers.Active[count] = FALSE; }
+
+		//fix rdram size
+		if (SaveRDRAMSize != RdramSize) {
+			if (RdramSize == 0x400000) { 
+				if (VirtualAlloc(N64MEM + 0x400000, 0x400000, MEM_COMMIT, PAGE_READWRITE)==NULL) {
+					DisplayError("Failed to Extend memory to 8mb");
+					ExitThread(0);
+				}
+				if (VirtualAlloc((BYTE *)XBOXJumpTable + 0x400000, 0x400000, MEM_COMMIT, PAGE_READWRITE)==NULL) {
+					DisplayError("Failed to Extend Jump Table to 8mb");
+					ExitThread(0);
+				}
+				if (VirtualAlloc((BYTE *)XBOXDelaySlotTable + (0x400000 >> 0xA), (0x400000 >> 0xA), MEM_COMMIT, PAGE_READWRITE)==NULL) {
+					DisplayError("Failed to Extend Delay Slot Table to 8mb");
+					ExitThread(0);
+				}
+			} else {
+				VirtualFree(N64MEM + 0x400000, 0x400000,MEM_DECOMMIT);
+				VirtualFree((BYTE *)XBOXJumpTable + 0x400000, 0x400000,MEM_DECOMMIT);
+				VirtualFree((BYTE *)XBOXDelaySlotTable + (0x400000 >> 0xA), (0x400000 >> 0xA),MEM_DECOMMIT);
+			}
+		}
+		RdramSize = SaveRDRAMSize;
+
+		ReadFile( hSaveFile,&Value,sizeof(Value),&dwRead,NULL);
+		ChangeTimer(ViTimer,Value);
+		ReadFile( hSaveFile,&PROGRAM_COUNTER,sizeof(PROGRAM_COUNTER),&dwRead,NULL);
+		ReadFile( hSaveFile,GPR,sizeof(_int64)*32,&dwRead,NULL);
+		ReadFile( hSaveFile,FPR,sizeof(_int64)*32,&dwRead,NULL);
+		ReadFile( hSaveFile,CP0,sizeof(DWORD)*32,&dwRead,NULL);
+		ReadFile( hSaveFile,FPCR,sizeof(DWORD)*32,&dwRead,NULL);
+		ReadFile( hSaveFile,&HI,sizeof(_int64),&dwRead,NULL);
+		ReadFile( hSaveFile,&LO,sizeof(_int64),&dwRead,NULL);
+		ReadFile( hSaveFile,RegRDRAM,sizeof(DWORD)*10,&dwRead,NULL);
+		ReadFile( hSaveFile,RegSP,sizeof(DWORD)*10,&dwRead,NULL);
+		ReadFile( hSaveFile,RegDPC,sizeof(DWORD)*10,&dwRead,NULL);
+		ReadFile( hSaveFile,RegMI,sizeof(DWORD)*4,&dwRead,NULL);
+		ReadFile( hSaveFile,RegVI,sizeof(DWORD)*14,&dwRead,NULL);
+		ReadFile( hSaveFile,RegAI,sizeof(DWORD)*6,&dwRead,NULL);
+		ReadFile( hSaveFile,RegPI,sizeof(DWORD)*13,&dwRead,NULL);
+		ReadFile( hSaveFile,RegRI,sizeof(DWORD)*8,&dwRead,NULL);
+		ReadFile( hSaveFile,RegSI,sizeof(DWORD)*4,&dwRead,NULL);
+		ReadFile( hSaveFile,tlb,sizeof(TLB)*32,&dwRead,NULL);
+		ReadFile( hSaveFile,PIF_Ram,0x40,&dwRead,NULL);
+		ReadFile( hSaveFile,RDRAM,RdramSize,&dwRead,NULL);
+		ReadFile( hSaveFile,DMEM,0x1000,&dwRead,NULL);
+		ReadFile( hSaveFile,IMEM,0x1000,&dwRead,NULL);
+		CloseHandle(hSaveFile);
+		_splitpath( FileName, drive, dir, ZipFile, ext );
+		sprintf(FileName,"%s%s",ZipFile,ext);
+	//}
+	ChangeCompareTimer();
+	if (GfxRomClosed != NULL)  { GfxRomClosed(); }
+	if (AiRomClosed != NULL)   { AiRomClosed(); }
+	if (ContRomClosed != NULL) { ContRomClosed(); }
+	if (RSPRomClosed) { RSPRomClosed(); }
+	if (GfxRomOpen != NULL) { GfxRomOpen(); }
+	if (ContRomOpen != NULL) { ContRomOpen(); }
+	DlistCount = 0;
+	AlistCount = 0;
+	AI_STATUS_REG = 0;
+	AiDacrateChanged(SYSTEM_NTSC);
+	ViStatusChanged();
+	ViWidthChanged();
+	SetupTLB();
+	CheckInterrupts();
+	DMAUsed = TRUE;
+	strcpy(SaveAsFileName,"");
+	strcpy(LoadFileName,"");
+	if (CPU_Type == CPU_SyncCores) {		
+		Registers.PROGRAM_COUNTER = PROGRAM_COUNTER;
+		Registers.HI.DW = HI.DW;
+		Registers.LO.DW = LO.DW;
+		Registers.DMAUsed = DMAUsed;
+		memcpy(&SyncRegisters,&Registers,sizeof(Registers));
+		memcpy(SyncFastTlb,FastTlb,sizeof(FastTlb));
+		memcpy(SyncTlb,tlb,sizeof(tlb));
+		memcpy(SyncMemory,N64MEM,RdramSize);
+		memcpy(SyncMemory + 0x04000000,N64MEM + 0x04000000,0x2000);		
+		SwitchSyncRegisters();
+		SetupTLB();
+		SwitchSyncRegisters();		
+		SyncNextInstruction = NORMAL;
+		SyncJumpToLocation = -1;
+		NextInstruction = NORMAL;
+		JumpToLocation = -1;
+		MemAddrUsedCount[0] = 0;
+		MemAddrUsedCount[1] = 0;
+		SyncToPC ();
+		DisplayError("Loaded");
+	}
+#ifdef Log_x86Code
+	Stop_x86_Log();
+	Start_x86_Log();
+#endif
+#ifndef EXTERNAL_RELEASE
+	StopLog();
+	StartLog();
+#endif
+	sprintf(String,"Loaded save state %s",FileName);
+	//SendMessage( hStatusWnd, SB_SETTEXT, 0, (LPARAM)String );
+	return TRUE;
+}
 
 void ChangePowerLEDColor( unsigned char LEDStatus )
 {
