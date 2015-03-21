@@ -101,8 +101,11 @@ BOOL LoadPlugins();
 
 enum { SAVE_STATE_1964_FORMAT, SAVE_STATE_PJ64_FORMAT, SAVE_STATE_1964_085_FORMAT};
 
+enum { LOAD_1964_CREATED_PJ64_STATE, LOAD_PJ64_CREATED_PJ64_STATE, SAVE_1964_CREATED_PJ64_STATE, DO_NOT_DO_PJ64_STATE};
 
 extern "C" void __EMU_GetStateFilename(int index, char *filename, int mode);
+extern "C" void __EMU_Get1964StateFilename(int index, char *filename, int mode);
+extern "C" void __EMU_GetPJ64StateFilename(int index, char *filename, int mode);
 
 /*#define INVALID_FILE_ATTRIBUTES ((DWORD)-1)
 extern BOOL PathFileExists(const char *pszPath);

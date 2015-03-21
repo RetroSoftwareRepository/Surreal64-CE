@@ -110,11 +110,6 @@ bool FrameBufferInRDRAMCheckCRC();
 void ClearFrameBufferToBlack(DWORD left=0, DWORD top=0, DWORD width=0, DWORD height=0);
 bool ProcessFrameWriteRecord();
 extern RECT frameWriteByCPURect;
-extern bool bloadstate[MAX_SAVE_STATES];
-extern bool bsavestate[MAX_SAVE_STATES];
-extern "C" void __EMU_SaveState(int index);
-extern "C" void __EMU_LoadState(int index);
-extern bool bSatesUpdated;
 
 LPDIRECT3DVERTEXBUFFER8 m_pVB;
 struct VERTEX { D3DXVECTOR4 p; FLOAT tu, tv; };
@@ -127,23 +122,6 @@ LPDIRECT3DSURFACE8 texSurface2;*/
 __forceinline void CDXGraphicsContext::UpdateFrame(bool swaponly)
 {
 	//HRESULT hr; //unreferenced
-
-	if (bSatesUpdated) {
-		bSatesUpdated = false;
-		
-		for (int i=0; i<MAX_SAVE_STATES; i++) {
-			if (bloadstate[i]) {
-				__EMU_LoadState(i+1);
-				bloadstate[i]=false;
-				break;
-			}
-			else if (bsavestate[i]) {
-				__EMU_SaveState(i+1);
-				bsavestate[i]=false;
-				break;
-			}
-		}
-	}
 
 	status.gFrameCount++;
 	CGraphicsContext::UpdateFrameBufferBeforeUpdateFrame();

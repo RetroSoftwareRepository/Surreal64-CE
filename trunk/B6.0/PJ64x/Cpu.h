@@ -50,7 +50,8 @@ typedef struct {
 	BOOL CheckInterrupts;
 	BOOL Pause;
 	BOOL SaveState;
-	BOOL RestoreState;
+	BOOL RestorePJ64State;
+	BOOL Restore1964State;
 	BOOL DoInterrupt;
 	BOOL Stepping;
 } CPU_ACTION;
@@ -71,27 +72,28 @@ typedef struct {
 	int  Timer;
 } SYSTEM_TIMERS;
 
-void ChangeCompareTimer ( void );
-void ChangeTimer        ( int Type, int Value );
-void CheckTimer         ( void );
-void CloseCpu           ( void );
-int  DelaySlotEffectsCompare ( DWORD PC, DWORD Reg1, DWORD Reg2 );
-int  DelaySlotEffectsJump (DWORD JumpPC);
-void DoSomething        ( void );
-void GetAutoSaveDir     ( char * Directory );
-void GetInstantSaveDir  ( char * Directory );
-void InPermLoop         ( void );
-void InitiliazeCPUFlags ( void );
-BOOL Machine_LoadState  ( void );
-BOOL Machine_SaveState  ( void );
-void PauseCpu           ( void );
-void RefreshScreen      ( void );
-void RunRsp             ( void );
-void SetCoreToRunning   ( void );
-void SetCoreToStepping  ( void );
-void StartEmulation     ( void );
-void StepOpcode         ( void );
-void TimerDone          ( void );
+void ChangeCompareTimer			( void );
+void ChangeTimer				( int Type, int Value );
+void CheckTimer					( void );
+void CloseCpu					( void );
+int  DelaySlotEffectsCompare	( DWORD PC, DWORD Reg1, DWORD Reg2 );
+int  DelaySlotEffectsJump		( DWORD JumpPC);
+void DoSomething				( void );
+void GetAutoSaveDir				( char * Directory );
+void GetInstantSaveDir			( char * Directory );
+void InPermLoop					( void );
+void InitiliazeCPUFlags			( void );
+BOOL Machine_LoadPJ64State		( void );
+BOOL Machine_Load1964State		( void );
+BOOL Machine_SaveState			( void );
+void PauseCpu					( void );
+void RefreshScreen				( void );
+void RunRsp						( void );
+void SetCoreToRunning			( void );
+void SetCoreToStepping			( void );
+void StartEmulation				( void );
+void StepOpcode					( void );
+void TimerDone					( void );
 
 #define NORMAL					0
 #define DO_DELAY_SLOT			1

@@ -107,13 +107,17 @@ extern int					game_country_tvsystem;
 
 void LoadPlugins();
 
+enum { LOAD_1964_CREATED_PJ64_STATE, LOAD_PJ64_CREATED_PJ64_STATE, SAVE_1964_CREATED_PJ64_STATE, DO_NOT_DO_PJ64_STATE};
+
 extern void __EMU_GetStateFilename(int index, char *filename, int mode);
+extern void __EMU_Get1964StateFilename(int index, char *filename, int mode);
+extern void __EMU_GetPJ64StateFilename(int index, char *filename, int mode);
 
 #define INVALID_FILE_ATTRIBUTES ((DWORD)-1)
 extern BOOL PathFileExists(const char *pszPath);
 
 extern char g_szPathSaves[256];
-extern int LoadAfter;
+extern int DoState;
 extern int stateindex;
 
 #endif

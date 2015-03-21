@@ -23,8 +23,7 @@
 #include "cheatcode.h"
 #ifdef _XBOX
 //#include "rompaging.h"
-extern bool bTriggerState;
-extern bool LoadAfter;
+extern int DoState;
 extern int stateindex;
 #else //win32
 
@@ -866,30 +865,6 @@ void RunTheRegCacheWithoutOpcodeDebugger(void)
 	{
 _DoOtherTask:
 
-	//Do this for RunTheRegCacheWithoutOpcodeDebugger() too
-	if(bTriggerState){
-		if (LoadAfter)
-		{	
-			sprintf(buf, "%s%08x\\%08X-%08X-%02X.%i", g_szPathSaves, currentromoptions.crc1, currentromoptions.crc1, currentromoptions.crc2, currentromoptions.countrycode, stateindex);
-			FileIO_ImportPJ64State(buf);
-			Init_Count_Down_Counters();
-			RefreshDynaDuringGamePlay();
-			bTriggerState = false;
-		}
-	}
-	if(bTriggerState){
-		if (!LoadAfter)
-		{
-			sprintf(buf, "%s%08x\\%08X-%08X-%02X.%i", g_szPathSaves, currentromoptions.crc1, currentromoptions.crc1, currentromoptions.crc2, currentromoptions.countrycode, stateindex);
-			FileIO_ExportPJ64State(buf);
-			FileIO_ImportPJ64State(buf); // Necessary...
-			Init_Count_Down_Counters();
-			RefreshDynaDuringGamePlay();
-			bTriggerState = false;
-		}	
-	}
-	
-
 		Block = (uint8 *) *r.r_.g_LookupPtr;
 		if(Block != NULL && r.r_.g_pc_is_rdram) 
 			Dyna_Check_Codes();
@@ -940,28 +915,6 @@ static void RunTheRegCacheNoCheck(void)
 	{
 _NextBlock:
 
-	// Usually load here
-	if(bTriggerState){
-		if (LoadAfter)
-		{	
-			sprintf(buf, "%s%08x\\%08X-%08X-%02X.%i", g_szPathSaves, currentromoptions.crc1, currentromoptions.crc1, currentromoptions.crc2, currentromoptions.countrycode, stateindex);
-			FileIO_ImportPJ64State(buf);
-			Init_Count_Down_Counters();
-			RefreshDynaDuringGamePlay();
-			bTriggerState = false;
-		}
-	}
-	if(bTriggerState){
-		if (!LoadAfter)
-		{
-			sprintf(buf, "%s%08x\\%08X-%08X-%02X.%i", g_szPathSaves, currentromoptions.crc1, currentromoptions.crc1, currentromoptions.crc2, currentromoptions.countrycode, stateindex);
-			FileIO_ExportPJ64State(buf);
-			FileIO_ImportPJ64State(buf); // Necessary...
-			Init_Count_Down_Counters();
-			RefreshDynaDuringGamePlay();
-			bTriggerState = false;
-		}	
-	}
 		__asm
 		{
 l1:        mov eax, r.r_.g_LookupPtr
@@ -1058,6 +1011,39 @@ void CPU_Check_Interrupts(void)
 	}
 	else	/* Dyna mode */
 	{
+#ifdef _XBOX
+		//Check for pending Save/Load State task
+		char buf[260];
+		switch(DoState){
+			case LOAD_1964_CREATED_PJ64_STATE:
+				sprintf(buf, "%s%08x\\%08X-%08X-%02X.%i.1964", g_szPathSaves, currentromoptions.crc1, currentromoptions.crc1, currentromoptions.crc2, currentromoptions.countrycode, stateindex);
+				FileIO_ImportPJ64State(buf);
+				Init_Count_Down_Counters();
+				RefreshDynaDuringGamePlay();
+				DoState = DO_NOT_DO_PJ64_STATE;
+				break;
+
+			case LOAD_PJ64_CREATED_PJ64_STATE:
+				sprintf(buf, "%s%08x\\%08X-%08X-%02X.%i.pj64", g_szPathSaves, currentromoptions.crc1, currentromoptions.crc1, currentromoptions.crc2, currentromoptions.countrycode, stateindex);
+				FileIO_ImportPJ64State(buf);
+				Init_Count_Down_Counters();
+				RefreshDynaDuringGamePlay();
+				DoState = DO_NOT_DO_PJ64_STATE;
+				break;
+
+			case SAVE_1964_CREATED_PJ64_STATE:
+				sprintf(buf, "%s%08x\\%08X-%08X-%02X.%i.1964", g_szPathSaves, currentromoptions.crc1, currentromoptions.crc1, currentromoptions.crc2, currentromoptions.countrycode, stateindex);
+				FileIO_ExportPJ64State(buf);
+				FileIO_ImportPJ64State(buf); // Necessary...
+				Init_Count_Down_Counters();
+				RefreshDynaDuringGamePlay();
+				DoState = DO_NOT_DO_PJ64_STATE;
+				break;
+			default:
+				break;
+		}
+#endif
+
 		if
 		(
 			(gHWS_COP0Reg[STATUS] & EXL_OR_ERL) == 0		/* No in another interrupt routine */

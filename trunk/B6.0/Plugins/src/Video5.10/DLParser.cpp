@@ -27,7 +27,7 @@ extern BOOL _INPUT_IsIngameMenuWaiting();
 extern BOOL _INPUT_UpdatePaks();
 extern BOOL _INPUT_UpdateControllerStates();
 extern void _INPUT_RumblePause(bool bPause);
-extern "C" void ReInitVirtualDynaMemory(boolean charge);
+extern "C" BOOL ReInitVirtualDynaMemory(boolean charge);
 extern int TextureMode;
 extern bool FrameSkip;
 
@@ -1131,36 +1131,47 @@ void DLParser_Process(OSTask * pTask)
 #ifdef _XBOX
 	if (_INPUT_IsIngameMenuWaiting())
 	{
+		bool Memdecommit = 0;
+		MEMORYSTATUS ms;
+		GlobalMemoryStatus(&ms);	
+		
+		// Clear Rice's textures before loading the menu.
+		gTextureCache.PurgeOldTextures();
+		gTextureCache.DropTextures();
+		RDP_Cleanup();
+		
+		
+		// Disable any active rumble
 		_INPUT_RumblePause(true);
-		
-		try{
-			gTextureCache.DropTextures();
-			gTextureCache.PurgeOldTextures();
-			RDP_Cleanup();
-		}
-		catch(...){}
 
-		try{
-		ReInitVirtualDynaMemory(false);
-		}
-		catch(...){}
-		
-		try{
-		RunIngameMenu();
-		}
-		catch(...){}
 
+		// Check free memory and decommit dynablock if necessary.
+		if (ms.dwAvailPhys < (8*1024*1024))
+		{
+			if(ReInitVirtualDynaMemory(false))
+			{
+				Memdecommit = 1;
+				RunIngameMenu();
+			}
+		}
+		else
+		{
+			RunIngameMenu();
+		}
 		
+		// Restore dynablock if we previously decommitted.
+		while(Memdecommit)
+		{
+			if(ReInitVirtualDynaMemory(true))
+				Memdecommit = 0;
+		}
 
+		// Update settings that the menu changed
 		options.forceTextureFilter=TextureMode;
-		_INPUT_UpdatePaks();//added by freakdave
-		_INPUT_UpdateControllerStates();//added by freakdave
+		_INPUT_UpdatePaks();
+		_INPUT_UpdateControllerStates();
 		
-		try{
-		ReInitVirtualDynaMemory(true);
-		}
-		catch(...){}
-
+		// Reenable rumble
 		_INPUT_RumblePause(false);
 	}
 #endif
