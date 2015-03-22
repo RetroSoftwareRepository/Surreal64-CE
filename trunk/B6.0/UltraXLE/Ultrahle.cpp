@@ -455,7 +455,15 @@ void __EMU_GetStateFilename(int index, char *filename, int mode)
 	return;
 }
 
+void __EMU_Get1964StateFilename(int index, char *filename, int mode)
+{
+	//unused
+}
 
+void __EMU_GetPJ64StateFilename(int index, char *filename, int mode)
+{
+	//unused
+}
 //-----------------------------------------------------------------------------
 // Name: SetAntiAliasMode()
 // Desc: Surreal64 function to set the antialiasing mode determined by the
