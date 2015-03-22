@@ -113,5 +113,7 @@ public:
 const DWORD D3DFVF_CProcessedVertex=D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_TEX2;
 
 extern "C" void __EMU_GetStateFilename(int index, char *filename, int mode);
+extern "C" void __EMU_Get1964StateFilename(int index, char *filename, int mode);
+extern "C" void __EMU_GetPJ64StateFilename(int index, char *filename, int mode);
 
 extern char g_szPathSaves[256];
