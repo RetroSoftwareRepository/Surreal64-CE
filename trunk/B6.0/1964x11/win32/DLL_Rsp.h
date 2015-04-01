@@ -16,7 +16,8 @@
 #define _1964_DLL_RSP_H
 
 #ifdef _XBOX
-#include <xtl.h>
+//#include <xtl.h>
+#include <xbox_depp.h>
 #include "../plugins.h"
 #else //win32
 #include <windows.h>

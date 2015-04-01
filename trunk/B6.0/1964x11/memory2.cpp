@@ -22,9 +22,28 @@
  * use existing methods in other emus, which to use a function array to access
  * memory. by Rice -- 11/09/2001
  */
+#ifndef USE_ICC_LIB
+#ifndef _XBOX_ICC
 #include "stdafx.h"
+#else
+#include <mytypes.h>
+#include "hardware.h"
+#include "emulator.h"
+#include "r4300i.h"
+#include "dynarec/opcodedebugger.h"
+#include "_memory.h"
+#include "gamesave.h"
+#include "compiler.h"
+#include "1964ini.h"
+#include "registers.h"
+#endif
 #include "cheatcode.h"
 
+#ifdef _XBOX_ICC
+extern N64::CRegisters r;
+extern INI_ENTRY currentromoptions;
+extern uint32	current_rdram_size;
+#endif
 /*#ifdef _XBOX
 #include "rompaging.h" // needed?
 #endif*/
@@ -1503,5 +1522,4 @@ void unprotect_framebuffer_memory_from_READ_set_func_array(uint32 pc)
 		gHardwareState.memory_read_functions[((addr | 0x20000000) / 0x10000) >> SHIFTER1_READ] = (unsigned int *(__fastcall *)()) read_mem_rdram_k1seg_eax_only;
 	}
 }
-
-
+#endif //USE_ICC_LIB

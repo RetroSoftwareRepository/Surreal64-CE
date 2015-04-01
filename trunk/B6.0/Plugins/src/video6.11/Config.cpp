@@ -25,7 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "../../../config.h"
 
 extern int TextureMode;
-extern bool FrameSkip;
+extern int FrameSkip;
 
 #define MAIN_KEY		"Software\\RICEVIDEO\\Version610"
 #define INI_FILE		"RiceVideo6.1.0.ini"
@@ -745,6 +745,8 @@ void ReadConfiguration(void)
 		options.textureEnhancement = 0;
 		options.textureEnhancementControl = 1; //0;
 		options.OpenglRenderSetting = OGL_DEVICE;
+		if((preferedemu != _1964x11)&&(FrameSkip>1))
+			FrameSkip = 0;
 		options.bSkipFrame = FrameSkip;
 		options.bDisplayTooltip = FALSE;
 		options.bHideAdvancedOptions = TRUE;

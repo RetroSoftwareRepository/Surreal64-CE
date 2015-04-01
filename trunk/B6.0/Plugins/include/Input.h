@@ -216,7 +216,7 @@ void _INPUT_SetRumble(int Control, BOOL on);
   input:    a 72byte array of cfg data
   output:   none
 *******************************************************************/ 
-void _INPUT_LoadButtonMap(byte *cfgData);
+void _INPUT_LoadButtonMap(BYTE *cfgData);
 
 /******************************************************************
   Function: _INPUT_GetXGamepadHandle

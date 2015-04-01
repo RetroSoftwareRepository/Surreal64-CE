@@ -53,7 +53,8 @@ extern bool bUseBasicAudio;
 extern int dwMaxVideoMem;
 
 extern bool HideLaunchScreens;
-extern bool FrameSkip;
+extern int FrameSkip;
+extern int AutoCF_1964;
 extern int VSync;
 extern int AntiAliasMode;
 //extern int RefreshRateInHz;

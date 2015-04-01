@@ -13,7 +13,24 @@
 // 59 Temple Place  -  Suite  330,  Boston, MA  02111-1307,  USA. To contact the
 // authors: email: schibo@emulation64.com, rice1964@yahoo.com
 
+#ifndef USE_ICC_LIB
+#ifndef _XBOX_ICC
 #include "../stdafx.h"
+#else
+#include <mytypes.h>
+#include "regcache.h"
+#include "opcodedebugger.h"
+#include "x86.h"
+#include "xmm.h"
+#include "../1964ini.h"
+#include "../Registers.h"
+//#include "../core.h"
+#endif
+
+#ifdef _XBOX_ICC
+extern INI_ENTRY currentromoptions;
+extern N64::CRegisters r;
+#endif
 
 #define IT_IS_HIGHWORD	- 2
 #define IT_IS_UNUSED	- 1
@@ -37,7 +54,9 @@ extern int ItIsARegisterNotToUse(int k);
 
 void ConvertRegTo32bitNew(int k)
 {
+#ifndef _XBOX
 	if(x86reg[k].HiWordLoc == -1) DisplayError("MapRegister() bug: HiWordLoc should not be -1");
+#endif
 
 	x86reg_Delete(x86reg[k].HiWordLoc);
 
@@ -178,10 +197,12 @@ void Map64bitNew(int To_XMM_Or_Memory, x86regtyp *Conditions, int _mips_from, in
             //don't assign the function return value to k.
             temp = FlushOneButNotThese3(To_XMM_Or_Memory, 99, keep2, keep3);
 
+#ifndef _XBOX
             if (temp==-1)
             {
                 MessageBox(0, "Map64bit: Failed to flush", "", 0);
             }
+#endif
 		}
 	}
 }
@@ -205,8 +226,9 @@ void ConvertRegTo64bitNew(int To_XMM_Or_Memory, int k, int mips_from, x86regtyp 
 		/* find a spot for the HiWord */
 		while(HiMapped == 0)
 		{
+#ifndef _XBOX
 			if(couldntmap++ >= 100) DisplayError("I can't find a place to map.");
-
+#endif
 			for(i = NUM_X86REGS-1; i >=0; i--)
 			{
 				if(ItIsARegisterNotToUse(i));
@@ -249,7 +271,9 @@ _MapIt:
 				i = FlushOneButNotThese3(To_XMM_Or_Memory, x86reg[k].mips_reg, keep2, keep3);
                     if (i==-1)
                     {
+#ifndef _XBOX
                         MessageBox(0, "ConvertRegTo64Bit: nothing available to free", "", 0);
+#endif
                     }
                     else
                         goto _MapIt;
@@ -299,8 +323,9 @@ void ConvertRegNew(int To_XMM_Or_Memory, int k, x86regtyp *Conditions, int mips_
 	x86reg[k].Is32bit = Conditions->Is32bit;
 	x86reg[k].BirthDate = ThisYear;
 	x86reg[x86reg[k].HiWordLoc].BirthDate = ThisYear;
-
+#ifndef _XBOX
 	if(x86reg[k].HiWordLoc == -1) DisplayError("Set&return map info: HiWord is -1!!!");
+#endif
 }
 
 /*
@@ -390,3 +415,4 @@ void MapOneConstantToRegisterNew(x86regtyp *Conditions, int mips_from, int The2n
 		}
 	}
 }
+#endif //USE_ICC_LIB

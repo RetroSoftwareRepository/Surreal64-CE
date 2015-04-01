@@ -24,8 +24,8 @@
 #define _COMPILER_H__1964_
 
 #ifdef _XBOX
-#include <xtl.h>
-
+//#include <xtl.h>
+#include <mytypes.h>
 #else //win32
 #include <windows.h>
 #endif
@@ -69,6 +69,7 @@ typedef struct BLOCK_ENTRY_STRUCT	BLOCK_ENTRY;
 extern struct CompilerStatus		compilerstatus;
 extern BLOCK_ENTRY					*current_block_entry;
 extern uint8						*dyna_RecompCode;
+extern void							(*Dyna_Check_Codes)(void);
 uint32								Dyna_Compile_Block(void);
 uint32								Dyna_Compile_4KB_Block(void);
 

@@ -164,5 +164,15 @@ extern void XBOX_Debugger_Log(const char *Message, ...);
 
 // reinstate max video mem
 void _VIDEO_RICE_611_SetMaxTextureMem(DWORD mem);
+enum Emulators
+{
+	_1964x085,
+	_PJ64x14,
+	_UltraHLE,
+	_PJ64x16,
+	_1964x11,
+	//_Mupen64PlusX,
+	_None
+};
 
 #endif

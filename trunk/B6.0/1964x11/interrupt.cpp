@@ -24,6 +24,7 @@
 #include "stdafx.h"
 #include <float.h>
 #include "cheatcode.h"
+#include "timer.h"
 
 extern void		Init_Timer_Event_List(void);
 extern uint32	TLB_Error_Vector;
@@ -36,7 +37,6 @@ LARGE_INTEGER	Freq;
 LARGE_INTEGER	CurrentTime;
 LARGE_INTEGER	Elapsed;
 double			tempvips;
-
 
 void rdp_fullsync()
 //Hack..gets rsp working for basic video plugin+rsp+starfox.
@@ -296,6 +296,7 @@ void Handle_DPC(uint32 value)
 extern unsigned int cpuIdlePercentages[4];
 extern int cpuIdlePercentageIdx;
 BOOL newSecond = FALSE;
+BOOL FirstSecond = FALSE;
 void Set_AutoCF()
 {
 	BOOL oldViFrameSkip;
@@ -303,10 +304,10 @@ void Set_AutoCF()
 	int cpuIdlePercentage=0;
 	int i;
 
-	if( newSecond == FALSE )
-		return;
+	if( ( newSecond == TRUE ) || ( FirstSecond == TRUE ) )
+		FirstSecond = TRUE;
 	else
-		newSecond = FALSE;
+		return;
 
 	// Only change AutoCF and AutoFrameSkip setting at a second boundary
 
@@ -321,7 +322,7 @@ void Set_AutoCF()
 	oldCounterFactor = CounterFactor;
 
 
-	/* Possible combinations:                                               */
+	// Possible combinations:                                               */
 	/*
 	 * 1) AutoCF=On, AutoFrameSkip=On
 	 *     CF=5,  emustatus.viframeskip=1    -----> (1)  ^
@@ -341,195 +342,85 @@ void Set_AutoCF()
 	 * 4) Both off, do nothing
 	 *	
 	 */
-
-	if( emuoptions.AutoCF && emuoptions.AutoFrameSkip )
+	
+	BOOL bSkipAutoCF = FALSE;
+	if( emuoptions.AutoFrameSkip )
 	{
-		// Case 1, both features are on
-
-		if( oldViFrameSkip == 1 )
+		if( ( emuoptions.AutoCF ) &&
+			( oldCounterFactor >= 5 ) &&
+			( vips < vips_speed_limits[MAXFPS_AUTO_SYNC]*0.92f)
+			)
 		{
-			if( oldCounterFactor != 5 )
-			{
-				// We will check again frame rate at the next second
-				emustatus.viframeskip = 0;
-				AutoCounterFactor = VICounterFactors[5];
-				CounterFactor = 5;
-			}
-			else if( cpuIdlePercentage > 15 || vips > vips_speed_limits[MAXFPS_AUTO_SYNC]*1.1f )
-			{
-				if( cpuIdlePercentage > 50 )
-				{
-					emustatus.viframeskip = 0;
-					AutoCounterFactor = VICounterFactors[3];
-					CounterFactor = 3;
-				}
-				else
-				{
-					emustatus.viframeskip = 0;
-					AutoCounterFactor = VICounterFactors[5];
-					CounterFactor = 5;
-				}
-			}
-			else
-			{
-				AutoCounterFactor = VICounterFactors[5];
-				CounterFactor = 5;
-			}
+			//Performance is poor and AutoCF tried it's best.
+			emustatus.viframeskip = 1;
+			bSkipAutoCF = TRUE;
 		}
-		else
+		else if( ( !emuoptions.AutoCF ) &&
+			( vips < vips_speed_limits[MAXFPS_AUTO_SYNC]*0.85f ))
 		{
-			// oldViFrameSkip = 0
-			if( oldCounterFactor > 4 )
-			{
-				if( vips < vips_speed_limits[MAXFPS_AUTO_SYNC]*0.85f )
-				{
-					emustatus.viframeskip = 1;
-					AutoCounterFactor = VICounterFactors[5];
-					CounterFactor = 5;
-				}
-
-//This one is too slow                
-//				else if (cpuIdlePercentage > 50 )
-//				{
-//					AutoCounterFactor = VICounterFactors[1];
-//					CounterFactor = 1;
-//				}
-				else if (cpuIdlePercentage > 20 )
-				{
-					AutoCounterFactor = VICounterFactors[3];
-					CounterFactor = 3;
-				}
-				else
-				{
-					AutoCounterFactor = VICounterFactors[5];
-					CounterFactor = 5;
-				}
-			}
-			else if( oldCounterFactor >2 )
-			{
-				if( vips < vips_speed_limits[MAXFPS_AUTO_SYNC]*0.6f )
-				{
-					emustatus.viframeskip = 1;
-					AutoCounterFactor = VICounterFactors[5];
-					CounterFactor = 5;
-				}
-				else if( vips < vips_speed_limits[MAXFPS_AUTO_SYNC]*0.9f )
-				{
-					AutoCounterFactor = VICounterFactors[5];
-					CounterFactor = 5;
-				}
-//Too slow
-//				else if ( cpuIdlePercentage > 20 )
-//				{
-//					AutoCounterFactor = VICounterFactors[1];
-//					CounterFactor = 1;
-//				}
-				else
-				{
-					AutoCounterFactor = VICounterFactors[3];
-					CounterFactor = 3;
-				}
-			}
-			else
-			{
-				if( vips < vips_speed_limits[MAXFPS_AUTO_SYNC]*0.4f )
-				{
-					emustatus.viframeskip = 1;
-					AutoCounterFactor = VICounterFactors[5];
-					CounterFactor = 5;
-				}
-				else if( vips < vips_speed_limits[MAXFPS_AUTO_SYNC]*0.6f )
-				{
-					AutoCounterFactor = VICounterFactors[5];
-					CounterFactor = 5;
-				}
-				else if( vips < vips_speed_limits[MAXFPS_AUTO_SYNC]*0.9f )
-				{
-					AutoCounterFactor = VICounterFactors[3];
-					CounterFactor = 3;
-				}
-//Too slow
-//				else
-//				{
-//					AutoCounterFactor = VICounterFactors[1];
-//					CounterFactor = 1;
-//				}
-			}
-		}
-	}
-	else if( emuoptions.AutoCF )
-	{
-		// case 2: AutoCF=on, AutoFrameSkip=Off
-
-		if( oldCounterFactor > 4 )
-		{
-			if( vips < vips_speed_limits[MAXFPS_AUTO_SYNC]*0.9f )
-			{
-				// We cannot do anything else to speed up
-				AutoCounterFactor = VICounterFactors[5];
-				CounterFactor = 5;
-			}
-			else if (cpuIdlePercentage > 20 )
-			{
-				AutoCounterFactor = VICounterFactors[3];
-				CounterFactor = 3;
-			}
-		}
-		else if( oldCounterFactor >2 )
-		{
-			if( vips < vips_speed_limits[MAXFPS_AUTO_SYNC]*0.9f )
-			{
-				AutoCounterFactor = VICounterFactors[5];
-				CounterFactor = 5;
-			}
-//Too slow
-//			else if ( cpuIdlePercentage > 20 )
-//			{
-//				AutoCounterFactor = VICounterFactors[1];
-//				CounterFactor = 1;
-//			}
-			else
-			{
-				AutoCounterFactor = VICounterFactors[3];
-				CounterFactor = 3;
-			}
-		}
-		else
-		{
-			if( vips < vips_speed_limits[MAXFPS_AUTO_SYNC]*0.6f )
-			{
-				AutoCounterFactor = VICounterFactors[5];
-				CounterFactor = 5;
-			}
-			else if( vips < vips_speed_limits[MAXFPS_AUTO_SYNC]*0.9f )
-			{
-				AutoCounterFactor = VICounterFactors[3];
-				CounterFactor = 3;
-			}
-//Too slow
-//			else
-//			{
-//				AutoCounterFactor = VICounterFactors[1];
-//				CounterFactor = 1;
-//			}
-		}
-	}
-	else if( emuoptions.AutoFrameSkip )
-	{
-		// case 3: AutoCF=off, AutoFrameSkip=on
-
-		if( vips < vips_speed_limits[MAXFPS_AUTO_SYNC]*0.85f )
-		{
+			//Performance is poor and AutoCF is disabled.
 			emustatus.viframeskip = 1;
 		}
-		else if( cpuIdlePercentage > 15 || vips > vips_speed_limits[MAXFPS_AUTO_SYNC]*1.1f )
+		else //if (newSecond)
 		{
+			//Performance is good, disable FrameSkip.
 			emustatus.viframeskip = 0;
 		}
 	}
-	else
+
+	if( emuoptions.AutoCF && !bSkipAutoCF )
 	{
-		// Both features are off
+		switch(oldCounterFactor)
+		{
+		case 5:
+			if (( vips > vips_speed_limits[MAXFPS_AUTO_SYNC]*0.85f )/* && newSecond*/ )
+			{
+				//Performance is good, do more emulation
+				AutoCounterFactor = VICounterFactors[3];
+				CounterFactor = 3;
+			}
+			else
+			{
+				//Performance is acceptable, maintain CF
+				AutoCounterFactor = VICounterFactors[5];
+				CounterFactor = 5;
+			}
+			break;
+		case 3:
+			if (( cpuIdlePercentage > 5) && ( vips > vips_speed_limits[MAXFPS_AUTO_SYNC]*0.95f ) && emuoptions.AllowCF1 )
+			{
+				//Performance is good, do more emulation
+				AutoCounterFactor = VICounterFactors[1];
+				CounterFactor = 1;
+			}
+			else if( vips < vips_speed_limits[MAXFPS_AUTO_SYNC]*0.85f )
+			{
+				//Performance is poor, do less emulation
+				AutoCounterFactor = VICounterFactors[5];
+				CounterFactor = 5;
+			}
+			else
+			{
+				//Performance is acceptable, maintain CF3
+				AutoCounterFactor = VICounterFactors[3];
+				CounterFactor = 3;
+			}
+			break;
+		case 1:
+			if (( vips < vips_speed_limits[MAXFPS_AUTO_SYNC]*0.92f ))
+			{
+				//Performance is poor, do less emulation
+				AutoCounterFactor = VICounterFactors[3];
+				CounterFactor = 3;
+			}
+			else
+			{
+				//Performance is acceptable, maintain CF1
+				AutoCounterFactor = VICounterFactors[1];
+				CounterFactor = 1;
+			}
+			break;
+		}
 	}
 }
 

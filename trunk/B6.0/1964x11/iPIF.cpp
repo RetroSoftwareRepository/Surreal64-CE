@@ -21,8 +21,42 @@
  * 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA. To contact the
  * authors: email: schibo@emulation64.com, rice1964@yahoo.com
  */
+#ifndef USE_ICC_LIB
+#ifndef _XBOX_ICC
 #include "stdafx.h"
+#else
+#include <mytypes.h>
+#include <memory.h>
+#include "ipif.h"
+#include "1964ini.h"
+#include "registers.h"
+#include "debug_option.h"
+#include "plugins.h"
+#include "emulator.h"
+#include "gamesave.h"
+#include "dynarec/opcodedebugger.h"
+#include "hardware.h"
+#endif
 #include <time.h> // for RTC
+
+extern void CONTROLLER_SetRumble(int cont, BOOL use);
+
+#ifdef _XBOX_ICC
+//extern MemoryState			gMemoryState;
+extern void CONTROLLER_ControllerCommand(int device, unsigned char *cmd);
+extern void	CONTROLLER_ReadController(int device, unsigned char *cmd);
+extern void CONTROLLER_GetKeys(int device, BUTTONS *Keys);
+
+extern void FileIO_LoadEEprom(void);
+extern void FileIO_LoadMemPak(int device);
+extern void FileIO_WriteEEprom(void);
+extern void FileIO_WriteMemPak(int device);
+
+extern CONTROL		Controls[4];
+extern N64::CRegisters r;
+extern INI_ENTRY currentromoptions;
+extern uint32	current_rdram_size;
+#endif
 
 _u8 EEProm_Status_Byte = 0x00;
 
@@ -328,9 +362,10 @@ BOOL ControllerCommand(_u8 *cmd, int device)
 #ifdef _XBOX
 		{
 			if((dwAddress >= 0x8000) && (dwAddress < 0x9000))
-				FillMemory(Data, 32, 0x80);
+				Data[32]= 0x80;
 			else
-				FillMemory(Data, 32, 0x00);
+				Data[32]= 0x00;
+				//FillMemory(Data, 32, 0x00);
 			BuildCRC(Data, &Data[32]);
 			break;
 		}
@@ -376,11 +411,11 @@ BOOL ControllerCommand(_u8 *cmd, int device)
 				// check the first byte, if its 0x01 then enable the rumble
 				if(*Data)
 				{
-					_CONTROLLER_SetRumble(device, TRUE);
+					CONTROLLER_SetRumble(device, TRUE);
 				}
 				else
 				{
-					_CONTROLLER_SetRumble(device, FALSE);
+					CONTROLLER_SetRumble(device, FALSE);
 				}
 			}
 
@@ -512,7 +547,7 @@ unsigned char byte2bcd(int n)
 
 BOOL EEpromCommand(_u8 *cmd)
 {
-	// added by weinersch
+	// added by Shapyi
 	time_t curtime_time;
     struct tm curtime;
 	
@@ -542,7 +577,7 @@ BOOL EEpromCommand(_u8 *cmd)
 		WriteEEprom((char*)&cmd[4], cmd[3] * 8);
 		break;
 	
-	// added by weinersch
+	// added by Shapyi
 	/* RTC, credit: Mupen64 source */
 	case 0x06:
 		// RTC status query
@@ -1377,3 +1412,4 @@ void LogPIFData(char *data, BOOL input)
 		fclose(stream);
 	}
 }
+#endif //USE_ICC_LIB

@@ -57,7 +57,7 @@ extern HINSTANCE	hinstControllerPlugin;
 
 #ifdef _XBOX
 extern void (CALL *_CONTROLLER_SetRumble) (int Control, BOOL on);
-extern void (CALL *_CONTROLLER_LoadButtonMap) (byte *cfgData);
+extern void (CALL *_CONTROLLER_LoadButtonMap) (BYTE *cfgData);
 #endif //_XBOX
 
 #endif

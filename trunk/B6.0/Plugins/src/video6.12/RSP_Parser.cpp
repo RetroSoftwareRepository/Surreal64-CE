@@ -418,12 +418,14 @@ void DLParser_Process()
 	{
 		TRACE0("Unknown exception happens in ProcessDList");
 #ifdef _XBOX
+#ifdef _DEBUG
 		_VIDEO_DisplayTemporaryMessage("Unknown exception happens in ProcessDList");
+#endif
 #endif
 		TriggerDPInterrupt();
 	}
 
-	CRender::g_pRender->EndRendering();
+	
 
 #ifdef _XBOX
 	if (_INPUT_IsIngameMenuWaiting())
@@ -433,6 +435,7 @@ void DLParser_Process()
 		GlobalMemoryStatus(&ms);	
 		
 		// Clear Rice's textures before loading the menu.
+		bPurgeOldBeforeIGM = TRUE;
 		gTextureManager.PurgeOldTextures();
 		gTextureManager.CleanUp();
 		RDP_Cleanup();
@@ -472,7 +475,8 @@ void DLParser_Process()
 		_INPUT_RumblePause(false);
 	}
 #endif
-		
+
+	CRender::g_pRender->EndRendering();	
 }
 
 //*****************************************************************************

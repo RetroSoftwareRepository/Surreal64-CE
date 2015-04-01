@@ -10,7 +10,12 @@
 #pragma warning(disable:4244)	// conversion, possible loss of data
 #pragma warning(disable:4731)	// frame pointer register modified by inline assembly code
 
+
+#ifndef _XBOX_ICC
 #include <xtl.h>
+#else
+#include <mytypes.h>
+#endif
 
 #if defined(__cplusplus)
 extern "C" {

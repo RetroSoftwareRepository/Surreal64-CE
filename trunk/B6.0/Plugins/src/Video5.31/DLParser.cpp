@@ -868,7 +868,7 @@ void DLParser_Process(OSTask * pTask)
 {
 	static int skipframe=0;
 
-	if( FrameSkip )
+	if( options.skipFrame )
 	{
 		skipframe++;
 		if(skipframe%2)
@@ -1030,6 +1030,7 @@ void DLParser_Process(OSTask * pTask)
 		GlobalMemoryStatus(&ms);	
 		
 		// Clear Rice's textures before loading the menu.
+		bPurgeOldBeforeIGM = TRUE;
 		gTextureCache.PurgeOldTextures();
 		gTextureCache.DropTextures();
 		RDP_Cleanup();

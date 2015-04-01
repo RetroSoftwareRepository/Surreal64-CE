@@ -26,6 +26,22 @@
  =======================================================================================================================
  =======================================================================================================================
  */
+#include <mytypes.h>
+#include "../Registers.h"
+#include "../compiler.h"
+#include "../r4300i.h"
+#include "opcodedebugger.h"
+#include "x86.h"
+#include "xmm.h"
+#define __g_Lookup_HI 32
+#include "../1964ini.h"
+
+extern INI_ENTRY currentromoptions;
+
+extern N64::CRegisters r;
+extern int Is_CPU_Doing_Other_Tasks(void);
+extern uint32	current_rdram_size;
+
 void DoSpeedHack(void)
 {
 	if(Is_CPU_Doing_Other_Tasks()) 
@@ -161,6 +177,7 @@ void TLB_TRANSLATE_PC_INDIRECT(void)
  =======================================================================================================================
  */
 extern void StoreImm_HI(int k, int i);
+extern int UnmappedMemoryExceptionHelper(unsigned int addr);
 void TLB_TRANSLATE_PC(uint32 pc)
 {
 	/*~~~~~~~~~~~~~~~~~~~~~~~~*/

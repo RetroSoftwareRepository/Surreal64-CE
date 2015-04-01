@@ -26,7 +26,33 @@
  * 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA. To contact the
  * authors: email: schibo@emulation64.com, rice1964@yahoo.com
  */
+#ifndef USE_ICC_LIB
+#ifndef _XBOX_ICC
 #include "stdafx.h"
+#else
+#include <mytypes.h>
+#include "compiler.h"
+#include "emulator.h"
+#include "r4300i.h"
+#include "interrupt.h"
+#include "dynarec/regcache.h"
+#include "dynarec/opcodedebugger.h"
+#include "dynarec/dynaCPU.h"
+#include "dynarec/x86.h"
+#include "dynarec/xmm.h"
+#include "1964ini.h"
+#include "Registers.h"
+#include "timer.h"
+#endif
+
+#ifdef _XBOX_ICC
+extern N64::CRegisters r;
+extern INI_ENTRY currentromoptions;
+extern int UnmappedMemoryExceptionHelper(unsigned int addr);
+extern uint32	current_rdram_size;
+extern BOOL ProtectBlock(uint32 pc);
+extern BOOL UnprotectBlock(uint32 pc);
+#endif
 
 #ifdef _XBOX
 MultiPass	gMultiPass; // Ez0n3 - etemp - from surreal - was in dynaLog.cpp
@@ -212,8 +238,10 @@ __forceinline uint32 DynaFetchInstruction(uint32 pc)
 #ifndef _XBOX
         PostMessage(gui.hwnd1964main, WM_COMMAND, ID_ROM_STOP, 0);
 #endif
+#ifndef _XBOX_ICC
         WaitForSingleObject(StopEmulatorEvent, 1000);
         TerminateThread(CPUThreadHandle, 0);
+#endif
 	}
 
 	return code;
@@ -310,8 +338,10 @@ step2:
 #ifndef _XBOX
         PostMessage(gui.hwnd1964main, WM_COMMAND, ID_ROM_STOP, 0);
 #endif
+#ifndef _XBOX_ICC
         WaitForSingleObject(StopEmulatorEvent, 1000);
         TerminateThread(CPUThreadHandle, 0);
+#endif
 	}
 
 	return code;
@@ -1085,3 +1115,4 @@ void Check_And_Invalidate_Compiled_Blocks_By_DMA(uint32 startaddr, uint32 len, c
 		}
 	}
 }
+#endif //USE_ICC_LIB

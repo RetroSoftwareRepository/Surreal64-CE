@@ -30,8 +30,20 @@
  * 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA. To contact the
  * authors: email: schibo@emulation64.com, rice1964@yahoo.com
  */
-#include "stdafx.h"
 
+#ifndef USE_ICC_LIB
+#ifndef _XBOX_ICC
+#include "stdafx.h"
+#else
+#include <mytypes.h>
+#include "r4300i.h"
+#include "dynarec/opcodedebugger.h"
+#include "Registers.h"
+#endif
+
+#ifdef _XBOX_ICC
+extern N64::CRegisters r;
+#endif
 
 void	instr32(uint32 Instruction);
 void	REGIMM_instr32(uint32 Instruction);
@@ -730,4 +742,4 @@ void r4300i_lwr_32bit(uint32 Instruction)
 		break;
 	}
 }
-
+#endif //USE_ICC_LIB

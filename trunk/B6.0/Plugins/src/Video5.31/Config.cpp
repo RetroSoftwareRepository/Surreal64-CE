@@ -373,6 +373,8 @@ void ReadConfiguration(void)
 
 		options.enableFog = TRUE;
 		options.enableSSE = TRUE;
+		if((preferedemu != _1964x11)&&(FrameSkip>1))
+			FrameSkip = 0;
 		options.skipFrame = FrameSkip;
 
 		options.RenderBufferSetting = 0;//1;
@@ -495,6 +497,10 @@ void GenerateCurrentRomOptions()
 	else if ((strnicmp(g_curRomInfo.szGameName, "NASCAR", 6) == 0))
 	{
 		options.enableHackForGames = HACK_FOR_NASCAR;
+	}
+	else if ((strstr(g_curRomInfo.szGameName, "ZELDA") != 0) && (strstr(g_curRomInfo.szGameName, "MASK") != 0))
+	{
+		options.enableHackForGames = HACK_FOR_ZELDA_MM;
 	}
 	else if ((strstr(g_curRomInfo.szGameName, "ZELDA") != 0))
 	{

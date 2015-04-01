@@ -107,7 +107,8 @@ bool SoftDisplayFilter = 0;
 int TextureMode = 3;
 int AntiAliasMode = 0;
 int VertexMode = 2; // default hardware
-bool FrameSkip = FALSE;
+int FrameSkip = 0;
+int AutoCF_1964 = 0;
 int VSync = INTERVAL_IMMEDIATE; //see D3D_PresentParameters (PresentationIntervals)
 bool bUseLinFog = FALSE;
 //int RefreshRateInHz = 60;
@@ -367,7 +368,7 @@ void ResetDefaults()
 	VSync = INTERVAL_IMMEDIATE;
 	AntiAliasMode = 0;
 	SoftDisplayFilter = 0;
-	FrameSkip = FALSE;
+	FrameSkip = 0;
 	bEnableHDTV = false;
 	bFullScreen = false;
 	bUseLinFog = false;
@@ -535,7 +536,8 @@ int ConfigAppSave2()
 	ini.SetLongValue("Settings", "VSync", VSync);
 	ini.SetLongValue("Settings", "AntiAliasMode", AntiAliasMode);
 	ini.SetBoolValue("Settings", "SoftDisplayFilter", SoftDisplayFilter);
-	ini.SetBoolValue("Settings", "FrameSkip", FrameSkip);
+	ini.SetLongValue("Settings", "FrameSkip", FrameSkip);
+	ini.SetLongValue("Settings", "AutoCF_1964", AutoCF_1964);
 	ini.SetBoolValue("Settings", "LinearFog", bUseLinFog);
 	ini.SetLongValue("Settings", "XboxPitch", XboxPitch);
 	ini.SetBoolValue("Settings", "EnableController1", EnableController1);
@@ -656,7 +658,8 @@ int ConfigAppLoad2()
 	VSync = ini.GetLongValue("Settings", "VSync", VSync );
 	AntiAliasMode = ini.GetLongValue("Settings", "AntiAliasMode", AntiAliasMode );
 	SoftDisplayFilter = ini.GetBoolValue("Settings", "SoftDisplayFilter", SoftDisplayFilter );
-	FrameSkip = ini.GetBoolValue("Settings", "FrameSkip", FrameSkip );
+	AutoCF_1964 = ini.GetLongValue("Settings", "AutoCF_1964", AutoCF_1964 );
+	FrameSkip = ini.GetLongValue("Settings", "FrameSkip", FrameSkip );
 	bUseLinFog = ini.GetBoolValue("Settings", "LinearFog", bUseLinFog );
 	XboxPitch = ini.GetLongValue("Settings", "XboxPitch", XboxPitch );
 	EnableController1 = ini.GetBoolValue("Settings", "EnableController1", EnableController1 );

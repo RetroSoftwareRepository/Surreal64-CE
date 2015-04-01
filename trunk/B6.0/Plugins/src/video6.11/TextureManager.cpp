@@ -34,6 +34,7 @@ CTextureManager gTextureManager;
 // Games seem to be smoother with the old way
 bool g_bUseSetTextureMem = true;
 DWORD g_maxTextureMemUsage = (5*1024*1024);
+BOOL bPurgeOldBeforeIGM = FALSE;
 
 #ifndef OLDTXTCACHE
 static const DWORD MEM_KEEP_FREE = (2*1024*1024); // keep 2MB free
@@ -173,6 +174,10 @@ void CTextureManager::PurgeOldTextures()
 		gTextureManager.CleanUp();
 		m_currentTextureMemUsage = 0;
 		return;
+	}
+	else if(bPurgeOldBeforeIGM)
+	{
+		bPurgeOldBeforeIGM = FALSE;
 	}
 	else if(options.enableHackForGames != HACK_FOR_QUAKE_2)
 	{

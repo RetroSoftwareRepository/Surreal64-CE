@@ -563,6 +563,7 @@ void Set_Delay_AI_Interrupt_Timer_Event(void)
  =======================================================================================================================
  =======================================================================================================================
  */
+DWORD lastTick = 0;//GetTickCount() / 1000;
 void Trigger_Timer_Event(void)
 {
 	/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -624,6 +625,18 @@ void Trigger_Timer_Event(void)
 		break;
 	}
 
+	
+	if (GetTickCount()-lastTick >= 1000)
+	{
+		lastTick = GetTickCount();// / 1000;
+		vips = (float)viCountePerSecond;
+		//vips = (vips * 0.8f + 0.2f * viCountePerSecond);
+		viCountePerSecond = 0;
+		format_profiler_result_msg(generalmessage);
+						reset_profiler();
+		QueryPerformanceCounter(&LastSecondTime);
+	}
+	//lastTick = GetTickCount();
 	CPUNeedToDoOtherTask = Is_CPU_Doing_Other_Tasks();
 }
 

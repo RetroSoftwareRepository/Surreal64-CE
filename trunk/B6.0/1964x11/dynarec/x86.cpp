@@ -13,7 +13,14 @@
 // 59 Temple Place  -  Suite  330,  Boston, MA  02111-1307,  USA. To contact the
 // authors: email: schibo@emulation64.com, rice1964@yahoo.com
 
+#ifndef USE_ICC_LIB
+#ifndef _XBOX_ICC
 #include "../stdafx.h"
+#else
+#include "../compiler.h"
+#include "regcache.h"
+#include "x86.h"
+#endif
 
 #ifdef _XBOX
 #define LOGGING_DYNA(macro) //surreal
@@ -614,7 +621,9 @@ void DEC_Reg(unsigned int OperandSize, unsigned int Reg)
 	}
 	else
 	{
+#ifndef _XBOX
 		DisplayError("DEC: Incomplete");
+#endif
 	}
 }
 
@@ -814,8 +823,10 @@ void MOV_MemoryToReg(unsigned int Reg, unsigned int ModRM, unsigned int Address)
  */
 void MOV_ModRMToReg(unsigned int Reg, unsigned int ModRM)
 {
+#ifndef _XBOX
 	if(Reg == Reg_ESP || Reg == Reg_EBP)
 		DisplayError("Fix me in function MOV_ModRMToReg(), does not support ESP and EBP");
+#endif
 	WC8(0x8B);
 	WC8( ((Reg << 3) | ModRM));
 }
@@ -826,8 +837,10 @@ void MOV_ModRMToReg(unsigned int Reg, unsigned int ModRM)
  */
 void MOV_RegToModRM(unsigned int OperandSize, unsigned int Reg, unsigned int ModRM)
 {
+#ifndef _XBOX
 	if(Reg == Reg_ESP || Reg == Reg_EBP)
 		DisplayError("Fix me in function MOV_ModRMToReg(), does not support ESP and EBP");
+#endif
 	WC8( (0x88 | OperandSize));
 	WC8( ((Reg << 3) | ModRM));
 }
@@ -1624,3 +1637,4 @@ void INT3()
 {
     WC8(0xCC);
 }
+#endif //USE_ICC_LIB

@@ -6,7 +6,8 @@
 #pragma once
 #endif //_MSC_VER > 1000
 
-#include <xtl.h>
+//#include <xtl.h>
+#include <xbox_depp.h>
 #include "Undocumented.h"
 
 #define TRAY_OPEN					16

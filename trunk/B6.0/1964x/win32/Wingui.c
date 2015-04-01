@@ -114,6 +114,11 @@ BOOL MessageBox(HWND hWnd, LPCTSTR lpText, LPCTSTR lpCaption, UINT uType)
 
 }
 
+extern float __EMU_GetVIPerSecond(void)
+{
+	return vips;
+}
+
 void __EMU_SaveState(int index)
 {
 	DoState = SAVE_1964_CREATED_PJ64_STATE;

@@ -34,7 +34,7 @@
 #define inline __inline
 #endif
 
-#include <xtl.h>
+
 #pragma once
 
 /* Plugin types */
@@ -47,14 +47,14 @@
 
 typedef struct
 {
-	WORD Version;        /* Set to 0x0102 */
-	WORD Type;           /* Set to PLUGIN_TYPE_GFX */
+	unsigned short Version;        /* Set to 0x0102 */
+	unsigned short Type;           /* Set to PLUGIN_TYPE_GFX */
 	char Name[100];      /* Name of the DLL */
 
 	/* If DLL supports memory these memory options then set them to TRUE or FALSE
 	   if it does not support it */
-	BOOL NormalMemory;    /* a normal BYTE array */ 
-	BOOL MemoryBswaped;  /* a normal BYTE array where the memory has been pre
+	int NormalMemory;    /* a normal BYTE array */ 
+	int MemoryBswaped;  /* a normal BYTE array where the memory has been pre
 	                          bswap on a dword (32 bits) boundry */
 
 } PLUGIN_INFO;

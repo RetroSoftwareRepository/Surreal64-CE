@@ -20,7 +20,26 @@
 //#define SAFE_FLUSHING 1
 //#define SAFE_PUSHPOP 1
 
+#ifndef USE_ICC_LIB
+#ifndef _XBOX_ICC
 #include "../stdafx.h"
+#else
+#include <mytypes.h>
+#include <memory.h>
+#include "../hardware.h"
+#include "opcodedebugger.h"
+#include "regcache.h"
+#include "x86.h"
+#include "xmm.h"
+#include "../1964ini.h"
+#include "../Registers.h"
+//#include "../core.h"
+#endif
+
+#ifdef _XBOX_ICC
+extern INI_ENTRY currentromoptions;
+extern N64::CRegisters r;
+#endif
 
 #define IT_IS_HIGHWORD	- 2
 #define IT_IS_UNUSED	- 1
@@ -43,7 +62,6 @@ x86regtyp   Temp_SSE_fpureg[NUM_fpuregS];
     MOVSS_RegToMemory(k, ModRM_disp32, (unsigned long) &gHardwareState.fpr32[fpureg[k].mips_reg<<Experiment]);
 
 #define LoadFPR_HI(k) \
-MessageBox(0, "StoreFPR_LO: This shouldn't be touched yet.", "", 0); \
     if(currentromoptions.Assume_32bit == ASSUME_32BIT_NO) \
 	{ \
         if(fpureg[k].mips_reg == 0) \
@@ -62,7 +80,6 @@ MessageBox(0, "StoreFPR_LO: This shouldn't be touched yet.", "", 0); \
 
 #define StoreFPR_HI(To_XMM_Or_Memory, k) \
 	{ \
-        MessageBox(0, "StoreFPR_HI: This shouldn't be touched yet.", "", 0); \
         if(fpureg[k].mips_reg == 0); \
 		else \
 		{ \
@@ -279,8 +296,9 @@ __MapIt:
 				{
 					LoadFPR_LO(To_XMM_Or_Memory, k);
 				}
-
+#ifndef _XBOX
 				if(fpureg[k].HiWordLoc == -1) DisplayError("Do32bit: Hiword = -1 Not expected.");
+#endif
 
 				fpureg[k].BirthDate = ThisYear;
 				MapSuccess = 1;
@@ -294,7 +312,9 @@ __MapIt:
 			k = SSE_FlushOneButNotThese3(To_XMM_Or_Memory, 99, keep2, keep3);
                     if (k==-1)
                     {
+#ifndef _XBOX
                         DisplayError("SSE_Map32bit: Failed to map", "", 0);
+#endif
                     }
                     else
                         goto __MapIt;
@@ -314,15 +334,18 @@ void SSE_Map64bit(int To_XMM_Or_Memory, int k, x86regtyp *Conditions, int The2nd
 	int NumRegsAvailable = 0;
 	/* make sure we have 2 registers available for mapping */
 	int MapSuccess = 0;
-
+#ifndef _XBOX
 	MessageBox(0, "SSEMap64bit should not be touched yet", "", 0);
+#endif
     while(MapSuccess == 0)
 	{
 		TheFirstAvailableReg = 0;
 		NumRegsAvailable = 0;
 		for(k = NUM_fpuregS - 1; k >= 0; k--)
 		{
+#ifndef _XBOX
 			if(fpureg[k].HiWordLoc == Reg_ESP) DisplayError("4: fpureg[%d]: Write to esp: cannot do that!", k);
+#endif
 
 			if(SSE_ItIsARegisterNotToUse(k));
 			else if(fpureg[k].mips_reg == IT_IS_UNUSED)
@@ -348,10 +371,10 @@ void SSE_Map64bit(int To_XMM_Or_Memory, int k, x86regtyp *Conditions, int The2nd
 					/* map hi */
 					fpureg[k].HiWordLoc = TheFirstAvailableReg;
 					Conditions->HiWordLoc = TheFirstAvailableReg;
-
+#ifndef _XBOX
 					if(fpureg[k].HiWordLoc == Reg_ESP)
 						DisplayError("3: fpureg[%d]: Write to esp: cannot do that!", k);
-
+#endif
 					fpureg[TheFirstAvailableReg].mips_reg = IT_IS_HIGHWORD;
 
 					if((Conditions->NoNeedToLoadTheHi == 0))
@@ -360,8 +383,9 @@ void SSE_Map64bit(int To_XMM_Or_Memory, int k, x86regtyp *Conditions, int The2nd
 					}
 
 					SSE_FlushedRegistersMap[fpureg[k].mips_reg].Is32bit = 0;
-
+#ifndef _XBOX
 					if(fpureg[k].HiWordLoc == -1) DisplayError("Do64bit: Hiword = -1 Not expected.");
+#endif
 
 					fpureg[k].BirthDate = ThisYear;
 					fpureg[TheFirstAvailableReg].BirthDate = ThisYear;
@@ -377,11 +401,12 @@ void SSE_Map64bit(int To_XMM_Or_Memory, int k, x86regtyp *Conditions, int The2nd
             
             //don't assign the function return value to k.
             temp = SSE_FlushOneButNotThese3(To_XMM_Or_Memory, 99, The2ndOneNotToFlush, The3rdOneNotToFlush);
-
+#ifndef _XBOX
                     if (temp==-1)
                     {
                         DisplayError("SSE_Map64bit: Failed to flush", "", 0);
                     }
+#endif
 
 		}
 	}
@@ -392,7 +417,9 @@ MapConstant TargetSSE_ConstMap[SSE_NUM_CONSTS];
 
 void SSE_ConvertRegTo32bit(int k)
 {
+#ifndef _XBOX
 	if(fpureg[k].HiWordLoc == -1) DisplayError("SSE_ConvertRegTo32bit() bug: HiWordLoc should not be -1");
+#endif
 
     fpureg_Delete(fpureg[k].HiWordLoc);
 
@@ -403,7 +430,9 @@ void SSE_ConvertRegTo32bit(int k)
 
 void SSE_ConvertRegTo64bit(int To_XMM_Or_Memory, int k, x86regtyp *Conditions, int The2ndOneNotToFlush, int The3rdOneNotToFlush)
 {
+#ifndef _XBOX
     MessageBox(0, "SSE_ConvertRegTo64bit: Unimplemented", "", 0);
+#endif
 }
 
 void SSE_ConvertReg(int To_XMM_Or_Memory, int k, x86regtyp *Conditions, int The2ndOneNotToFlush, int The3rdOneNotToFlush)
@@ -439,7 +468,9 @@ void SSE_ConvertReg(int To_XMM_Or_Memory, int k, x86regtyp *Conditions, int The2
 	fpureg[k].BirthDate = ThisYear;
 	fpureg[fpureg[k].HiWordLoc].BirthDate = ThisYear;
 
+#ifndef _XBOX
 	if(fpureg[k].HiWordLoc == -1) DisplayError("Set&return map info: HiWord is -1!!!");
+#endif
 }
 
 
@@ -501,8 +532,9 @@ void SSE_MapConst(x86regtyp *xMAP, int value)
 #ifndef NO_CONSTS
 	int where = SSE_CheckWhereIsMipsReg(xMAP->mips_reg);
 	/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
+#ifndef _XBOX
     MessageBox(0, "SSE_MapConstant: Hi", "", 0);
+#endif
     if(where > -1)
 	{
 		fpureg[where].IsDirty = 0;
@@ -531,8 +563,9 @@ void SSE_MapOneConstantToRegister(x86regtyp *Conditions, int The2ndOneNotToFlush
 	/*~~~~~~~~~~~~~~~*/
 	x86regtyp	xRJ[1];
 	/*~~~~~~~~~~~~~~~*/
-
+#ifndef _XBOX
     MessageBox(0, "SSE_MapOneConstantToRegister: Hi", "", 0);
+#endif
     xRJ->Is32bit = Conditions->Is32bit;
 
 	if(SSE_ConstMap[Conditions->mips_reg].IsMapped == 1)
@@ -662,7 +695,9 @@ void SSE_WriteBackDirty(int To_XMM_Or_Memory, _int8 k)
     /* 32 bit register */
 	if((fpureg[k].HiWordLoc == k))
 	{
+#ifndef _XBOX
 		if(fpureg[k].Is32bit != 1) DisplayError("Bug");
+#endif
 
         StoreFPR_LO(To_XMM_Or_Memory, k);
 //
@@ -679,10 +714,10 @@ void SSE_WriteBackDirty(int To_XMM_Or_Memory, _int8 k)
 	else
 	/* 64 bit register */
 	{
-		
+#ifndef _XBOX
         MessageBox(0, "SSE_WriteBackDirty: This should not be touched yet", "", 0);
         if(fpureg[k].Is32bit == 1) DisplayError("Bug");
-
+#endif
 		StoreFPR_LO(To_XMM_Or_Memory, k);
 
 		if
@@ -732,7 +767,9 @@ void SSE_WriteBackDirtyLoOrHi(int To_XMM_Or_Memory, _int8 k, int Lo)
 	{
 		if((fpureg[k].HiWordLoc == k))
 		{
+#ifndef _XBOX
 			if(fpureg[k].Is32bit != 1) DisplayError("Bug");
+#endif
 
 			if(Lo == 0)
 			{
@@ -754,8 +791,9 @@ void SSE_WriteBackDirtyLoOrHi(int To_XMM_Or_Memory, _int8 k, int Lo)
 		else
 		/* 64 bit register */
 		{
+#ifndef _XBOX
 			if(fpureg[k].Is32bit == 1) DisplayError("Bug");
-
+#endif
 			if(!Lo)
 			{
 				StoreFPR_LO(To_XMM_Or_Memory, k);
@@ -954,3 +992,4 @@ _next:
 
     return (MarkedForDeletion);
 }
+#endif //USE_ICC_LIB

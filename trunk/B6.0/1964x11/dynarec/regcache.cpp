@@ -22,9 +22,22 @@
 
 
 
+#ifndef USE_ICC_LIB
+#ifndef _XBOX_ICC
 #include "../stdafx.h"
+#else
+#include <mytypes.h>
+#include <memory.h>
+#include "regcache.h"
+#include "x86.h"
+#include "opcodedebugger.h"
 #include "../Registers.h"
+#include "../1964ini.h"
+#endif
 
+#ifdef _XBOX_ICC
+extern INI_ENTRY currentromoptions;
+#endif
 extern N64::CRegisters r;
 
 #define IT_IS_HIGHWORD	- 2
@@ -310,27 +323,30 @@ int FindFreeRegister()
  */
 void FetchEBP_Params(int mips_reg)
 {
-	if (mips_reg == 0)
-		DisplayError("Fetch Error");
-	else
-
-	if(mips_reg < 17)
+	if (mips_reg != 0)
 	{
-		// negative 8bit displacement 
-		x86params.ModRM = ModRM_disp8_EBP;
-		x86params.Address = -128 + ((mips_reg-1) << 3);
+		if(mips_reg < 17)
+		{
+			// negative 8bit displacement 
+			x86params.ModRM = ModRM_disp8_EBP;
+			x86params.Address = -128 + ((mips_reg-1) << 3);
+		}
+		else if(mips_reg < 32)
+		{
+			// positive 8bit displacement 
+			x86params.ModRM = ModRM_disp8_EBP;
+			x86params.Address = (((mips_reg-1) - 16) << 3);
+		}
+		else
+		{
+			// positive 32bit displacement. Only GPR_HI/GPR_LO use this. 
+			x86params.ModRM = ModRM_disp32;
+			x86params.Address = (_u32) & gHWS_GPR(0) + (((mips_reg)) << 3);
+		}
 	}
-	else if(mips_reg < 32)
-	{
-		// positive 8bit displacement 
-		x86params.ModRM = ModRM_disp8_EBP;
-		x86params.Address = (((mips_reg-1) - 16) << 3);
-	}
 	else
 	{
-		// positive 32bit displacement. Only GPR_HI/GPR_LO use this. 
-		x86params.ModRM = ModRM_disp32;
-		x86params.Address = (_u32) & gHWS_GPR(0) + (((mips_reg)) << 3);
+	//DisplayError("Fetch Error");
 	}
 }
 
@@ -519,8 +535,9 @@ void WriteBackDirty(int To_XMM_Or_Memory, _int8 k)
 	/* 32 bit register */
 	if((x86reg[k].HiWordLoc == k))
 	{
+#ifndef _XBOX
 		if(x86reg[k].Is32bit != 1) DisplayError("Bug");
-
+#endif
 		StoreGPR_LO(To_XMM_Or_Memory, k);
 
 		if((currentromoptions.Assume_32bit == ASSUME_32BIT_NO) /*&& 
@@ -536,7 +553,9 @@ void WriteBackDirty(int To_XMM_Or_Memory, _int8 k)
 	else
 	/* 64 bit register */
 	{
+#ifndef _XBOX
 		if(x86reg[k].Is32bit == 1) DisplayError("Bug");
+#endif
 
 		StoreGPR_LO(To_XMM_Or_Memory, k);
 
@@ -602,7 +621,9 @@ void WriteBackDirtyLoOrHi(int To_XMM_Or_Memory, _int8 k, int Lo)
 	{
 		if((x86reg[k].HiWordLoc == k))
 		{
+#ifndef _XBOX
 			if(x86reg[k].Is32bit != 1) DisplayError("Bug");
+#endif
 
 			if(Lo == 0)
 			{
@@ -624,7 +645,9 @@ void WriteBackDirtyLoOrHi(int To_XMM_Or_Memory, _int8 k, int Lo)
 		else
 		/* 64 bit register */
 		{
+#ifndef _XBOX
 			if(x86reg[k].Is32bit == 1) DisplayError("Bug");
+#endif
 
 			if(!Lo)
 			{
@@ -863,8 +886,10 @@ void PUSH_RegIfMapped(int k, int TryStoringToARegisterFirst, int RegisterToProte
                         }
 					}
 				}
+#ifndef _XBOX
                 if (!found)
                     DisplayError("PUSH_RegIfMapped2():  loword not found!");
+#endif
 			}
             //or is it a loword needing to be preserved?
             else if((x86reg[k].mips_reg > -1) && (ConstMap[x86reg[k].mips_reg].FinalAddressUsedAt >= gHWS_pc))
@@ -1050,3 +1075,4 @@ _next:
 
     return (MarkedForDeletion);
 }
+#endif //USE_ICC_LIB

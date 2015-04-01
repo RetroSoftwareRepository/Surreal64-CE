@@ -18,7 +18,37 @@
  * 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA. To contact the
  * authors: email: schibo@emulation64.com, rice1964@yahoo.com
  */
+#ifndef USE_ICC_LIB
+#ifndef _XBOX_ICC
 #include "stdafx.h"
+#else
+#include <mytypes.h>
+#include <memory.h>
+#include "Emulator.h"
+#include "r4300i.h"
+#include "interrupt.h"
+#include "dynarec/opcodedebugger.h"
+#include "1964ini.h"
+#include "_memory.h"
+#include "Registers.h"
+#include "n64rcp.h"
+#include "dma.h"
+#include "gamesave.h"
+#include "timer.h"
+#include "plugins.h"
+#include "compiler.h"
+#include "fileio.h"
+
+#endif
+#include "ipif.h"
+
+
+#ifdef _XBOX_ICC
+extern void __cdecl iPifCheck(void);
+extern void VIDEO_FrameBufferRead(DWORD addr);
+extern void VIDEO_FrameBufferWrite(DWORD addr, DWORD size);
+extern int GetPtrIdex(uint32 addr);
+#endif
 
 #ifdef _XBOX
 //#include "rompaging.h"
@@ -1107,6 +1137,7 @@ void DMA_MemCopy_DRAM_to_SI(void)
  =======================================================================================================================
  =======================================================================================================================
  */
+extern BOOL AUDIO_IsMusyX(void);
 void DMA_AI(void)
 {
 	if (AUDIO_IsMusyX() == TRUE)
@@ -1268,3 +1299,4 @@ void DMAIncreaseTimer(uint32 val)
 {
 	Count_Down(val * VICounterFactors[CounterFactor] / 2);	/* assume each pclock will transfer 4 bytes */
 }
+#endif //USE_ICC_LIB

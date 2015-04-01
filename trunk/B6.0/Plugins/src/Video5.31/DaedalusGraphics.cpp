@@ -84,16 +84,7 @@ extern "C" void __EMU_Load1964State(int index);
 extern "C" void __EMU_LoadPJ64State(int index);
 extern bool bSatesUpdated;
 extern int preferedemu;
-enum Emulators
-{
-	_1964x085,
-	_PJ64x14,
-	_UltraHLE,
-	_PJ64x16,
-	_1964x11,
-	//_Mupen64PlusX,
-	_None
-};
+
 bool bSatesUpdated2 = false;
 char tempmsg[260]; 
 #endif

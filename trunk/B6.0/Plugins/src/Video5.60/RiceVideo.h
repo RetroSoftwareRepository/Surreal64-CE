@@ -138,5 +138,15 @@ void SetVIScales();
 
 extern void _VIDEO_DisplayTemporaryMessage(const char *msg);
 
+enum Emulators
+{
+	_1964x085,
+	_PJ64x14,
+	_UltraHLE,
+	_PJ64x16,
+	_1964x11,
+	//_Mupen64PlusX,
+	_None
+};
 
 #endif

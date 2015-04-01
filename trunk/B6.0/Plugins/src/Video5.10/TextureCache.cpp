@@ -35,7 +35,7 @@ static const DWORD MEM_KEEP_FREE = (2*1024*1024); // keep 2MB free
 // Games seem to be smoother with the old way
 bool g_bUseSetTextureMem = true;
 DWORD g_maxTextureMemUsage = (5*1024*1024);
-
+BOOL bPurgeOldBeforeIGM = FALSE;
 
 
 // Returns the first prime greater than or equal to nFirst
@@ -177,6 +177,10 @@ void CTextureCache::PurgeOldTextures()
 		gTextureCache.DropTextures();
 		m_currentTextureMemUsage = 0;
 		return;
+	}
+	else if(bPurgeOldBeforeIGM)
+	{
+		bPurgeOldBeforeIGM = FALSE;
 	}
 	else if((stricmp(g_curRomInfo.szGameName, "QUAKE II") != 0))
 	{

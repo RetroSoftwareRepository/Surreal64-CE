@@ -1211,7 +1211,7 @@ BOOL Machine_SaveState(void) {
 		return FALSE;
 	}
 
-	sprintf(FileName, "%s%08X\\%08X-%08X-%02X.%i", g_szPathSaves, *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x14)), *((BYTE *)(RomHeader + 0x3D)), CurrentSaveSlot);
+	sprintf(FileName, "%s%08X\\%08X-%08X-%02X.%i.pj64", g_szPathSaves, *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x14)), *((BYTE *)(RomHeader + 0x3D)), CurrentSaveSlot);
 
 	strcpy(Directory, g_szPathSaves);
 	
@@ -1410,6 +1410,16 @@ void RefreshScreen (void ){
 		}
 	} else {
 		ViFieldNumber = 0;
+	}
+
+	if (CurrentFrame > (NoOfFrames << 3)) {
+		LARGE_INTEGER Total;
+		int count;
+		Total.QuadPart = 0;
+		for (count = 0; count < NoOfFrames; count ++) {
+			Total.QuadPart += Frames[count].QuadPart;
+		}
+		XboxVIs = 2 * (float)(Frequency.QuadPart/ ((double)Total.QuadPart / (NoOfFrames << 3)));
 	}
 	
 	if (ShowCPUPer || Profiling) { StartTimer("CPU Idel"); }

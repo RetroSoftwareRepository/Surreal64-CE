@@ -24,6 +24,11 @@
 #include "stdafx.h"
 #include <time.h>
 
+#ifdef _XBOX
+extern int FrameSkip;
+extern int AutoCF_1964;
+#endif
+
 BOOL	CPUNeedToDoOtherTask = FALSE;
 BOOL	CPUNeedToCheckInterrupt = FALSE;
 BOOL	CPUNeedToCheckException = FALSE;
@@ -553,6 +558,9 @@ void Set_Delay_AI_Interrupt_Timer_Event(unsigned __int32 delay)
  =======================================================================================================================
  =======================================================================================================================
  */
+extern BOOL newSecond;
+int tempTimer = 1;
+int TimerModifier = 2;
 void Trigger_Timer_Event(void)
 {
 	/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -643,7 +651,54 @@ void Trigger_Timer_Event(void)
 		DisplayError("Invalid timer event is triggered, should never happens");
 		break;
 	}
-
+#ifdef _XBOX
+	newSecond = FALSE;
+	static DWORD lastTick = GetTickCount() / (1000/TimerModifier);
+	if (lastTick != GetTickCount() / (1000/TimerModifier))
+	{
+		lastTick = GetTickCount() / ((1000/TimerModifier));
+		vips = (float)(viCountPerSecond*(TimerModifier/tempTimer));
+		if(tempTimer == TimerModifier)
+		{
+			switch(AutoCF_1964)
+			{
+			case 0:
+				emuoptions.AutoCF = FALSE;
+				emuoptions.AllowCF1 = FALSE;
+				break;
+			case 1:
+				emuoptions.AutoCF = TRUE;
+				emuoptions.AllowCF1 = FALSE;
+				break;
+			case 2:
+				emuoptions.AutoCF = TRUE;
+				emuoptions.AllowCF1 = FALSE;
+				break;
+			}
+			switch(FrameSkip)
+			{
+			case 0:
+				emuoptions.AutoFrameSkip = FALSE;
+				break;
+			case 1:
+				emuoptions.AutoFrameSkip = FALSE;
+				break;
+			case 2:
+				emuoptions.AutoFrameSkip = TRUE;
+				break;
+			}
+			newSecond = TRUE;
+			if(emuoptions.AutoFrameSkip || emuoptions.AutoCF ) 
+			{
+				format_profiler_result_msg(generalmessage);
+				reset_profiler();
+			}
+			viCountPerSecond = 0;
+			tempTimer = 0;
+		}
+		tempTimer++;
+	}
+#endif
 	CPUNeedToDoOtherTask = Is_CPU_Doing_Other_Tasks();
 }
 

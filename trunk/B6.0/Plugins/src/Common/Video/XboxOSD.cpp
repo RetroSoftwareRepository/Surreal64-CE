@@ -16,7 +16,7 @@
 #define DEBUGSIZE 20
 #define DEBUGHDSIZE 30
 
-
+extern "C" float __EMU_GetVIPerSecond(void);
 extern BOOL g_bTempMessage;
 extern DWORD g_dwTempMessageStart;
 extern char g_szTempMessage[100];
@@ -31,7 +31,7 @@ MEMORYSTATUS memStat;
 //fd - more debug output
 extern int iAudioPlugin;
 extern int iRspPlugin;
-extern bool FrameSkip;
+extern int FrameSkip;
 extern int VSync;
 extern int DefaultPak;
 extern int iPagingMethod;
@@ -51,6 +51,8 @@ char emuinfo[128];
 
 BOOL bInitOSD = false;
 BOOL bIsUltra = false;
+BOOL bSentMsg = false;
+BOOL bClearOnce = true;
 
 void XboxDrawDebugInfo();
 void XboxDrawTemporaryMessage();
@@ -115,8 +117,15 @@ void XboxDrawOSD()
 	if (g_bTempMessage)
 		XboxDrawTemporaryMessage();
 
-	if (!showdebug && !g_bTempMessage)
+	if (!showdebug && !g_bTempMessage && bSentMsg)
 	{
+		//g_pd3dDevice->Present(NULL,NULL,NULL,NULL);
+
+		if(AntiAliasMode){
+			//g_pd3dDevice->Present(NULL,NULL,NULL,NULL);
+			g_pd3dDevice->Clear(0,NULL,D3DCLEAR_TARGET,D3DCOLOR_ARGB(0,0,0,0),0,0);
+			//bClearOnce = FALSE;
+		}
 		switch (AntiAliasMode)	// Revert FSAA from ttf messages
 		{
 			case 2:		g_pd3dDevice->SetRenderState( D3DRS_MULTISAMPLEMODE, D3DMULTISAMPLE_2_SAMPLES_MULTISAMPLE_LINEAR );		break;
@@ -126,6 +135,8 @@ void XboxDrawOSD()
 		}
 
 		g_pd3dDevice->SetBackBufferScale( 1.0f, 1.0f );
+		bSentMsg = FALSE;
+		bClearOnce = TRUE;
 	}
 	
 	// not sure why this fixes it, but it does
@@ -142,7 +153,8 @@ __forceinline void XboxDrawLowMemWarning()
 		WCHAR szMemWarning[128];
 		swprintf(szMemWarning,L"Out of Memory! Returning to Launcher...");
 
-		//Clear to save memory 
+		//Clear Screen
+		//g_pd3dDevice->Present(NULL,NULL,NULL,NULL);
 		g_pd3dDevice->Clear(0,NULL,D3DCLEAR_TARGET,D3DCOLOR_ARGB(0,0,0,0),0,0);
 
 		// Flick AA off before drawing Temp Messages
@@ -175,6 +187,13 @@ __forceinline void XboxDrawLowMemWarning()
 		g_pd3dDevice->GetBackBuffer(-1, D3DBACKBUFFER_TYPE_MONO, &pFrontBuffer);
 		g_pd3dDevice->GetBackBuffer(0, D3DBACKBUFFER_TYPE_MONO, &pBackBuffer);
 
+		if(bEnableHDTV)
+		g_defaultTrueTypeFont->SetTextHeight(DEBUGHDSIZE);
+		else
+		g_defaultTrueTypeFont->SetTextHeight(DEBUGSIZE);
+		g_defaultTrueTypeFont->SetTextAntialiasLevel(g_defaultTrueTypeFont->GetTextAntialiasLevel());
+
+
 		// Align Top Left
 		XFONT_SetTextAlignment(g_defaultTrueTypeFont, XFONT_TOP | XFONT_LEFT);
 
@@ -186,6 +205,8 @@ __forceinline void XboxDrawLowMemWarning()
 		
 		g_pd3dDevice->EndScene();
 		g_pd3dDevice->Present(NULL,NULL,NULL,NULL);
+		
+		bSentMsg = TRUE;
 
 		//Lock in a loop until its time to exit
 		while(1)
@@ -205,14 +226,17 @@ __forceinline void XboxDrawLowMemWarning()
 
 __forceinline void XboxDrawDebugInfo()
 {
+	// Free Mem 
 	WCHAR szMemStatus[128];
 	GlobalMemoryStatus(&memStat);
-	
+	swprintf(szMemStatus, L"%.2f MB free", memStat.dwAvailPhys/(1024.0f*1024.0f));
+
+	// FPS
 	static DWORD lastTick = GetTickCount() / 1000;
 	static int lastTickFPS = 0;
 	static int frameCount = 0;
 
-	if (lastTick != GetTickCount() / 1000)
+	if (lastTick != GetTickCount() / 1000) 
 	{
 		lastTickFPS = frameCount;
 		frameCount = 0;
@@ -220,11 +244,17 @@ __forceinline void XboxDrawDebugInfo()
 	}
 	frameCount++;
 	WCHAR str[128];
-	swprintf(str,L"%i fps", lastTickFPS);
-	swprintf(szMemStatus,L"%d MB free",(memStat.dwAvailPhys /1024 /1024));
+	swprintf(str,L"%i FPS", lastTickFPS);
+	
+	// VI/s
+	WCHAR VICount[128];
+	swprintf(VICount ,L"%.1f VI/s", __EMU_GetVIPerSecond());
+
+	// Emu name
 	WCHAR debugemu[256];
 	swprintf(debugemu,L"%S",emuinfo);
 
+	// Video Plugin
 	WCHAR debugvideo[256];
 	switch (videoplugin)
 	{
@@ -234,11 +264,12 @@ __forceinline void XboxDrawDebugInfo()
 		case _VideoPluginRice611: swprintf(debugvideo,L"Rice Video 6.11"); break;
 		case _VideoPluginRice612: swprintf(debugvideo,L"Rice Video 6.12"); break;
 	}
-	//check audio plugins
+
+	// Audio Plugin
 	WCHAR debugaudio[256];
 	switch (iAudioPlugin)
 	{
-		case _AudioPluginNone:		swprintf(debugaudio,L"NUll Audio Plugin");		break;
+		case _AudioPluginNone:		swprintf(debugaudio,L"Null Audio Plugin");		break;
 		case _AudioPluginLleRsp:	swprintf(debugaudio,L"Using LLE RSP Audio");	break;
 		case _AudioPluginBasic:		swprintf(debugaudio,L"Basic Audio");	break;
 		case _AudioPluginJttl:		swprintf(debugaudio,L"JttL Audio 1.2");		break;
@@ -247,7 +278,7 @@ __forceinline void XboxDrawDebugInfo()
 		case _AudioPluginM64P:		swprintf(debugaudio,L"Using HLE RSP Audio");	break;
 	}
 
-	//check RSP plugins
+	// RSP Plugin
 	WCHAR debugrsp[256];
 	switch (iRspPlugin)
 	{
@@ -258,7 +289,7 @@ __forceinline void XboxDrawDebugInfo()
 	}
 
 	
-	
+	// Blank lines in UltraHLE
 	if (bIsUltra) {
 		swprintf(debugvideo,		L"");
 		swprintf(debugaudio,		L"");
@@ -277,6 +308,7 @@ __forceinline void XboxDrawDebugInfo()
 		g_pd3dDevice->SetBackBufferScale( 0.5f, 1.0f );
 	}
 	
+	// Use custom font
 	DWORD dwFontCacheSize = 16 * 1024;
 	if (g_defaultTrueTypeFont == NULL)
 	{
@@ -324,9 +356,10 @@ __forceinline void XboxDrawDebugInfo()
 		g_defaultTrueTypeFont->TextOut(pBackBuffer,	 buf, (unsigned)-1, 30, ((DEBUGSIZE * NumDebugLines) + 15 ) );
 		}	
 	}
-
+	
+	//Align Top Right
 	XFONT_SetTextAlignment(g_defaultTrueTypeFont, XFONT_TOP | XFONT_RIGHT);
-	for(int NumDebugLines = 1; NumDebugLines <= 2; NumDebugLines++){
+	for(int NumDebugLines = 1; NumDebugLines <= 3; NumDebugLines++){
 
 		WCHAR buf[200];
 		
@@ -334,6 +367,7 @@ __forceinline void XboxDrawDebugInfo()
 		{
 			case 1	: swprintf(buf, szMemStatus);		break;
 			case 2	: swprintf(buf,	str);				break;
+			case 3	: swprintf(buf, VICount);			break;
 		}
 		if(bEnableHDTV){
 		g_defaultTrueTypeFont->TextOut(pFrontBuffer, buf, (unsigned)-1, 1250, ((DEBUGHDSIZE * NumDebugLines) + 15 ) );
@@ -347,10 +381,16 @@ __forceinline void XboxDrawDebugInfo()
 	pFrontBuffer->Release();
 	pBackBuffer->Release();
 
+	bSentMsg = TRUE;
+
 }
 
 __forceinline void XboxDrawTemporaryMessage()
 {
+	if(AntiAliasMode && bClearOnce){
+		g_pd3dDevice->Clear(0,NULL,D3DCLEAR_TARGET,D3DCOLOR_ARGB(0,0,0,0),0,0);
+		bClearOnce = FALSE;
+	}
 	// Flick AA off before drawing Temp Messages
 	if(AntiAliasMode > 3)		// 4x FSAA  
 	{
@@ -391,6 +431,13 @@ __forceinline void XboxDrawTemporaryMessage()
 
 	mbstowcs(buf, g_szTempMessage, strlen(g_szTempMessage));
 
+	if(bEnableHDTV)
+	g_defaultTrueTypeFont->SetTextHeight(DEBUGHDSIZE);
+	else
+	g_defaultTrueTypeFont->SetTextHeight(DEBUGSIZE);
+	g_defaultTrueTypeFont->SetTextAntialiasLevel(g_defaultTrueTypeFont->GetTextAntialiasLevel());
+
+
 	// Align Top Left
 	XFONT_SetTextAlignment(g_defaultTrueTypeFont, XFONT_TOP | XFONT_LEFT);
 
@@ -399,5 +446,7 @@ __forceinline void XboxDrawTemporaryMessage()
 
 	pFrontBuffer->Release();
 	pBackBuffer->Release();
+
+	bSentMsg = TRUE;
 
 }

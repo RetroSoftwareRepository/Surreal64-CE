@@ -43,6 +43,9 @@ void InitAll1964Options(void)
 	emuoptions.UsingRspPlugin = FALSE;
 	emuoptions.dma_in_segments = FALSE;
 	emuoptions.SyncVI = TRUE;
+	emuoptions.AutoCF = FALSE;
+	emuoptions.AutoFrameSkip = FALSE;
+	emuoptions.AllowCF1 = FALSE;
 
 	defaultoptions.Eeprom_size = EEPROMSIZE_4KB;
 	defaultoptions.RDRAM_Size = RDRAMSIZE_4MB;

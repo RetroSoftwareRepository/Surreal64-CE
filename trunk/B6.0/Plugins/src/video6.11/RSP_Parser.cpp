@@ -932,6 +932,7 @@ void DLParser_Process(OSTask * pTask)
 		GlobalMemoryStatus(&ms);	
 		
 		// Clear Rice's textures before loading the menu.
+		bPurgeOldBeforeIGM = TRUE;
 		gTextureManager.PurgeOldTextures();
 		gTextureManager.CleanUp();
 		RDP_Cleanup();

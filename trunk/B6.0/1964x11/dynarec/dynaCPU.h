@@ -22,6 +22,7 @@
  */
 #ifndef __1964_DYNACPU_H
 #define __1964_DYNACPU_H
+#include "../hardware.h"
 
 #define _SAFETY_CPU_(x)
 

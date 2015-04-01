@@ -11,7 +11,42 @@
  * 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA. To contact the
  * authors: email: schibo@emulation64.com, rice1964@yahoo.com
  */
+#ifndef USE_ICC_LIB
+#ifndef _XBOX_ICC
 #include "stdafx.h"
+#else
+#include <mytypes.h>
+#include <memory.h>
+#include "Emulator.h"
+#include "r4300i.h"
+#include "interrupt.h"
+#include "dynarec/opcodedebugger.h"
+#include "1964ini.h"
+#include "_memory.h"
+#include "Registers.h"
+#include "n64rcp.h"
+#include "dma.h"
+#include "gamesave.h"
+#include "timer.h"
+#include "plugins.h"
+//#include "../core.h"
+#endif
+
+#ifdef _XBOX_ICC
+extern int CoreDoingAIUpdate;
+extern int game_country_tvsystem;
+extern N64::CRegisters r;
+extern INI_ENTRY currentromoptions;
+extern void AUDIO_AiDacrateChanged(int SystemType);
+extern void AUDIO_AiLenChanged(void);
+extern DWORD AUDIO_AiReadLength(void);
+extern void AUDIO_AiUpdate(BOOL update);
+extern void VIDEO_ProcessRDPList(void);
+extern void VIDEO_UpdateScreen(void);
+extern void VIDEO_ViStatusChanged(void);
+extern void VIDEO_ViWidthChanged(void);
+extern int Is_CPU_Doing_Other_Tasks(void);
+#endif
 
 /*#ifdef _XBOX
 #include "rompaging.h"
@@ -758,6 +793,7 @@ void r4300i_sync(uint32 Instruction)
  =======================================================================================================================
  =======================================================================================================================
  */
+#define SET_EXCEPTION(exception)	{ gHWS_COP0Reg[CAUSE] &= NOT_EXCCODE; gHWS_COP0Reg[CAUSE] |= exception; }
 void r4300i_syscall(uint32 Instruction)
 {
 	/* Cause a SYSCALL exception */
@@ -3645,3 +3681,4 @@ __inline void Display_Address_Error(uint32 addr, char *opcode)
 	TRACE4("%08X: %s to access VA=%08X, PA=%08X, Out of range. ", gHWS_pc, opcode, virtualaddress, addr);
 #endif
 }
+#endif //USE_ICC_LIB
