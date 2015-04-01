@@ -27,3 +27,5 @@ void Timer_Initialize  ( double Hertz);
 void Timer_Start       ( void );
 void Timer_Stop        ( void );
 BOOL Timer_Process     ( DWORD * FrameRate );
+
+extern float XboxVIs;

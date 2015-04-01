@@ -85,6 +85,11 @@ extern "C" {
 
 char emuname[256];
 
+extern "C" float __EMU_GetVIPerSecond(void)
+{
+	return vips;
+}
+
 extern "C" void __EMU_SaveState(int index)
 {
 	DoState = SAVE_1964_CREATED_PJ64_STATE;
@@ -806,3 +811,4 @@ void Exit1964(void)
         exit(0);
     }
 }
+

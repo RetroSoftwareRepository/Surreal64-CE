@@ -31,6 +31,7 @@ bool bNoPreview = false;
 extern void _VIDEO_DisplayTemporaryMessage(const char *msg);
 
 //weinerschnitzel - Skin Control
+extern char emuname[256];
 extern DWORD dwMenuItemColor;
 extern DWORD dwMenuTitleColor;
 extern char skinname[32];
@@ -131,7 +132,8 @@ void ToggleFlickerFilter(bool inc);
 void VideoSettingsMenu();
 void ToggleTextureFilter(bool inc);
 void ToggleSoftDisplayFilter();
-void ToggleFrameSkip();
+void ToggleFrameSkip(bool inc);
+void ToggleAutoCF(bool inc);
 void ToggleFogMode();
 void ToggleXboxPitch();
 void ToggleSensitivity(bool inc);
@@ -193,6 +195,10 @@ void incflicker(){ ToggleFlickerFilter(true); }
 void decflicker(){ ToggleFlickerFilter(false); }
 void incTextureFilter(){ ToggleTextureFilter(true); }
 void decTextureFilter(){ ToggleTextureFilter(false); }
+void incFrameSkip(){ ToggleFrameSkip(true); }
+void decFrameSkip(){ ToggleFrameSkip(false); }
+void incAutoCF(){ ToggleAutoCF(true); }
+void decAutoCF(){ ToggleAutoCF(false); }
 void incSensitivity(){ ToggleSensitivity(true); }
 void decSensitivity(){ ToggleSensitivity(false); }
 void incDeadzone(){ ToggleDeadzone(true); }
@@ -1421,8 +1427,10 @@ void VideoSettingsMenu(void)
 	XLMenu_SetFont(&m_Font);
 
     WCHAR currentname[120];
-
-	m_pSettingsMenu = XLMenu_Init((float)iIGMMenuTxtPosX,(float)iIGMMenuTxtPosY,7, GetMenuFontAlign(iIGMMenuTxtAlign)|MENU_WRAP, NULL);
+	if(preferedemu != _1964x11)
+		m_pSettingsMenu = XLMenu_Init((float)iIGMMenuTxtPosX,(float)iIGMMenuTxtPosY,6, GetMenuFontAlign(iIGMMenuTxtAlign)|MENU_WRAP, NULL);
+	else
+		m_pSettingsMenu = XLMenu_Init((float)iIGMMenuTxtPosX,(float)iIGMMenuTxtPosY,7, GetMenuFontAlign(iIGMMenuTxtAlign)|MENU_WRAP, NULL);
 
 	m_pSettingsMenu->itemcolor = dwMenuItemColor;
 	m_pSettingsMenu->parent = m_pMainMenu;
@@ -1455,11 +1463,26 @@ void VideoSettingsMenu(void)
 	XLMenu_AddItem2(m_pSettingsMenu,MITEM_ROUTINE,currentname,incTextureFilter,decTextureFilter);
 
 	//FrameSkip
-	if (!FrameSkip)
-	swprintf(currentname,L"Skip Frames : No");
-	else 
-	swprintf(currentname,L"Skip Frames : Yes");
-	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,currentname,ToggleFrameSkip);
+	switch (FrameSkip){
+		case 0 : 	swprintf(currentname,L"Frame Skip : Off");
+			break;
+		case 1 : 	swprintf(currentname,L"Frame Skip : On");
+			break;
+		case 2 : 	swprintf(currentname,L"Frame Skip : Auto");
+			break;	}
+	XLMenu_AddItem2(m_pSettingsMenu,MITEM_ROUTINE,currentname,incFrameSkip,decFrameSkip);
+	
+	if(preferedemu == _1964x11){
+		switch (AutoCF_1964){
+			case 0 : 	swprintf(currentname,L"Counter Factor : Use Ini");
+				break;
+			case 1 : 	swprintf(currentname,L"Counter Factor : Auto");
+				break;
+			case 2 : 	swprintf(currentname,L"Counter Factor : Auto with CF1");
+				break;	}
+		XLMenu_AddItem2(m_pSettingsMenu,MITEM_ROUTINE,currentname,incAutoCF,decAutoCF);
+	}
+	
 
 	//Fog Mode
 	if (!bUseLinFog)
@@ -1476,7 +1499,9 @@ void VideoSettingsMenu(void)
 	swprintf(currentname,L"Texture Depth : 32bit");
 	XboxPitch = 4;
 	}
-	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,currentname,ToggleXboxPitch);
+	//Disable menu item, no improvement from 16bit?
+	//Uncomment and increase menu items to use
+	//XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,currentname,ToggleXboxPitch);
 
 
 	XLMenu_Activate(m_pSettingsMenu);
@@ -1542,18 +1567,77 @@ void ToggleSoftDisplayFilter()
 	ConfigAppSave2();
 }
 
-void ToggleFrameSkip()
+void ToggleAutoCF(bool inc)
 {
     WCHAR currentname[120];
 	currentItem = m_pSettingsMenu->curitem;
-	FrameSkip =! FrameSkip;
+
+	if (inc)
+	{
+	AutoCF_1964++;
+    if (AutoCF_1964 > 2) AutoCF_1964 = 0;
+	}
+	else
+	{
+	AutoCF_1964--;
+    if (AutoCF_1964 < 0) AutoCF_1964 = 2;
+	}
 	
 	XLMenu_CurRoutine = NULL;
+  	
+	switch(AutoCF_1964){
+		case 0:
+			swprintf(currentname,L"Counter Factor : Use Ini");
+			break;
+		case 1:
+			swprintf(currentname,L"Counter Factor : Auto");
+			break;
+		case 2:
+			swprintf(currentname,L"Counter Factor : Auto with CF1");
+			break;
+	}
+
+
+	XLMenu_SetItemText(&m_pSettingsMenu->items[currentItem], currentname);
+
+	ConfigAppSave2();
+}
+
+
+void ToggleFrameSkip(bool inc)
+{
+    WCHAR currentname[120];
+	currentItem = m_pSettingsMenu->curitem;
+
+	if (inc)
+	{
+	FrameSkip++;
+    if (FrameSkip > 2) FrameSkip = 0;
+	}
+	else
+	{
+	FrameSkip--;
+    if (FrameSkip < 0) FrameSkip = 2;
+	}
 	
-  	if (!FrameSkip)
-	swprintf(currentname,L"Skip Frames : No");
-	else 
-	swprintf(currentname,L"Skip Frames : Yes");
+	XLMenu_CurRoutine = NULL;
+
+	// Auto Frame Skip is only in 1964x11
+  	if((FrameSkip == 2) && (preferedemu != _1964x11))
+		FrameSkip = 0;
+
+	switch(FrameSkip){
+		case 0:
+			swprintf(currentname,L"Frame Skip : Off");
+			break;
+		case 1:
+			swprintf(currentname,L"Frame Skip : On");
+			break;
+		case 2:
+			swprintf(currentname,L"Frame Skip : Auto");
+			break;
+	}
+
 	XLMenu_SetItemText(&m_pSettingsMenu->items[currentItem], currentname);
 
 	ConfigAppSave2();

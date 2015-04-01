@@ -21,8 +21,32 @@
  * 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA. To contact the
  * authors: email: schibo@emulation64.com, rice1964@yahoo.com
  */
+#ifndef USE_ICC_LIB
+#ifndef _XBOX_ICC
 #include "stdafx.h"
+#else
+#include <mytypes.h>
+#include <memory.h>
+#include <string.h>
+#include "debug_option.h"
+#include "1964ini.h"
+#include "compiler.h"
+#include "Registers.h"
+#include "Emulator.h"
+#include "interrupt.h"
+#include "r4300i.h"
+#include "dynarec/dynaCPU.h"
+#include "dynarec/regcache.h"
+#include "dynarec/opcodedebugger.h"
+#include "_memory.h"
+#include "plugins.h"
+#endif
 
+#ifdef _XBOX_ICC
+#define SET_EXCEPTION(exception)	{ gHWS_COP0Reg[CAUSE] &= NOT_EXCCODE; gHWS_COP0Reg[CAUSE] |= exception; }
+extern N64::CRegisters r;
+extern unsigned int Get_COUNT_Register(void);
+#endif
 
 #define DUMMYDIRECTTLBVALUE 0x00000000
 
@@ -505,19 +529,33 @@ uint32 TranslateTLBAddress(uint32 address, int operation)
 		}
 	}
 
-	/*
-	 * hack for golden eye ?	 * if( strncmp(currentromoptions.Game_Name, "GOLDENEYE", 9) == 0 &&
-	 * (address&0xFF000000) == 0x7F000000 ) { if( rominfo.TV_System == TV_SYSTEM_NTSC
-	 * ) { uint32 i; for( i=0; i<(gAllocationLength - 0x34b30)/0x1000; i++) {
-	 * Direct_TLB_Lookup_Table[0x7f000+i] = 0x90034b30+i*0x1000;
-	 * TLB_sDWORD_R[0x7f000+i] = &gMS_ROM_Image[0x34b30+i*0x1000]; } realAddress
-	 * (address - 0x7f000000) + 0x90034b30; } else { uint32 i; for( i=0;
-	 * i<(gAllocationLength - 0x329f0)/0x1000; i++) {
-	 * Direct_TLB_Lookup_Table[0x7f000+i] = 0x900329f0+i*0x1000;
-	 * TLB_sDWORD_R[0x7f000+i] = &gMS_ROM_Image[0x329f0+i*0x1000]; } realAddress
-	 * (address - 0x7f000000) + 0x900329f0; } TLB_DETAIL_TRACE(TRACE2("Hack, mapping
-	 * for GoldenEye: %08X ==> %08X", address, realAddress)); return realAddress; }
-	 */
+	
+	 /* hack for golden eye */
+	if( strncmp(currentromoptions.Game_Name, "GOLDENEYE", 9) == 0 && (address&0xFF000000) == 0x7F000000 ) 
+	{ 
+		if( rominfo.TV_System == TV_SYSTEM_NTSC) 
+		{
+			uint32 i;
+			for( i=0; i<(gAllocationLength - 0x34b30)/0x1000; i++)
+			{
+				Direct_TLB_Lookup_Table[0x7f000+i] = 0x90034b30+i*0x1000;
+				TLB_sDWORD_R[0x7f000+i] = &gMS_ROM_Image[0x34b30+i*0x1000]; 
+			}
+			realAddress=(address - 0x7f000000) + 0x90034b30; 
+		}
+		else
+		{
+			uint32 i;
+			for( i=0; i<(gAllocationLength - 0x329f0)/0x1000; i++)
+			{
+				Direct_TLB_Lookup_Table[0x7f000+i] = 0x900329f0+i*0x1000;
+				TLB_sDWORD_R[0x7f000+i] = &gMS_ROM_Image[0x329f0+i*0x1000];
+			}
+			realAddress=(address - 0x7f000000) + 0x900329f0;
+		} 
+		//TLB_DETAIL_TRACE(TRACE2("Hack, mapping for GoldenEye: %08X ==> %08X", address, realAddress)); return realAddress;
+	}
+	 
 	if(invalidmatched)
 		return(Trigger_TLB_Invalid_Exception(address, operation));
 	else
@@ -533,7 +571,7 @@ void __cdecl error(char *Message, ...)
 	char	Msg[400];
 	va_list ap;
 	/*~~~~~~~~~~~~~*/
-
+#ifndef _XBOX_ICC
 	va_start(ap, Message);
 	vsprintf(Msg, Message, ap);
 	va_end(ap);
@@ -543,6 +581,7 @@ void __cdecl error(char *Message, ...)
 	OutputDebugString("\n");
 #else //win32
 	MessageBox(NULL, Msg, "Error", MB_OK | MB_ICONINFORMATION);
+#endif
 #endif
 }
 
@@ -1414,3 +1453,4 @@ void Build_Whole_Direct_TLB_Lookup_Table(void)
 
 	InitTLBOther();
 }
+#endif //USE_ICC_LIB

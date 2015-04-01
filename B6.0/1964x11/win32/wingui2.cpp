@@ -22,7 +22,8 @@
  */
 
 #ifdef _XBOX
-#include <xtl.h>
+//#include <xtl.h>
+#include <xbox_depp.h>
 #include <math.h>
 
 #else //win32

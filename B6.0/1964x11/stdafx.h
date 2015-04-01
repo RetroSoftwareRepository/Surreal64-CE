@@ -11,11 +11,11 @@
 
 // Windows Header Files:
 #ifdef _XBOX
-#include <xtl.h>
+//#include <xtl.h>
 #include <xbox_depp.h>
 
-//#undef USE_ROM_PAGING  // disable ROM Paging to cache whole ROM to memory, as is. Expensive.
-#define USE_ROM_PAGING	// enable ROM Paging using temporary file, breaks 007 and conker for 1.1
+#undef USE_ROM_PAGING  // disable ROM Paging to cache whole ROM to memory, as is. Expensive.
+//#define USE_ROM_PAGING	// enable ROM Paging using temporary file, breaks 007 and conker for 1.1
 
 #if _MSC_VER > 1200
 #include "xmmintrin.h" //SSE - needed?

@@ -1410,7 +1410,7 @@ void DLParser_SetTile(MicroCodeCommand command)
 	}
 
 	// Hack for DK64
-	/*
+	
 	if( tile.dwMaskS > 0 && tile.dwMaskT > 0 && tile.dwMaskS < 8 && tile.dwMaskT < 8 )
 	{
 		tile.sh = tile.sl + (1<<tile.dwMaskS);
@@ -1418,7 +1418,7 @@ void DLParser_SetTile(MicroCodeCommand command)
 		tile.hilite_sl = tile.sl;
 		tile.hilite_tl = tile.tl;
 	}
-	*/
+	
 
 	tile.lastTileCmd = CMD_SETTILE;
 

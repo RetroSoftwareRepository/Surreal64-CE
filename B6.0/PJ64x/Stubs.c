@@ -914,7 +914,10 @@ static __forceinline void SwapRomHeader(uint8 *romheader)
 	}
 }
 
-
+extern float __EMU_GetVIPerSecond(void)
+{
+	return XboxVIs;// + Timers.Timer);
+}
 
 extern int CurrentSaveSlot;
 extern CPU_ACTION CPU_Action;

@@ -27,6 +27,7 @@ static const DWORD MEM_KEEP_FREE = (2*1024*1024); // keep 2MB free
 
 bool g_bUseSetTextureMem = true;
 DWORD g_maxTextureMemUsage = (5*1024*1024);
+BOOL bPurgeOldBeforeIGM = FALSE;
 
 // Returns the first prime greater than or equal to nFirst
 inline LONG GetNextPrime(LONG nFirst)
@@ -185,11 +186,14 @@ void CTextureManager::PurgeOldTextures()
 		m_currentTextureMemUsage = 0;
 		return;
 	}
+	else if(bPurgeOldBeforeIGM)
+	{
+		bPurgeOldBeforeIGM = FALSE;
+	}
 	else if(options.enableHackForGames != HACK_FOR_QUAKE_2)
 	{
 		return;
 	}
-	
 	static const DWORD dwFramesToKill = 5*30;			// 5 secs at 30 fps
 	static const DWORD dwFramesToDelete = 30*30;		// 30 secs at 30 fps
 	

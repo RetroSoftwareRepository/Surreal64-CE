@@ -81,6 +81,7 @@ struct EmuOptions
 	BOOL	SyncVI;
 	BOOL	AutoFrameSkip;
     BOOL	AutoCF; //Automatic Counter Factor Timing, If TRUE, CF constantly changes automatically during gameplay.
+	BOOL	AllowCF1;
 	BOOL	UsingRspPlugin;
 	BOOL	UsingInternalRSP;
 };

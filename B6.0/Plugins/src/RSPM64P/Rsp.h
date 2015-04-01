@@ -29,32 +29,32 @@
 extern "C" {
 #endif
 typedef struct {
-	HINSTANCE hInst;
-	BOOL MemoryBswaped;    /* If this is set to TRUE, then the memory has been pre
+	int hInst;
+	int MemoryBswaped;    /* If this is set to TRUE, then the memory has been pre
 	                          bswap on a dword (32 bits) boundry */
-	BYTE * RDRAM;
-	BYTE * DMEM;
-	BYTE * IMEM;
-	DWORD * MI_INTR_REG;
+	unsigned char * RDRAM;
+	unsigned char * DMEM;
+	unsigned char * IMEM;
+	unsigned long * MI_INTR_REG;
 
-	DWORD * SP_MEM_ADDR_REG;
-	DWORD * SP_DRAM_ADDR_REG;
-	DWORD * SP_RD_LEN_REG;
-	DWORD * SP_WR_LEN_REG;
-	DWORD * SP_STATUS_REG;
-	DWORD * SP_DMA_FULL_REG;
-	DWORD * SP_DMA_BUSY_REG;
-	DWORD * SP_PC_REG;
-	DWORD * SP_SEMAPHORE_REG;
+	unsigned long * SP_MEM_ADDR_REG;
+	unsigned long * SP_DRAM_ADDR_REG;
+	unsigned long * SP_RD_LEN_REG;
+	unsigned long * SP_WR_LEN_REG;
+	unsigned long * SP_STATUS_REG;
+	unsigned long * SP_DMA_FULL_REG;
+	unsigned long * SP_DMA_BUSY_REG;
+	unsigned long * SP_PC_REG;
+	unsigned long * SP_SEMAPHORE_REG;
 
-	DWORD * DPC_START_REG;
-	DWORD * DPC_END_REG;
-	DWORD * DPC_CURRENT_REG;
-	DWORD * DPC_STATUS_REG;
-	DWORD * DPC_CLOCK_REG;
-	DWORD * DPC_BUFBUSY_REG;
-	DWORD * DPC_PIPEBUSY_REG;
-	DWORD * DPC_TMEM_REG;
+	unsigned long * DPC_START_REG;
+	unsigned long * DPC_END_REG;
+	unsigned long * DPC_CURRENT_REG;
+	unsigned long * DPC_STATUS_REG;
+	unsigned long * DPC_CLOCK_REG;
+	unsigned long * DPC_BUFBUSY_REG;
+	unsigned long * DPC_PIPEBUSY_REG;
+	unsigned long * DPC_TMEM_REG;
 	void (*CheckInterrupts)( void );
 	void (*ProcessDList)( void );
 	void (*ProcessAList)( void );
@@ -63,12 +63,12 @@ typedef struct {
 } RSP_INFO;
 
 void  _RSP_M64p_CloseDLL (void);
-void  _RSP_M64p_DllAbout ( HWND hParent );
-DWORD _RSP_M64p_DoRspCycles ( DWORD Cycles );
+void  _RSP_M64p_DllAbout ( int hParent );
+unsigned long _RSP_M64p_DoRspCycles ( unsigned long Cycles );
 void  _RSP_M64p_GetDllInfo ( PLUGIN_INFO * PluginInfo );
-void  _RSP_M64p_InitiateRSP ( RSP_INFO Rsp_Info, DWORD * CycleCount);
+void  _RSP_M64p_InitiateRSP ( RSP_INFO Rsp_Info, unsigned long * CycleCount);
 void  _RSP_M64p_RomClosed (void);
-void  _RSP_M64p_DllConfig (HWND hWnd);
+void  _RSP_M64p_DllConfig (int hWnd);
 #if defined(__cplusplus)
 }
 #endif

@@ -118,7 +118,8 @@ AUDIO_INFO;
 #define PLUGIN_MEMPAK		2
 #define PLUGIN_RUMBLE_PAK	3	/* not implemeted for non raw data */
 #define PLUGIN_TANSFER_PAK	4	/* not implemeted for non raw data */
-/*
+
+#ifdef _XBOX_ICC
 typedef struct
 {
 	BOOL	Present;
@@ -151,7 +152,7 @@ typedef union
 		signed		X_AXIS : 8;
 	};
 } BUTTONS;
-*/
+#endif
 typedef struct
 {
 	DWORD addr;
@@ -278,7 +279,9 @@ typedef struct {
 #include <AudioNone.h>
 #endif //_AUDIO_NONE
 
+#ifndef _XBOX_ICC
 #include <Input.h>
+#endif
 
 //#include <Video.h>
 #if defined(_VIDEO_1964_11)
@@ -300,5 +303,7 @@ typedef struct {
 
 extern GFX_INFO		Gfx_Info;
 extern AUDIO_INFO	Audio_Info;
+#ifndef _XBOX_ICC
 extern CONTROL		Controls[4];
+#endif
 #endif //_PLUGINS_H__1964_

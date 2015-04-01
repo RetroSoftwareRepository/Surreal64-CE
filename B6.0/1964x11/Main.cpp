@@ -1,8 +1,8 @@
 #include "InterpretedOpcodes.h"
 	
 #ifdef _XBOX
-#include <xtl.h>
-	
+//#include <xtl.h>
+#include <xbox_depp.h>	
 #else //win32
 #include <windows.h>
 

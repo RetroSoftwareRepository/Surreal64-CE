@@ -488,6 +488,9 @@ void N64_Boot(void)
 #endif
     static int remember_debug_opcode = 0;
 
+	if(strncmp(currentromoptions.Game_Name, "DONKEY KONG 64", 14) == 0)
+		emuoptions.AllowCF1 = FALSE;
+
    
 	SetCounterFactor(CounterFactor);
 	emustatus.Emu_Is_Running = TRUE;

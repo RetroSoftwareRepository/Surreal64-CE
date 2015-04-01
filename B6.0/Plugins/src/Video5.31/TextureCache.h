@@ -244,5 +244,6 @@ extern CTextureCache gTextureCache;		// The global instance of CTextureCache cla
 // reinstate max video mem
 extern bool g_bUseSetTextureMem;
 extern DWORD g_maxTextureMemUsage;
+extern BOOL bPurgeOldBeforeIGM;
 
 #endif

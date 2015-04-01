@@ -32,11 +32,15 @@
 //Compile_Slot_AndInterruptsNewTest = calls Interrupts to patches after the translatepc
 //InterruptsNewTest = patches b4 the translatepc
 //Interrupts = patches after the translat
-
+#include <memory.h>
 #include "../debug_option.h"
 #include "../1964ini.h"
 #include "../compiler.h"
 #include "../Registers.h"
+#include "../Emulator.h"
+#include "dynaCPU.h"
+#include "regcache.h"
+#include "opcodedebugger.h"
 
 extern N64::CRegisters r;
 
@@ -2199,7 +2203,7 @@ void jalr(OP_PARAMS)
 
 void Riight()
 {
-    MessageBox(0, "Riight", "", 0);
+    //MessageBox(0, "Riight", "", 0);
 }
 
 /*

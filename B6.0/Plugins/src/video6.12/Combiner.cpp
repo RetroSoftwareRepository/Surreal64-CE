@@ -301,8 +301,8 @@ void CColorCombiner::InitCombinerMode(void)
 		InitCombinerCycleCopy();
 		m_bCycleChanged = true;
 	}
-	else if ( gRDP.otherMode.cycle_type == CYCLE_TYPE_FILL )
-	//else if ( gRDP.otherMode.cycle_type == CYCLE_TYPE_FILL && gRSP.ucode != 5 )	//hack
+	//else if ( gRDP.otherMode.cycle_type == CYCLE_TYPE_FILL )
+	else if ( gRDP.otherMode.cycle_type == CYCLE_TYPE_FILL && gRSP.ucode != 5 )	//hack
 	{
 		InitCombinerCycleFill();
 		m_bCycleChanged = true;

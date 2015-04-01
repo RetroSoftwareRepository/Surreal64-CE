@@ -180,7 +180,7 @@ void format_profiler_result_msg(char *msg)
 
 	cpuIdlePercentageIdx++;
 	cpuIdlePercentageIdx %= 4;
-	cpuIdlePercentages[cpuIdlePercentageIdx] = (uint32)(((double)(__int64)profiler_timer_count[CPU_IDLE_PROF] * 100.0 / (double)(__int64)totaltimer)+0.5);
+	cpuIdlePercentages[cpuIdlePercentageIdx] = (uint32)((((double)(__int64)profiler_timer_count[CPU_IDLE_PROF] * 100.0) / (double)(__int64)totaltimer)+0.5);
 }
 
 /*

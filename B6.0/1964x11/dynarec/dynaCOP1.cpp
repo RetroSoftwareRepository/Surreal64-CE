@@ -13,7 +13,29 @@
 // 59 Temple Place  -  Suite  330,  Boston, MA  02111-1307,  USA. To contact the
 // authors: email: schibo@emulation64.com, rice1964@yahoo.com
 
+#ifndef USE_ICC_LIB
+#ifndef _XBOX_ICC
 #include "../stdafx.h"
+#else
+#include <mytypes.h>
+#include <memory.h>
+#include "../hardware.h"
+#include "../compiler.h"
+#include "../r4300i.h"
+#include "opcodedebugger.h"
+#include "dynaCPU.h"
+#include "regcache.h"
+#include "x86.h"
+#include "xmm.h"
+#include "../1964ini.h"
+#include "../Registers.h"
+//#include "../core.h"
+#endif
+
+#ifdef _XBOX_ICC
+extern INI_ENTRY currentromoptions;
+extern N64::CRegisters r;
+#endif
 
 #ifdef _XBOX
 #define LOGGING_DYNA(macro) //surreal
@@ -2908,3 +2930,4 @@ void sdc1(OP_PARAMS)
     MOV_RegToMemory(1, Reg_ECX, ModRM_disp8_EAX, 4);
     MOV_RegToMemory(1, Reg_EDX, ModRM_EAX, 0);
 }
+#endif //USE_ICC_LIB

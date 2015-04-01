@@ -21,9 +21,30 @@
  * 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA. To contact the
  * authors: email: schibo@emulation64.com, rice1964@yahoo.com
  */
+#ifndef USE_ICC_LIB
+#ifndef _XBOX_ICC
 #include "stdafx.h"
+#else
+#include <mytypes.h>
+#include <memory.h>
+#include "Emulator.h"
+#include "r4300i.h"
+#include "interrupt.h"
+#include "dynarec/opcodedebugger.h"
+#include "1964ini.h"
+#include "_memory.h"
+#include "Registers.h"
+#include "n64rcp.h"
+#include "dma.h"
+#include "gamesave.h"
+#include "timer.h"
+#include "plugins.h"
 #include <float.h>
 #include <math.h>
+#endif
+#ifdef _XBOX_ICC
+extern N64::CRegisters r;
+#endif
 
 
 /* Rounding control of FPU */
@@ -81,6 +102,7 @@ extern int iMXCSR_NEAR;
 extern int iMXCSR_CEIL;
 extern int iMXCSR_FLOOR;
 extern int  iMXCSR;
+extern BOOL __cdecl IsSSESupported(void);
 
 void RestoreOldRoundingMode(int ctrl)
 {
@@ -1485,3 +1507,4 @@ void COP1_NotAvailable_instr(uint32 Instruction)
 		TriggerFPUUnusableException();
 	}
 }
+#endif //USE_ICC_LIB

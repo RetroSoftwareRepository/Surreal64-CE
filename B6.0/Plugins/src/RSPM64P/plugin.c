@@ -45,7 +45,7 @@ static void (*l_ProcessRdpList)(void) = NULL;
 static void (*l_ShowCFB)(void) = NULL;
 static void (*l_DebugCallback)(void *, int, const char *) = NULL;
 static void *l_DebugCallContext = NULL;
-static int l_PluginInit = 0;
+//static int l_PluginInit = 0;
 
 /* local function */
 static void DebugMessage(int level, const char *message, va_list args)
@@ -178,13 +178,13 @@ EXPORT m64p_error CALL PluginGetVersion(m64p_plugin_type *PluginType, int *Plugi
     return M64ERR_SUCCESS;
 }
 #endif
-DWORD _RSP_M64p_DoRspCycles(DWORD Cycles)
+unsigned long _RSP_M64p_DoRspCycles(unsigned long Cycles)
 {
     hle_execute(&g_hle);
     return Cycles;
 }
 
-void _RSP_M64p_InitiateRSP(RSP_INFO Rsp_Info, DWORD* UNUSED(CycleCount))
+void _RSP_M64p_InitiateRSP(RSP_INFO Rsp_Info, unsigned long* UNUSED(CycleCount))
 {
     hle_init(&g_hle,
              Rsp_Info.RDRAM,
@@ -226,10 +226,10 @@ void _RSP_M64p_GetDllInfo(PLUGIN_INFO * PluginInfo)
     PluginInfo->Version = 0x0101;
 	PluginInfo->Type = PLUGIN_TYPE_RSP;
 	strcpy(PluginInfo->Name, "Mupen64Plus HLE RSP Plugin");
-	PluginInfo->NormalMemory = TRUE;
-	PluginInfo->MemoryBswaped = TRUE;
+	PluginInfo->NormalMemory = 1;
+	PluginInfo->MemoryBswaped = 1;
 }
-void _RSP_M64p_DllConfig(HWND hWnd)
+void _RSP_M64p_DllConfig(int hWnd)
 {
     /* do nothing */
 }

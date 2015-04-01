@@ -19,6 +19,9 @@
 #define SDWORD signed long
 #define QWORD  unsigned __int64
 #define SQWORD signed __int64
+#define BOOL int
+#define TRUE 1
+#define FALSE 0
 #endif
 
 #endif

@@ -22,6 +22,7 @@
  */
 #ifndef _REGCACHE_H__1964_
 #define _REGCACHE_H__1964_
+#include <mytypes.h>
 
 /* The following are macros that help us debug the dynarec */
 

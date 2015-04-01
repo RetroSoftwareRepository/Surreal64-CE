@@ -667,6 +667,7 @@ extern uint32	ConvertHexStringToInt(const char *str, int nchars);
  =======================================================================================================================
  =======================================================================================================================
  */
+#ifndef _XBOX
 LRESULT APIENTRY CheatAndHackDialog(HWND hDlg, unsigned message, WORD wParam, LONG lParam)
 {
 	/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -686,7 +687,7 @@ LRESULT APIENTRY CheatAndHackDialog(HWND hDlg, unsigned message, WORD wParam, LO
 	//LPMEASUREITEMSTRUCT lpmis;
 	//LPDRAWITEMSTRUCT	lpdis;
 	/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-#ifndef _XBOX
+
 	switch(message)
 	{
 	case WM_INITDIALOG:
@@ -1318,11 +1319,8 @@ LRESULT APIENTRY CheatAndHackDialog(HWND hDlg, unsigned message, WORD wParam, LO
 	}
 
 	return(FALSE);
-#else //_XBOX
-//CodeList_ReadCode(romlist[rlstatus.selected_rom_index]->pinientry->Game_Name,cheatfilename);
-return TRUE;
-#endif
 }
+#endif
 
 /*
  =======================================================================================================================

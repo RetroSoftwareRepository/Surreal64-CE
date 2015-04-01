@@ -24,8 +24,25 @@
 #define _TIMER_H__1964_
 
 #ifdef _XBOX
-#include <xtl.h>
-
+//#include <xtl.h>
+#include <mytypes.h>
+#ifdef _XBOX_ICC
+#if defined(MIDL_PASS)
+typedef struct _LARGE_INTEGER {
+#else // MIDL_PASS
+typedef union _LARGE_INTEGER {
+    struct {
+        DWORD LowPart;
+        LONG HighPart;
+    };
+    struct {
+        DWORD LowPart;
+        LONG HighPart;
+    } u;
+#endif //MIDL_PASS
+    LONGLONG QuadPart;
+} LARGE_INTEGER;
+#endif
 #else //win32
 #include "windows.h"
 #endif

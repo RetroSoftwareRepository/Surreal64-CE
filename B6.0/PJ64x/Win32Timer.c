@@ -24,6 +24,7 @@
  *
  */
 #include <xtl.h>
+float XboxVIs = 0;
 //#include "Language.h"
 
 /********************* Win32 Thread Timer ********************/
@@ -75,6 +76,7 @@ BOOL Timer_Process(DWORD * FrameRate) {
 	if (CurrentTime - FPSTimer.LastTime >= 1000) {
 		/* Output FPS */
 		if (FrameRate != NULL) { *FrameRate = FPSTimer.Frames; }
+		//XboxVIs = (float)FPSTimer.Frames;
 		FPSTimer.Frames = 0;
 		FPSTimer.LastTime = CurrentTime;
 

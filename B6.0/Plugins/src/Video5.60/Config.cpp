@@ -25,7 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "../../../config.h"
 
 extern int TextureMode;
-extern bool FrameSkip;
+extern int FrameSkip;
 
 #define MAIN_RICE_VIDEO		"Software\\RICEVIDEO560\\WINDOW"
 //#define RICE_VIDEO_INI_FILE		"D:\\RiceVideo5.6.0.ini"
@@ -420,6 +420,8 @@ void ReadConfiguration(void)
 		options.colorQuality = TEXTURE_FMT_A4R4G4B4;
 		options.textureEnhancement = 0;
 		options.textureEnhancementControl = 1;
+		if((preferedemu != _1964x11)&&(FrameSkip>1))
+			FrameSkip = 0;
 		options.bSkipFrame = FrameSkip;
 		options.bDisplayTooltip = FALSE;
 		options.bHideAdvancedOptions = TRUE;
@@ -550,6 +552,10 @@ void GenerateCurrentRomOptions()
 	else if ((strnicmp(g_curRomInfo.szGameName, "NASCAR", 6) == 0))
 	{
 		options.enableHackForGames = HACK_FOR_NASCAR;
+	}
+	else if ((strstr(g_curRomInfo.szGameName, "ZELDA") != 0) && (strstr(g_curRomInfo.szGameName, "MASK") != 0))
+	{
+		options.enableHackForGames = HACK_FOR_ZELDA_MM;
 	}
 	else if ((strstr(g_curRomInfo.szGameName, "ZELDA") != 0))
 	{

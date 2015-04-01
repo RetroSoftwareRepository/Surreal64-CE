@@ -15,8 +15,21 @@
 // along with this program; if not, write to the Free Software Foundation, Inc.,
 // 59 Temple Place  -  Suite  330,  Boston, MA  02111-1307,  USA. To contact the
 // authors: email: schibo@emulation64.com, rice1964@yahoo.com
-
+#ifndef USE_ICC_LIB
+#ifndef _XBOX_ICC
 #include "../stdafx.h"
+#else
+#include "regcache.h"
+#include "../r4300i.h"
+#include "../1964ini.h"
+#include "../Registers.h"
+//#include "../core.h"
+#endif
+
+#ifdef _XBOX_ICC
+extern N64::CRegisters r;
+extern INI_ENTRY currentromoptions;
+#endif
 
 #ifdef _XBOX
 #include "OpcodeDebugger.h" //surreal
@@ -432,3 +445,4 @@ void AnalyzeBlock(void)
     gHWS_pc = tempPC;
     ConstMap[RA].FinalAddressUsedAt = 0xffffffff;
 }
+#endif // USE_ICC_LIB

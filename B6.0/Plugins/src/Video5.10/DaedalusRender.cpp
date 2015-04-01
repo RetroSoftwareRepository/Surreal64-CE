@@ -269,6 +269,12 @@ void CDaedalusRender::SetWorldView(const DaedalusMatrix & mat, BOOL bPush, LONG 
 #ifdef USING_INT_MATRIX
 			gRSP.modelviewIntMtxs[gRSP.modelViewMtxTop] = intMtx;
 #endif
+			// Hack needed to show flashing last heart and map arrows in Zelda OoT & MM
+			// It renders at Z cordinate = 0.0f that gets clipped away
+			// So we translate them a bit along Z to make them stick
+			if( stricmp(g_curRomInfo.szGameName, "ZELDA") != 0)
+				gRSP.projectionMtxs[gRSP.projectionMtxTop]._43 += 0.5f;
+
 		}
 		else
 		{

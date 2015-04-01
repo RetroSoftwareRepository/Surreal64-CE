@@ -14,7 +14,31 @@
 // 59 Temple Place  -  Suite  330,  Boston, MA  02111-1307,  USA. To contact the
 // authors: email: schibo@emulation64.com, rice1964@yahoo.com
 
+#ifndef USE_ICC_LIB
+#ifndef _XBOX_ICC
 #include "../stdafx.h"
+#else
+#include <mytypes.h>
+#include "../timer.h"
+#endif
+
+#ifdef _XBOX_ICC
+#define EXC_CPU 44
+#define IE			0x00000001
+#define EXL			0x00000002
+#define ERL			0x00000004
+#define EXL_OR_ERL	0x00000006
+#define BD			0x80000000
+#define NOT_BD		0x7FFFFFFF
+#define BEV			0x00400000
+#define NOT_EXCCODE					0xFFFFFF83
+
+#ifdef _XBOX
+#define LOGGING_DYNA(macro) //surreal
+#endif
+
+extern uint8			*dynarommap[];
+#endif
 
 #ifdef USE_ROM_PAGING //_XBOX
 //#include "../rompaging.h"
@@ -911,9 +935,8 @@ resrvd(OP_PARAMS)
 
 // _____________________________________________________________________________
 //
-
-void
-lwl(OP_PARAMS)
+extern void r4300i_lwl_32bit(uint32 Intrsuction);
+void lwl(OP_PARAMS)
 {
     OpcodePrologue(1, &r4300i_lwl, 0, PASS_PARAMS);
 
@@ -928,6 +951,7 @@ lwl(OP_PARAMS)
 
 // _____________________________________________________________________________
 //
+extern void r4300i_lwr_32bit(uint32 Intrsuction);
 void lwr(OP_PARAMS)
 {
     OpcodePrologue(1, &r4300i_lwr, 0, PASS_PARAMS);
@@ -2711,10 +2735,10 @@ void slti(OP_PARAMS)
 		if(!Is32bit) {
 
 
-
+#ifndef _XBOX
 			if (xRS->Is32bit)
 				MessageBox(0, "Error", "", 0);
-
+#endif
 			xRT->Is32bit = 1;
 			xRT->NoNeedToLoadTheLo = 1;
 			xRT->IsDirty = 1;
@@ -5129,7 +5153,9 @@ void prepare_run_exception(uint32 exception_code)
 
 void Hello()
 {
+#ifndef _XBOX
     MessageBox(0, "Break", "", 0);
+#endif
 }
 
 // _____________________________________________________________________________
@@ -6060,3 +6086,4 @@ void dsra32(OP_PARAMS)
 
 #endif
 }
+#endif //USE_ICC_LIB

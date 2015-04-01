@@ -1,7 +1,14 @@
 //Floating point SSE opcodes that use the XMM registers.
 
 
+#ifndef USE_ICC_LIB
+#ifndef _XBOX_ICC
 #include "../stdafx.h"
+#else
+#include <mytypes.h>
+#include <string.h>
+#include "x86.h"
+#endif
 
 char SSEReason[0xff];
 
@@ -166,3 +173,4 @@ void LDMXCSR(unsigned int Address)
     WC8(0x15); // slash2
     WC32(Address);
 }
+#endif //USE_ICC_LIB

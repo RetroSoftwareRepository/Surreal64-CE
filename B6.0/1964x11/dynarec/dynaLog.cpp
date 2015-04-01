@@ -21,7 +21,12 @@
  * 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA. To contact the
  * authors: email: schibo@emulation64.com, rice1964@yahoo.com
  */
-#include "../stdafx.h"
+#ifndef USE_ICC_LIB
+#ifndef _XBOX_ICC
+#include "stdafx.h"
+#else
+#include <mytypes.h>
+#endif
 
 MultiPass	gMultiPass;
 
@@ -116,3 +121,4 @@ void CloseLogDyna(void)
 		dynalog_fileisopen = FALSE;
 	}
 }
+#endif //USE_ICC_LIB

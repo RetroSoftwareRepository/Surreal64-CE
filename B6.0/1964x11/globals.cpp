@@ -21,7 +21,8 @@
  * authors: email: schibo@emulation64.com, rice1964@yahoo.com
  */
 #ifdef _XBOX
-#include <xtl.h>
+//#include <xtl.h>
+#include <xbox_depp.h>
 #include <math.h>
 
 #else //win32

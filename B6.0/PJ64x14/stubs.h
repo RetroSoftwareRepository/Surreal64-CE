@@ -27,6 +27,7 @@ extern DWORD g_dwPageSize;
 extern DWORD g_dwNumFrames;
 extern int g_iPagingMethod;
 extern char g_temporaryRomPath[260];
+extern float XboxVIs;
 
 typedef struct
 {

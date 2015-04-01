@@ -841,7 +841,7 @@ extern BOOL _INPUT_UpdateControllerStates();
 extern void _INPUT_RumblePause(bool bPause);
 extern "C" BOOL ReInitVirtualDynaMemory(boolean charge);
 extern int TextureMode;
-extern bool FrameSkip;
+extern int FrameSkip;
 
 void DLParser_Process(OSTask * pTask)
 {
@@ -850,7 +850,7 @@ void DLParser_Process(OSTask * pTask)
 	dlistMtxCount = 0;
 	bHalfTxtScale = false;
 
-	if( FrameSkip )
+	if( options.bSkipFrame )
 	{
 		skipframe++;
 		if(skipframe%2)
@@ -1025,6 +1025,7 @@ void DLParser_Process(OSTask * pTask)
 		GlobalMemoryStatus(&ms);	
 		
 		// Clear Rice's textures before loading the menu.
+		bPurgeOldBeforeIGM = TRUE;
 		gTextureManager.PurgeOldTextures();
 		gTextureManager.CleanUp();
 		RDP_Cleanup();

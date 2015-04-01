@@ -251,4 +251,5 @@ extern void DumpCachedTexture(TxtrCacheEntry &entry);
 extern bool g_bUseSetTextureMem;
 extern DWORD g_maxTextureMemUsage;
 extern int XboxPitch;
+extern BOOL bPurgeOldBeforeIGM;
 #endif
