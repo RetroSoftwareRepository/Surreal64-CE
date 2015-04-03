@@ -251,7 +251,7 @@ void DisplayPC(void)
 	static uint32	pc = 0;
 	/*~~~~~~~~~~~~~~~~~~~*/
 
-	if(pc != gHWS_pc) TRACE1("PC=%08X", gHWS_pc);
+	if(pc != gHWS_pc){TRACE1("PC=%08X", gHWS_pc);}
 	pc = gHWS_pc;
 
 	/* DisplayError("PC=%08X", gHWS_pc); */

@@ -402,6 +402,7 @@ __forceinline void RefreshDynaDuringGamePlay(void)
 
 extern uint32 Experiment;
 uint32 HydroThunder;
+uint32 ConkerBFD_Link4KBlocks = 0;
 
 /*
  =======================================================================================================================
@@ -421,6 +422,13 @@ void InitEmu(void)
         HydroThunder = 1;
     else
         HydroThunder = 0;
+
+	if(strncmp(currentromoptions.Game_Name, "DONKEY KONG 64", 14) == 0)
+		emuoptions.AllowCF1 = FALSE;
+
+	if((strncmp(currentromoptions.Game_Name, "CONKER BFD", 14) == 0) &&
+		(currentromoptions.Link_4KB_Blocks == USE4KBLINKBLOCK_YES))
+		ConkerBFD_Link4KBlocks = 1;
 
 	CPUdelay = 0;
 	CPUdelayPC = 0;
@@ -455,7 +463,7 @@ void InitEmu(void)
 		fread(&HeaderDllPass[0], sizeof(uint8), 0x40, tmpFile);
 		fclose(tmpFile);
 	}
-
+	
 #else // win32 - no paging
 	memcpy(&HeaderDllPass[0], &gMS_ROM_Image[0], 0x40);
 #endif
@@ -482,15 +490,10 @@ void N64_Boot(void)
 #ifdef USE_ROM_PAGING //_XBOX
 	// added by oDD
 	uint32  bootaddr = (ReadUWORDFromROM(8) & 0x007FFFFF) + 0x80000000;
-    
 #else // win32 - no paging
 	uint32	bootaddr = (*(uint32 *) (gMS_ROM_Image + 8) & 0x007FFFFF) + 0x80000000;
 #endif
     static int remember_debug_opcode = 0;
-
-	if(strncmp(currentromoptions.Game_Name, "DONKEY KONG 64", 14) == 0)
-		emuoptions.AllowCF1 = FALSE;
-
    
 	SetCounterFactor(CounterFactor);
 	emustatus.Emu_Is_Running = TRUE;
@@ -1020,6 +1023,7 @@ void CPU_Check_Interrupts(void)
 		switch(DoState){
 			case LOAD_1964_CREATED_PJ64_STATE:
 				sprintf(buf, "%s%08x\\%08X-%08X-%02X.%i.1964", g_szPathSaves, currentromoptions.crc1, currentromoptions.crc1, currentromoptions.crc2, currentromoptions.countrycode, stateindex);
+				Sleep(1000);
 				FileIO_ImportPJ64State(buf);
 				Init_Count_Down_Counters();
 				RefreshDynaDuringGamePlay();
@@ -1028,6 +1032,7 @@ void CPU_Check_Interrupts(void)
 
 			case LOAD_PJ64_CREATED_PJ64_STATE:
 				sprintf(buf, "%s%08x\\%08X-%08X-%02X.%i.pj64", g_szPathSaves, currentromoptions.crc1, currentromoptions.crc1, currentromoptions.crc2, currentromoptions.countrycode, stateindex);
+				Sleep(1000);
 				FileIO_ImportPJ64State(buf);
 				Init_Count_Down_Counters();
 				RefreshDynaDuringGamePlay();
@@ -1036,7 +1041,9 @@ void CPU_Check_Interrupts(void)
 
 			case SAVE_1964_CREATED_PJ64_STATE:
 				sprintf(buf, "%s%08x\\%08X-%08X-%02X.%i.1964", g_szPathSaves, currentromoptions.crc1, currentromoptions.crc1, currentromoptions.crc2, currentromoptions.countrycode, stateindex);
+				Sleep(1000);
 				FileIO_ExportPJ64State(buf);
+				Sleep(1000);
 				FileIO_ImportPJ64State(buf); // Necessary...
 				Init_Count_Down_Counters();
 				RefreshDynaDuringGamePlay();
