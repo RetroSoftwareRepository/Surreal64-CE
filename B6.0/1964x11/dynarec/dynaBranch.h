@@ -29,7 +29,7 @@
 
 
 //Compile_Slot_AndInterruptsNewTest = calls InterruptsNewTest to patch b4 the translatepc
-//Compile_Slot_AndInterruptsNewTest = calls Interrupts to patches after the translatepc
+//Compile_Slot_AndInterrupts = calls Interrupts to patches after the translatepc
 //InterruptsNewTest = patches b4 the translatepc
 //Interrupts = patches after the translat
 #include <memory.h>
@@ -47,6 +47,8 @@ extern N64::CRegisters r;
 extern unsigned int HardwareStart;
 extern void			MapRegisterNew(int To_XMM_Or_Memory, x86regtyp *Conditions, x86regtyp *xFrom, int keep2, int keep3);
 extern BOOL IsBooting;
+extern uint32 ConkerBFD_Link4KBlocks;
+
 /*
  * These are defines for branches that set GPR[31] to the link value. ?
  * This does not refer to our 4k link :)
@@ -288,6 +290,9 @@ void Compile_Slot_And_InterruptsNewTest(_u32 pc, uint32 targetpc, uint32 DoLink,
 
 	CompilingSlot = FALSE;
 	
+	if(ConkerBFD_Link4KBlocks)
+        Interrupts(JUMP_TYPE_DIRECT, targetpc, DoLink, LinkVal);
+	else
         InterruptsNewTest(JUMP_TYPE_DIRECT, targetpc, DoLink, LinkVal);
 
 	if( PreserveMap) {
@@ -672,9 +677,11 @@ extern void SwitchToOpcodePass(void);
 
 void BranchOutEpilogue(int tempPC, int Likely)
 {
-                if ((!IsBooting) && (currentromoptions.Link_4KB_Blocks == USE4KBLINKBLOCK_YES)
-                    
-)
+	
+                if ((!IsBooting) && 
+					(currentromoptions.Link_4KB_Blocks == USE4KBLINKBLOCK_YES) &&
+                    !(ConkerBFD_Link4KBlocks)
+					)
                 {
                     gHWS_pc=tempPC;
                     compilerstatus.KEEP_RECOMPILING = 1;
@@ -823,17 +830,15 @@ void BNE(OP_PARAMS, int pC, int Likely)
 		if( ConstMap[xRT->mips_reg].IsMapped == 1) {
 			if( ConstMap[xRS->mips_reg].value == ConstMap[xRT->mips_reg].value) {
 				// false
-				
                 BranchOutEpilogue(tempPC, Likely);
 
             } else {
 				// true
 				SPEED_HACK
 				r.r_.pc += 4;
-//				Compile_Slot_And_InterruptsNewTest(r.r_.pc, aValue, LINK_NO, 0, 1);
-    			Compile_Slot_And_InterruptsNewTest(r.r_.pc, aValue, LINK_NO, 0, 
-                ((!IsBooting) && (currentromoptions.Link_4KB_Blocks == USE4KBLINKBLOCK_YES)) ? 1:0);
-
+				Compile_Slot_And_InterruptsNewTest(r.r_.pc, aValue, LINK_NO, 0, 
+                ( (!IsBooting) && (currentromoptions.Link_4KB_Blocks == USE4KBLINKBLOCK_YES))
+				 || (ConkerBFD_Link4KBlocks) );
 
 			}
 
@@ -907,8 +912,7 @@ _Redo:
 	SPEED_HACK
 	r.r_.pc += 4;
 
-
-    Compile_Slot_And_InterruptsNewTest(r.r_.pc, aValue, LINK_NO, 0, 1);
+	Compile_Slot_And_InterruptsNewTest(r.r_.pc, aValue, LINK_NO, 0, 1);
 
 	/* false */
 	wPosition = compilerstatus.lCodePosition - JumpTargets[91];
@@ -998,11 +1002,13 @@ void BEQ(OP_PARAMS, int pC, int Likely)
 		SPEED_HACK 
         r.r_.pc += 4;
         
-        //Needed for Conker. But Why ?
-//        Compile_Slot_And_Interrupts(r.r_.pc, aValue, LINK_NO, 0, 0);
-    	Compile_Slot_And_InterruptsNewTest(r.r_.pc, aValue, LINK_NO, 0, 
-            ((!IsBooting) && (currentromoptions.Link_4KB_Blocks == USE4KBLINKBLOCK_YES))? 1:0);
-
+        // Needed for Conker. But Why ?
+		// ^ Needed for Link_4KB_Blocks & Conker BFD
+		// Conker BFD needs Link_4KB_Blocks when using ROM Paging.
+		// But why? - wsch
+		Compile_Slot_And_InterruptsNewTest(r.r_.pc, aValue, LINK_NO, 0, 
+            ( (!IsBooting) && (currentromoptions.Link_4KB_Blocks == USE4KBLINKBLOCK_YES))
+			|| (ConkerBFD_Link4KBlocks) );
 		return;
 	}
 	else if((ConstMap[xRS->mips_reg].IsMapped == 1) && (ConstMap[xRT->mips_reg].IsMapped == 1))
@@ -1012,10 +1018,9 @@ void BEQ(OP_PARAMS, int pC, int Likely)
 			/* true */
 			SPEED_HACK 
             r.r_.pc += 4;
-//			Compile_Slot_And_InterruptsNewTest(r.r_.pc, aValue, LINK_NO, 0, 1);
-  			Compile_Slot_And_InterruptsNewTest(r.r_.pc, aValue, LINK_NO, 0, 
-                ((!IsBooting) && (currentromoptions.Link_4KB_Blocks == USE4KBLINKBLOCK_YES))? 1:0);
-
+			Compile_Slot_And_InterruptsNewTest(r.r_.pc, aValue, LINK_NO, 0, 
+                ( (!IsBooting) && (currentromoptions.Link_4KB_Blocks == USE4KBLINKBLOCK_YES))
+				 || (ConkerBFD_Link4KBlocks) );
 		}
 		else
 		{
@@ -1097,7 +1102,7 @@ _Redo3: templCodePosition = compilerstatus.lCodePosition;
 	
     
     
-    Compile_Slot_And_InterruptsNewTest(r.r_.pc, aValue, LINK_NO, 0, 1);
+	Compile_Slot_And_InterruptsNewTest(r.r_.pc, aValue, LINK_NO, 0, 1);
 
 
 
@@ -1133,6 +1138,7 @@ _Redo3: templCodePosition = compilerstatus.lCodePosition;
 	}
 
     BranchOutEpilogue(tempPC, Likely);
+
 
 }
 
@@ -1190,15 +1196,15 @@ void BLEZ(OP_PARAMS, int pC, int Likely)
 			/* true */
 			SPEED_HACK 
             r.r_.pc += 4;
-//			Compile_Slot_And_InterruptsNewTest(r.r_.pc, aValue, LINK_NO, 0, 1);
    			Compile_Slot_And_InterruptsNewTest(r.r_.pc, aValue, LINK_NO, 0, 
-                ((!IsBooting) && (currentromoptions.Link_4KB_Blocks == USE4KBLINKBLOCK_YES))? 1:0);
-
+                ( (!IsBooting) && (currentromoptions.Link_4KB_Blocks == USE4KBLINKBLOCK_YES))
+				 || (ConkerBFD_Link4KBlocks) );
 		}
 		else
 		{
 			/* false */
 			BranchOutEpilogue(tempPC, Likely);
+
 		}
 
 		return;
@@ -1284,6 +1290,7 @@ _Redo32:
 	}
 
     BranchOutEpilogue(tempPC, Likely);
+
 }
 
 /*
@@ -1343,14 +1350,14 @@ void BGTZ(OP_PARAMS, int pC, int Likely)
 			/* true */
 			SPEED_HACK 
             r.r_.pc += 4;
-//			Compile_Slot_And_InterruptsNewTest(r.r_.pc, aValue, LINK_NO, 0, 1);
    			Compile_Slot_And_InterruptsNewTest(r.r_.pc, aValue, LINK_NO, 0, 
-                ((!IsBooting) && (currentromoptions.Link_4KB_Blocks == USE4KBLINKBLOCK_YES))? 1:0);
-
+                ( (!IsBooting) && (currentromoptions.Link_4KB_Blocks == USE4KBLINKBLOCK_YES))
+				 || (ConkerBFD_Link4KBlocks) );
 		}
 		else
 		{
             /* false */
+
 			BranchOutEpilogue(tempPC, Likely);
 		}
 
@@ -1428,7 +1435,7 @@ _Redo32:
 		SetNearTarget(91);
 		if(!Use32bit) SetNearTarget(93);
 	}
-
+	
     BranchOutEpilogue(tempPC, Likely);
 }
 
@@ -1485,10 +1492,9 @@ void _BLTZ(OP_PARAMS, int pC, int Likely)
 			/* true */
 			SPEED_HACK
 			r.r_.pc += 4;
-//			Compile_Slot_And_InterruptsNewTest(r.r_.pc, aValue, LINK_NO, 0, 1);
   			Compile_Slot_And_InterruptsNewTest(r.r_.pc, aValue, LINK_NO, 0, 
-                ((!IsBooting) && (currentromoptions.Link_4KB_Blocks == USE4KBLINKBLOCK_YES))? 1:0);
-
+                ( (!IsBooting) && (currentromoptions.Link_4KB_Blocks == USE4KBLINKBLOCK_YES))
+				 || (ConkerBFD_Link4KBlocks) );
 		}
 		else
 		{
@@ -1520,6 +1526,7 @@ _Redo:
 	SPEED_HACK 
     r.r_.pc += 4;
 	Compile_Slot_And_InterruptsNewTest(r.r_.pc, aValue, LINK_NO, 0, 1);
+
 	wPosition = compilerstatus.lCodePosition - JumpTargets[91];
 	if((wPosition > 120) && (IsNear == 0))
 	{
@@ -1538,7 +1545,7 @@ _Redo:
 	else
 		SetTarget(91);
 	
-    
+
     BranchOutEpilogue(tempPC, Likely);
 }
 
@@ -1596,14 +1603,15 @@ void _BGEZ(OP_PARAMS, int pC, int Likely)
             // true
 			SPEED_HACK 
 			r.r_.pc += 4;
-//			Compile_Slot_And_InterruptsNewTest(r.r_.pc, aValue, LINK_NO, 0, 1);
    			Compile_Slot_And_InterruptsNewTest(r.r_.pc, aValue, LINK_NO, 0, 
-                ((!IsBooting) && (currentromoptions.Link_4KB_Blocks == USE4KBLINKBLOCK_YES))? 1:0);
+                ( (!IsBooting) && (currentromoptions.Link_4KB_Blocks == USE4KBLINKBLOCK_YES))
+				 || (ConkerBFD_Link4KBlocks) );
 
 		}
 		else
 		{
 			// false
+
             BranchOutEpilogue(tempPC, Likely);		
         }
 
@@ -1647,6 +1655,7 @@ _Redo32:
 
 	SPEED_HACK 
 	r.r_.pc += 4;
+	
 	Compile_Slot_And_InterruptsNewTest(r.r_.pc, aValue, LINK_NO, 0, 1);
 
 	wPosition = compilerstatus.lCodePosition - JumpTargets[91];
@@ -1677,6 +1686,7 @@ _Redo32:
 		SetNearTarget(91);
 		if(!Use32bit) SetNearTarget(93);
 	}
+
 
     BranchOutEpilogue(tempPC, Likely);
 }
@@ -1931,7 +1941,11 @@ void jal(OP_PARAMS)
 	/* end of compiled block */
 	compilerstatus.KEEP_RECOMPILING = FALSE;
 
-	InterruptsNewTest(JUMP_TYPE_DIRECT, aValue, LINK_YES, LinkVal);
+	//Are you even used in Conker?
+	if(ConkerBFD_Link4KBlocks)
+		Interrupts(JUMP_TYPE_DIRECT, aValue, LINK_YES, LinkVal);
+	else
+		InterruptsNewTest(JUMP_TYPE_DIRECT, aValue, LINK_YES, LinkVal);
     
 }
 
@@ -2040,10 +2054,8 @@ void cop1_bc1f(OP_PARAMS)
     SPEED_HACK
     r.r_.pc += 4;
 	Compile_Slot_And_InterruptsNewTest(r.r_.pc, aValue, LINK_NO, 0, 1);
-
 	SetNearTarget(91);
 	
-    
     BranchOutEpilogue(tempPC, 0);
 }
 
@@ -2076,7 +2088,7 @@ void cop1_bc1fl(OP_PARAMS)
 	SPEED_HACK 
 	r.r_.pc += 4;
 	Compile_Slot_And_InterruptsNewTest(r.r_.pc, aValue, LINK_NO, 0, 1);
-
+	
 	SetNearTarget(91);
 
     BranchOutEpilogue(tempPC, 1);
@@ -2110,6 +2122,7 @@ void cop1_bc1t(OP_PARAMS)
 	/* delay Slot */
 	SPEED_HACK
     r.r_.pc += 4;
+	
 	Compile_Slot_And_InterruptsNewTest(r.r_.pc, aValue, LINK_NO, 0, 1);
 
 	SetNearTarget(91);

@@ -639,12 +639,12 @@ EXPORT void CALL _VIDEO_RICE_531_UpdateScreen (void)
 	bSatesUpdated=false;
 	bSatesUpdated2=true;
 	
-		for (int i=0; i<MAX_SAVE_STATES; i++) 
+		for (int i=1; i<=MAX_SAVE_STATES; i++) 
 		{
 			if (bloadstate[i]) // This will never be true, unless UHLE accepts plugins. 
 			{
 				try{
-					__EMU_LoadState(i+1);
+					__EMU_LoadState(i);
 				}catch(...){};
 
 				sprintf(tempmsg, "Loaded UHLE State %d", i);
@@ -655,7 +655,7 @@ EXPORT void CALL _VIDEO_RICE_531_UpdateScreen (void)
 			else if (bload1964state[i]) 
 			{
 				try{
-					__EMU_Load1964State(i+1);
+					__EMU_Load1964State(i);
 				}catch(...){};
 
 				sprintf(tempmsg, "Loaded 1964 State %d", i);
@@ -666,7 +666,7 @@ EXPORT void CALL _VIDEO_RICE_531_UpdateScreen (void)
 			else if (bloadPJ64state[i]) 
 			{
 				try{
-					__EMU_LoadPJ64State(i+1);
+					__EMU_LoadPJ64State(i);
 				}catch(...){};
 
 				sprintf(tempmsg, "Loaded PJ64 State %d", i);
@@ -677,11 +677,11 @@ EXPORT void CALL _VIDEO_RICE_531_UpdateScreen (void)
 			else if (bsavestate[i]) 
 			{
 				try{
-					__EMU_SaveState(i+1);
+					__EMU_SaveState(i);
 				}catch(...){};
 
 				if(preferedemu == _UltraHLE)
-					sprintf(tempmsg, "Saved UHLE State %d", i+1); // Unused until UHLE becomes zilmar spec 
+					sprintf(tempmsg, "Saved UHLE State %d", i); // Unused until UHLE becomes zilmar spec 
 				else if((preferedemu == _1964x11)||(preferedemu == _1964x085))
 					sprintf(tempmsg, "Saved 1964 State %d", i);
 				else if((preferedemu == _PJ64x16)||(preferedemu == _PJ64x14))

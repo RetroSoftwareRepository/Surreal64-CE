@@ -858,7 +858,8 @@ void CPU_Check_Interrupts(void)
 		//Check for pending Save/Load State task
 		switch(DoState){
 			case LOAD_1964_CREATED_PJ64_STATE:
-				sprintf(buf, "%s%08x\\%08X-%08X-%02X.%i", g_szPathSaves, currentromoptions.crc1, currentromoptions.crc1, currentromoptions.crc2, currentromoptions.countrycode, stateindex);
+				sprintf(buf, "%s%08x\\%08X-%08X-%02X.%i.1964", g_szPathSaves, currentromoptions.crc1, currentromoptions.crc1, currentromoptions.crc2, currentromoptions.countrycode, stateindex);
+				Sleep(1000);
 				FileIO_ImportPJ64State(buf);
 				Init_Count_Down_Counters();
 				RefreshDynaDuringGamePlay();
@@ -866,7 +867,8 @@ void CPU_Check_Interrupts(void)
 				break;
 
 			case LOAD_PJ64_CREATED_PJ64_STATE:
-				sprintf(buf, "%s%08x\\%08X-%08X-%02X.%i", g_szPathSaves, currentromoptions.crc1, currentromoptions.crc1, currentromoptions.crc2, currentromoptions.countrycode, stateindex);
+				sprintf(buf, "%s%08x\\%08X-%08X-%02X.%i.pj64", g_szPathSaves, currentromoptions.crc1, currentromoptions.crc1, currentromoptions.crc2, currentromoptions.countrycode, stateindex);
+				Sleep(1000);
 				FileIO_ImportPJ64State(buf);
 				Init_Count_Down_Counters();
 				RefreshDynaDuringGamePlay();
@@ -874,8 +876,10 @@ void CPU_Check_Interrupts(void)
 				break;
 
 			case SAVE_1964_CREATED_PJ64_STATE:
-				sprintf(buf, "%s%08x\\%08X-%08X-%02X.%i", g_szPathSaves, currentromoptions.crc1, currentromoptions.crc1, currentromoptions.crc2, currentromoptions.countrycode, stateindex);
+				sprintf(buf, "%s%08x\\%08X-%08X-%02X.%i.1964", g_szPathSaves, currentromoptions.crc1, currentromoptions.crc1, currentromoptions.crc2, currentromoptions.countrycode, stateindex);
+				Sleep(1000);
 				FileIO_ExportPJ64State(buf);
+				Sleep(1000);
 				FileIO_ImportPJ64State(buf); // Necessary...
 				Init_Count_Down_Counters();
 				RefreshDynaDuringGamePlay();
