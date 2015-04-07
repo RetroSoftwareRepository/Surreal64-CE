@@ -420,7 +420,7 @@ void CTextureManager::RemoveTexture(TxtrCacheEntry * pEntry)
 	while (pCurr)
 	{
 		// Check that the attributes match
-		if ( pCurr == pEntry )
+		if ( pCurr->ti == pEntry->ti )
 		{
 			if (pPrev != NULL) 
 				pPrev->pNext = pCurr->pNext;
@@ -687,12 +687,13 @@ TxtrCacheEntry * CTextureManager::GetTexture(TxtrInfo * pgti, bool fromTMEM, boo
 		dwPalCRC = CalculateRDRAMCRC(pStart, 0, 0, maxCI+1, 1, TXT_SIZE_16b, dwPalSize*2);
 		dwAsmCRC = dwAsmCRCSave;
 	}
-
+	
+	//This creates a black texture on the floor in Planet Zebes in SSB
 	// Fix for textures where ti is identical. In this case just the first texture has been added to the Cache.
 	// for further instances this texture has just been replaced instead of adding the additional texture to the same index
 	// in the cachelist. This was causing the slowdowns. Thus we have to iterate through the bucket of the cache list and see
 	// which of the textures that have been placed to it is the one we are looking for
-	if(pEntry && pEntry->dwCRC == dwAsmCRC && pEntry->dwPalCRC != dwPalCRC &&
+	/*if(pEntry && pEntry->dwCRC == dwAsmCRC && pEntry->dwPalCRC != dwPalCRC &&
 			(!loadFromTextureBuffer || gRenderTextureInfos[txtBufIdxToLoadFrom].updateAtFrame < pEntry->FrameLastUsed ))
 	{
 		bool bChecksumDoMatch=false;
@@ -714,7 +715,7 @@ TxtrCacheEntry * CTextureManager::GetTexture(TxtrInfo * pgti, bool fromTMEM, boo
 			// try to load it
 			pEntry = NULL;
 		}
-	} 
+	}*/ 
 
 	if (pEntry && doCRCCheck )
 	{

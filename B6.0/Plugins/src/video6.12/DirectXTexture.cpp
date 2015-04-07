@@ -180,7 +180,7 @@ LPRICETEXTURE CDirectXTexture::CreateTexture(uint32 dwWidth, uint32 dwHeight, Te
 		{
 		case AS_BACK_BUFFER_SAVE:
 #ifdef _XBOX
-			pf = D3DFMT_A4R4G4B4;
+			pf = D3DFMT_LIN_X1R5G5B5;
 #else
 			pf = D3DFMT_X4R4G4B4;
 #endif

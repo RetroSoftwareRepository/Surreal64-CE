@@ -17,7 +17,7 @@ const DWORD PACKET_SIZE		= 2048 * 2 * 2;
 const float PACKET_TIME		= 2048.0f / 44100.0f;
 
 const DWORD PACKET_COUNT	= 43;	// Base number of packets
-const DWORD EXTRA_PACKETS	= 10;	// Extra packets to get through the transition
+const DWORD EXTRA_PACKETS	= 0;	// Extra packets to get through the transition
 const float FADE_TIME		= PACKET_COUNT * PACKET_TIME;
 
 enum MM_STATE
