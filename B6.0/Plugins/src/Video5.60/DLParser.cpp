@@ -843,7 +843,7 @@ extern "C" BOOL ReInitVirtualDynaMemory(boolean charge);
 extern int TextureMode;
 extern int FrameSkip;
 
-void DLParser_Process(OSTask * pTask)
+void DLParser_Process()
 {
 	static int skipframe=0;
 
@@ -866,12 +866,21 @@ void DLParser_Process(OSTask * pTask)
 	}
 
 	StartProfiler(PROFILE_ALL);
-	g_pOSTask = pTask;
+	//g_pOSTask = pTask;
+	//status.bScreenIsDrawn = true;
 	
 	DebuggerPauseCountN( NEXT_DLIST );
 	status.bRDPHalted = FALSE;
 	status.gRDPTime = timeGetTime();
 	status.gDlistCount++;
+
+	OSTask * pTask = (OSTask *)(g_GraphicsInfo.DMEM + 0x0FC0);
+	DWORD code_base = (DWORD)pTask->t.ucode & 0x1fffffff;
+	DWORD code_size = pTask->t.ucode_size;
+	DWORD data_base = (DWORD)pTask->t.ucode_data & 0x1fffffff;
+	DWORD data_size = pTask->t.ucode_data_size;
+	DWORD stack_size = pTask->t.dram_stack_size >> 6;
+
 
 	uint32 dwPC;
 	uint32 word0;
@@ -922,7 +931,7 @@ void DLParser_Process(OSTask * pTask)
 
 			SetVIScales();
 			CRender::g_pRender->RenderReset();
-
+			CRender::g_pRender->ResetMatrices(stack_size);
 			//for( int i=0; i<8; i++ )
 			//{
 			//	memset(&gRDP.tiles[i], 0, sizeof(Tile));
@@ -1608,14 +1617,16 @@ void DLParser_FillRect(uint32 word0, uint32 word1)
 			status.bottomRendered = status.bottomRendered<0 ? y1 : max((int)y1,status.bottomRendered);
 			CGraphicsContext::g_pGraphicsContext->CheckTxtrBufsWithNewCI(g_CI,gRDP.scissor.bottom,false);
 		}
-
+#ifndef _DOES_THIS_DO_DISCO
 		if( gRDP.otherMode.cycle_type == CYCLE_TYPE_FILL )
+#endif
 		{
 			if( !status.bHandleN64TextureBuffer || g_pTextureBufferInfo->CI_Info.dwSize == TXT_SIZE_16b )
 			{
 				CRender::g_pRender->FillRect(x0, y0, x1, y1, gRDP.fillColor);
 			}
 		}
+#ifndef _DOES_THIS_DO_DISCO
 		else
 		{
 			D3DCOLOR primColor = GetPrimitiveColor();
@@ -1624,6 +1635,7 @@ void DLParser_FillRect(uint32 word0, uint32 word1)
 				CRender::g_pRender->FillRect(x0, y0, x1, y1, primColor);
 			}
 		}
+#endif
 		DEBUGGER_PAUSE_AND_DUMP_COUNT_N( NEXT_FLUSH_TRI,{TRACE0("Pause after FillRect\n");});
 		DEBUGGER_PAUSE_AND_DUMP_COUNT_N( NEXT_FILLRECT, {DebuggerAppendMsg("FillRect: X0=%d, Y0=%d, X1=%d, Y1=%d, Color=0x%08X", x0, y0, x1, y1, gRDP.originalFillColor);
 		DebuggerAppendMsg("Pause after FillRect: Color=%08X\n", gRDP.originalFillColor);});

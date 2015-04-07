@@ -243,6 +243,6 @@ extern CTextureManager gTextureManager;		// The global instance of CTextureManag
 // Ez0n3 - reinstate max video mem until freakdave finishes this
 extern bool g_bUseSetTextureMem;
 extern DWORD g_maxTextureMemUsage;
-
+extern BOOL bPurgeOldBeforeIGM;
 
 #endif

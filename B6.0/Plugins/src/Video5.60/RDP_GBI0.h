@@ -940,12 +940,23 @@ void RSP_RDP_InsertMatrix(uint32 word0, uint32 word1)
 		int x = (word0 & 0x1F) >> 1;
 		int y = x >> 2;
 		x &= 3;
+		
+		float integer = (float)(short)((word1)>>16);
+        fraction      = (float)fabs(gRSPworldProject.m[y][x] - (int)gRSPworldProject.m[y][x]);
 
-		fraction = (float)fabs(gRSPworldProject.m[y][x] - (int)gRSPworldProject.m[y][x]);
-		gRSPworldProject.m[y][x] = (short)(word1>>16) + fraction;
+        if(integer >= 0.0f)
+            gRSPworldProject.m[y][x] = integer + fraction;
+        else
+            gRSPworldProject.m[y][x] = integer - fraction;
 
-		fraction = (float)fabs(gRSPworldProject.m[y][x+1] - (int)gRSPworldProject.m[y][x+1]);
-		gRSPworldProject.m[y][x+1] = (short)(word1&0xFFFF) + fraction;
+
+        integer  = (float)(short)((word1)&0xFFFF);
+        fraction = (float)fabs(gRSPworldProject.m[y][x+1] - (int)gRSPworldProject.m[y][x+1]);
+
+        if(integer >= 0.0f)
+            gRSPworldProject.m[y][x+1] = integer + fraction;
+        else
+            gRSPworldProject.m[y][x+1] = integer - fraction;
 	}
 
 	gRSP.bMatrixIsUpdated = false;
