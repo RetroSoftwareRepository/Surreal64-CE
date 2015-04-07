@@ -620,7 +620,7 @@ extern LPCSTR			ucodeNames_GBI1[256];
 void DLParser_Init();
 void RDP_GFX_Reset();
 void RDP_Cleanup();
-void DLParser_Process(OSTask * pTask);
+void DLParser_Process();
 void RDP_DLParser_Process(void);
 
 void PrepareTextures();

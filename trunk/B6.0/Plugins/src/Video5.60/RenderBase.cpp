@@ -751,12 +751,14 @@ void ComputeLOD(bool openGL)
 	dt = sqrt((s0-s1)*(s0-s1)+(t0-t1)*(t0-t1));
 
 	float lod = dt/d;
-	float frac = log10(lod)/log10(2.0f);
+	int ilod = (int)lod;
+	double intptr;
+	float frac = log10f(lod)/log10f(2.0f);
 	//DEBUGGER_IF_DUMP(pauseAtNext,{DebuggerAppendMsg("LOD frac = %f", frac);});
-	frac = (lod / pow(2.0f,floor(frac)));
-	frac = frac - floor(frac);
+	float lod_tile = min((log10f(lod)/log10f(2.0f)), gRSP.curTile + floorf(frac));
+ 	frac = max(modf(lod / pow(2.0f,lod_tile),(float *)&intptr), gRDP.primLODMin / 255.0f);
 	//DEBUGGER_IF_DUMP(pauseAtNext,{DebuggerAppendMsg("LOD = %f, frac = %f", lod, frac);});
-	gRDP.LODFrac = (DWORD)(frac*255);
+	gRDP.LODFrac = (uint32)(frac*255);
 	CRender::g_pRender->SetCombinerAndBlender();
 }
 

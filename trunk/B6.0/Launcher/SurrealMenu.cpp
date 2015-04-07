@@ -1723,7 +1723,10 @@ void VideoSettingsMenu(void)
 	XLMenu_AddItem2(m_pSettingsMenu,MITEM_ROUTINE,currentname,incAAMode,decAAMode);
 
 	// Software Vertex Clipper
-	if((VertexMode<1)||(VertexMode >= 2)||(videoplugin !=_VideoPluginRice612)||(bUseLinFog)){
+	if((videoplugin !=_VideoPluginRice612)){
+		VertexMode = 2;
+		swprintf(currentname,L"Force Vertex Clipper : Rice 6.12 Only");
+	}else if((VertexMode<1)||(VertexMode >= 2)||(bUseLinFog)){
 		VertexMode = 2;
 		swprintf(currentname,L"Force Vertex Clipper : No");
 	}else
@@ -1732,9 +1735,11 @@ void VideoSettingsMenu(void)
 
 	//Fog Mode
 	if (bUseLinFog && (videoplugin ==_VideoPluginRice612))
-	swprintf(currentname,L"Fog Mode : Linear");
-	else 
-	swprintf(currentname,L"Fog Mode : Range");
+		swprintf(currentname,L"Fog Mode : Linear");
+	else if(videoplugin ==_VideoPluginRice612)
+		swprintf(currentname,L"Fog Mode : Range");
+	else
+		swprintf(currentname,L"Fog Mode : Rice 6.12 Only");
 	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,currentname,ToggleFogMode);
 
 	XLMenu_Activate(m_pSettingsMenu);
@@ -2236,8 +2241,10 @@ void ToggleFogMode()
 		swprintf(currentname,L"Force Vertex Clipper : Yes");
 		XLMenu_SetItemText(&m_pSettingsMenu->items[currentItem-1], currentname);
 		swprintf(currentname,L"Fog Mode : Linear");
-	}else 
+	}else if(videoplugin == _VideoPluginRice612)
 		swprintf(currentname,L"Fog Mode : Range");
+	else
+		swprintf(currentname,L"Fog Mode : Rice 6.12 Only");
 	XLMenu_SetItemText(&m_pSettingsMenu->items[currentItem], currentname);
 
 	ConfigAppSave2();
@@ -2377,10 +2384,23 @@ void ToggleVertexMode(bool inc)
 		VertexMode = 2;
 	
 	XLMenu_CurRoutine = NULL;
-	if((VertexMode<1)||(VertexMode >= 2)){
-		swprintf(currentname,L"Force Vertex Clipper : No");
-	}else
+	if((videoplugin !=_VideoPluginRice612)){
+		// Not using Rice 6.12, Unsupported
+		VertexMode = 2;
+		swprintf(currentname,L"Force Vertex Clipper : Rice 6.12 Only");
+	}else if(bUseLinFog && (videoplugin == _VideoPluginRice612)){
+		// Using LinearFog, need to force software vertex clipper
+		VertexMode = 1;
 		swprintf(currentname,L"Force Vertex Clipper : Yes");
+	}else if((VertexMode<1)||(VertexMode >= 2)){
+		// Disable settings for Pure Device, Software Vertes, and Mixed Vertex
+		// We don't don't need these. So: Software Vertex == Force Software Vertex Clipper
+		VertexMode = 2;
+		swprintf(currentname,L"Force Vertex Clipper : No");
+	}else{
+		// Force Software Vertex Clipper
+		swprintf(currentname,L"Force Vertex Clipper : Yes");
+	}
 	XLMenu_SetItemText(&m_pSettingsMenu->items[currentItem], currentname);
 
 	ConfigAppSave2();

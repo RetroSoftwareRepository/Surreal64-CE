@@ -106,7 +106,7 @@ public:
 	Matrix & GetWorldProjectMatrix(void);
 	void SetWorldProjectMatrix(Matrix &mtx);
 	
-	void ResetMatrices();
+	void ResetMatrices(DWORD size);
 
 	inline RenderShadeMode GetShadeMode() { return gRSP.shadeMode; }
 

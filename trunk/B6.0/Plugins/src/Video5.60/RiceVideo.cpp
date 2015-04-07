@@ -927,7 +927,7 @@ void ProcessDListStep2(void)
 
 	try
 	{
-		DLParser_Process((OSTask *)(g_GraphicsInfo.DMEM + 0x0FC0));
+		DLParser_Process(/*(OSTask *)(g_GraphicsInfo.DMEM + 0x0FC0)*/);
 	}
 	catch (...)
 	{
@@ -953,7 +953,7 @@ EXPORT DWORD CALL _VIDEO_RICE_560_ProcessDListCountCycles(void)
 	status.DPCycleCount = 0;
 	try
 	{
-		DLParser_Process((OSTask *)(g_GraphicsInfo.DMEM + 0x0FC0));
+		DLParser_Process(/*(OSTask *)(g_GraphicsInfo.DMEM + 0x0FC0)*/);
 	}
 	catch (...)
 	{

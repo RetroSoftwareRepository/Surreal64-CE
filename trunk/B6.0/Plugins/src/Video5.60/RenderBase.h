@@ -25,7 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *  to make them be accessed faster
  */
 
-#define RICE_MATRIX_STACK		60
+#define RICE_MATRIX_STACK			20
 #define MAX_TEXTURES				8
 
 enum
@@ -146,6 +146,7 @@ typedef struct
 
 	Matrix	projectionMtxs[RICE_MATRIX_STACK];
 	Matrix	modelviewMtxs[RICE_MATRIX_STACK];
+	DWORD		mMatStackSize;
 
 	bool	bMatrixIsUpdated;
 	bool	bCombinedMatrixIsUpdated;
