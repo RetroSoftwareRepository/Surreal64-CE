@@ -330,13 +330,13 @@ bool CRender::FillRect(LONG nX0, LONG nY0, LONG nX1, LONG nY1, uint32 dwColor)
 
 	/*
 	//CHECKME if statement was previously disabled
-	*/
+	// This makes Duke Nukem intro look funny.
 	if( gRDP.otherMode.cycle_type == CYCLE_TYPE_FILL && nX0 == 0 && nY0 == 0 && ((nX1==windowSetting.uViWidth && nY1==windowSetting.uViHeight)||(nX1==windowSetting.uViWidth-1 && nY1==windowSetting.uViHeight-1)) )
 	{
 		CGraphicsContext::g_pGraphicsContext->Clear(CLEAR_COLOR_BUFFER,dwColor);
 	}
 	else
-
+	*/
 	{
 		//BOOL m_savedZBufferFlag = gRSP.bZBufferEnabled;	// Save ZBuffer state
 		ZBufferEnable( FALSE );
