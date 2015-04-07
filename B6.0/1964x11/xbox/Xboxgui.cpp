@@ -176,6 +176,11 @@ extern int loaddwMaxVideoMem();
 extern int loadiPagingMethod();
 extern int loadbAudioBoost();
 
+extern int loadiCF5toCF3StepUp();
+extern int loadiCF3toCF1StepUp();
+extern int loadiCF3toCF5StepDown();
+extern int loadiCF1toCF3StepDown();
+
 extern void GetPathSaves(char *pszPathSaves);
 
 #if defined __cplusplus
@@ -238,6 +243,11 @@ void __cdecl main()
 	}
 #endif
 	Enable128MegCaching();
+
+	iCF5toCF3StepUp = loadiCF5toCF3StepUp();
+	iCF3toCF1StepUp = loadiCF3toCF1StepUp();
+	iCF3toCF5StepDown = loadiCF3toCF5StepDown();
+	iCF1toCF3StepDown = loadiCF1toCF3StepDown();
 
 	g_dwRecompCodeSize = loaddw1964DynaMem() * 1024 * 1024;
 

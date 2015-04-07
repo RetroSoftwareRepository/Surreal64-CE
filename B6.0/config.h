@@ -37,7 +37,7 @@ extern int dwPJ64PagingMem;
 extern int iAudioPlugin; //use iAudioPlugin instead to determine if basic audio is used
 extern int iRspPlugin;
 extern bool bUseRspAudio; // control a listing
-
+extern bool bDisableEEPROMSaves;
 extern int iPagingMethod;
 
 // ultrahle mem settings
@@ -55,6 +55,10 @@ extern int dwMaxVideoMem;
 extern bool HideLaunchScreens;
 extern int FrameSkip;
 extern int AutoCF_1964;
+extern int CF5toCF3StepUp;
+extern int CF3toCF1StepUp;
+extern int CF1toCF3StepDown;
+extern int CF3toCF5StepDown;
 extern int VSync;
 extern int AntiAliasMode;
 //extern int RefreshRateInHz;

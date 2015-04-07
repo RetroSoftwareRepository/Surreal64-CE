@@ -134,6 +134,10 @@ void ToggleTextureFilter(bool inc);
 void ToggleSoftDisplayFilter();
 void ToggleFrameSkip(bool inc);
 void ToggleAutoCF(bool inc);
+void ToggleCF5toCF3StepUp(bool inc);
+void ToggleCF3toCF1StepUp(bool inc);
+void ToggleCF1toCF3StepDown(bool inc);
+void ToggleCF3toCF5StepDown(bool inc);
 void ToggleFogMode();
 void ToggleXboxPitch();
 void ToggleSensitivity(bool inc);
@@ -199,6 +203,14 @@ void incFrameSkip(){ ToggleFrameSkip(true); }
 void decFrameSkip(){ ToggleFrameSkip(false); }
 void incAutoCF(){ ToggleAutoCF(true); }
 void decAutoCF(){ ToggleAutoCF(false); }
+void incCF3toCF1StepUp(){ ToggleCF3toCF1StepUp(true); }
+void decCF3toCF1StepUp(){ ToggleCF3toCF1StepUp(false); }
+void incCF5toCF3StepUp(){ ToggleCF5toCF3StepUp(true); }
+void decCF5toCF3StepUp(){ ToggleCF5toCF3StepUp(false); }
+void incCF1toCF3StepDown(){ ToggleCF1toCF3StepDown(true); }
+void decCF1toCF3StepDown(){ ToggleCF1toCF3StepDown(false); }
+void incCF3toCF5StepDown(){ ToggleCF3toCF5StepDown(true); }
+void decCF3toCF5StepDown(){ ToggleCF3toCF5StepDown(false); }
 void incSensitivity(){ ToggleSensitivity(true); }
 void decSensitivity(){ ToggleSensitivity(false); }
 void incDeadzone(){ ToggleDeadzone(true); }
@@ -1420,6 +1432,8 @@ void SaveState5()
 
 void VideoSettingsMenu(void)
 {
+	ConfigAppLoad2();
+
 	DWORD dwMenuCommand = 0;
 
 	XLMenu_CurRoutine = NULL;
@@ -1428,9 +1442,9 @@ void VideoSettingsMenu(void)
 
     WCHAR currentname[120];
 	if(preferedemu != _1964x11)
-		m_pSettingsMenu = XLMenu_Init((float)iIGMMenuTxtPosX,(float)iIGMMenuTxtPosY,6, GetMenuFontAlign(iIGMMenuTxtAlign)|MENU_WRAP, NULL);
+		m_pSettingsMenu = XLMenu_Init((float)iIGMMenuTxtPosX,(float)iIGMMenuTxtPosY,5, GetMenuFontAlign(iIGMMenuTxtAlign)|MENU_WRAP, NULL);
 	else
-		m_pSettingsMenu = XLMenu_Init((float)iIGMMenuTxtPosX,(float)iIGMMenuTxtPosY,7, GetMenuFontAlign(iIGMMenuTxtAlign)|MENU_WRAP, NULL);
+		m_pSettingsMenu = XLMenu_Init((float)iIGMMenuTxtPosX,(float)iIGMMenuTxtPosY,11, GetMenuFontAlign(iIGMMenuTxtAlign)|MENU_WRAP, NULL);
 
 	m_pSettingsMenu->itemcolor = dwMenuItemColor;
 	m_pSettingsMenu->parent = m_pMainMenu;
@@ -1463,6 +1477,8 @@ void VideoSettingsMenu(void)
 	XLMenu_AddItem2(m_pSettingsMenu,MITEM_ROUTINE,currentname,incTextureFilter,decTextureFilter);
 
 	//FrameSkip
+	if((FrameSkip == 2) && (preferedemu != _1964x11))
+		FrameSkip = 0;
 	switch (FrameSkip){
 		case 0 : 	swprintf(currentname,L"Frame Skip : Off");
 			break;
@@ -1473,6 +1489,8 @@ void VideoSettingsMenu(void)
 	XLMenu_AddItem2(m_pSettingsMenu,MITEM_ROUTINE,currentname,incFrameSkip,decFrameSkip);
 	
 	if(preferedemu == _1964x11){
+		
+		//AutoCF 
 		switch (AutoCF_1964){
 			case 0 : 	swprintf(currentname,L"Counter Factor : Use Ini");
 				break;
@@ -1481,6 +1499,23 @@ void VideoSettingsMenu(void)
 			case 2 : 	swprintf(currentname,L"Counter Factor : Auto with CF1");
 				break;	}
 		XLMenu_AddItem2(m_pSettingsMenu,MITEM_ROUTINE,currentname,incAutoCF,decAutoCF);
+		
+		//AutoCF separator
+		XLMenu_AddItem(m_pSettingsMenu,MITEM_DISABLED,L"Auto Counter Factor Settings",NULL);
+
+		//AutoCF Tweaks
+		swprintf(currentname,L"CF5-CF3 Step Up : %2.0d%%", CF5toCF3StepUp);
+		XLMenu_AddItem2(m_pSettingsMenu,MITEM_ROUTINE,currentname,incCF5toCF3StepUp,decCF5toCF3StepUp);
+		
+		swprintf(currentname,L"CF3-CF1 Step Up : %2.0d%%", CF3toCF1StepUp);
+		XLMenu_AddItem2(m_pSettingsMenu,MITEM_ROUTINE,currentname,incCF3toCF1StepUp,decCF3toCF1StepUp);
+
+		swprintf(currentname,L"CF1-CF3 Step Down : %2.0d%%", CF1toCF3StepDown);
+		XLMenu_AddItem2(m_pSettingsMenu,MITEM_ROUTINE,currentname,incCF1toCF3StepDown,decCF1toCF3StepDown);
+
+		swprintf(currentname,L"CF3-CF5 Step Down : %2.0d%%", CF3toCF5StepDown);
+		XLMenu_AddItem2(m_pSettingsMenu,MITEM_ROUTINE,currentname,incCF3toCF5StepDown,decCF3toCF5StepDown);
+
 	}
 	
 
@@ -1489,7 +1524,8 @@ void VideoSettingsMenu(void)
 	swprintf(currentname,L"Fog Mode : Range");
 	else 
 	swprintf(currentname,L"Fog Mode : Linear");
-	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,currentname,ToggleFogMode);
+	//Disable Menu item. Requires Restart, should be modified by Launcher
+	//XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,currentname,ToggleFogMode);
 
 	//Texture Depth
 	if (XboxPitch == 2){
@@ -1602,6 +1638,122 @@ void ToggleAutoCF(bool inc)
 
 	ConfigAppSave2();
 }
+
+void ToggleCF5toCF3StepUp(bool inc)
+{
+	WCHAR currentname[120];
+	currentItem = m_pSettingsMenu->curitem;
+	
+	if((preferedemu == _1964x11)&&(AutoCF_1964 > 0))
+	{
+		if (inc)
+		{
+		CF5toCF3StepUp += 1;
+		if(CF5toCF3StepUp > 100) CF5toCF3StepUp = 75;
+		}
+		else
+		{
+		CF5toCF3StepUp -= 1;
+		if(CF5toCF3StepUp < 75) CF5toCF3StepUp = 100;
+		}
+	}
+
+	XLMenu_CurRoutine = NULL;
+
+	swprintf(currentname,L"CF5-CF3 Step Up : %2.0d%%",CF5toCF3StepUp);
+	XLMenu_SetItemText(&m_pSettingsMenu->items[currentItem], currentname);
+
+	ConfigAppSave2();
+}
+
+void ToggleCF3toCF1StepUp(bool inc)
+{
+	WCHAR currentname[120];
+	currentItem = m_pSettingsMenu->curitem;
+	
+	if((preferedemu == _1964x11)&&(AutoCF_1964 > 0))
+	{
+		if (inc)
+		{
+		CF3toCF1StepUp += 1;
+		if(CF3toCF1StepUp > 100) CF3toCF1StepUp = 75;
+		}
+		else
+		{
+		CF3toCF1StepUp -= 1;
+		if(CF3toCF1StepUp < 75) CF3toCF1StepUp = 100;
+		}
+	}
+
+	XLMenu_CurRoutine = NULL;
+
+	swprintf(currentname,L"CF3-CF1 Step Up : %2.0d%%",CF3toCF1StepUp);
+	XLMenu_SetItemText(&m_pSettingsMenu->items[currentItem], currentname);
+
+	ConfigAppSave2();
+}
+
+
+
+void ToggleCF1toCF3StepDown(bool inc)
+{
+	WCHAR currentname[120];
+	currentItem = m_pSettingsMenu->curitem;
+	
+	if((preferedemu == _1964x11)&&(AutoCF_1964 > 0))
+	{
+		if (inc)
+		{
+		CF1toCF3StepDown += 1;
+		if(CF1toCF3StepDown > 100) CF1toCF3StepDown = 75;
+		}
+		else
+		{
+		CF1toCF3StepDown -= 1;
+		if(CF1toCF3StepDown < 75) CF1toCF3StepDown = 100;
+		}
+	}
+
+	XLMenu_CurRoutine = NULL;
+
+	swprintf(currentname,L"CF1-CF3 Step Down : %2.0d%%",CF1toCF3StepDown);
+	XLMenu_SetItemText(&m_pSettingsMenu->items[currentItem], currentname);
+
+	ConfigAppSave2();
+}
+
+
+
+void ToggleCF3toCF5StepDown(bool inc)
+{
+	WCHAR currentname[120];
+	currentItem = m_pSettingsMenu->curitem;
+	
+	if((preferedemu == _1964x11)&&(AutoCF_1964 > 0))
+	{
+		if (inc)
+		{
+		CF3toCF5StepDown += 1;
+		if(CF3toCF5StepDown > 100) CF3toCF5StepDown = 75;
+		}
+		else
+		{
+		CF3toCF5StepDown -= 1;
+		if(CF3toCF5StepDown < 75) CF3toCF5StepDown = 100;
+		}
+	}
+
+	XLMenu_CurRoutine = NULL;
+
+	swprintf(currentname,L"CF3-CF5 Step Down : %2.0d%%",CF3toCF5StepDown);
+	XLMenu_SetItemText(&m_pSettingsMenu->items[currentItem], currentname);
+
+	ConfigAppSave2();
+}
+
+
+
+
 
 
 void ToggleFrameSkip(bool inc)

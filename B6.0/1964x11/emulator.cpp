@@ -25,6 +25,7 @@
 //#include "rompaging.h"
 extern int DoState;
 extern int stateindex;
+extern int loadbDisableEEPROMSaves(void);
 #else //win32
 
 #include "romlist.h"
@@ -429,6 +430,8 @@ void InitEmu(void)
 	if((strncmp(currentromoptions.Game_Name, "CONKER BFD", 14) == 0) &&
 		(currentromoptions.Link_4KB_Blocks == USE4KBLINKBLOCK_YES))
 		ConkerBFD_Link4KBlocks = 1;
+	if(loadbDisableEEPROMSaves())
+		currentromoptions.Save_Type = SRAM_SAVETYPE;
 
 	CPUdelay = 0;
 	CPUdelayPC = 0;

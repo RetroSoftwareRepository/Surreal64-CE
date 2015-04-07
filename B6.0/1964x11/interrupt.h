@@ -229,4 +229,8 @@ typedef struct {
 	DWORD	yield_data_size;
 } OSTask_t;
 
+extern int iCF5toCF3StepUp;
+extern int iCF3toCF1StepUp;
+extern int iCF3toCF5StepDown;
+extern int iCF1toCF3StepDown;
 #endif

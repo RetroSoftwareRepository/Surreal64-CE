@@ -362,9 +362,10 @@ BOOL ControllerCommand(_u8 *cmd, int device)
 #ifdef _XBOX
 		{
 			if((dwAddress >= 0x8000) && (dwAddress < 0x9000))
-				Data[32]= 0x80;
+				memset(Data,0x80,32);
+				//FillMemory(Data, 32, 0x80);
 			else
-				Data[32]= 0x00;
+				memset(Data,0x00,32);
 				//FillMemory(Data, 32, 0x00);
 			BuildCRC(Data, &Data[32]);
 			break;
