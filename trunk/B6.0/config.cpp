@@ -41,6 +41,11 @@ extern "C" int loadiPagingMethod();
 extern "C" int loadbAudioBoost();
 extern "C" void GetPathSaves(char *pszPathSaves);
 
+extern "C" int loadiCF5toCF3StepUp();
+extern "C" int loadiCF3toCF1StepUp();
+extern "C" int loadiCF3toCF5StepDown();
+extern "C" int loadiCF1toCF3StepDown();
+
 void LoadSkinFile();
 void WriteSkinFile();
 
@@ -64,6 +69,7 @@ enum D3D_PresentationIntervals
 	//INTERVAL_THREE_OR_IMMEDIATE, //see SDK docs*/
 };
 
+bool bDisableEEPROMSaves = false; // hack for 1964 saves
 
 int dw1964DynaMem=4;//8
 int dw1964PagingMem=4;
@@ -109,6 +115,10 @@ int AntiAliasMode = 0;
 int VertexMode = 2; // default hardware
 int FrameSkip = 0;
 int AutoCF_1964 = 0;
+int CF5toCF3StepUp = 95;
+int CF3toCF1StepUp = 95;
+int CF1toCF3StepDown = 92;
+int CF3toCF5StepDown = 85;
 int VSync = INTERVAL_IMMEDIATE; //see D3D_PresentParameters (PresentationIntervals)
 bool bUseLinFog = FALSE;
 //int RefreshRateInHz = 60;
@@ -352,6 +362,7 @@ void ResetDefaults()
 	dwPJ64PagingMem=4;
 	dwMaxVideoMem=4; //reinstate max free mem //5
 	bUseRspAudio=false; // control a listing
+	bDisableEEPROMSaves = false;
 
 	// ultrahle mem settings
 	dwUltraCodeMem=5;
@@ -369,6 +380,11 @@ void ResetDefaults()
 	AntiAliasMode = 0;
 	SoftDisplayFilter = 0;
 	FrameSkip = 0;
+	AutoCF_1964 = 0;
+	CF5toCF3StepUp = 95;
+	CF3toCF1StepUp = 95;
+	CF1toCF3StepDown = 92;
+	CF3toCF5StepDown = 85;
 	bEnableHDTV = false;
 	bFullScreen = false;
 	bUseLinFog = false;
@@ -517,7 +533,8 @@ int ConfigAppSave2()
 	ini.SetLongValue("Settings", "dwPJ64PagingMem", dwPJ64PagingMem);
 	ini.SetLongValue("Settings", "dwMaxVideoMem", dwMaxVideoMem); // reinstate max video mem
 	ini.SetBoolValue("Settings", "bUseRspAudio", bUseRspAudio); // control a listing
-	
+	ini.SetBoolValue("Settings", "bDisableEEPROMSaves", bDisableEEPROMSaves);
+
 	// ultrahle mem settings
 	ini.SetLongValue("Settings", "dwUltraCodeMem", dwUltraCodeMem);
 	ini.SetLongValue("Settings", "dwUltraGroupMem", dwUltraGroupMem);
@@ -538,6 +555,10 @@ int ConfigAppSave2()
 	ini.SetBoolValue("Settings", "SoftDisplayFilter", SoftDisplayFilter);
 	ini.SetLongValue("Settings", "FrameSkip", FrameSkip);
 	ini.SetLongValue("Settings", "AutoCF_1964", AutoCF_1964);
+	ini.SetLongValue("Settings", "CF5toCF3StepUp", CF5toCF3StepUp);
+	ini.SetLongValue("Settings", "CF3toCF1StepUp", CF3toCF1StepUp);
+	ini.SetLongValue("Settings", "CF1toCF3StepDown", CF1toCF3StepDown);
+	ini.SetLongValue("Settings", "CF3toCF5StepDown", CF3toCF5StepDown);
 	ini.SetBoolValue("Settings", "LinearFog", bUseLinFog);
 	ini.SetLongValue("Settings", "XboxPitch", XboxPitch);
 	ini.SetBoolValue("Settings", "EnableController1", EnableController1);
@@ -639,7 +660,7 @@ int ConfigAppLoad2()
 	dwMaxVideoMem = ini.GetLongValue("Settings", "dwMaxVideoMem", dwMaxVideoMem ); // reinstate max video mem
 	
 	bUseRspAudio = ini.GetBoolValue("Settings", "bUseRspAudio", bUseRspAudio ); // control a listing
-	
+	bDisableEEPROMSaves = ini.GetBoolValue("Settings", "bDisableEEPROMSaves", bDisableEEPROMSaves);
 	// ultrahle mem settings
 	dwUltraCodeMem = ini.GetLongValue("Settings", "dwUltraCodeMem", dwUltraCodeMem );
 	dwUltraGroupMem = ini.GetLongValue("Settings", "dwUltraGroupMem", dwUltraGroupMem );
@@ -659,6 +680,10 @@ int ConfigAppLoad2()
 	AntiAliasMode = ini.GetLongValue("Settings", "AntiAliasMode", AntiAliasMode );
 	SoftDisplayFilter = ini.GetBoolValue("Settings", "SoftDisplayFilter", SoftDisplayFilter );
 	AutoCF_1964 = ini.GetLongValue("Settings", "AutoCF_1964", AutoCF_1964 );
+	CF5toCF3StepUp = ini.GetLongValue("Settings", "CF5toCF3StepUp", CF5toCF3StepUp);
+	CF3toCF1StepUp = ini.GetLongValue("Settings", "CF3toCF1StepUp", CF3toCF1StepUp);
+	CF1toCF3StepDown = ini.GetLongValue("Settings", "CF1toCF3StepDown", CF1toCF3StepDown);
+	CF3toCF5StepDown = ini.GetLongValue("Settings", "CF3toCF5StepDown", CF3toCF5StepDown);
 	FrameSkip = ini.GetLongValue("Settings", "FrameSkip", FrameSkip );
 	bUseLinFog = ini.GetBoolValue("Settings", "LinearFog", bUseLinFog );
 	XboxPitch = ini.GetLongValue("Settings", "XboxPitch", XboxPitch );
@@ -1286,6 +1311,7 @@ int loaddwPJ64PagingMem(){ return dwPJ64PagingMem;}
 int loaddwPJ64DynaMem(){ return dwPJ64DynaMem;}
 int loaddw1964PagingMem(){ return dw1964PagingMem;}
 int loaddw1964DynaMem(){ return dw1964DynaMem;}
+int loadbDisableEEPROMSaves(){ return bDisableEEPROMSaves;}
 int loaddwMaxVideoMem(){ return dwMaxVideoMem;} //reinstate max video mem
 
 //int loadbUseLLERSP(){ return bUseLLERsp;}
@@ -1301,6 +1327,10 @@ int loaddwUltraGroupMem(){ return dwUltraGroupMem;}
 int loadiPagingMethod(){ return iPagingMethod;}
 int loadbAudioBoost() { if (bAudioBoost) return 1; return 0; };
 
+int loadiCF5toCF3StepUp(){return CF5toCF3StepUp;}
+int loadiCF3toCF1StepUp(){return CF3toCF1StepUp;}
+int loadiCF3toCF5StepDown(){return CF3toCF5StepDown;}
+int loadiCF1toCF3StepDown(){return CF1toCF3StepDown;}
 /* // not used?
 char* LabelCheck(char *s,char *szLabel)
 {

@@ -69,6 +69,8 @@ struct RomIniEntry
 	int videoplugin;
 	int iRspPlugin;
 	bool bUseRspAudio; // control a listing
+
+	bool bDisableEEPROMSaves;
 	
 	int iPagingMethod;
 	

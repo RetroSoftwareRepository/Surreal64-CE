@@ -293,6 +293,11 @@ void Handle_DPC(uint32 value)
 	*/
 }
 
+int iCF5toCF3StepUp = 95;
+int iCF3toCF1StepUp = 95;
+int iCF1toCF3StepDown = 92;
+int iCF3toCF5StepDown = 85;
+
 extern unsigned int cpuIdlePercentages[4];
 extern int cpuIdlePercentageIdx;
 BOOL newSecond = FALSE;
@@ -373,7 +378,7 @@ void Set_AutoCF()
 		switch(oldCounterFactor)
 		{
 		case 5:
-			if (( vips > vips_speed_limits[MAXFPS_AUTO_SYNC]*0.85f )/* && newSecond*/ )
+			if (( vips > vips_speed_limits[MAXFPS_AUTO_SYNC]*(iCF5toCF3StepUp/100.0f) )/* && newSecond*/ )
 			{
 				//Performance is good, do more emulation
 				AutoCounterFactor = VICounterFactors[3];
@@ -387,13 +392,13 @@ void Set_AutoCF()
 			}
 			break;
 		case 3:
-			if (( cpuIdlePercentage > 5) && ( vips > vips_speed_limits[MAXFPS_AUTO_SYNC]*0.95f ) && emuoptions.AllowCF1 )
+			if (( cpuIdlePercentage > 5) && ( vips > vips_speed_limits[MAXFPS_AUTO_SYNC]*(iCF3toCF1StepUp/100.0f) ) && emuoptions.AllowCF1 )
 			{
 				//Performance is good, do more emulation
 				AutoCounterFactor = VICounterFactors[1];
 				CounterFactor = 1;
 			}
-			else if( vips < vips_speed_limits[MAXFPS_AUTO_SYNC]*0.85f )
+			else if( vips < vips_speed_limits[MAXFPS_AUTO_SYNC]*(iCF3toCF5StepDown/100.0f) )
 			{
 				//Performance is poor, do less emulation
 				AutoCounterFactor = VICounterFactors[5];
@@ -407,7 +412,7 @@ void Set_AutoCF()
 			}
 			break;
 		case 1:
-			if (( vips < vips_speed_limits[MAXFPS_AUTO_SYNC]*0.92f ))
+			if (( vips < vips_speed_limits[MAXFPS_AUTO_SYNC]*(iCF1toCF3StepDown/100.0f) ))
 			{
 				//Performance is poor, do less emulation
 				AutoCounterFactor = VICounterFactors[3];

@@ -56,7 +56,7 @@ bool EmuDoesNoRsp(int p_iEmulator);
 bool RspDoesAlist(int p_iRspPlugin);
 
 extern bool HideLaunchScreens;
-extern bool FrameSkip;
+extern int FrameSkip;
 
 extern bool g_bQuit;
 

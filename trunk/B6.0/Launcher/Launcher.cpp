@@ -326,12 +326,10 @@ HRESULT	CXBoxSample::Initialize()
 
 	if (RandomBGMusic)
 		music.SetRandom(true);
-	
+	Sleep(500);
     music.Initialize();
 
-	if(EnableBGMusic){
-		music.Play();
-	}
+	
 	
 
 //#define DEBUG_CMD 1
@@ -403,6 +401,11 @@ HRESULT	CXBoxSample::Initialize()
 
 	if (romcounter == 0)
 		OpenRomBrowser();
+
+	if(EnableBGMusic){
+		Sleep(1000);
+		music.Play();
+	}
 
 return S_OK;
 
@@ -1196,7 +1199,7 @@ int ConfigAppLoad3() //LoadRomConfig()
 	//---------------------------------------------------------------
 	
 	// also in IniFile.cpp for defaults
-	int iMaxVideoMem = 10;
+	int iMaxVideoMem = 32;
 	int iMaxDynaMem = 20;
 	int iMaxPagingMem = 20;
 	if (has128ram) {

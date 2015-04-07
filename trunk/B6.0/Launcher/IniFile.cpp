@@ -80,6 +80,7 @@ IniFile::IniFile(void)
 	m_defaultIniEntry.videoplugin = _VideoPluginRice560;
 	m_defaultIniEntry.iRspPlugin = _RSPPluginHLE;
 	m_defaultIniEntry.bUseRspAudio = false;
+	m_defaultIniEntry.bDisableEEPROMSaves = false;
 	
 	m_defaultIniEntry.iPagingMethod = _PagingXXX;
 	
@@ -158,7 +159,7 @@ bool IniFile::Load(const string &szIniFilename)
 	
 	// set setting based on phys ram
 	// also set in ConfigAppLoad3
-	unsigned int iMaxVideoMem = 10;
+	unsigned int iMaxVideoMem = 32;
 	unsigned int iMaxDynaMem = 20;
 	unsigned int iMaxPagingMem = 20;
 	if (has128ram) {
@@ -238,7 +239,9 @@ bool IniFile::Load(const string &szIniFilename)
 		
 	m_currentIniEntry.bUseRspAudio = ini.GetBoolValue("Settings", "Default Use Rsp Audio", m_defaultIniEntry.bUseRspAudio );
 	
-	
+	m_currentIniEntry.bDisableEEPROMSaves = ini.GetBoolValue("Settings", "Default Disable EEPROM Saves", m_defaultIniEntry.bDisableEEPROMSaves );
+
+
 	// these two are not used anymore in the emu's, but leave them to retain user setting between versions
 	m_currentIniEntry.bUseLLERSP = ini.GetBoolValue("Settings", "Default Use LLE RSP", m_defaultIniEntry.bUseLLERSP );
 	m_currentIniEntry.bUseLLERSP = ini.GetBoolValue("Settings", "Default Use Basic Audio", m_defaultIniEntry.bUseBasicAudio );
@@ -347,6 +350,8 @@ bool IniFile::Load(const string &szIniFilename)
 		pCurrentEntry->dwMaxVideoMem = ini.GetLongValue(szRomCrcs, "Max Video Mem", m_currentIniEntry.dwMaxVideoMem );
 
 		pCurrentEntry->bUseRspAudio = ini.GetBoolValue(szRomCrcs, "Use Rsp Audio", m_currentIniEntry.bUseRspAudio ); // control a listing
+		
+		pCurrentEntry->bDisableEEPROMSaves = ini.GetBoolValue(szRomCrcs, "Disable EEPROM Saves", m_currentIniEntry.bDisableEEPROMSaves ); // control a listing
 
 		// these two are not used anymore in the emu's, but leave them to retain user setting between versions
 		pCurrentEntry->bUseLLERSP = ini.GetBoolValue(szRomCrcs, "Use LLE RSP", m_currentIniEntry.bUseLLERSP ); //NULL
@@ -413,6 +418,7 @@ bool IniFile::Save(const string &szIniFilename)
 	ini.SetLongValue("Settings", "Default Audio Plugin", m_currentIniEntry.iAudioPlugin);
 	ini.SetLongValue("Settings", "Default Rsp Plugin", m_currentIniEntry.iRspPlugin);
 	ini.SetBoolValue("Settings", "Default Use Rsp Audio", m_currentIniEntry.bUseRspAudio); // control a listing
+	ini.SetBoolValue("Settings", "Default Disable EEPROM Saves", m_currentIniEntry.bDisableEEPROMSaves); // control a listing
 	
 	ini.SetLongValue("Settings", "Default Paging Method", m_currentIniEntry.iPagingMethod);
 	
@@ -531,6 +537,9 @@ bool IniFile::Save(const string &szIniFilename)
 					
 				if (pCurrentEntry->bUseRspAudio != m_currentIniEntry.bUseRspAudio)
 					ini.SetBoolValue(szRomCrcs, "Use Rsp Audio", pCurrentEntry->bUseRspAudio);
+				
+				if (pCurrentEntry->bDisableEEPROMSaves != m_currentIniEntry.bDisableEEPROMSaves)
+					ini.SetBoolValue(szRomCrcs, "Disable EEPROM Saves", pCurrentEntry->bDisableEEPROMSaves);
 					
 				
 				// not used anymore but leave for ini
