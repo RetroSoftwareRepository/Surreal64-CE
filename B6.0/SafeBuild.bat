@@ -98,12 +98,6 @@ rem ---------------------------------------------
 		%NET% %%i /build %MODE%
 	)
 
-	for %%i in %XBE_SOL_P510_LIST% do IF NOT EXIST %MODE%\%%i (
-		ECHO ----
-		echo %%i failed to build!
-		set ERROR=1
-	)
-
 	if %MODE%==release_icc xcopy release\*.xbe preBUILD
 	xcopy %MODE%\*.xbe preBUILD
 
@@ -121,118 +115,86 @@ rem ---------------------------------------------
 		ECHO Compiling...
 		%NET% %%i /build %MODE%
 	)
+
+	if %MODE%==release_icc xcopy release\*.xbe preBUILD
+	xcopy %MODE%\*.xbe preBUILD
+
+	if %MODE%==release_icc (rmdir release /S /Q)
+	if %MODE%==release_icc (md release)
+	rmdir %MODE% /S /Q
+	md %MODE%
+
+	for %%i in %SOL_P560% do (
+		ECHO Cleaning...
+		%NET% %%i /clean %MODE%
+	)
+
+	for %%i in %SOL_P560% do (
+		ECHO Compiling...
+		%NET% %%i /build %MODE%
+	)
+
+	if %MODE%==release_icc xcopy release\*.xbe preBUILD
+	xcopy %MODE%\*.xbe preBUILD
+
+	if %MODE%==release_icc (rmdir release /S /Q)
+	if %MODE%==release_icc (md release)
+	rmdir %MODE% /S /Q
+	md %MODE%
+
+	for %%i in %SOL_P611% do (
+		ECHO Cleaning...
+		%NET% %%i /clean %MODE%
+	)
+
+	for %%i in %SOL_P611% do (
+		ECHO Compiling...
+		%NET% %%i /build %MODE%
+	)
+
+	if %MODE%==release_icc xcopy release\*.xbe preBUILD
+	xcopy %MODE%\*.xbe preBUILD
+
+	if %MODE%==release_icc (rmdir release /S /Q)
+	if %MODE%==release_icc (md release)
+	rmdir %MODE% /S /Q
+	md %MODE%
+
+	for %%i in %SOL_P612% do (
+		ECHO Cleaning...
+		%NET% %%i /clean %MODE%
+	)
+
+	for %%i in %SOL_P612% do (
+		ECHO Compiling...
+		%NET% %%i /build %MODE%
+	)
+
+	if %MODE%==release_icc xcopy release\*.xbe preBUILD
+	xcopy %MODE%\*.xbe preBUILD
+
+	if %MODE%==release_icc (rmdir release /S /Q)
+	if %MODE%==release_icc (md release)
+	rmdir %MODE% /S /Q
+	md %MODE%
+
+	for %%i in %SOL_MAIN% do (
+		ECHO Cleaning...
+		%NET% %%i /clean %MODE%
+	)
+
+	for %%i in %SOL_MAIN% do (
+		ECHO Compiling...
+		%NET% %%i /build %MODE%
+	)
+
+	if %MODE%==release_icc xcopy release\*.xbe preBUILD
+	xcopy %MODE%\*.xbe preBUILD
+
+	if %MODE%==release_icc (rmdir release /S /Q)
+	if %MODE%==release_icc (md release)
 	
-	for %%i in %XBE_SOL_P531_LIST% do IF NOT EXIST %MODE%\%%i (
-		ECHO ----
-		echo %%i failed to build!
-		set ERROR=1
-	)
-
-	if %MODE%==release_icc xcopy release\*.xbe preBUILD
-	xcopy %MODE%\*.xbe preBUILD
-
-	if %MODE%==release_icc (rmdir release /S /Q)
-	if %MODE%==release_icc (md release)
-	rmdir %MODE% /S /Q
-	md %MODE%
-
-	for %%i in %SOL_P560% do (
-		ECHO Cleaning...
-		%NET% %%i /clean %MODE%
-	)
-
-	for %%i in %SOL_P560% do (
-		ECHO Compiling...
-		%NET% %%i /build %MODE%
-	)
-
-	for %%i in %XBE_SOL_P560_LIST% do IF NOT EXIST %MODE%\%%i (
-		ECHO ----
-		echo %%i failed to build!
-		set ERROR=1
-	)
-
-	if %MODE%==release_icc xcopy release\*.xbe preBUILD
-	xcopy %MODE%\*.xbe preBUILD
-
-	if %MODE%==release_icc (rmdir release /S /Q)
-	if %MODE%==release_icc (md release)
-	rmdir %MODE% /S /Q
-	md %MODE%
-
-	for %%i in %SOL_P611% do (
-		ECHO Cleaning...
-		%NET% %%i /clean %MODE%
-	)
-
-	for %%i in %SOL_P611% do (
-		ECHO Compiling...
-		%NET% %%i /build %MODE%
-	)
-
-	for %%i in %XBE_SOL_P611_LIST% do IF NOT EXIST %MODE%\%%i (
-		ECHO ----
-		echo %%i failed to build!
-		set ERROR=1
-	)
-
-	if %MODE%==release_icc xcopy release\*.xbe preBUILD
-	xcopy %MODE%\*.xbe preBUILD
-
-	if %MODE%==release_icc (rmdir release /S /Q)
-	if %MODE%==release_icc (md release)
-	rmdir %MODE% /S /Q
-	md %MODE%
-
-	for %%i in %SOL_P612% do (
-		ECHO Cleaning...
-		%NET% %%i /clean %MODE%
-	)
-
-	for %%i in %SOL_P612% do (
-		ECHO Compiling...
-		%NET% %%i /build %MODE%
-	)
-
-	for %%i in %XBE_SOL_P612_LIST% do IF NOT EXIST %MODE%\%%i (
-		ECHO ----
-		echo %%i failed to build!
-		set ERROR=1
-	)
-
-	if %MODE%==release_icc xcopy release\*.xbe preBUILD
-	xcopy %MODE%\*.xbe preBUILD
-
-	if %MODE%==release_icc (rmdir release /S /Q)
-	if %MODE%==release_icc (md release)
-	rmdir %MODE% /S /Q
-	md %MODE%
-
-	for %%i in %SOL_MAIN% do (
-		ECHO Cleaning...
-		%NET% %%i /clean %MODE%
-	)
-
-	for %%i in %SOL_MAIN% do (
-		ECHO Compiling...
-		%NET% %%i /build %MODE%
-	)
-
-	for %%i in %XBE_SOL_MAIN_LIST% do IF NOT EXIST %MODE%\%%i (
-		ECHO ----
-		echo %%i failed to build!
-		set ERROR=1
-	)
-
-	if %MODE%==release_icc xcopy release\*.xbe preBUILD
-	xcopy %MODE%\*.xbe preBUILD
-
-	if %MODE%==release_icc (rmdir release /S /Q)
-	if %MODE%==release_icc (md release)
-	rmdir %MODE% /S /Q
-	md %MODE%
-
-rem---------------------------------------------------------------------
+rem ---------------------------------------------------------------------
 	if %ERROR%==1 (
 		set DIETEXT="Build Failed! (See BuildLog.htm(s) for details)"
 		goto DIE
@@ -286,7 +248,7 @@ rem---------------------------------------------------------------------
 	ECHO Done!
 	ECHO ------------------------------
 	
-	if %MODE%==release_icc (goto CLEANRELEASE)
+	if %MODE%==release_icc goto CLEAN_RELEASE
 
 	goto VIEWPAUSE
 
@@ -297,7 +259,7 @@ rem---------------------------------------------------------------------
 	ECHO !-!-!-!-!-!-!-!-!-!-!-!-!-!-!-
 	goto VIEWPAUSE
 
-:CLEANRELEASE
+:CLEAN_RELEASE
 	ECHO ------------------------------
 	ECHO Cleaning...
 	for %%i in %SOL_P510% do %NET% %%i /clean release
@@ -313,6 +275,7 @@ rem---------------------------------------------------------------------
 
 :VIEWPAUSE
 	set S64CE_BUILD_ANSWER=
+	ECHO Build Script Complete!
 	ECHO Press any key to exit...
 	pause > NUL
   

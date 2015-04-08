@@ -30,7 +30,7 @@ extern BOOL _INPUT_UpdateControllerStates();
 extern void _INPUT_RumblePause(bool bPause);
 extern "C" BOOL ReInitVirtualDynaMemory(boolean charge);
 extern int TextureMode;
-extern bool FrameSkip;
+extern int FrameSkip;
 #endif
 
 //////////////////////////////////////////////////////////
