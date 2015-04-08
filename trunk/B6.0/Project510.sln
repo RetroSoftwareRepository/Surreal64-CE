@@ -135,6 +135,7 @@ Global
 		Profile = Profile
 		Profile_FastCap = Profile_FastCap
 		Release = Release
+		Release_ICC = Release_ICC
 		Release_LTCG = Release_LTCG
 	EndGlobalSection
 	GlobalSection(ProjectConfiguration) = postSolution
@@ -146,6 +147,8 @@ Global
 		{8093DA18-6D55-4807-89F1-E33B99D4237D}.Profile_FastCap.Build.0 = Profile_FastCap|Xbox
 		{8093DA18-6D55-4807-89F1-E33B99D4237D}.Release.ActiveCfg = Release|Xbox
 		{8093DA18-6D55-4807-89F1-E33B99D4237D}.Release.Build.0 = Release|Xbox
+		{8093DA18-6D55-4807-89F1-E33B99D4237D}.Release_ICC.ActiveCfg = Release|Xbox
+		{8093DA18-6D55-4807-89F1-E33B99D4237D}.Release_ICC.Build.0 = Release|Xbox
 		{8093DA18-6D55-4807-89F1-E33B99D4237D}.Release_LTCG.ActiveCfg = Release_LTCG|Xbox
 		{8093DA18-6D55-4807-89F1-E33B99D4237D}.Release_LTCG.Build.0 = Release_LTCG|Xbox
 		{5B602B97-9A1A-4395-A6B6-BBEB9BB1B89E}.Debug.ActiveCfg = Debug|Xbox
@@ -156,6 +159,8 @@ Global
 		{5B602B97-9A1A-4395-A6B6-BBEB9BB1B89E}.Profile_FastCap.Build.0 = Profile_FastCap|Xbox
 		{5B602B97-9A1A-4395-A6B6-BBEB9BB1B89E}.Release.ActiveCfg = Release|Xbox
 		{5B602B97-9A1A-4395-A6B6-BBEB9BB1B89E}.Release.Build.0 = Release|Xbox
+		{5B602B97-9A1A-4395-A6B6-BBEB9BB1B89E}.Release_ICC.ActiveCfg = Release|Xbox
+		{5B602B97-9A1A-4395-A6B6-BBEB9BB1B89E}.Release_ICC.Build.0 = Release|Xbox
 		{5B602B97-9A1A-4395-A6B6-BBEB9BB1B89E}.Release_LTCG.ActiveCfg = Release_LTCG|Xbox
 		{5B602B97-9A1A-4395-A6B6-BBEB9BB1B89E}.Release_LTCG.Build.0 = Release_LTCG|Xbox
 		{FC45B107-2692-476F-8A53-0B7672164C40}.Debug.ActiveCfg = Debug|Xbox
@@ -166,6 +171,8 @@ Global
 		{FC45B107-2692-476F-8A53-0B7672164C40}.Profile_FastCap.Build.0 = Profile_FastCap|Xbox
 		{FC45B107-2692-476F-8A53-0B7672164C40}.Release.ActiveCfg = Release|Xbox
 		{FC45B107-2692-476F-8A53-0B7672164C40}.Release.Build.0 = Release|Xbox
+		{FC45B107-2692-476F-8A53-0B7672164C40}.Release_ICC.ActiveCfg = Release|Xbox
+		{FC45B107-2692-476F-8A53-0B7672164C40}.Release_ICC.Build.0 = Release|Xbox
 		{FC45B107-2692-476F-8A53-0B7672164C40}.Release_LTCG.ActiveCfg = Release_LTCG|Xbox
 		{FC45B107-2692-476F-8A53-0B7672164C40}.Release_LTCG.Build.0 = Release_LTCG|Xbox
 		{889EA010-906E-4817-862B-20E152193325}.Debug.ActiveCfg = Debug|Xbox
@@ -176,6 +183,8 @@ Global
 		{889EA010-906E-4817-862B-20E152193325}.Profile_FastCap.Build.0 = Profile_FastCap|Xbox
 		{889EA010-906E-4817-862B-20E152193325}.Release.ActiveCfg = Release|Xbox
 		{889EA010-906E-4817-862B-20E152193325}.Release.Build.0 = Release|Xbox
+		{889EA010-906E-4817-862B-20E152193325}.Release_ICC.ActiveCfg = Release|Xbox
+		{889EA010-906E-4817-862B-20E152193325}.Release_ICC.Build.0 = Release|Xbox
 		{889EA010-906E-4817-862B-20E152193325}.Release_LTCG.ActiveCfg = Release_LTCG|Xbox
 		{889EA010-906E-4817-862B-20E152193325}.Release_LTCG.Build.0 = Release_LTCG|Xbox
 		{13D8F192-23C1-4EE0-896D-3E9010A13D65}.Debug.ActiveCfg = Debug|Xbox
@@ -186,6 +195,8 @@ Global
 		{13D8F192-23C1-4EE0-896D-3E9010A13D65}.Profile_FastCap.Build.0 = Profile_FastCap|Xbox
 		{13D8F192-23C1-4EE0-896D-3E9010A13D65}.Release.ActiveCfg = Release|Xbox
 		{13D8F192-23C1-4EE0-896D-3E9010A13D65}.Release.Build.0 = Release|Xbox
+		{13D8F192-23C1-4EE0-896D-3E9010A13D65}.Release_ICC.ActiveCfg = Release|Xbox
+		{13D8F192-23C1-4EE0-896D-3E9010A13D65}.Release_ICC.Build.0 = Release|Xbox
 		{13D8F192-23C1-4EE0-896D-3E9010A13D65}.Release_LTCG.ActiveCfg = Release_LTCG|Xbox
 		{13D8F192-23C1-4EE0-896D-3E9010A13D65}.Release_LTCG.Build.0 = Release_LTCG|Xbox
 		{50BCDC05-7A50-4F10-9E30-0E291372F8A1}.Debug.ActiveCfg = Debug|Xbox
@@ -196,6 +207,8 @@ Global
 		{50BCDC05-7A50-4F10-9E30-0E291372F8A1}.Profile_FastCap.Build.0 = Profile_FastCap|Xbox
 		{50BCDC05-7A50-4F10-9E30-0E291372F8A1}.Release.ActiveCfg = Release|Xbox
 		{50BCDC05-7A50-4F10-9E30-0E291372F8A1}.Release.Build.0 = Release|Xbox
+		{50BCDC05-7A50-4F10-9E30-0E291372F8A1}.Release_ICC.ActiveCfg = Release|Xbox
+		{50BCDC05-7A50-4F10-9E30-0E291372F8A1}.Release_ICC.Build.0 = Release|Xbox
 		{50BCDC05-7A50-4F10-9E30-0E291372F8A1}.Release_LTCG.ActiveCfg = Release_LTCG|Xbox
 		{50BCDC05-7A50-4F10-9E30-0E291372F8A1}.Release_LTCG.Build.0 = Release_LTCG|Xbox
 		{5AA63184-8488-4760-8A8F-2784090D5A77}.Debug.ActiveCfg = Debug|Xbox
@@ -206,6 +219,8 @@ Global
 		{5AA63184-8488-4760-8A8F-2784090D5A77}.Profile_FastCap.Build.0 = Profile_FastCap|Xbox
 		{5AA63184-8488-4760-8A8F-2784090D5A77}.Release.ActiveCfg = Release|Xbox
 		{5AA63184-8488-4760-8A8F-2784090D5A77}.Release.Build.0 = Release|Xbox
+		{5AA63184-8488-4760-8A8F-2784090D5A77}.Release_ICC.ActiveCfg = Release|Xbox
+		{5AA63184-8488-4760-8A8F-2784090D5A77}.Release_ICC.Build.0 = Release|Xbox
 		{5AA63184-8488-4760-8A8F-2784090D5A77}.Release_LTCG.ActiveCfg = Release_LTCG|Xbox
 		{5AA63184-8488-4760-8A8F-2784090D5A77}.Release_LTCG.Build.0 = Release_LTCG|Xbox
 		{984BB0B1-96DA-412B-82A1-5C86A4D40FBA}.Debug.ActiveCfg = Debug|Xbox
@@ -216,6 +231,8 @@ Global
 		{984BB0B1-96DA-412B-82A1-5C86A4D40FBA}.Profile_FastCap.Build.0 = Profile_FastCap|Xbox
 		{984BB0B1-96DA-412B-82A1-5C86A4D40FBA}.Release.ActiveCfg = Release|Xbox
 		{984BB0B1-96DA-412B-82A1-5C86A4D40FBA}.Release.Build.0 = Release|Xbox
+		{984BB0B1-96DA-412B-82A1-5C86A4D40FBA}.Release_ICC.ActiveCfg = Release|Xbox
+		{984BB0B1-96DA-412B-82A1-5C86A4D40FBA}.Release_ICC.Build.0 = Release|Xbox
 		{984BB0B1-96DA-412B-82A1-5C86A4D40FBA}.Release_LTCG.ActiveCfg = Release_LTCG|Xbox
 		{984BB0B1-96DA-412B-82A1-5C86A4D40FBA}.Release_LTCG.Build.0 = Release_LTCG|Xbox
 		{DF18099D-35B6-4619-A8FE-CB2BC25364F4}.Debug.ActiveCfg = Debug|Xbox
@@ -226,6 +243,8 @@ Global
 		{DF18099D-35B6-4619-A8FE-CB2BC25364F4}.Profile_FastCap.Build.0 = Profile_FastCap|Xbox
 		{DF18099D-35B6-4619-A8FE-CB2BC25364F4}.Release.ActiveCfg = Release|Xbox
 		{DF18099D-35B6-4619-A8FE-CB2BC25364F4}.Release.Build.0 = Release|Xbox
+		{DF18099D-35B6-4619-A8FE-CB2BC25364F4}.Release_ICC.ActiveCfg = Release|Xbox
+		{DF18099D-35B6-4619-A8FE-CB2BC25364F4}.Release_ICC.Build.0 = Release|Xbox
 		{DF18099D-35B6-4619-A8FE-CB2BC25364F4}.Release_LTCG.ActiveCfg = Release_LTCG|Xbox
 		{DF18099D-35B6-4619-A8FE-CB2BC25364F4}.Release_LTCG.Build.0 = Release_LTCG|Xbox
 		{D101F663-FBE6-45E1-B3CE-C70184F718EF}.Debug.ActiveCfg = Debug|Xbox
@@ -236,6 +255,8 @@ Global
 		{D101F663-FBE6-45E1-B3CE-C70184F718EF}.Profile_FastCap.Build.0 = Profile_FastCap|Xbox
 		{D101F663-FBE6-45E1-B3CE-C70184F718EF}.Release.ActiveCfg = Release|Xbox
 		{D101F663-FBE6-45E1-B3CE-C70184F718EF}.Release.Build.0 = Release|Xbox
+		{D101F663-FBE6-45E1-B3CE-C70184F718EF}.Release_ICC.ActiveCfg = Release|Xbox
+		{D101F663-FBE6-45E1-B3CE-C70184F718EF}.Release_ICC.Build.0 = Release|Xbox
 		{D101F663-FBE6-45E1-B3CE-C70184F718EF}.Release_LTCG.ActiveCfg = Release_LTCG|Xbox
 		{D101F663-FBE6-45E1-B3CE-C70184F718EF}.Release_LTCG.Build.0 = Release_LTCG|Xbox
 		{7127654B-181D-4D65-8C06-C45086FC21F9}.Debug.ActiveCfg = Debug|Xbox
@@ -246,6 +267,8 @@ Global
 		{7127654B-181D-4D65-8C06-C45086FC21F9}.Profile_FastCap.Build.0 = Profile_FastCap|Xbox
 		{7127654B-181D-4D65-8C06-C45086FC21F9}.Release.ActiveCfg = Release|Xbox
 		{7127654B-181D-4D65-8C06-C45086FC21F9}.Release.Build.0 = Release|Xbox
+		{7127654B-181D-4D65-8C06-C45086FC21F9}.Release_ICC.ActiveCfg = Release|Xbox
+		{7127654B-181D-4D65-8C06-C45086FC21F9}.Release_ICC.Build.0 = Release|Xbox
 		{7127654B-181D-4D65-8C06-C45086FC21F9}.Release_LTCG.ActiveCfg = Release_LTCG|Xbox
 		{7127654B-181D-4D65-8C06-C45086FC21F9}.Release_LTCG.Build.0 = Release_LTCG|Xbox
 		{BBDE61F2-D298-4B51-BA24-98831EA6B16E}.Debug.ActiveCfg = Debug|Xbox
@@ -256,6 +279,8 @@ Global
 		{BBDE61F2-D298-4B51-BA24-98831EA6B16E}.Profile_FastCap.Build.0 = Profile_FastCap|Xbox
 		{BBDE61F2-D298-4B51-BA24-98831EA6B16E}.Release.ActiveCfg = Release|Xbox
 		{BBDE61F2-D298-4B51-BA24-98831EA6B16E}.Release.Build.0 = Release|Xbox
+		{BBDE61F2-D298-4B51-BA24-98831EA6B16E}.Release_ICC.ActiveCfg = Release|Xbox
+		{BBDE61F2-D298-4B51-BA24-98831EA6B16E}.Release_ICC.Build.0 = Release|Xbox
 		{BBDE61F2-D298-4B51-BA24-98831EA6B16E}.Release_LTCG.ActiveCfg = Release_LTCG|Xbox
 		{BBDE61F2-D298-4B51-BA24-98831EA6B16E}.Release_LTCG.Build.0 = Release_LTCG|Xbox
 		{B03134F1-3846-4D16-B5F3-3F69C54DE23A}.Debug.ActiveCfg = Debug|Xbox
@@ -266,6 +291,8 @@ Global
 		{B03134F1-3846-4D16-B5F3-3F69C54DE23A}.Profile_FastCap.Build.0 = Profile_FastCap|Xbox
 		{B03134F1-3846-4D16-B5F3-3F69C54DE23A}.Release.ActiveCfg = Release|Xbox
 		{B03134F1-3846-4D16-B5F3-3F69C54DE23A}.Release.Build.0 = Release|Xbox
+		{B03134F1-3846-4D16-B5F3-3F69C54DE23A}.Release_ICC.ActiveCfg = Release|Xbox
+		{B03134F1-3846-4D16-B5F3-3F69C54DE23A}.Release_ICC.Build.0 = Release|Xbox
 		{B03134F1-3846-4D16-B5F3-3F69C54DE23A}.Release_LTCG.ActiveCfg = Release|Xbox
 		{B03134F1-3846-4D16-B5F3-3F69C54DE23A}.Release_LTCG.Build.0 = Release|Xbox
 		{AE93B07A-3290-4453-9045-F4FDFB2E3383}.Debug.ActiveCfg = Debug|Xbox
@@ -276,6 +303,8 @@ Global
 		{AE93B07A-3290-4453-9045-F4FDFB2E3383}.Profile_FastCap.Build.0 = Profile_FastCap|Xbox
 		{AE93B07A-3290-4453-9045-F4FDFB2E3383}.Release.ActiveCfg = Release|Xbox
 		{AE93B07A-3290-4453-9045-F4FDFB2E3383}.Release.Build.0 = Release|Xbox
+		{AE93B07A-3290-4453-9045-F4FDFB2E3383}.Release_ICC.ActiveCfg = Release_ICC|Xbox
+		{AE93B07A-3290-4453-9045-F4FDFB2E3383}.Release_ICC.Build.0 = Release_ICC|Xbox
 		{AE93B07A-3290-4453-9045-F4FDFB2E3383}.Release_LTCG.ActiveCfg = Release_LTCG|Xbox
 		{AE93B07A-3290-4453-9045-F4FDFB2E3383}.Release_LTCG.Build.0 = Release_LTCG|Xbox
 		{33F4B993-02F8-4004-9BC9-D81AF53F4824}.Debug.ActiveCfg = Debug|Xbox
@@ -286,6 +315,8 @@ Global
 		{33F4B993-02F8-4004-9BC9-D81AF53F4824}.Profile_FastCap.Build.0 = Profile_FastCap|Xbox
 		{33F4B993-02F8-4004-9BC9-D81AF53F4824}.Release.ActiveCfg = Release|Xbox
 		{33F4B993-02F8-4004-9BC9-D81AF53F4824}.Release.Build.0 = Release|Xbox
+		{33F4B993-02F8-4004-9BC9-D81AF53F4824}.Release_ICC.ActiveCfg = Release_ICC|Xbox
+		{33F4B993-02F8-4004-9BC9-D81AF53F4824}.Release_ICC.Build.0 = Release_ICC|Xbox
 		{33F4B993-02F8-4004-9BC9-D81AF53F4824}.Release_LTCG.ActiveCfg = Release_LTCG|Xbox
 		{33F4B993-02F8-4004-9BC9-D81AF53F4824}.Release_LTCG.Build.0 = Release_LTCG|Xbox
 		{889EA010-906E-4817-862B-20E152193325}.Debug.ActiveCfg = Debug|Xbox
@@ -296,6 +327,8 @@ Global
 		{889EA010-906E-4817-862B-20E152193325}.Profile_FastCap.Build.0 = Profile_FastCap|Xbox
 		{889EA010-906E-4817-862B-20E152193325}.Release.ActiveCfg = Release|Xbox
 		{889EA010-906E-4817-862B-20E152193325}.Release.Build.0 = Release|Xbox
+		{889EA010-906E-4817-862B-20E152193325}.Release_ICC.ActiveCfg = Release|Xbox
+		{889EA010-906E-4817-862B-20E152193325}.Release_ICC.Build.0 = Release|Xbox
 		{889EA010-906E-4817-862B-20E152193325}.Release_LTCG.ActiveCfg = Release_LTCG|Xbox
 		{889EA010-906E-4817-862B-20E152193325}.Release_LTCG.Build.0 = Release_LTCG|Xbox
 		{FC45B107-2692-476F-8A53-0B7672164C40}.Debug.ActiveCfg = Debug|Xbox
@@ -306,6 +339,8 @@ Global
 		{FC45B107-2692-476F-8A53-0B7672164C40}.Profile_FastCap.Build.0 = Profile_FastCap|Xbox
 		{FC45B107-2692-476F-8A53-0B7672164C40}.Release.ActiveCfg = Release|Xbox
 		{FC45B107-2692-476F-8A53-0B7672164C40}.Release.Build.0 = Release|Xbox
+		{FC45B107-2692-476F-8A53-0B7672164C40}.Release_ICC.ActiveCfg = Release|Xbox
+		{FC45B107-2692-476F-8A53-0B7672164C40}.Release_ICC.Build.0 = Release|Xbox
 		{FC45B107-2692-476F-8A53-0B7672164C40}.Release_LTCG.ActiveCfg = Release_LTCG|Xbox
 		{FC45B107-2692-476F-8A53-0B7672164C40}.Release_LTCG.Build.0 = Release_LTCG|Xbox
 		{DAE1DCB6-1992-4939-B13B-A59451415CC2}.Debug.ActiveCfg = Debug|Xbox
@@ -316,6 +351,8 @@ Global
 		{DAE1DCB6-1992-4939-B13B-A59451415CC2}.Profile_FastCap.Build.0 = Profile_FastCap|Xbox
 		{DAE1DCB6-1992-4939-B13B-A59451415CC2}.Release.ActiveCfg = Release|Xbox
 		{DAE1DCB6-1992-4939-B13B-A59451415CC2}.Release.Build.0 = Release|Xbox
+		{DAE1DCB6-1992-4939-B13B-A59451415CC2}.Release_ICC.ActiveCfg = Release|Xbox
+		{DAE1DCB6-1992-4939-B13B-A59451415CC2}.Release_ICC.Build.0 = Release|Xbox
 		{DAE1DCB6-1992-4939-B13B-A59451415CC2}.Release_LTCG.ActiveCfg = Release_LTCG|Xbox
 		{DAE1DCB6-1992-4939-B13B-A59451415CC2}.Release_LTCG.Build.0 = Release_LTCG|Xbox
 	EndGlobalSection

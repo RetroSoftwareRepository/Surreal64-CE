@@ -38,7 +38,7 @@
 #include "plugins.h"
 #include "compiler.h"
 #include "fileio.h"
-
+#include "xbox/rompaging.h"
 #endif
 #include "ipif.h"
 

@@ -30,6 +30,7 @@
 #include "timer.h"
 #include "plugins.h"
 //#include "../core.h"
+#include "xbox/rompaging.h"
 #endif
 
 #ifdef _XBOX_ICC

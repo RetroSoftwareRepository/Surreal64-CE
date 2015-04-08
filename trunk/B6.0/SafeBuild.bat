@@ -47,16 +47,19 @@ rem ---------------------------------------------
 	ECHO [F] Profile FastCap
 	ECHO [R] Release
 	ECHO [L] Release LTCG
+	ECHO [I] Release ICC
 	ECHO ------------------------------
-	set /P S64CE_COMPILE_ANSWER=Which mode should be used [d/p/f/r/l] ?
+	set /P S64CE_COMPILE_ANSWER=Which mode should be used [d/p/f/r/l/i] ?
 	if /i "%S64CE_COMPILE_ANSWER:~,1%" EQU "d" set MODE=debug
 	if /i "%S64CE_COMPILE_ANSWER:~,1%" EQU "p" set MODE=profile
 	if /i "%S64CE_COMPILE_ANSWER:~,1%" EQU "f" set MODE=profile_fastcap
 	if /i "%S64CE_COMPILE_ANSWER:~,1%" EQU "r" set MODE=release
 	if /i "%S64CE_COMPILE_ANSWER:~,1%" EQU "l" set MODE=release_ltcg
+	if /i "%S64CE_COMPILE_ANSWER:~,1%" EQU "i" set MODE=release_icc
 	
 	if %MODE%==release goto PROMPT_DIST
 	if %MODE%==release_ltcg goto PROMPT_DIST
+	if %MODE%==release_icc goto PROMPT_DIST
 	
 	goto COMPILE
 rem ---------------------------------------------
@@ -80,6 +83,8 @@ rem ---------------------------------------------
 	rmdir preBUILD /S /Q
 	md preBUILD
 	
+	if %MODE%==release_icc (rmdir release /S /Q)
+	if %MODE%==release_icc (md release)
 	rmdir %MODE% /S /Q
 	md %MODE%
 
@@ -98,10 +103,12 @@ rem ---------------------------------------------
 		echo %%i failed to build!
 		set ERROR=1
 	)
-	
+
+	if %MODE%==release_icc xcopy release\*.xbe preBUILD
 	xcopy %MODE%\*.xbe preBUILD
 
-
+	if %MODE%==release_icc (rmdir release /S /Q)
+	if %MODE%==release_icc (md release)
 	rmdir %MODE% /S /Q
 	md %MODE%
 
@@ -121,9 +128,11 @@ rem ---------------------------------------------
 		set ERROR=1
 	)
 
+	if %MODE%==release_icc xcopy release\*.xbe preBUILD
 	xcopy %MODE%\*.xbe preBUILD
 
-
+	if %MODE%==release_icc (rmdir release /S /Q)
+	if %MODE%==release_icc (md release)
 	rmdir %MODE% /S /Q
 	md %MODE%
 
@@ -143,9 +152,11 @@ rem ---------------------------------------------
 		set ERROR=1
 	)
 
+	if %MODE%==release_icc xcopy release\*.xbe preBUILD
 	xcopy %MODE%\*.xbe preBUILD
 
-
+	if %MODE%==release_icc (rmdir release /S /Q)
+	if %MODE%==release_icc (md release)
 	rmdir %MODE% /S /Q
 	md %MODE%
 
@@ -165,9 +176,11 @@ rem ---------------------------------------------
 		set ERROR=1
 	)
 
+	if %MODE%==release_icc xcopy release\*.xbe preBUILD
 	xcopy %MODE%\*.xbe preBUILD
 
-
+	if %MODE%==release_icc (rmdir release /S /Q)
+	if %MODE%==release_icc (md release)
 	rmdir %MODE% /S /Q
 	md %MODE%
 
@@ -187,9 +200,11 @@ rem ---------------------------------------------
 		set ERROR=1
 	)
 
+	if %MODE%==release_icc xcopy release\*.xbe preBUILD
 	xcopy %MODE%\*.xbe preBUILD
 
-
+	if %MODE%==release_icc (rmdir release /S /Q)
+	if %MODE%==release_icc (md release)
 	rmdir %MODE% /S /Q
 	md %MODE%
 
@@ -209,9 +224,11 @@ rem ---------------------------------------------
 		set ERROR=1
 	)
 
+	if %MODE%==release_icc xcopy release\*.xbe preBUILD
 	xcopy %MODE%\*.xbe preBUILD
 
-
+	if %MODE%==release_icc (rmdir release /S /Q)
+	if %MODE%==release_icc (md release)
 	rmdir %MODE% /S /Q
 	md %MODE%
 
@@ -269,6 +286,8 @@ rem---------------------------------------------------------------------
 	ECHO Done!
 	ECHO ------------------------------
 	
+	if %MODE%==release_icc (goto CLEANRELEASE)
+
 	goto VIEWPAUSE
 
 :DIE
@@ -276,6 +295,20 @@ rem---------------------------------------------------------------------
 	set DIETEXT=ERROR: %DIETEXT%
 	echo %DIETEXT%
 	ECHO !-!-!-!-!-!-!-!-!-!-!-!-!-!-!-
+	goto VIEWPAUSE
+
+:CLEANRELEASE
+	ECHO ------------------------------
+	ECHO Cleaning...
+	for %%i in %SOL_P510% do %NET% %%i /clean release
+	for %%i in %SOL_P531% do %NET% %%i /clean release
+	for %%i in %SOL_P560% do %NET% %%i /clean release
+	for %%i in %SOL_P611% do %NET% %%i /clean release
+	for %%i in %SOL_P612% do %NET% %%i /clean release
+	for %%i in %SOL_MAIN% do %NET% %%i /clean release
+	ECHO Done!
+	ECHO ------------------------------
+	
 	goto VIEWPAUSE
 
 :VIEWPAUSE
