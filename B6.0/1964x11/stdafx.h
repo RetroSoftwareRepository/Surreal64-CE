@@ -17,6 +17,9 @@
 //#undef USE_ROM_PAGING  // disable ROM Paging to cache whole ROM to memory, as is. Expensive.
 #define USE_ROM_PAGING	// enable ROM Paging using temporary file, breaks 007 and conker for 1.1
 
+//#define USE_ICC_LIB // define this when linking with ICC optimized lib
+//#define _XBOX_ICC // defined in ICC Project
+
 #if _MSC_VER > 1200
 #include "xmmintrin.h" //SSE - needed?
 #endif

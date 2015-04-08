@@ -1,0 +1,25 @@
+Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{EAF909A5-FA59-4C3D-9431-0FCC20D5BCF9}") = "RSPM64P_ICC", "RSPM64P_ICC.icproj", "{4679DC5A-82F2-48ED-8F1F-C04BA6F16858}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		Debug = Debug
+		Release = Release
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{4679DC5A-82F2-48ED-8F1F-C04BA6F16858}.Debug.ActiveCfg = Debug|Win32
+		{4679DC5A-82F2-48ED-8F1F-C04BA6F16858}.Debug.Build.0 = Debug|Win32
+		{4679DC5A-82F2-48ED-8F1F-C04BA6F16858}.Release.ActiveCfg = Release|Win32
+		{4679DC5A-82F2-48ED-8F1F-C04BA6F16858}.Release.Build.0 = Release|Win32
+		{522841A1-4A21-4F23-A98A-3F6A3314CA5C}.Release.Build.0 = Release|Win32
+		{522841A1-4A21-4F23-A98A-3F6A3314CA5C}.Release.ActiveCfg = Release|Win32
+		{522841A1-4A21-4F23-A98A-3F6A3314CA5C}.Debug.Build.0 = Debug|Win32
+		{522841A1-4A21-4F23-A98A-3F6A3314CA5C}.Debug.ActiveCfg = Debug|Win32
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal

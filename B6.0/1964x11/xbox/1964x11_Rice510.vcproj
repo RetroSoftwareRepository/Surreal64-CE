@@ -22,7 +22,7 @@
 				Optimization="0"
 				OptimizeForProcessor="2"
 				AdditionalIncludeDirectories="..\..\Plugins\Include\;..\..\Common\"
-				PreprocessorDefinitions="_DEBUG;DEBUG;_XBOX;DYNAREC;ENABLE_64BIT_FPU;WIN32;_WIN32;_WINDOWS;EXTERNAL_RELEASE;_VIDEO_RICE_510;_RSP_PJ64_LLE;_RSP_SOLO;_AUDIO_AZIMER;_AUDIO_JTTL;_AUDIO_M64P;_AUDIO_NONE;_1964_11"
+				PreprocessorDefinitions="_DEBUG;DEBUG;_XBOX;DYNAREC;ENABLE_64BIT_FPU;WIN32;_WIN32;_WINDOWS;EXTERNAL_RELEASE;_VIDEO_RICE_510;_RSP_PJ64_LLE;_RSP_SOLO;_AUDIO_AZIMER;_AUDIO_JTTL;_AUDIO_NONE;_AUDIO_M64P;_1964_11"
 				BasicRuntimeChecks="0"
 				RuntimeLibrary="0"
 				StructMemberAlignment="4"
@@ -182,7 +182,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="xapilib.lib d3d8i.lib d3dx8.lib xgraphics.lib dsound.lib dmusici.lib xactengi.lib xboxkrnl.lib xbdm.lib xzlib.lib Input.lib VideoRice510.lib RspPJ64LLE.lib AudioAzimer.lib AudioM64Plus.lib AudioJttL.lib AudioNone.lib"
+				AdditionalDependencies="xapilib.lib d3d8i.lib d3dx8.lib xgraphics.lib dsound.lib dmusici.lib xactengi.lib xboxkrnl.lib xbdm.lib xzlib.lib Input.lib VideoRice510.lib RspPJ64LLE.lib AudioAzimer.lib AudioJttL.lib AudioNone.lib AudioM64Plus.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\..\Plugins\lib;.\zlib"
@@ -304,7 +304,7 @@
 				EnableFiberSafeOptimizations="TRUE"
 				OptimizeForProcessor="2"
 				AdditionalIncludeDirectories="..\..\Plugins\Include\;..\..\Common\"
-				PreprocessorDefinitions="NDEBUG;_XBOX;DYNAREC;ENABLE_64BIT_FPU;WIN32;_WIN32;_WINDOWS;EXTERNAL_RELEASE;LTCG;_VIDEO_RICE_510;_RSP_PJ64_LLE;_RSP_HACK_HLE;_RSP_M64P_HLE;_AUDIO_AZIMER;_AUDIO_JTTL;_AUDIO_M64P;_AUDIO_NONE;_AUDIO_BASIC;_1964_11"
+				PreprocessorDefinitions="NDEBUG;_XBOX;DYNAREC;ENABLE_64BIT_FPU;WIN32;_WIN32;_WINDOWS;EXTERNAL_RELEASE;LTCG;_VIDEO_RICE_510;_RSP_PJ64_LLE;_RSP_HACK_HLE;_RSP_M64P_HLE;_AUDIO_AZIMER;_AUDIO_JTTL;_AUDIO_NONE;_AUDIO_BASIC;_AUDIO_M64P;_1964_11"
 				StringPooling="TRUE"
 				RuntimeLibrary="0"
 				StructMemberAlignment="5"
@@ -324,6 +324,79 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="xapilib.lib d3d8ltcg.lib d3dx8.lib xgraphicsltcg.lib dsound.lib dmusicltcg.lib xactengltcg.lib xboxkrnl.lib xzlib.lib Input.lib VideoRice510.lib RSP.lib RSPHLE.lib RSPM64P.lib AudioBasic.lib AudioJttl.lib AudioNone.lib AudioAzimer.lib AudioM64Plus.lib"
+				OutputFile="$(OutDir)\$(ProjectName).exe"
+				LinkIncremental="1"
+				AdditionalLibraryDirectories="..\..\Plugins\lib;.\zlib"
+				IgnoreAllDefaultLibraries="FALSE"
+				IgnoreDefaultLibraryNames=""
+				GenerateDebugInformation="TRUE"
+				ProgramDatabaseFile="$(OutDir)\$(ProjectName).pdb"
+				SubSystem="2"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				OptimizeForWindows98="1"
+				SetChecksum="TRUE"
+				TargetMachine="1"/>
+			<Tool
+				Name="VCPostBuildEventTool"/>
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+			<Tool
+				Name="XboxDeploymentTool"
+				RemotePath="xe:\Surreal64 CE\$(ProjectName).xbe"/>
+			<Tool
+				Name="XboxImageTool"
+				FileName="$(TargetDir)$(ProjectName).xbe"
+				StackSize="65536"
+				NoLibWarn="TRUE"
+				UDCluster="3"
+				TitleID="0x64CE64CE"
+				TitleName="Surreal 64 CE - $(ProjectName)"/>
+		</Configuration>
+		<Configuration
+			Name="Release_ICC|Xbox"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
+			ConfigurationType="1"
+			CharacterSet="2"
+			WholeProgramOptimization="TRUE">
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="2"
+				GlobalOptimizations="TRUE"
+				InlineFunctionExpansion="2"
+				EnableIntrinsicFunctions="FALSE"
+				ImproveFloatingPointConsistency="FALSE"
+				FavorSizeOrSpeed="1"
+				OmitFramePointers="TRUE"
+				EnableFiberSafeOptimizations="TRUE"
+				OptimizeForProcessor="2"
+				AdditionalIncludeDirectories="..\..\Plugins\include\;..\..\Common\"
+				PreprocessorDefinitions="NDEBUG;_XBOX;DYNAREC;ENABLE_64BIT_FPU;WIN32;USE_ICC_LIB;_WIN32;_WINDOWS;EXTERNAL_RELEASE;_VIDEO_RICE_510;_AUDIO_AZIMER;_AUDIO_JTTL;_AUDIO_NONE;_AUDIO_BASIC;_AUDIO_M64P;_RSP_HACK_HLE;_RSP_PJ64_LLE;_RSP_M64P_HLE;_1964_11"
+				StringPooling="TRUE"
+				RuntimeLibrary="0"
+				StructMemberAlignment="5"
+				BufferSecurityCheck="FALSE"
+				EnableFunctionLevelLinking="TRUE"
+				EnableEnhancedInstructionSet="1"
+				UsePrecompiledHeader="0"
+				AssemblerOutput="0"
+				BrowseInformation="1"
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="FALSE"
+				DebugInformationFormat="3"
+				CallingConvention="1"
+				CompileAs="2"/>
+			<Tool
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalOptions="/nodefaultlib:libmmt.lib
+/nodefaultlib:svml_disp.lib
+"
+				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xacteng.lib xboxkrnl.lib xbdm.lib zlib\xzlib.lib AudioBasic.lib AudioJttl.lib AudioM64Plus.lib AudioNone.lib AudioAzimer.lib Input.lib RSP.lib RSPHLE.lib RSPM64P_ICC.lib VideoRice510.lib 1964x11_ICC.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\Plugins\lib;.\zlib"
@@ -593,6 +666,12 @@
 							Name="VCCLCompilerTool"
 							ObjectFile="$(IntDir)\$(InputName)_$(ProjectName).obj"/>
 					</FileConfiguration>
+					<FileConfiguration
+						Name="Release_ICC|Xbox">
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)\$(InputName)_$(ProjectName).obj"/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\win32\Dll_Input.cpp">
@@ -622,6 +701,12 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Release_LTCG|Xbox">
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)\$(InputName)_$(ProjectName).obj"/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release_ICC|Xbox">
 						<Tool
 							Name="VCCLCompilerTool"
 							ObjectFile="$(IntDir)\$(InputName)_$(ProjectName).obj"/>
@@ -659,6 +744,12 @@
 							Name="VCCLCompilerTool"
 							ObjectFile="$(IntDir)\$(InputName)_$(ProjectName).obj"/>
 					</FileConfiguration>
+					<FileConfiguration
+						Name="Release_ICC|Xbox">
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)\$(InputName)_$(ProjectName).obj"/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="..\win32\Dll_Video.cpp">
@@ -688,6 +779,12 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Release_LTCG|Xbox">
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)\$(InputName)_$(ProjectName).obj"/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release_ICC|Xbox">
 						<Tool
 							Name="VCCLCompilerTool"
 							ObjectFile="$(IntDir)\$(InputName)_$(ProjectName).obj"/>

@@ -20,6 +20,7 @@
 #else
 #include <mytypes.h>
 #include "../timer.h"
+#include "../xbox/rompaging.h"
 #endif
 
 #ifdef _XBOX_ICC
