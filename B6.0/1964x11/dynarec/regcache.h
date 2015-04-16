@@ -22,7 +22,9 @@
  */
 #ifndef _REGCACHE_H__1964_
 #define _REGCACHE_H__1964_
+#ifdef _XBOX_ICC
 #include <mytypes.h>
+#endif
 
 /* The following are macros that help us debug the dynarec */
 

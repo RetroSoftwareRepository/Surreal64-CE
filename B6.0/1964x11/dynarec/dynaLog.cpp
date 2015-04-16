@@ -23,7 +23,7 @@
  */
 #ifndef USE_ICC_LIB
 #ifndef _XBOX_ICC
-#include "stdafx.h"
+#include "../stdafx.h"
 #else
 #include <mytypes.h>
 #endif

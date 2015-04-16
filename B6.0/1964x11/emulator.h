@@ -106,7 +106,7 @@ void	Dyna_Code_Check_QWORD(void);
 void	Dyna_Exception_Service_Routine(uint32 vector);
 void	Invalidate4KBlock(uint32 addr, char *opcodename, int type, uint64 newvalue);
 void	CPU_Task_To_String(char *str);
-void    RefreshDynaDuringGamePlay(void);
+extern void    RefreshDynaDuringGamePlay(void);
 
 #ifdef _XBOX
 extern int stateindex;

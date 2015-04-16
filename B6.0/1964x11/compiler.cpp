@@ -32,7 +32,6 @@
 #else
 #include <mytypes.h>
 #include "compiler.h"
-#include "emulator.h"
 #include "r4300i.h"
 #include "interrupt.h"
 #include "dynarec/regcache.h"
@@ -44,7 +43,7 @@
 #include "Registers.h"
 #include "timer.h"
 #endif
-
+#include "emulator.h"
 #ifdef _XBOX_ICC
 extern N64::CRegisters r;
 extern INI_ENTRY currentromoptions;
