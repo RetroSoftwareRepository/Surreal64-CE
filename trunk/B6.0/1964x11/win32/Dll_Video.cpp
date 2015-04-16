@@ -76,7 +76,9 @@ void (CALL *_VIDEO_Under_Selecting_Test) (HWND) = NULL;
 void (CALL *_VIDEO_Under_Selecting_About) (HWND) = NULL;
 
 void (CALL *_VIDEO_FrameBufferWrite) (DWORD addr, DWORD size) = NULL;
-//void (CALL *_VIDEO_FrameBufferWriteList) (FrameBufferModifyEntry *plist, DWORD size) = NULL;
+#ifndef _XBOX
+void (CALL *_VIDEO_FrameBufferWriteList) (FrameBufferModifyEntry *plist, DWORD size) = NULL;
+#endif
 void (CALL *_VIDEO_FrameBufferRead) (DWORD addr) = NULL;
 void (CALL *_VIDEO_GetFrameBufferInfo) (void *pinfo) = NULL;
 void (CALL *_VIDEO_SetOnScreenText) (char *msg) = NULL;

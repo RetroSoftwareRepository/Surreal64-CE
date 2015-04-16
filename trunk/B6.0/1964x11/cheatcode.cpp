@@ -682,10 +682,12 @@ LRESULT APIENTRY CheatAndHackDialog(HWND hDlg, unsigned message, WORD wParam, LO
 	CODEGROUP			newgroup;
 	DWORD				dwParam = *(DWORD *) &wParam;
 	COLORREF			savecol;
-	//TEXTMETRIC			tm;
 	int					y, i;
-	//LPMEASUREITEMSTRUCT lpmis;
-	//LPDRAWITEMSTRUCT	lpdis;
+#ifndef _XBOX
+	TEXTMETRIC			tm;
+	LPMEASUREITEMSTRUCT lpmis;
+	LPDRAWITEMSTRUCT	lpdis;
+#endif
 	/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 	switch(message)

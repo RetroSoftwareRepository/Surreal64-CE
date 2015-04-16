@@ -39,9 +39,10 @@
 #include "gamesave.h"
 #include "timer.h"
 #include "plugins.h"
+#endif
 #include <float.h>
 #include <math.h>
-#endif
+
 #ifdef _XBOX_ICC
 extern N64::CRegisters r;
 #endif

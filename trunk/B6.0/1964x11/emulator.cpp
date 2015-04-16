@@ -25,7 +25,7 @@
 //#include "rompaging.h"
 extern int DoState;
 extern int stateindex;
-extern int loadbDisableEEPROMSaves(void);
+extern int			loadbDisableEEPROMSaves(void);
 #else //win32
 
 #include "romlist.h"
@@ -40,6 +40,7 @@ extern char			*DebugPrintInstruction(uint32 instruction);
 extern char		    *Get_Interrupt_Name(void);
 #endif
 #endif
+
 
 extern char			*DebugPrintInstructionWithOutRefresh(uint32 Instruction);
 extern char			*DebugPrintInstr(uint32 Instruction);
@@ -430,8 +431,10 @@ void InitEmu(void)
 	if((strncmp(currentromoptions.Game_Name, "CONKER BFD", 14) == 0) &&
 		(currentromoptions.Link_4KB_Blocks == USE4KBLINKBLOCK_YES))
 		ConkerBFD_Link4KBlocks = 1;
+#ifdef _XBOX
 	if(loadbDisableEEPROMSaves())
 		currentromoptions.Save_Type = SRAM_SAVETYPE;
+#endif
 
 	CPUdelay = 0;
 	CPUdelayPC = 0;

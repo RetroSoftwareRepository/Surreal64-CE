@@ -400,6 +400,7 @@ void CONTROLLER_ReadController(int _Control, BYTE *_Command)
  */
 void CONTROLLER_SetRumble(int _Control, BOOL _Command)
 {
+#ifdef _XBOX
 	if(_CONTROLLER_SetRumble != NULL)
 	{
 		__try
@@ -411,6 +412,7 @@ void CONTROLLER_SetRumble(int _Control, BOOL _Command)
 		{
 		}
 	}
+#endif
 }
 
 

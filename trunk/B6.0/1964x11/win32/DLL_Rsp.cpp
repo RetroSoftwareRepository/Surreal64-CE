@@ -27,7 +27,9 @@ void	(CALL *_RSPRomClosed)			( void ) = NULL;
 DWORD	(CALL *_DoRspCycles)			( DWORD ) = NULL;
 void	(CALL *_InitiateRSP_1_0)		( RSP_INFO_1_0 rspinfo, DWORD * cycles) = NULL;
 void	(CALL *_InitiateRSP_1_1)		( RSP_INFO_1_1 rspinfo, DWORD * cycles) = NULL;
-//void	(CALL *_RSP_GetDllInfo)			(PLUGIN_INFO *) = NULL;
+#ifndef _XBOX
+void	(CALL *_RSP_GetDllInfo)			(PLUGIN_INFO *) = NULL;
+#endif
 void	(CALL *_RSP_Under_Selecting_DllAbout) (HWND _hWnd) = NULL;
 
 #ifdef _DEBUG

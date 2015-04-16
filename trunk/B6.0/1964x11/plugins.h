@@ -119,7 +119,7 @@ AUDIO_INFO;
 #define PLUGIN_RUMBLE_PAK	3	/* not implemeted for non raw data */
 #define PLUGIN_TANSFER_PAK	4	/* not implemeted for non raw data */
 
-#ifdef _XBOX_ICC
+#if defined(_XBOX_ICC) || !defined(_XBOX)
 typedef struct
 {
 	BOOL	Present;
