@@ -154,8 +154,7 @@ void ErrorToCallFunction(_u32 addr)
 {
 	char buf[200];
 	sprintf(buf, "Error to call function at: %08X in file: %s",addr, ucodeInfos[gUcode].filename);
-	//MessageBox(0,buf, "Error", MB_OK);
-	OutputDebugString(buf);
+	MessageBox(0,buf, "Error", MB_OK);
 }
 
 #ifndef BIG_ENDIAN
@@ -551,8 +550,7 @@ void rsp_ldv_compiler(_u32 addr, _u32 rt, _u32 offset)
 //
 void rsp_lpv(_u32 Instruction)
 {
-    //MessageBox(NULL, "LPV not implemented", "TODO", MB_OK);
-	OutputDebugString("LPV not implemented\n");
+    MessageBox(NULL, "LPV not implemented", "TODO", MB_OK);
 }
 
 //_____________________________________________________________________
@@ -560,8 +558,7 @@ void rsp_lpv(_u32 Instruction)
 //
 void rsp_cop2_vectop_vrcpl(_u32 Instruction)
 {
-    //MessageBox (NULL, "VRCPL not implemented", "TODO", MB_OK);
-	OutputDebugString("VRCPL not implemented\n");
+    MessageBox (NULL, "VRCPL not implemented", "TODO", MB_OK);
 }
 
 //_____________________________________________________________________
@@ -569,8 +566,7 @@ void rsp_cop2_vectop_vrcpl(_u32 Instruction)
 //
 void rsp_cop2_vectop_vrcph(_u32 Instruction)
 {
-    //MessageBox (0, "VRCPH not implemented", "TODO", MB_OK);
-	OutputDebugString("VRCPH not implemented\n");
+    MessageBox (0, "VRCPH not implemented", "TODO", MB_OK);
 }
 
 //_____________________________________________________________________
@@ -578,8 +574,7 @@ void rsp_cop2_vectop_vrcph(_u32 Instruction)
 //
 void rsp_cop2_vectop_vabs(_u32 Instruction)
 {
-	//MessageBox (NULL, "VABS not implemented", "TODO", MB_OK);
-	OutputDebugString("VABS not implemented\n");
+	MessageBox (NULL, "VABS not implemented", "TODO", MB_OK);
 }
 
 //_____________________________________________________________________
@@ -592,7 +587,11 @@ FILE *File_Open(char *filename, char *mode)
 {
 	char		fullPath[1024];
 	// update your path here...
+#ifdef _XBOX
 	strcpy(fullPath, "D:\\");
+#else
+	strcpy(fullPath, "C://");
+#endif
 	strcat(fullPath, filename);
 	return fopen(fullPath, mode);
 }

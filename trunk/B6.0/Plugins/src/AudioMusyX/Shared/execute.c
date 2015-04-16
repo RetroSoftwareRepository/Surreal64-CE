@@ -131,7 +131,11 @@ int LookupUcode()
 
 #ifdef LOG_UCODES
 	{
+#ifdef _XBOX
 		FILE	*fp = File_Open("T:\\Misc\\audioUcodes.log","at");
+#else
+		FILE	*fp = File_Open("audioUcodes.log","at");
+#endif
 		if( fp )
 		{
 			fprintf(fp, "0x%08X,\t0x%08X,\t1,\t// %s\n", crc1, crc2, gameName);
@@ -146,25 +150,25 @@ int LookupUcode()
 		if (*(_u32*)(UData+(0x30)) == 0x0B396696)
 		{
 			//ABI 5
-			//MessageBox(0, "ABI5: MusyX", "", 0);
+			MessageBox(0, "ABI5: MusyX", "", 0);
 			return 6;
 		}
 		else
 		{
 			// ABI 3
-			//MessageBox(0, "ABI3", "", 0);
+			MessageBox(0, "ABI3", "", 0);
 			return 1;
 		}
 	} else {
 		if (*(_u32*)(UData+(0x30)) == 0xF0000F00) // Should be common in ABI 1
 		{
 			// ABI 1
-			//MessageBox(0, "ABI1", "", 0);
+			MessageBox(0, "ABI1", "", 0);
 			return 0;
 		}
 		else {
 			// ABI 2
-			//MessageBox(0, "ABI2", "", 0);
+			MessageBox(0, "ABI2", "", 0);
 			return 2;
 		}
 	}
@@ -198,8 +202,13 @@ void DetectMicrocode()
 void rsp_reset()
 {
 #ifdef TEST_MODE
+#ifdef _XBOX
 	if( !dfile )
 		dfile = File_Open("T:\\Misc\\DynaAudioLog.log","wt");
+#else
+	if( !dfile )
+		dfile = File_Open("DynaAudioLog.log","wt");
+#endif
 #endif // TEST_MODE
 
     memset(&state, 0, sizeof(state));

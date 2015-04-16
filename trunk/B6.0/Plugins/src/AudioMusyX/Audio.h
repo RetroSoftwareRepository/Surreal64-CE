@@ -12,7 +12,13 @@ are both passed to the DLL in InitiateAudio will generate an Interrupt from with
 the plugin.
 
 **********************************************************************************/
-#pragma once
+#ifndef _AUDIO_H_INCLUDED__
+#ifdef _XBOX
+#undef _AUDIO_H_INCLUDED__
+#pragma once // does this change do anyhing?
+#else
+#define _AUDIO_H_INCLUDED__
+#endif
 
 #if defined(__cplusplus)
 extern "C" {
@@ -22,8 +28,8 @@ extern "C" {
 
 #define PLUGIN_TYPE_AUDIO			3
 
-//#define EXPORT						__declspec(dllexport)
-//#define CALL							_cdecl
+#define EXPORT						__declspec(dllexport)
+#define CALL						_cdecl
 
 #define SYSTEM_NTSC					0
 #define SYSTEM_PAL					1
@@ -87,6 +93,13 @@ typedef struct {
 	void (*CheckInterrupts)( void );
 } AUDIO_INFO;
 
+#ifdef _XBOX
+#define NAME_DEFINE(name) _AUDIO_MUSYX_##name
+#define FUNC_TYPE(type) type
+#else
+#define NAME_DEFINE(name)  CALL name
+#define FUNC_TYPE(type) EXPORT type
+#endif
 
 /******************************************************************
   Function: AiDacrateChanged
@@ -98,7 +111,7 @@ typedef struct {
                SYSTEM_MPAL	2
   output:   none
 *******************************************************************/ 
-void _AUDIO_MUSYX_AiDacrateChanged (int  SystemType);
+FUNC_TYPE(void) NAME_DEFINE(AiDacrateChanged) (int  SystemType);
 
 /******************************************************************
   Function: AiLenChanged
@@ -107,7 +120,7 @@ void _AUDIO_MUSYX_AiDacrateChanged (int  SystemType);
   input:    none
   output:   none
 *******************************************************************/ 
-void _AUDIO_MUSYX_AiLenChanged (void);
+FUNC_TYPE(void) NAME_DEFINE(AiLenChanged) (void);
 
 /******************************************************************
   Function: AiReadLength
@@ -116,7 +129,7 @@ void _AUDIO_MUSYX_AiLenChanged (void);
   input:    none
   output:   The amount of bytes still left to play.
 *******************************************************************/ 
-DWORD _AUDIO_MUSYX_AiReadLength (void);
+FUNC_TYPE(DWORD) NAME_DEFINE(AiReadLength) (void);
 
 /******************************************************************
   Function: AiUpdate
@@ -130,7 +143,7 @@ DWORD _AUDIO_MUSYX_AiReadLength (void);
             till there is a messgae in the its message queue.
   output:   none
 *******************************************************************/ 
-void _AUDIO_MUSYX_AiUpdate (BOOL Wait);
+FUNC_TYPE(void) NAME_DEFINE(AiUpdate) (BOOL Wait);
 
 /******************************************************************
   Function: CloseDLL
@@ -139,7 +152,7 @@ void _AUDIO_MUSYX_AiUpdate (BOOL Wait);
   input:    none
   output:   none
 *******************************************************************/ 
-void _AUDIO_MUSYX_CloseDLL (void);
+FUNC_TYPE(void) NAME_DEFINE(CloseDLL) (void);
 
 /******************************************************************
   Function: DllAbout
@@ -148,7 +161,7 @@ void _AUDIO_MUSYX_CloseDLL (void);
   input:    a handle to the window that calls this function
   output:   none
 *******************************************************************/ 
-void _AUDIO_MUSYX_DllAbout ( HWND hParent );
+FUNC_TYPE(void) NAME_DEFINE(DllAbout) ( HWND hParent );
 
 /******************************************************************
   Function: DllConfig
@@ -157,7 +170,7 @@ void _AUDIO_MUSYX_DllAbout ( HWND hParent );
   input:    a handle to the window that calls this function
   output:   none
 *******************************************************************/ 
-void _AUDIO_MUSYX_DllConfig ( HWND hParent );
+FUNC_TYPE(void) NAME_DEFINE(DllConfig) ( HWND hParent );
 
 /******************************************************************
   Function: DllTest
@@ -166,7 +179,7 @@ void _AUDIO_MUSYX_DllConfig ( HWND hParent );
   input:    a handle to the window that calls this function
   output:   none
 *******************************************************************/ 
-void _AUDIO_MUSYX_DllTest ( HWND hParent );
+FUNC_TYPE(void) NAME_DEFINE(DllTest) ( HWND hParent );
 
 /******************************************************************
   Function: GetDllInfo
@@ -176,7 +189,7 @@ void _AUDIO_MUSYX_DllTest ( HWND hParent );
             filled by the function. (see def above)
   output:   none
 *******************************************************************/ 
-void _AUDIO_MUSYX_GetDllInfo ( PLUGIN_INFO * PluginInfo );
+FUNC_TYPE(void) NAME_DEFINE(GetDllInfo) ( PLUGIN_INFO * PluginInfo );
 
 /******************************************************************
   Function: InitiateSound
@@ -193,7 +206,7 @@ void _AUDIO_MUSYX_GetDllInfo ( PLUGIN_INFO * PluginInfo );
   and then call the function CheckInterrupts to tell the emulator
   that there is a waiting interrupt.
 *******************************************************************/ 
-BOOL _AUDIO_MUSYX_InitiateAudio (AUDIO_INFO Audio_Info);
+FUNC_TYPE(BOOL) NAME_DEFINE(InitiateAudio) (AUDIO_INFO Audio_Info);
 
 /******************************************************************
   Function: ProcessAList
@@ -203,8 +216,8 @@ BOOL _AUDIO_MUSYX_InitiateAudio (AUDIO_INFO Audio_Info);
   input:    none
   output:   none
 *******************************************************************/ 
-void _AUDIO_MUSYX_ProcessAList(void);
-DWORD _AUDIO_MUSYX_ProcessAListCountCycles(void);
+FUNC_TYPE(void) NAME_DEFINE(ProcessAList) (void);
+FUNC_TYPE(DWORD) NAME_DEFINE(ProcessAListCountCycles) (void);
 
 /******************************************************************
   Function: RomClosed
@@ -212,19 +225,22 @@ DWORD _AUDIO_MUSYX_ProcessAListCountCycles(void);
   input:    none
   output:   none
 *******************************************************************/ 
-void _AUDIO_MUSYX_RomClosed (void);
+FUNC_TYPE(void) NAME_DEFINE(RomClosed) (void);
 
-void _AUDIO_MUSYX_AudioBoost (BOOL Boost);
+FUNC_TYPE(void) NAME_DEFINE(AudioBoost) (BOOL Boost);
 
-BOOL _AUDIO_MUSYX_IsMusyX(void);
+FUNC_TYPE(BOOL) NAME_DEFINE(IsMusyX) (void);
 
 #if defined(__cplusplus)
 }
 #endif
-/*
+
+#ifndef _XBOX
 #ifdef _DEBUG
 extern void DebuggerMsgToEmuCore(char *msg);
 #else
 #define DebuggerMsgToEmuCore(msg)
-#endif
-*/
+#endif // _DEBUG
+#endif // _XBOX
+
+#endif // _AUDIO_H_INCLUDED__
