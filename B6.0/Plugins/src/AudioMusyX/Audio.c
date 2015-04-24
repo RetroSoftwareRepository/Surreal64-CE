@@ -43,14 +43,14 @@
 #define DSB_Play	IDirectSoundBuffer8_Play
 #define DSB_Stop	IDirectSoundBuffer8_Stop
 #define DSB_GetStatus	IDirectSoundBuffer8_GetStatus
-#define DSB_GETFORMAT	IDirectSoundBuffer8_GetFormat
+#define DSB_GetFormat	IDirectSoundBuffer8_GetFormat
 #define DSB_SetFormat	IDirectSoundBuffer8_SetFormat
 #define DSB_Lock	IDirectSoundBuffer8_Lock
 #define DSB_Unlock	IDirectSoundBuffer8_Unlock
 #define DSB_SetVolume	IDirectSoundBuffer8_SetVolume
 #define DSB_SetHeadroom	IDirectSoundBuffer8_SetHeadroom
 #define DSB_SetMixBins	IDirectSoundBuffer8_SetMixBins
-#define DSB_SetNotificationPositions	IDirectSoundBuffer8_SetNotificationPositions
+#define DSN_SetNotificationPositions	IDirectSoundNotify_SetNotificationPositions
 #define DS_QueryInterface	IDirectSound8_QueryInterface
 #define DS_Release	IDirectSound8_Release
 #define DSB_Release	IDirectSoundBuffer8_Release
@@ -107,8 +107,8 @@ LPDIRECTSOUND8        lpds;
 #ifndef _XBOX
 LPDIRECTSOUNDNOTIFY8  lpdsNotify;
 #endif
-HANDLE               rghEvent[NUMCAPTUREEVENTS];
-DSBPOSITIONNOTIFY    rgdscbpn[NUMCAPTUREEVENTS];
+HANDLE               rghEvent[NUMCAPTUREEVENTS + 1];
+DSBPOSITIONNOTIFY    rgdscbpn[NUMCAPTUREEVENTS + 1];
 
 extern int gUcode;
 FUNC_TYPE(void) NAME_DEFINE(AiDacrateChanged) (int SystemType) {
@@ -180,7 +180,7 @@ FUNC_TYPE(void) NAME_DEFINE(AiLenChanged) (void) {
 	if (Playing) {
 		for (count = 0; count < 3; count ++) {
 			if (SndBuffer[count] == Buffer_Playing) {
-				offset = (count + 1) & 3;
+				offset = (count + 1) % 3;
 			}
 		}
 	} else {
@@ -188,22 +188,22 @@ FUNC_TYPE(void) NAME_DEFINE(AiLenChanged) (void) {
 	}
 
 	for (count = 0; count < 3; count ++) {
-		if (SndBuffer[(count + offset) & 3] == Buffer_HalfFull) {
-			FillBuffer((count + offset) & 3);
+		if (SndBuffer[(count + offset) % 3] == Buffer_HalfFull) {
+			FillBuffer((count + offset) % 3);
 			count = 3;
 		}
 	}
 	for (count = 0; count < 3; count ++) {
-		if (SndBuffer[(count + offset) & 3] == Buffer_Full) {
-			FillBuffer((count + offset + 1) & 3);
-			FillBuffer((count + offset + 2) & 3);
+		if (SndBuffer[(count + offset) % 3] == Buffer_Full) {
+			FillBuffer((count + offset + 1) % 3);
+			FillBuffer((count + offset + 2) % 3);
 			count = 20;
 		}
 	}
 	if (count < 10) {
-		FillBuffer((0 + offset) & 3);
-		FillBuffer((1 + offset) & 3);
-		FillBuffer((2 + offset) & 3);
+		FillBuffer((0 + offset) % 3);
+		FillBuffer((1 + offset) % 3);
+		FillBuffer((2 + offset) % 3);
 	}
 }
 
@@ -267,21 +267,33 @@ DWORD dwEvt;
 	}
 
 	switch (dwEvt) {
+#ifdef _XBOX
 	case WAIT_OBJECT_0: 
+#else
+	case 0:
+#endif
 		SndBuffer[0] = Buffer_Empty;
 		FillSectionWithSilence(0);
 		SndBuffer[1] = Buffer_Playing;
 		FillBuffer(2);
 		FillBuffer(0);
 		break;
+#ifdef _XBOX
 	case WAIT_OBJECT_0 + 1: 
+#else
+	case 1:
+#endif
 		SndBuffer[1] = Buffer_Empty;
 		FillSectionWithSilence(1);
 		SndBuffer[2] = Buffer_Playing;
 		FillBuffer(0);
 		FillBuffer(1);
 		break;
+#ifdef _XBOX
 	case WAIT_OBJECT_0 + 2: 
+#else
+	case 2:
+#endif
 		SndBuffer[2] = Buffer_Empty;
 		FillSectionWithSilence(2);
 		SndBuffer[0] = Buffer_Playing;
@@ -428,7 +440,7 @@ FUNC_TYPE(void) NAME_DEFINE(CloseDLL) (void)
 		DS_Release(lpds);
         lpds = NULL;
 	}
-	#endif
+#endif
 }
 
 #ifdef _XBOX
@@ -589,7 +601,7 @@ __forceinline BOOL FillBufferWithSilence( LPDIRECTSOUNDBUFFER lpDsb ) {
 
 #ifndef _XBOX
 	//	freakdave - GetFormat Not supported on XBOX
-    if ( FAILED( DSB_GETFORMAT(/*lpDsb*/lpdsbuf, &wfx, sizeof( WAVEFORMATEX ), &dwSizeWritten ) ) ) {
+    if ( FAILED( DSB_GetFormat(lpDsb, &wfx, sizeof( WAVEFORMATEX ), &dwSizeWritten ) ) ) {
         return FALSE;
 	}
 #else
@@ -649,7 +661,7 @@ FUNC_TYPE(void) NAME_DEFINE(GetDllInfo) ( PLUGIN_INFO * PluginInfo )
 extern DWORD imem_DMA_dst;
 extern DWORD imem_DMA_src;
 
-BOOL _AUDIO_MUSYX_InitiateAudio (AUDIO_INFO Audio_Info) 
+FUNC_TYPE(BOOL) NAME_DEFINE(InitiateAudio) (AUDIO_INFO Audio_Info) 
 {
 //	HRESULT hr;
 //	int count;
@@ -811,7 +823,8 @@ void SetupDSoundBuffers(void) {
 #else
 	hr = IDirectSound8_CreateSoundBuffer(lpds,&dsPrimaryBuff, &lpdsb, NULL);
 #endif
-	if (SUCCEEDED ( hr ) ) {
+	if (SUCCEEDED ( hr ) ) 
+	{
 #ifdef _XBOX
 		if (bAudioBoostMusyX) {
 		DSMIXBINVOLUMEPAIR dsmbvp[8] = {
@@ -836,12 +849,14 @@ void SetupDSoundBuffers(void) {
 		DSB_Play(lpdsbuf, 0, 0, DSBPLAY_LOOPING );
 		}
 		else
-#endif
 		{
 		DSB_SetFormat(lpdsbuf, &wfm );
 		DSB_Play(lpdsbuf, 0, 0, DSBPLAY_LOOPING );
 		}
-		
+#else
+		DSB_SetFormat(lpdsb, &wfm );
+		DSB_Play(lpdsb, 0, 0, DSBPLAY_LOOPING );
+#endif
 	}
 #ifdef _XBOX
 	else
@@ -888,7 +903,7 @@ void SetupDSoundBuffers(void) {
 	}
 
     // Set capture buffer notifications.
-    if ( FAILED( hr = DSB_SetNotificationPositions(lpdsNotify, NUMCAPTUREEVENTS, rgdscbpn ) ) ) {
+    if ( FAILED( hr = DSN_SetNotificationPositions(lpdsNotify, NUMCAPTUREEVENTS, rgdscbpn ) ) ) {
 		DisplayError("IDirectSoundNotify_SetNotificationPositions: Failed");
 		return;
     }
