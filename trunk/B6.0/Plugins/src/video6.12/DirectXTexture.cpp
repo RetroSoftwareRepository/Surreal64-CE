@@ -180,7 +180,7 @@ LPRICETEXTURE CDirectXTexture::CreateTexture(uint32 dwWidth, uint32 dwHeight, Te
 		{
 		case AS_BACK_BUFFER_SAVE:
 #ifdef _XBOX
-			pf = D3DFMT_LIN_X1R5G5B5;
+			pf = D3DFMT_A4R4G4B4;
 #else
 			pf = D3DFMT_X4R4G4B4;
 #endif
@@ -215,14 +215,8 @@ LPRICETEXTURE CDirectXTexture::CreateTexture(uint32 dwWidth, uint32 dwHeight, Te
 		break;
 	}
 
-	//Ensure that texture height and widths are of a power of two.
-	uint32 w;
-	for (w = 1; w < dwWidth; w <<= 1);
-	uint32 h;
-	for (h = 1; h < dwHeight; h <<= 1);
-	
-	m_dwCreatedTextureWidth = w;
-	m_dwCreatedTextureHeight = h;
+	m_dwCreatedTextureWidth = dwWidth;
+	m_dwCreatedTextureHeight = dwHeight;
 
 	m_dwWidth = dwWidth;
 	m_dwHeight = dwHeight;

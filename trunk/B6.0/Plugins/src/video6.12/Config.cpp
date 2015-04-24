@@ -25,7 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "../../../config.h"
 
 extern int TextureMode;
-extern int FrameSkip;
+extern bool FrameSkip;
 
 #define MAIN_KEY		"Software\\RICEVIDEO\\Version612"
 #define INI_FILE		"RiceVideo6.1.2.ini"
@@ -138,22 +138,22 @@ const SettingInfo ForceTextureFilterSettings[] =
 const SettingInfo TextureEnhancementSettings[] =
 {
 	"N64 original texture (No enhancement)",	TEXTURE_NO_ENHANCEMENT,
-	"2x (Double the texture size)",	TEXTURE_2X_ENHANCEMENT,
-	"2xSaI", TEXTURE_2XSAI_ENHANCEMENT,
-	"hq2x", TEXTURE_HQ2X_ENHANCEMENT,
-	"lq2x", TEXTURE_LQ2X_ENHANCEMENT,
-	"hq4x", TEXTURE_HQ4X_ENHANCEMENT,
-	"Sharpen", TEXTURE_SHARPEN_ENHANCEMENT,
-	"Sharpen More", TEXTURE_SHARPEN_MORE_ENHANCEMENT,
+	//"2x (Double the texture size)",	TEXTURE_2X_ENHANCEMENT,
+	//"2xSaI", TEXTURE_2XSAI_ENHANCEMENT,
+	//"hq2x", TEXTURE_HQ2X_ENHANCEMENT,
+	//"lq2x", TEXTURE_LQ2X_ENHANCEMENT,
+	//"hq4x", TEXTURE_HQ4X_ENHANCEMENT,
+	//"Sharpen", TEXTURE_SHARPEN_ENHANCEMENT,
+	//"Sharpen More", TEXTURE_SHARPEN_MORE_ENHANCEMENT,
 };
 
 const SettingInfo TextureEnhancementControlSettings[] =
 {
 	"Normal",	TEXTURE_ENHANCEMENT_NORMAL,
-	"Smooth",	TEXTURE_ENHANCEMENT_WITH_SMOOTH_FILTER_1,
-	"Less smooth", TEXTURE_ENHANCEMENT_WITH_SMOOTH_FILTER_2,
-	"2xSaI smooth", TEXTURE_ENHANCEMENT_WITH_SMOOTH_FILTER_3,
-	"Less 2xSaI smooth", TEXTURE_ENHANCEMENT_WITH_SMOOTH_FILTER_4,
+	//"Smooth",	TEXTURE_ENHANCEMENT_WITH_SMOOTH_FILTER_1,
+	//"Less smooth", TEXTURE_ENHANCEMENT_WITH_SMOOTH_FILTER_2,
+	//"2xSaI smooth", TEXTURE_ENHANCEMENT_WITH_SMOOTH_FILTER_3,
+	//"Less 2xSaI smooth", TEXTURE_ENHANCEMENT_WITH_SMOOTH_FILTER_4,
 };
 
 const SettingInfo colorQualitySettings[] =
@@ -410,23 +410,15 @@ void ReadConfiguration(void)
 		options.bEnableVertexShader = FALSE;
 		options.RenderBufferSetting=0;
 		options.forceTextureFilter = TextureMode;
-		if(XboxPitch == 2)
-			options.textureQuality = TXT_QUALITY_16BIT; //TXT_QUALITY_DEFAULT
-		else
-			options.textureQuality = TXT_QUALITY_32BIT; //TXT_QUALITY_DEFAULT
+		options.textureQuality = TXT_QUALITY_16BIT; //TXT_QUALITY_DEFAULT
 		options.bTexRectOnly = FALSE;
 		options.bSmallTextureOnly = FALSE;
 		options.bLoadHiResTextures = FALSE;
 		options.bDumpTexturesToFiles = FALSE;
 		options.DirectXDepthBufferSetting = 0;
-		if(XboxPitch == 2)
-			options.colorQuality = TEXTURE_FMT_A4R4G4B4;
-		else
-			options.colorQuality = TEXTURE_FMT_A8R8G8B8;
+		options.colorQuality = TEXTURE_FMT_A4R4G4B4;
 		options.textureEnhancement = 0;
-		options.textureEnhancementControl = 0; //0
-		if((preferedemu != _1964x11)&&(FrameSkip>1))
-			FrameSkip = 0;
+		options.textureEnhancementControl = 1; //0
 		options.bSkipFrame = FrameSkip;
 		options.DirectXAntiAliasingValue = 0;
 		options.DirectXCombiner = DX_PIXEL_SHADER;
@@ -664,10 +656,6 @@ void GenerateCurrentRomOptions()
 	else if ((stricmp(g_curRomInfo.szGameName, "QUAKE II") == 0))
 	{
 		options.enableHackForGames = HACK_FOR_QUAKE_2;
-	}
-	else if ((stricmp(g_curRomInfo.szGameName, "MarioParty") == 0))
-	{
-		options.enableHackForGames = HACK_FOR_MARIOPARTY;
 	}
 
 	if( currentRomOptions.N64FrameBufferEmuType == 0 )		currentRomOptions.N64FrameBufferEmuType = defaultRomOptions.N64FrameBufferEmuType;

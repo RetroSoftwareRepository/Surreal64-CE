@@ -60,6 +60,7 @@ public:
 	BOOL	m_bBlendModeValid;
 
 	CColorCombiner *m_pColorCombiner;
+	CBlender *m_pAlphaBlender;
 	
 	
 	virtual ~CRender();
@@ -83,7 +84,11 @@ public:
 	void SetTextureEnable(bool bEnable);
 	void SetTextureScale(int dwTile, float fScaleX, float fScaleY);
 	
-	virtual void SetFogEnable(bool bEnable) {}
+	virtual void SetFogEnable(bool bEnable) 
+	{ 
+		DEBUGGER_IF_DUMP( (gRSP.bFogEnabled != bEnable && logFog ), TRACE1("Set Fog %s", bEnable? "enable":"disable"));
+		gRSP.bFogEnabled = bEnable&&options.bEnableFog;
+	}
 	virtual void SetFogMinMax(float fMin, float fMax) = 0;
 	virtual void TurnFogOnOff(bool flag)=0;
 	bool m_bFogStateSave;
@@ -109,7 +114,7 @@ public:
 			TRACE0("Popping past projection stack limits");
 	}
 
-	void PopWorldView(u32 num = 1);
+	void PopWorldView();
 	Matrix & GetWorldProjectMatrix(void);
 	void SetWorldProjectMatrix(Matrix &mtx);
 	
@@ -117,12 +122,7 @@ public:
 
 	inline RenderShadeMode GetShadeMode() { return gRSP.shadeMode; }
 
-	inline void CopyVtx(uint32 dwSrc, uint32 dwDest)
-	{
-		g_fVtxTxtCoords[dwDest].x = g_fVtxTxtCoords[dwSrc].x;
-		g_fVtxTxtCoords[dwDest].y = g_fVtxTxtCoords[dwSrc].y;
-	}
-	inline void SetVtxTextureCoord(uint32 dwV, float tu, float tv)
+	void SetVtxTextureCoord(uint32 dwV, float tu, float tv)
 	{
 		g_fVtxTxtCoords[dwV].x = tu;
 		g_fVtxTxtCoords[dwV].y = tv;
@@ -131,8 +131,7 @@ public:
 	virtual void RenderReset();
 	virtual void SetCombinerAndBlender();
 	virtual void SetMux(uint32 dwMux0, uint32 dwMux1);
-	virtual void SetCullMode(bool bCullFront, bool bCullBack)
-	{ gRDP.tnl.TriCull = bCullFront; gRDP.tnl.CullBack = bCullBack; }
+	virtual void SetCullMode(bool bCullFront, bool bCullBack) { gRSP.bCullFront = bCullFront; gRSP.bCullBack = bCullBack; }
 
 	virtual void BeginRendering(void) {CRender::gRenderReferenceCount++;}		// For DirectX only
 	virtual void EndRendering(void) 

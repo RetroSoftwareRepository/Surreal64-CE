@@ -21,7 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "TextureFilters.h"
 //#include "lib/BMGDll.h"
 
-#ifndef _XBOX_KITTEN_MEOW_MEOW
+#ifndef _XBOX
 
 
 /************************************************************************/
@@ -607,10 +607,10 @@ void EnhanceTexture(TxtrCacheEntry *pEntry)
 		return;
 	}
 
-	//if( status.primitiveType != PRIM_TEXTRECT && options.bTexRectOnly )
-	//{
-	//	return;
-	//}
+	if( status.primitiveType != PRIM_TEXTRECT && options.bTexRectOnly )
+	{
+		return;
+	}
 
 	DrawInfo srcInfo;	
 	if( pEntry->pTexture->StartUpdate(&srcInfo) == false )
@@ -908,7 +908,7 @@ CSortedList<uint64,ExtTxtrInfo> gHiresTxtrInfos;
 
 extern void GetPluginDir( char * Directory );
 extern char * right(char * src, int nchars);
-/*
+
 void FindAllTexturesFromFolder(char *foldername, CSortedList<uint64,ExtTxtrInfo> &infos, bool extraCheck, bool bRecursive)
 {
 	if( PathIsDirectory(foldername) == FALSE )	return;
@@ -1213,8 +1213,7 @@ void FindAllTexturesFromFolder(char *foldername, CSortedList<uint64,ExtTxtrInfo>
 		}
 	} while(FindNextFile(findfirst, &libaa));
 }
-*/
-/*
+
 bool CheckAndCreateFolder(const char* pathname)
 {
 	if( !PathFileExists(pathname) )
@@ -1228,7 +1227,6 @@ bool CheckAndCreateFolder(const char* pathname)
 
 	return true;
 }
-*/
 
 
 // Texture dumping filenaming
@@ -1246,7 +1244,7 @@ char *subfolders[] = {
 	"ci_bmp_with_pal_crc\\",
 	"ci_by_png\\",
 };
-/*
+
 void FindAllDumpedTextures(void)
 {
 	char	foldername[256];
@@ -1285,8 +1283,8 @@ void FindAllDumpedTextures(void)
 		}
 	}
 }
-*/
-/*
+
+
 void FindAllHiResTextures(void)
 {
 	char	foldername[256];
@@ -1309,8 +1307,7 @@ void FindAllHiResTextures(void)
 		FindAllTexturesFromFolder(foldername,gHiresTxtrInfos, true, true);
 	}
 }
-*/
-/*
+
 void CloseHiresTextures(void)
 {
 	for( int i=0; i<gHiresTxtrInfos.size(); i++)
@@ -1370,7 +1367,7 @@ void InitExternalTextures(void)
 	InitHiresTextures();
 	InitTextureDump();
 }
-*/
+
 int FindScaleFactor(ExtTxtrInfo &info, TxtrCacheEntry &entry)
 {
 	int scaleShift = -1;
@@ -1500,7 +1497,7 @@ bool SaveCITextureToFile(TxtrCacheEntry &entry, char *filename, bool bShow, bool
 //		"ci_bmp_with_pal_crc\\",
 //		"ci_by_png\\",
 //};
-/*
+
 void DumpCachedTexture( TxtrCacheEntry &entry )
 {
 	//if( (gRDP.otherMode.text_tlut>=2 || entry.ti.Format == TXT_FMT_CI || entry.ti.Format == TXT_FMT_RGBA) && entry.ti.Size <= TXT_SIZE_8b )
@@ -1663,8 +1660,7 @@ bool LoadRGBBufferFromJPEGFile(char *filename, unsigned char **pbuf, int &width,
 		return false;
 	}
 }
-*/
-/*
+
 bool LoadRGBABufferFromColorIndexedFile(char *filename, TxtrCacheEntry &entry, unsigned char **pbuf, int &width, int &height)
 {
 	BITMAPFILEHEADER fileHeader;
@@ -1831,8 +1827,7 @@ bool LoadRGBBufferFromBMPFile(char *filename, unsigned char **pbuf, int &width, 
 		return false;
 	}
 }
-*/
-/*
+
 void LoadHiresTexture( TxtrCacheEntry &entry )
 {
 	if( entry.bExternalTxtrChecked )
@@ -2029,7 +2024,7 @@ void LoadHiresTexture( TxtrCacheEntry &entry )
 	if( buf_a )
 		delete [] buf_a;
 }
-*/
+
 #endif
 
 

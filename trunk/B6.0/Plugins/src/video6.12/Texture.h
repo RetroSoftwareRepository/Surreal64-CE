@@ -92,10 +92,8 @@ public:
 
 	virtual void RestoreAlphaChannel(void);	// Restore Alpha channel from RGB channel
 
-	CTexture(uint32 dwWidth, uint32 dwHeight, TextureUsage usage = AS_NORMAL);
-
 protected:
-	MYLPDIRECT3DTEXTURE CreateTexture(uint32 dwWidth, uint32 dwHeight, TextureUsage usage = AS_NORMAL);
+	CTexture(uint32 dwWidth, uint32 dwHeight, TextureUsage usage = AS_NORMAL);
 	LPRICETEXTURE	m_pTexture;
 	TextureFmt		m_dwTextureFmt;
 };

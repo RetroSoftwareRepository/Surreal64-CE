@@ -23,7 +23,6 @@ CTextureManager gTextureManager;
 
 bool g_bUseSetTextureMem = true;
 DWORD g_maxTextureMemUsage = (5*1024*1024);
-BOOL bPurgeOldBeforeIGM = FALSE;
 
 
 static const DWORD MEM_KEEP_FREE = (2*1024*1024); // keep 2MB free
@@ -158,7 +157,7 @@ bool CTextureManager::CleanUp()
 		{
 			TxtrCacheEntry * pVictim = m_pHead;
 			m_pHead = pVictim->pNext;
-			m_currentTextureMemUsage -= (pVictim->pTexture->m_dwWidth * pVictim->pTexture->m_dwHeight * XboxPitch);
+			m_currentTextureMemUsage -= (pVictim->pTexture->m_dwWidth * pVictim->pTexture->m_dwHeight * 2);
 			delete pVictim;
 		}
 	}
@@ -181,12 +180,7 @@ void CTextureManager::PurgeOldTextures()
 	{
 		gTextureManager.CleanUp();
 		m_currentTextureMemUsage = 0;
-		bPurgeOldBeforeIGM = FALSE;
 		return;
-	}
-	else if(bPurgeOldBeforeIGM)
-	{
-		bPurgeOldBeforeIGM = FALSE;
 	}
 	else if(options.enableHackForGames != HACK_FOR_QUAKE_2)
 	{
@@ -235,7 +229,7 @@ void CTextureManager::PurgeOldTextures()
 			if (pPrev != NULL) pPrev->pNext        = pCurr->pNext;
 			else			   m_pHead = pCurr->pNext;
 
-			m_currentTextureMemUsage -= (pCurr->pTexture->m_dwWidth * pCurr->pTexture->m_dwHeight * XboxPitch);
+			m_currentTextureMemUsage -= (pCurr->pTexture->m_dwWidth * pCurr->pTexture->m_dwHeight * 2);
 			
 			delete pCurr;
 			pCurr = pNext;	
@@ -273,7 +267,7 @@ void CTextureManager::RecycleAllTextures()
 			dwTotalUses += pTVictim->dwUses;
 			dwCount++;
 
-			m_currentTextureMemUsage -= (pTVictim->pTexture->m_dwWidth * pTVictim->pTexture->m_dwHeight * XboxPitch);
+			m_currentTextureMemUsage -= (pTVictim->pTexture->m_dwWidth * pTVictim->pTexture->m_dwHeight * 2);
 			delete pTVictim;
 
 		}
@@ -438,7 +432,7 @@ void CTextureManager::RemoveTexture(TxtrCacheEntry * pEntry)
 				}
 
 				// decrease the mem usage counter
-				m_currentTextureMemUsage -= (pEntry->pTexture->m_dwWidth * pEntry->pTexture->m_dwHeight * XboxPitch);
+				m_currentTextureMemUsage -= (pEntry->pTexture->m_dwWidth * pEntry->pTexture->m_dwHeight * 2);
 			
 				delete pEntry;
 
@@ -478,7 +472,7 @@ TxtrCacheEntry * CTextureManager::CreateNewCacheEntry(uint32 dwAddr, uint32 dwWi
 	uint32 widthToCreate = dwWidth;
 	uint32 heightToCreate = dwHeight;
 
-	DWORD freeUpSize = (widthToCreate * heightToCreate * XboxPitch);
+	DWORD freeUpSize = (widthToCreate * heightToCreate * 2);
 
 	FreeTextures(); // make sure memory is in a safe zone
 
@@ -505,7 +499,7 @@ TxtrCacheEntry * CTextureManager::CreateNewCacheEntry(uint32 dwAddr, uint32 dwWi
 	{
 	pEntry = ReviveTexture(dwWidth, dwHeight);
 	}
-	m_currentTextureMemUsage += (dwWidth * dwHeight * XboxPitch);
+	m_currentTextureMemUsage += (dwWidth * dwHeight * 2);
 	
 
 #ifdef OLDTXTCACHE
@@ -687,35 +681,6 @@ TxtrCacheEntry * CTextureManager::GetTexture(TxtrInfo * pgti, bool fromTMEM, boo
 		dwPalCRC = CalculateRDRAMCRC(pStart, 0, 0, maxCI+1, 1, TXT_SIZE_16b, dwPalSize*2);
 		dwAsmCRC = dwAsmCRCSave;
 	}
-	
-	//This creates a black texture on the floor in Planet Zebes in SSB
-	// Fix for textures where ti is identical. In this case just the first texture has been added to the Cache.
-	// for further instances this texture has just been replaced instead of adding the additional texture to the same index
-	// in the cachelist. This was causing the slowdowns. Thus we have to iterate through the bucket of the cache list and see
-	// which of the textures that have been placed to it is the one we are looking for
-	/*if(pEntry && pEntry->dwCRC == dwAsmCRC && pEntry->dwPalCRC != dwPalCRC &&
-			(!loadFromTextureBuffer || gRenderTextureInfos[txtBufIdxToLoadFrom].updateAtFrame < pEntry->FrameLastUsed ))
-	{
-		bool bChecksumDoMatch=false;
-		// iterate through all textures located in the same bucket
-		while(pEntry->pNext)
-		{
-			// check the next texture in the same bucket
-			pEntry = pEntry->pNext;
-				// let's see if this one is the one we are actually looking for
-				if(pEntry->dwCRC == dwAsmCRC && pEntry->dwPalCRC == dwPalCRC && (!loadFromTextureBuffer || gRenderTextureInfos[txtBufIdxToLoadFrom].updateAtFrame < pEntry->FrameLastUsed ))
-				{
-					// found it in the neighbourhood
-					bChecksumDoMatch = true;
-					break;
-				}
-		}
-		// cannot find it 
-		if(!bChecksumDoMatch){
-			// try to load it
-			pEntry = NULL;
-		}
-	}*/ 
 
 	if (pEntry && doCRCCheck )
 	{
@@ -1563,10 +1528,10 @@ void ConvertTextureRGBAtoI(TxtrCacheEntry* pEntry, bool alpha)
 		uint32 val;
 		uint32 r,g,b,a,i;
 
-		for(unsigned int nY = 0; nY < srcInfo.dwCreatedHeight; nY++)
+		for(int nY = 0; nY < srcInfo.dwCreatedHeight; nY++)
 		{
 			buf = (uint32*)((uint8*)srcInfo.lpSurface+nY*srcInfo.lPitch);
-			for(unsigned int nX = 0; nX < srcInfo.dwCreatedWidth; nX++)
+			for(int nX = 0; nX < srcInfo.dwCreatedWidth; nX++)
 			{
 				val = buf[nX];
 				b = (val>>0)&0xFF;

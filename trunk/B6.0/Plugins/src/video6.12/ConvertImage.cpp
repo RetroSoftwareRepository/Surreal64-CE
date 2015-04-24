@@ -702,7 +702,7 @@ void ConvertCI4_RGBA16(CTexture *pTexture, const TxtrInfo &tinfo)
 
 			uint32 dwByteOffset = ((y+tinfo.TopToLoad) * tinfo.Pitch);
 			uint32 * pDst = (uint32 *)((uint8 *)dInfo.lpSurface + y * dInfo.lPitch);
-            if (tinfo.WidthToLoad == 1)
+            /*if (tinfo.WidthToLoad == 1)
             {
                 // corner case
                 uint8 b = pSrc[dwByteOffset ^ nFiddle];
@@ -714,7 +714,7 @@ void ConvertCI4_RGBA16(CTexture *pTexture, const TxtrInfo &tinfo)
                 }
             }
             else
-			{
+			{*/
 				for (uint32 x = 0; x < tinfo.WidthToLoad; x+=2)
 				{
 					// two at a time
@@ -735,7 +735,7 @@ void ConvertCI4_RGBA16(CTexture *pTexture, const TxtrInfo &tinfo)
 					pDst+=2;
 
 					dwByteOffset++;
-				}
+				//}
 			}
 		}	
 		
@@ -749,7 +749,7 @@ void ConvertCI4_RGBA16(CTexture *pTexture, const TxtrInfo &tinfo)
 
 			uint32 dwByteOffset = ((y+tinfo.TopToLoad) * tinfo.Pitch) + (tinfo.LeftToLoad / 2);
 
-            if (tinfo.WidthToLoad == 1)
+            /*if (tinfo.WidthToLoad == 1)
             {
                 // corner case
                 uint8 b = pSrc[dwByteOffset ^ 0x3];
@@ -761,7 +761,7 @@ void ConvertCI4_RGBA16(CTexture *pTexture, const TxtrInfo &tinfo)
                 }
             }
             else
-			{
+			{*/
 				for (uint32 x = 0; x < tinfo.WidthToLoad; x+=2)
 				{
 					uint8 b = pSrc[dwByteOffset ^ 0x3];
@@ -781,7 +781,7 @@ void ConvertCI4_RGBA16(CTexture *pTexture, const TxtrInfo &tinfo)
 					pDst+=2;
 
 					dwByteOffset++;
-				}
+				//}
 			}
 		}	
 	}
@@ -823,7 +823,7 @@ void ConvertCI4_IA16(CTexture *pTexture, const TxtrInfo &tinfo)
 
 			uint32 dwByteOffset = ((y+tinfo.TopToLoad) * tinfo.Pitch) + (tinfo.LeftToLoad / 2);
 
-            if (tinfo.WidthToLoad == 1)
+            /*if (tinfo.WidthToLoad == 1)
             {
                 // corner case
                 uint8 b = pSrc[dwByteOffset ^ nFiddle];
@@ -833,7 +833,7 @@ void ConvertCI4_IA16(CTexture *pTexture, const TxtrInfo &tinfo)
                     *pDst |= 0xFF000000;
             }
             else
-			{
+			{*/
 				for (uint32 x = 0; x < tinfo.WidthToLoad; x+=2)
 				{
 					uint8 b = pSrc[dwByteOffset ^ nFiddle];
@@ -853,7 +853,7 @@ void ConvertCI4_IA16(CTexture *pTexture, const TxtrInfo &tinfo)
 					pDst+=2;
 
 					dwByteOffset++;
-				}
+				//}
 			}
 		}	
 		
@@ -866,7 +866,7 @@ void ConvertCI4_IA16(CTexture *pTexture, const TxtrInfo &tinfo)
 			uint32 * pDst = (uint32 *)((uint8 *)dInfo.lpSurface + y * dInfo.lPitch);
 
 			uint32 dwByteOffset = ((y+tinfo.TopToLoad) * tinfo.Pitch) + (tinfo.LeftToLoad / 2);
-            if (tinfo.WidthToLoad == 1)
+            /*if (tinfo.WidthToLoad == 1)
             {
                 // corner case
                 uint8 b = pSrc[dwByteOffset ^ 0x3];
@@ -876,7 +876,7 @@ void ConvertCI4_IA16(CTexture *pTexture, const TxtrInfo &tinfo)
                     *pDst |= 0xFF000000;
             }
             else
-			{
+			{*/
 				for (uint32 x = 0; x < tinfo.WidthToLoad; x+=2)
 				{
 					uint8 b = pSrc[dwByteOffset ^ 0x3];
@@ -896,7 +896,7 @@ void ConvertCI4_IA16(CTexture *pTexture, const TxtrInfo &tinfo)
 					pDst+=2;
 
 					dwByteOffset++;
-				}
+				//}
 			}
 		}	
 	}
@@ -1124,9 +1124,9 @@ void ConvertYUV(CTexture *pTexture, const TxtrInfo &tinfo)
 
 				for (x = 0; x < tinfo.WidthToLoad/2; x++)
 				{
-					int y0 = *(uint8*)&pByteSrc[(dwWordOffset  )^nFiddle];
+					int y0 = *(uint8*)&pByteSrc[(dwWordOffset+2)^nFiddle];
 					int v0 = *(uint8*)&pByteSrc[(dwWordOffset+1)^nFiddle];
-					int y1 = *(uint8*)&pByteSrc[(dwWordOffset+2)^nFiddle];
+					int y1 = *(uint8*)&pByteSrc[(dwWordOffset  )^nFiddle];
 					int u0 = *(uint8*)&pByteSrc[(dwWordOffset+3)^nFiddle];
 
 					dwDst[x*2+0] = ConvertYUV16ToR8G8B8(y0,u0,v0);
@@ -1146,10 +1146,10 @@ void ConvertYUV(CTexture *pTexture, const TxtrInfo &tinfo)
 
 				for (x = 0; x < tinfo.WidthToLoad/2; x++)
 				{
-					int y0 = *(uint8*)&pByteSrc[dwByteOffset];
-					int v0 = *(uint8*)&pByteSrc[dwByteOffset+1];
-					int y1 = *(uint8*)&pByteSrc[dwByteOffset+2];
-					int u0 = *(uint8*)&pByteSrc[dwByteOffset+3];
+					int y0 = *(uint8*)&pByteSrc[(dwByteOffset+2)];
+					int v0 = *(uint8*)&pByteSrc[(dwByteOffset+1)];
+					int y1 = *(uint8*)&pByteSrc[(dwByteOffset  )];
+					int u0 = *(uint8*)&pByteSrc[(dwByteOffset+3)];
 
 					dwDst[x*2+0] = ConvertYUV16ToR8G8B8(y0,u0,v0);
 					dwDst[x*2+1] = ConvertYUV16ToR8G8B8(y1,u0,v0);
@@ -1174,11 +1174,13 @@ uint32 ConvertYUV16ToR8G8B8(int Y, int U, int V)
 	int G = int(g_convc0 *(Y-16) + g_convc2 * U - g_convc3 * V);
 	int B = int(g_convc0 *(Y-16) + g_convc4 * U);
 	*/
+	Y += 80;
 
 	int R = int(Y + (1.370705f * (V-128)));
 	int G = int(Y - (0.698001f * (V-128)) - (0.337633f * (U-128)));
 	int B = int(Y + (1.732446f * (U-128)));
 
+	/*
 	R = R<0 ? 0 : R;
 	G = G<0 ? 0 : G;
 	B = B<0 ? 0 : B;
@@ -1186,8 +1188,12 @@ uint32 ConvertYUV16ToR8G8B8(int Y, int U, int V)
 	uint32 R2 = R>255 ? 255 : R;
 	uint32 G2 = G>255 ? 255 : G;
 	uint32 B2 = B>255 ? 255 : B;
+	*/
+	R = R < 0 ? 0 : (R>255 ? 255 : R);
+	G = G < 0 ? 0 : (G>255 ? 255 : G);
+	B = B < 0 ? 0 : (B>255 ? 255 : B);
 
-	return COLOR_RGBA(R2, G2, B2, 0xFF);
+	return COLOR_RGBA(R, G, B, 0xFF);
 }
 
 
@@ -1236,7 +1242,7 @@ void Convert4b(CTexture *pTexture, const TxtrInfo &tinfo)
 		//uint32 * pDst = (uint32 *)((uint8 *)dInfo.lpSurface + y * dInfo.lPitch);
 
 		int idx = tinfo.tileNo>=0 ? tile.dwLine*8*y : ((y+tinfo.TopToLoad) * tinfo.Pitch) + (tinfo.LeftToLoad / 2);
-        if (tinfo.WidthToLoad == 1)
+        /*if (tinfo.WidthToLoad == 1)
         {
             // corner case
             uint8 b = pByteSrc[idx^nFiddle];
@@ -1265,7 +1271,7 @@ void Convert4b(CTexture *pTexture, const TxtrInfo &tinfo)
             if( bIgnoreAlpha )
                 *pDst |= 0xFF000000;
         }
-        else
+        else*/
 		for (uint32 x = 0; x < tinfo.WidthToLoad; x+=2, idx++)
 		{
 			uint8 b = pByteSrc[idx^nFiddle];

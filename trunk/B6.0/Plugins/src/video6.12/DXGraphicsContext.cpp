@@ -206,13 +206,28 @@ extern bool bloadstate[MAX_SAVE_STATES];
 extern bool bsavestate[MAX_SAVE_STATES];
 extern "C" void __EMU_SaveState(int index);
 extern "C" void __EMU_LoadState(int index);
-extern "C" BOOL __EMU_Pause(void);
-extern "C" void __EMU_Resume(void);
 extern bool bSatesUpdated;
 
 __forceinline void CDXGraphicsContext::UpdateFrame(bool swaponly)
 {
 	//HRESULT hr; //unreferenced
+
+	if (bSatesUpdated) {
+		bSatesUpdated = false;
+		
+		for (int i=0; i<MAX_SAVE_STATES; i++) {
+			if (bloadstate[i]) {
+				__EMU_LoadState(i+1);
+				bloadstate[i]=false;
+				break;
+			}
+			else if (bsavestate[i]) {
+				__EMU_SaveState(i+1);
+				bsavestate[i]=false;
+				break;
+			}
+		}
+	}
 
 	status.gFrameCount++;
 
@@ -223,15 +238,86 @@ __forceinline void CDXGraphicsContext::UpdateFrame(bool swaponly)
 
 	g_pFrameBufferManager->UpdateFrameBufferBeforeUpdateFrame();
 
+/*	//if( options.bDisplayOnscreenFPS && !status.bDisableFPS )
+	{
+		char str[256];
+		RECT rect={windowSetting.uDisplayWidth-100,windowSetting.toolbarHeight+windowSetting.uDisplayHeight-100,windowSetting.uDisplayWidth-10,windowSetting.toolbarHeight+windowSetting.uDisplayHeight};
+		if( (options.bDisplayOnscreenFPS == ONSCREEN_DISPLAY_DLIST_PER_SECOND ||
+			options.bDisplayOnscreenFPS == ONSCREEN_DISPLAY_DLIST_PER_SECOND_WITH_CORE_MSG ) && windowSetting.dps > 0 )
+		{
+			sprintf(str,"%.1f dps", windowSetting.dps);
+			DrawText(str, rect,2);
+		}
+		else if( (options.bDisplayOnscreenFPS == ONSCREEN_DISPLAY_FRAME_PER_SECOND ||
+			options.bDisplayOnscreenFPS == ONSCREEN_DISPLAY_FRAME_PER_SECOND_WITH_CORE_MSG ) && windowSetting.fps > 0 )
+		{
+			sprintf(str,"%.1f fps", windowSetting.fps);
+			DrawText(str, rect,2);
+		}
+	
+		if( options.bDisplayOnscreenFPS >= ONSCREEN_DISPLAY_TEXT_FROM_CORE_ONLY && status.CPUCoreMsgIsSet && strlen(status.CPUCoreMsgToDisplay) > 0 && windowSetting.dps > 0 )
+		{
+			RECT rect2={10,windowSetting.toolbarHeight+windowSetting.uDisplayHeight-100,windowSetting.uDisplayWidth-100,windowSetting.toolbarHeight+windowSetting.uDisplayHeight};
+			DrawText(status.CPUCoreMsgToDisplay, rect2,1);
+		}
+	}*/
+
 	if( CRender::g_pRender )
 	{
 		CRender::g_pRender->EndRendering();
 	}
 	
-	gTextureManager.FreeTextures();
+//#ifndef OLDTXTCACHE
+	//if (!g_bUseSetTextureMem)
+		gTextureManager.FreeTextures();
+//#endif
 
-	if( !g_curRomInfo.bForceScreenClear )	
-		Clear(CLEAR_DEPTH_BUFFER);
+	
+
+	/*Lock();
+	
+	if (m_pd3dDevice == NULL)
+	{
+		hr = E_FAIL;
+	}
+	else
+	{
+#ifndef _XBOX
+		// Test the cooperative level to see if it's okay to render
+		if( FAILED( hr = m_pd3dDevice->TestCooperativeLevel() ) )
+		{
+			// If the device was lost, do not render until we get it back
+			if( hr == D3DERR_DEVICELOST )
+			{
+				hr = S_OK;
+				goto exit;
+			}
+			
+			// Check if the device needs to be resized.
+			if( hr == D3DERR_DEVICENOTRESET )
+			{
+				// If we are windowed, read the desktop mode and use the same format for
+				// the back buffer
+				//if( m_bWindowed )
+				//{
+				//	D3DAdapterInfo* pAdapterInfo = &m_Adapters[m_dwAdapter];
+				//	m_pD3D->GetAdapterDisplayMode( m_dwAdapter, &pAdapterInfo->d3ddmDesktop );
+				//	m_d3dpp.BackBufferFormat = pAdapterInfo->d3ddmDesktop.Format;
+				//}
+				
+				if( FAILED( hr = ResizeD3DEnvironment() ) )
+				{
+					goto exit;
+				}
+			}
+			
+			// return hr
+			goto exit;
+		}
+#endif*/
+
+		if( !g_curRomInfo.bForceScreenClear )	
+			Clear(CLEAR_DEPTH_BUFFER);
 
 //freakdave - watch this space!
 // GogoAckman - here are the settings to adjust size (commented out here)
@@ -245,6 +331,34 @@ __forceinline void CDXGraphicsContext::UpdateFrame(bool swaponly)
   //m_pd3dDevice->SetBackBufferScale(0.5f,0.5f); // remember that for FBA :D
 
 
+
+
+/*#ifndef _XBOX
+		if( m_bWindowed )
+		{
+			RECT dstrect={0,windowSetting.toolbarHeight,windowSetting.uDisplayWidth,windowSetting.toolbarHeight+windowSetting.uDisplayHeight};
+			RECT srcrect={0,0,windowSetting.uDisplayWidth,windowSetting.uDisplayHeight};
+			hr = m_pd3dDevice->Present( &srcrect, &dstrect, NULL, NULL );
+		}
+		else
+#endif
+		{
+			hr = m_pd3dDevice->Present( NULL, NULL, NULL, NULL );
+		}
+
+#ifdef _DEBUG
+		if( pauseAtNext && eventToPause == NEXT_FRAME )
+		{
+			TRACE0("Update screen");
+		}
+#endif
+
+	}*/
+/*#ifndef _XBOX
+exit:
+#endif
+	
+	Unlock();*/
 	XboxDrawOSD();
 	m_pd3dDevice->Present( NULL, NULL, NULL, NULL );
 	status.bScreenIsDrawn = false;
@@ -261,14 +375,8 @@ BOOL CDXGraphicsContext::FindDepthStencilFormat( UINT iAdapter, D3DDEVTYPE Devic
 											  D3DFORMAT* pDepthStencilFormat )
 {
 //#ifdef _XBOX
-	if(XboxPitch ==2){
-		*pDepthStencilFormat = D3DFMT_D16;
-		return TRUE;
-	}else
-	{
-		*pDepthStencilFormat = D3DFMT_D24S8;
-		return TRUE;
-	}
+	*pDepthStencilFormat = D3DFMT_D16;
+	return TRUE;
 /*#else
 	if( m_dwMinDepthBits <= 16 && m_dwMinStencilBits == 0 )
 	{

@@ -264,6 +264,9 @@
 				RelativePath=".\DeviceBuilder.cpp">
 			</File>
 			<File
+				RelativePath=".\DirectXBlender.cpp">
+			</File>
+			<File
 				RelativePath=".\DirectXCombiner.cpp">
 			</File>
 			<File
@@ -289,9 +292,6 @@
 			</File>
 			<File
 				RelativePath=".\GraphicsContext.cpp">
-			</File>
-			<File
-				RelativePath=".\Microcode.cpp">
 			</File>
 			<File
 				RelativePath=".\Render.cpp">
@@ -386,6 +386,9 @@
 				RelativePath=".\DeviceBuilder.h">
 			</File>
 			<File
+				RelativePath=".\DirectXBlender.h">
+			</File>
+			<File
 				RelativePath=".\DirectXCombiner.h">
 			</File>
 			<File
@@ -420,9 +423,6 @@
 			</File>
 			<File
 				RelativePath=".\interp.h">
-			</File>
-			<File
-				RelativePath=".\Microcode.h">
 			</File>
 			<File
 				RelativePath=".\RDP_Texture.h">
