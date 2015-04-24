@@ -50,7 +50,7 @@ struct GGBI1_Matrix
 	u32	push:1;
 	u32	:5;
 	u32	cmd:8;
-	u32 addr;
+	u32    addr;
 };
 
 struct GGBI1_PopMatrix
@@ -132,8 +132,7 @@ struct GGBI1_ModifyVtx
 	u32 value;
 };
 
-struct GBI_Texture
-{
+struct GBI_Texture{
 	u32	enable_gbi0:1;
 	u32	enable_gbi2:1;
 	u32	:6;
@@ -147,13 +146,13 @@ struct GBI_Texture
 
 struct SetCullDL
 {
-    u32 pad0:1;
-    u32 first:15;
-    u32 pad2:8;
-    u32 cmd:8;
-    u32 pad3:1;
-    u32 end:15;
-    u32 pad4:8;
+    u32 pad0:1;             
+    u32 first:15;   
+    u32 pad2:8;            
+    u32 cmd:8;             
+    u32 pad3:1;            
+    u32 end:15;    
+    u32 pad4:8;             
 };
 
 struct SetTImg
@@ -379,9 +378,9 @@ struct TriDKR
     signed short	t2, s2;
 };
 
-union MicroCodeCommand
+union Gfx
 {
-	Instruction		inst;
+	Instruction		words;
 	GGBI0_Vtx		vtx0;
 	GGBI1_Vtx		vtx1;
 	GGBI2_Vtx		vtx2;
@@ -406,8 +405,8 @@ union MicroCodeCommand
 	GGBI1_Dlist		dlist;
 
 	SetCullDL		culldl;	
-	GSetColor		setcolor;
 	SetTImg			img;
+	GSetColor		setcolor;
 
 	LoadTile		loadtile;
 	SetFillRect		fillrect;
@@ -432,86 +431,29 @@ union MicroCodeCommand
 	__int64	force_structure_alignment;
 };
 
-struct RDP_TexRect
-{
-	union
-	{
-		struct
-		{
-			u32 cmd3;
-			u32 cmd2;
-			u32 cmd1;
-			u32 cmd0;
-		};
-
-		struct
-		{
-			// cmd3
-			s32		dtdy : 16;
-			s32		dsdx : 16;
-
-			// cmd2
-			s32		t : 16;
-			s32		s : 16;
-
-			// cmd1
-			u32		y0 : 12;
-			u32		x0 : 12;
-			u32		tile_idx : 3;
-			s32		pad1 : 5;
-
-			// cmd0
-			u32		y1 : 12;
-			u32		x1 : 12;
-
-			u32		cmd : 8;
-		};
+typedef union {
+	struct {
+		u32	w0;
+		u32	w1;
+		u32	w2;
+		u32	w3;
 	};
-};
+	struct {
+		u32	yl:12;	/* Y coordinate of upper left	*/
+		u32	xl:12;	/* X coordinate of upper left	*/
+		u32	cmd:8;	/* command			*/
 
-struct RDP_GeometryMode
-{
-	union
-	{
-		union
-		{
-			struct
-			{
-				u32 GBI1_Zbuffer : 1;		// 0x1
-				u32 GBI1_Texture : 1;		// 0x2
-				u32 GBI1_Shade : 1;			// 0x4
-				u32 GBI1_pad0 : 6;			// 0x0
-				u32 GBI1_ShadingSmooth : 1;	// 0x200
-				u32 GBI1_pad1 : 2;			// 0x0
-				u32 GBI1_CullFront : 1;		// 0x1000
-				u32 GBI1_CullBack : 1;		// 0x2000
-				u32 GBI1_pad2 : 2;			// 0x0
-				u32 GBI1_Fog : 1;			// 0x10000
-				u32 GBI1_Lighting : 1;		// 0x20000
-				u32 GBI1_TexGen : 1;		// 0x40000
-				u32 GBI1_TexGenLin : 1;		// 0x80000
-				u32 GBI1_Lod : 1;			// 0x100000
-				u32 GBI1_pad3 : 11;			// 0x0
-			};
-			struct
-			{
-				u32 GBI2_Zbuffer : 1;		// 0x1
-				u32 GBI2_pad0 : 8;			// 0x0
-				u32 GBI2_CullBack : 1;		// 0x200
-				u32 GBI2_CullFront : 1;		// 0x400
-				u32 GBI2_pad1 : 5;			// 0x0
-				u32 GBI2_Fog : 1;			// 0x10000
-				u32 GBI2_Lighting : 1;		// 0x20000
-				u32 GBI2_TexGen : 1;		// 0x40000
-				u32 GBI2_TexGenLin : 1;		// 0x80000
-				u32 GBI2_Lod : 1;			// 0x100000
-				u32 GBI2_ShadingSmooth : 1;	// 0x200000
-				u32 GBI2_PointLight : 1;	// 0x400000
-				u32 GBI2_pad2 : 9;			// 0x0
-			};
-		};
-		u32	_u32;
+		u32	yh:12;	/* Y coordinate of lower right	*/
+		u32	xh:12;	/* X coordinate of lower right	*/
+		u32	tile:3;	/* Tile descriptor index	*/
+		u32	pad1:5;	/* Padding			*/
+
+		u32	t:16;	/* T texture coord at top left	*/
+		u32	s:16;	/* S texture coord at top left	*/
+
+		u32	dtdy:16;/* Change in T per change in Y	*/
+		u32	dsdx:16;/* Change in S per change in X	*/
 	};
-};
+} Gtexrect;
 
 #endif

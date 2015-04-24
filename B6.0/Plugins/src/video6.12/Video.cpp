@@ -25,9 +25,9 @@ char generalText[256];
 GFX_INFO g_GraphicsInfo;
 
 uint32 g_dwRamSize = 0x400000;
-uint32* g_pu32RamBase = NULL;
-signed char *g_ps8RamBase = NULL;
-unsigned char *g_pu8RamBase = NULL;
+uint32* g_pRDRAMu32 = NULL;
+signed char *g_pRDRAMs8 = NULL;
+unsigned char *g_pRDRAMu8 = NULL;
 
 CCritSect g_CritialSection;
 
@@ -62,21 +62,6 @@ char g_szTempMessage[100];
 //XFONT *g_defaultTrueTypeFont = NULL;
 extern bool g_bUseSetTextureMem;
 extern DWORD g_maxTextureMemUsage;
-
-#include "../../../config.h"
-extern bool bloadstate[MAX_SAVE_STATES];
-extern bool bsavestate[MAX_SAVE_STATES];
-extern bool bload1964state[MAX_SAVE_STATES];
-extern bool bloadPJ64state[MAX_SAVE_STATES];
-extern "C" void __EMU_SaveState(int index);
-extern "C" void __EMU_LoadState(int index);
-extern "C" void __EMU_Load1964State(int index);
-extern "C" void __EMU_LoadPJ64State(int index);
-extern bool bSatesUpdated;
-extern int preferedemu;
-
-bool bSatesUpdated2 = false;
-char tempmsg[260]; 
 #endif
 //---------------------------------------------------------------------------------------
 
@@ -798,75 +783,7 @@ FUNC_TYPE(void) NAME_DEFINE(UpdateScreen) (void)
 		WaitForSingleObject( threadFinished, INFINITE );
 	}
 #else
-	UpdateScreenStep2();
-#endif
-
-#ifdef _XBOX
-	if(bSatesUpdated2)
-	{
-		_VIDEO_DisplayTemporaryMessage(tempmsg);
-		bSatesUpdated2=false;
-	}
-
-	if(bSatesUpdated)
-	{
-	bSatesUpdated=false;
-	bSatesUpdated2=true;
-	
-		for (int i=1; i<=MAX_SAVE_STATES; i++) 
-		{
-			if (bloadstate[i]) // This will never be true, unless UHLE accepts plugins. 
-			{
-				try{
-					__EMU_LoadState(i);
-				}catch(...){};
-
-				sprintf(tempmsg, "Loaded UHLE State %d", i);
-				bloadstate[i]=false;
-				
-				break;
-			}
-			else if (bload1964state[i]) 
-			{
-				try{
-					__EMU_Load1964State(i);
-				}catch(...){};
-
-				sprintf(tempmsg, "Loaded 1964 State %d", i);
-				bload1964state[i]=false;
-
-				break;
-			}
-			else if (bloadPJ64state[i]) 
-			{
-				try{
-					__EMU_LoadPJ64State(i);
-				}catch(...){};
-
-				sprintf(tempmsg, "Loaded PJ64 State %d", i);
-				bloadPJ64state[i]=false;
-
-				break;
-			}
-			else if (bsavestate[i]) 
-			{
-				try{
-					__EMU_SaveState(i);
-				}catch(...){};
-
-				if(preferedemu == _UltraHLE)
-					sprintf(tempmsg, "Saved UHLE State %d", i); // Unused until UHLE becomes zilmar spec 
-				else if((preferedemu == _1964x11)||(preferedemu == _1964x085))
-					sprintf(tempmsg, "Saved 1964 State %d", i);
-				else if((preferedemu == _PJ64x16)||(preferedemu == _PJ64x14))
-					sprintf(tempmsg, "Saved PJ64 State %d", i);
-				
-				bsavestate[i]=false;
-
-				break;
-			}
-		}
-	}
+	 UpdateScreenStep2();
 #endif
 }
 
@@ -918,10 +835,10 @@ FUNC_TYPE(BOOL) NAME_DEFINE(InitiateGFX)(GFX_INFO Gfx_Info)
 	windowSetting.bDisplayFullscreen = FALSE;
 	memcpy(&g_GraphicsInfo, &Gfx_Info, sizeof(GFX_INFO));
 	
-	g_pu8RamBase			= Gfx_Info.RDRAM;
-	g_pu32RamBase			= (uint32*)Gfx_Info.RDRAM;
-	g_ps8RamBase			= (signed char *)Gfx_Info.RDRAM;
-	
+	g_pRDRAMu8			= Gfx_Info.RDRAM;
+	g_pRDRAMu32			= (uint32*)Gfx_Info.RDRAM;
+	g_pRDRAMs8			= (signed char *)Gfx_Info.RDRAM;
+
 	windowSetting.fViWidth = 320;
 	windowSetting.fViHeight = 240;
 	status.ToToggleFullScreen = FALSE;

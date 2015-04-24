@@ -101,7 +101,7 @@ public:
 			Size == sec.Size &&
 			Pitch == sec.Pitch &&
 			bSwapped == sec.bSwapped &&
-			//TLutFmt == sec.TLutFmt &&
+			TLutFmt == sec.TLutFmt &&
 			mirrorS == sec.mirrorS &&
 			mirrorT == sec.mirrorT &&
 			clampS == sec.clampS &&
@@ -192,7 +192,6 @@ protected:
 		int arrayWidth, int flag, int mask, int mirror, int clamp, uint32 otherSize);
 
 	uint32 Hash(uint32 dwValue);
-	bool TCacheEntryIsLoaded(TxtrCacheEntry *pEntry);
 
 	void updateColorTexture(CTexture *ptexture, uint32 color);
 
@@ -250,6 +249,5 @@ extern void DumpCachedTexture(TxtrCacheEntry &entry);
 // reinstate max video mem
 extern bool g_bUseSetTextureMem;
 extern DWORD g_maxTextureMemUsage;
-extern int XboxPitch;
-extern BOOL bPurgeOldBeforeIGM;
+
 #endif

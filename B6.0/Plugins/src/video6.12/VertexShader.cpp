@@ -33,7 +33,7 @@ extern void TexGen(float &s, float &t);
 
 void ProcessVertexDataExternal(uint32 dwAddr, uint32 dwV0, uint32 dwNum)
 {
-	FiddledVtx * g_pVtxBase = (FiddledVtx*)(g_pu8RamBase + dwAddr);
+	FiddledVtx * g_pVtxBase = (FiddledVtx*)(g_pRDRAMu8 + dwAddr);
 	uint32 i;
 	for (i = dwV0; i < dwV0 + dwNum; i++)
 	{
@@ -52,7 +52,7 @@ void ProcessVertexDataExternal(uint32 dwAddr, uint32 dwV0, uint32 dwNum)
 		g_vtxForExternal[i].b = vert.rgba.b;
 		g_vtxForExternal[i].a = vert.rgba.a;
 
-		if (gRDP.tnl.TexGen && gRDP.tnl.Light )
+		if (gRSP.bTextureGen && gRSP.bLightingEnable )
 		{
 			TexGen(g_vtxForExternal[i].u, g_vtxForExternal[i].v);
 		}
@@ -115,10 +115,10 @@ void UpdateOptionsForVertexShader(float halfS, float halfT)
 
 	float (*pf)[4];
 
-	pf = gRDP.tnl.Fog ? &f1 : &f0;
+	pf = gRSP.bFogEnabled ? &f1 : &f0;
 	g_pD3DDev->SetVertexShaderConstant( FOG_IS_ENABLED, (float*)pf, 1 );
 
-	pf = gRDP.tnl.Light ? &f1 : &f0;
+	pf = gRSP.bLightingEnable ? &f1 : &f0;
 	g_pD3DDev->SetVertexShaderConstant( LIGHTING_ENABLED, (float*)pf, 1 );
 
 	if(  gRDP.otherMode.key_en )
@@ -138,7 +138,7 @@ void UpdateOptionsForVertexShader(float halfS, float halfT)
 	pf = g_curRomInfo.bZHack ? &f1 : &f0;
 	g_pD3DDev->SetVertexShaderConstant( Z_HACK_ENABLE, (float*)pf, 1 );
 
-	pf = ((gRDP.tnl.Shade) == 0 && gRSP.ucode < 5) ? &f1 : &f0;
+	pf = ( (gRDP.geometryMode & G_SHADE) == 0 && gRSP.ucode < 5 ) ? &f1 : &f0;
 	g_pD3DDev->SetVertexShaderConstant( USE_PRIMARY_COLOR, (float*)pf, 1 );
 
 	if( (g_curRomInfo.bPrimaryDepthHack || options.enableHackForGames == HACK_FOR_NASCAR ) && gRDP.otherMode.depth_source )
@@ -163,7 +163,7 @@ void UpdateOptionsForVertexShader(float halfS, float halfT)
 	{
 		float scale0x, scale1x=0, offset0x, offset1x=0;
 		float scale0y, scale1y=0, offset0y, offset1y=0;
-		if (gRDP.tnl.TexGen && gRDP.tnl.Light)
+		if (gRSP.bTextureGen && gRSP.bLightingEnable)
 		{
 			RenderTexture &tex0 = g_textures[gRSP.curTile];
 			scale0x = 32 * 1024 * gRSP.fTexScaleX / tex0.m_fTexWidth * (gRDP.tiles[gRSP.curTile].fShiftScaleS);

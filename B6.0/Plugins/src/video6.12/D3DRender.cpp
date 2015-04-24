@@ -177,14 +177,14 @@ bool D3DRender::InitDeviceObjects()
 #endif
 
 	// Dafault is ZBuffer disabled
-	//gD3DDevWrapper.SetRenderState(D3DRS_ZENABLE, m_dwrsZEnable );
+	gD3DDevWrapper.SetRenderState(D3DRS_ZENABLE, m_dwrsZEnable );
 
     gD3DDevWrapper.SetRenderState(D3DRS_ALPHATESTENABLE,TRUE );
     gD3DDevWrapper.SetRenderState(D3DRS_ALPHAREF,0x04 );
     gD3DDevWrapper.SetRenderState( D3DRS_ALPHAFUNC, D3DCMP_GREATEREQUAL );
 
-	//m_dwrsZEnable=D3DZB_FALSE;
-	//m_dwrsZWriteEnable=FALSE;
+	m_dwrsZEnable=D3DZB_FALSE;
+	m_dwrsZWriteEnable=FALSE;
 
 	memset(&m_D3DCombStages, 0, sizeof(D3DCombinerStage)*8);
 
@@ -212,7 +212,7 @@ bool D3DRender::InitDeviceObjects()
 	m_Mux = 0;
 	memset(&m_curCombineInfo, 0, sizeof( m_curCombineInfo) );
 
-	gD3DDevWrapper.Initalize();
+	//gD3DDevWrapper.Initalize();
 
 	m_dwrsZEnable = 0xEEEE;
 	m_dwrsZWriteEnable = 0xEEEE;
@@ -330,7 +330,7 @@ void ApplyZBias(uint32 bias)
 }
 void D3DRender::SetZBias(int bias)
 {
-	if (m_dwZBias != bias)
+	//if (m_dwZBias != bias)
 	{
 		DEBUGGER_IF_DUMP(pauseAtNext, TRACE1("Set zbias = %d", bias));
 
@@ -554,7 +554,7 @@ void D3DRender::SetZCompare(BOOL bZCompare)
 	if( g_curRomInfo.bForceDepthBuffer )
 		bZCompare = TRUE;
 
-	gRDP.tnl.Zbuffer = bZCompare;
+	gRSP.bZBufferEnabled = bZCompare;
 	m_bZCompare = bZCompare;
 	gD3DDevWrapper.SetRenderState(D3DRS_ZENABLE, bZCompare ? D3DZB_TRUE : D3DZB_FALSE );
 }
@@ -639,7 +639,7 @@ void D3DRender::SetAlphaRef(uint32 dwAlpha)
 void D3DRender::ForceAlphaRef(uint32 dwAlpha)
 {
 	//gD3DDevWrapper.SetRenderState(D3DRS_ALPHAREF,dwAlpha);
-	//m_dwrsAlphaRef = dwAlpha;
+	m_dwrsAlphaRef = dwAlpha;
 	gD3DDevWrapper.SetRenderState( D3DRS_ALPHAREF, dwAlpha );	
 }
 
@@ -755,19 +755,22 @@ void D3DRender::TurnFogOnOff(bool flag)
 #define RSP_ZELDA_CULL_FRONT 0x00000400
 void D3DRender::SetFogEnable(bool bEnable)
 {
-	DEBUGGER_IF_DUMP( (gRDP.tnl.Fog != (bEnable==TRUE) && logFog ), TRACE1("Set Fog %s", bEnable? "enable":"disable"));
+	DEBUGGER_IF_DUMP( (gRSP.bFogEnabled != (bEnable==TRUE) && logFog ), TRACE1("Set Fog %s", bEnable? "enable":"disable"));
 
-	if( options.enableHackForGames == HACK_FOR_TWINE && gRDP.tnl.Fog == FALSE && bEnable == FALSE && (gRDP.tnl.TriCull) )
+	if( options.enableHackForGames == HACK_FOR_TWINE && gRSP.bFogEnabled == FALSE && bEnable == FALSE && (gRDP.geometryMode & RSP_ZELDA_CULL_FRONT) )
 	{
 		g_pD3DDev->Clear(1, NULL, D3DCLEAR_ZBUFFER, 0xFF000000, 1.0, 0);
 	}
 
-	DEBUGGER_IF_DUMP(pauseAtNext,{DebuggerAppendMsg("Set Fog %s", bEnable?"enable":"disable");});
+
+
+	gRSP.bFogEnabled = bEnable&&options.bEnableFog;
+	//DEBUGGER_IF_DUMP(pauseAtNext,{DebuggerAppendMsg("Set Fog %s", bEnable?"enable":"disable");});
 	
 	//gD3DDevWrapper.SetRenderState( D3DRS_FOGENABLE, FALSE);
 	//return;		//Fog does work, need to fix
 
-	if( gRDP.tnl.Fog )
+	if( gRSP.bFogEnabled )
 	{
 		gD3DDevWrapper.SetRenderState( D3DRS_FOGENABLE, TRUE);
 		gD3DDevWrapper.SetRenderState(D3DRS_FOGCOLOR, gRDP.fogColor);

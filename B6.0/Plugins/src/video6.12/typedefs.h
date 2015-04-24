@@ -27,7 +27,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 typedef unsigned char				uint8;
 
 typedef signed char					s8;	
-typedef signed short				s16;
 typedef long						s32;
 typedef unsigned long				u32;
 typedef unsigned char				u8;
@@ -51,30 +50,7 @@ typedef struct
 	uint32 dwRGBA, dwRGBACopy;
 	char x,y,z;			// Direction
 	uint8 pad;
-} N64LightOld;
-
-
-//Move me, just putting it here for now
-struct N64Light
-{
-	u8 ca, b, g, r;					// Colour and ca (ca is different for conker)
-	u8 la, b2, g2, r2;
-	union
-	{
-		struct
-		{
-			s8 pad0, dir_z, dir_y, dir_x;	// Direction
-			u8 pad1, qa, pad2, nonzero;
-		};
-		struct
-		{
-			s16 y1, x1, w1, z1;		// Position, GBI2 ex Majora's Mask
-		};
-	};
-	s32 pad4, pad5, pad6, pad7;		// Padding..
-	s16 y, x, w, z; 				// Position, Conker
-};
-
+} N64Light;
 
 
 typedef struct
@@ -250,54 +226,6 @@ typedef struct
 	float u,v;
 }EXTERNAL_VERTEX, *LPSHADERVERTEX;
 
-struct Color
-{
-	union {
-		struct {
-			uint8 r;
-			uint8 g;
-			uint8 b;
-			uint8 a;
-		};
-		uint32 col;
-	};
-
-	union {
-		struct {
-			float fr;
-			float fg;
-			float fb;
-			float fa;
-		};
-		float fcolors[4];
-	};
-};
-
-struct Direction
-{
-	union {
-		struct {
-			float x;
-			float y;
-			float z;
-			float range;		// Range == 0  for directional light
-			// Range != 0  for point light, Zelda MM
-		};
-	};
-};
-
-struct Light
-{
-	Direction direction;
-	u32 SkipIfZero; //Needed by CBFD and MM
-	Color colour; // Holds the colours
-	float Iscale; // Used by CBFD
-	D3DXVECTOR4 Position; // Position -32768 to 32767
-	float ca; //Used by point lights
-	float la; //Used by point lights
-	float qa; //Used by point lights
-	u32 Pad0;
-};
 
 typedef struct
 {
@@ -366,7 +294,8 @@ typedef struct
 		__m64 odir64[2];
 #endif
 	};
-} LightOld;
+} Light;
+
 
 
 typedef struct

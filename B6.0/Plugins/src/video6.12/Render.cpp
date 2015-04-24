@@ -86,6 +86,7 @@ CRender::CRender() :
 	m_pColorCombiner = CDeviceBuilder::GetBuilder()->CreateColorCombiner(this);
 	m_pColorCombiner->Initialize();
 
+	m_pAlphaBlender = CDeviceBuilder::GetBuilder()->CreateAlphaBlender(this);
 
 }
 
@@ -95,6 +96,12 @@ CRender::~CRender()
 	{
 		CDeviceBuilder::GetBuilder()->DeleteColorCombiner();
 		m_pColorCombiner = NULL;
+	}
+	
+	if( m_pAlphaBlender != NULL )
+	{
+		CDeviceBuilder::GetBuilder()->DeleteAlphaBlender();
+		m_pAlphaBlender = NULL;
 	}
 }
 
@@ -127,29 +134,40 @@ void CRender::ResetMatrices(uint32 size)
 
 void CRender::SetProjection(const Matrix & mat, bool bPush, bool bReplace) 
 {
-	if (gRSP.projectionMtxTop >= (RICE_MATRIX_STACK-1) && bPush)
+	if (bPush)
 	{
-		TRACE0("Pushing past proj stack limits!");
-	}
-	else if (bPush)
-		gRSP.projectionMtxTop++;
+		if (gRSP.projectionMtxTop >= (RICE_MATRIX_STACK-1))
+		{
+			TRACE0("Pushing past proj stack limits!");
+		}
+		else
+			gRSP.projectionMtxTop++;
 
-	if (bReplace)
-	{
-		// Load projection matrix
-		gRSP.projectionMtxs[gRSP.projectionMtxTop] = mat;
-
-		// Hack needed to show flashing last heart and map arrows in Zelda OoT & MM
-		// It renders at Z cordinate = 0.0f that gets clipped away
-		// So we translate them a bit along Z to make them stick
-		if( options.enableHackForGames == HACK_FOR_ZELDA || options.enableHackForGames == HACK_FOR_ZELDA_MM )
-		gRSP.projectionMtxs[gRSP.projectionMtxTop]._43 += 0.5f;
+		if (bReplace)
+		{
+			// Load projection matrix
+			gRSP.projectionMtxs[gRSP.projectionMtxTop] = mat;
+		}
+		else
+		{
+			gRSP.projectionMtxs[gRSP.projectionMtxTop] = mat * gRSP.projectionMtxs[gRSP.projectionMtxTop-1];
+		}
+		
 	}
 	else
 	{
-		gRSP.projectionMtxs[gRSP.projectionMtxTop] = bPush ? mat * gRSP.projectionMtxs[gRSP.projectionMtxTop - 1] : mat * gRSP.projectionMtxs[gRSP.projectionMtxTop];
-	}
+		if (bReplace)
+		{
+			// Load projection matrix
+			gRSP.projectionMtxs[gRSP.projectionMtxTop] = mat;
+		}
+		else
+		{
+			gRSP.projectionMtxs[gRSP.projectionMtxTop] = mat * gRSP.projectionMtxs[gRSP.projectionMtxTop];
+		}
 
+	}
+	
 	gRSP.bMatrixIsUpdated = true;
 
 	DumpMatrix(mat,"Set Projection Matrix");
@@ -179,6 +197,20 @@ void CRender::SetWorldView(const Matrix & mat, bool bPush, bool bReplace)
 		{
 			// Load projection matrix
 			gRSP.modelviewMtxs[gRSP.modelViewMtxTop] = mat;
+
+			// Hack needed to show flashing last heart and map arrows in Zelda OoT & MM
+            // It renders at Z cordinate = 0.0f that gets clipped away
+            // So we translate them a bit along Z to make them stick
+            if( options.enableHackForGames == HACK_FOR_ZELDA || options.enableHackForGames == HACK_FOR_ZELDA_MM) 
+            {
+                if(gRSP.modelviewMtxs[gRSP.modelViewMtxTop]._43 == 0.0f
+                    && gRSP.modelviewMtxs[gRSP.modelViewMtxTop]._42 != 0.0f
+                    && gRSP.modelviewMtxs[gRSP.modelViewMtxTop]._42 <= 94.5f
+                    && gRSP.modelviewMtxs[gRSP.modelViewMtxTop]._42 >= -94.5f)
+                {
+                    gRSP.modelviewMtxs[gRSP.modelViewMtxTop]._43 -= 10.1f;
+                }
+            }
 		}
 		else
 		{
@@ -205,11 +237,11 @@ void CRender::SetWorldView(const Matrix & mat, bool bPush, bool bReplace)
 }
 
 
-void CRender::PopWorldView(u32 num)
+void CRender::PopWorldView()
 {
-	if (gRSP.modelViewMtxTop > (num-1))
+	if (gRSP.modelViewMtxTop > 0)
 	{
-		gRSP.modelViewMtxTop-=num;
+		gRSP.modelViewMtxTop--;
 		gRSPmodelViewTop = gRSP.modelviewMtxs[gRSP.modelViewMtxTop];
 		if( options.enableHackForGames == HACK_REVERSE_XY_COOR )
 		{
@@ -272,20 +304,19 @@ void CRender::SetCombinerAndBlender()
 	InitOtherModes();
 
 	if( g_curRomInfo.bDisableBlender )
-		CBlender::DisableAlphaBlender();
+		m_pAlphaBlender->DisableAlphaBlender();
 	else if( currentRomOptions.bNormalBlender )
-		CBlender::NormalAlphaBlender();
+		m_pAlphaBlender->NormalAlphaBlender();
 	else
-		CBlender::InitBlenderMode();
+		m_pAlphaBlender->InitBlenderMode();
 
 	m_pColorCombiner->InitCombinerMode();
-
-	//ApplyTextureFilter();
 }
 
 void CRender::RenderReset()
 {
 	UpdateClipRectangle();
+	//ResetMatrices(uint32 size);
 	SetZBias(0);
 	gRSP.numVertices = 0;
 	gRSP.maxVertexID = 0;
@@ -329,8 +360,7 @@ bool CRender::FillRect(LONG nX0, LONG nY0, LONG nX1, LONG nY1, uint32 dwColor)
 	bool res=true;
 
 	/*
-	//CHECKME if statement was previously disabled
-	// This makes Duke Nukem intro look funny.
+	// I don't know why this does not work for OpenGL
 	if( gRDP.otherMode.cycle_type == CYCLE_TYPE_FILL && nX0 == 0 && nY0 == 0 && ((nX1==windowSetting.uViWidth && nY1==windowSetting.uViHeight)||(nX1==windowSetting.uViWidth-1 && nY1==windowSetting.uViHeight-1)) )
 	{
 		CGraphicsContext::g_pGraphicsContext->Clear(CLEAR_COLOR_BUFFER,dwColor);
@@ -338,7 +368,7 @@ bool CRender::FillRect(LONG nX0, LONG nY0, LONG nX1, LONG nY1, uint32 dwColor)
 	else
 	*/
 	{
-		//BOOL m_savedZBufferFlag = gRSP.bZBufferEnabled;	// Save ZBuffer state
+		BOOL m_savedZBufferFlag = gRSP.bZBufferEnabled;	// Save ZBuffer state
 		ZBufferEnable( FALSE );
 
 		m_fillRectVtx[0].x = ViewPortTranslatei_x(nX0);
@@ -352,25 +382,20 @@ bool CRender::FillRect(LONG nX0, LONG nY0, LONG nX1, LONG nY1, uint32 dwColor)
 		{
 			ZBufferEnable(FALSE);
 		}
-		else
-		{
-			//dwColor = PostProcessDiffuseColor(0);
-			dwColor = PostProcessDiffuseColor(gRDP.primitiveColor);
-		}
 
 		float depth = (gRDP.otherMode.depth_source == 1 ? gRDP.fPrimitiveDepth : 0 );
 
 		ApplyRDPScissor();
 		TurnFogOnOff(false);
 		res = RenderFillRect(dwColor, depth);
-		TurnFogOnOff(gRDP.tnl.Fog);
+		TurnFogOnOff(gRSP.bFogEnabled);
 #ifdef _OLDCLIPPER
 		ApplyScissorWithClipRatio();// Rice 5.60
 #endif
 
 		if( gRDP.otherMode.cycle_type  >= CYCLE_TYPE_COPY )
 		{
-			ZBufferEnable(gRDP.tnl.Zbuffer);
+			ZBufferEnable(gRSP.bZBufferEnabled);
 		}
 	}
 
@@ -802,12 +827,11 @@ bool CRender::TexRect(LONG nX0, LONG nY0, LONG nX1, LONG nY1, float fS0, float f
 	ApplyScissorWithClipRatio(); //Rice 5.60
 #endif
 	}
-
-	TurnFogOnOff(gRDP.tnl.Fog);
+	TurnFogOnOff(gRSP.bFogEnabled);
 
 	if( gRDP.otherMode.cycle_type  >= CYCLE_TYPE_COPY || !gRDP.otherMode.z_cmp  )
 	{
-		ZBufferEnable(gRDP.tnl.Zbuffer);
+		ZBufferEnable(gRSP.bZBufferEnabled);
 	}
 
 	DEBUGGER_PAUSE_AT_COND_AND_DUMP_COUNT_N((eventToPause == NEXT_FLUSH_TRI || eventToPause == NEXT_TEXTRECT), {
@@ -842,7 +866,7 @@ bool CRender::TexRectFlip(LONG nX0, LONG nY0, LONG nX1, LONG nY1, float fS0, flo
 	PrepareTextures();
 
 	// Save ZBuffer state
-	//m_savedZBufferFlag = gRSP.bZBufferEnabled;
+	m_savedZBufferFlag = gRSP.bZBufferEnabled;
 	if( gRDP.otherMode.depth_source == 0 )	ZBufferEnable( FALSE );
 
 	float widthDiv = g_textures[gRSP.curTile].m_fTexWidth;
@@ -901,10 +925,10 @@ bool CRender::TexRectFlip(LONG nX0, LONG nY0, LONG nX1, LONG nY1, float fS0, flo
 #endif
 	bool res = RenderTexRect();
 
-	TurnFogOnOff(gRDP.tnl.Fog);
+	TurnFogOnOff(gRSP.bFogEnabled);
 
 	// Restore state
-	ZBufferEnable( gRDP.tnl.Zbuffer );
+	ZBufferEnable( m_savedZBufferFlag );
 
 	DEBUGGER_PAUSE_AT_COND_AND_DUMP_COUNT_N((eventToPause == NEXT_FLUSH_TRI || eventToPause == NEXT_TEXTRECT), {
 		DebuggerAppendMsg("TexRectFlip: tile=%d, X0=%d, Y0=%d, X1=%d, Y1=%d,\nfS0=%f, fT0=%f, nfS1=%f, fT1=%f\n",
@@ -1080,11 +1104,11 @@ void CRender::SetTextureScale(int dwTile,  float fScaleX, float fScaleY)
 
 void CRender::SetFogFlagForNegativeW()
 {
-	if( !gRDP.tnl.Fog )	return;
+	if( !gRSP.bFogEnabled )	return;
 
-	m_bFogStateSave = gRDP.tnl.Fog;
+	m_bFogStateSave = gRSP.bFogEnabled;
 
-	bool flag=gRDP.tnl.Fog;
+	bool flag=gRSP.bFogEnabled;
 	
 	for (uint32 i = 0; i < gRSP.numVertices; i++) 
 	{
@@ -1097,7 +1121,7 @@ void CRender::SetFogFlagForNegativeW()
 
 void CRender::RestoreFogFlag()
 {
-	if( !gRDP.tnl.Fog )	return;
+	if( !gRSP.bFogEnabled )	return;
 	TurnFogOnOff(m_bFogStateSave);
 }
 
@@ -1209,7 +1233,7 @@ bool CRender::DrawTriangles()
 		}
 	}
 
-	if( !gRDP.bFogEnableInBlender && gRDP.tnl.Fog )
+	if( !gRDP.bFogEnableInBlender && gRSP.bFogEnabled )
 	{
 		TurnFogOnOff(false);
 	}
@@ -1309,9 +1333,9 @@ bool CRender::DrawTriangles()
 	{
 		ZBufferEnable(FALSE);
 	}
-//#ifdef _OLDCLIPPER
+#ifdef _OLDCLIPPER
 	ApplyScissorWithClipRatio(); //Rice 5.60
-//#endif
+#endif
 
 	if( g_curRomInfo.bZHack )
 	{
@@ -1332,7 +1356,7 @@ bool CRender::DrawTriangles()
 		if( logCombiners ) m_pColorCombiner->DisplayMuxString();
 	});
 
-	if( !gRDP.bFogEnableInBlender && gRDP.tnl.Fog )
+	if( !gRDP.bFogEnableInBlender && gRSP.bFogEnabled )
 	{
 		TurnFogOnOff(true);
 	}
@@ -1909,6 +1933,7 @@ void CRender::UpdateScissorWithClipRatio()
 
 void CRender::InitOtherModes(void)					// Set other modes not covered by color combiner or alpha blender
 {
+	ApplyTextureFilter();
 
 	//
 	// I can't think why the hand in mario's menu screen is rendered with an opaque rendermode,
@@ -1952,7 +1977,7 @@ void CRender::InitOtherModes(void)					// Set other modes not covered by color c
 	}
 
 	if( options.enableHackForGames == HACK_FOR_SOUTH_PARK_RALLY && m_Mux == 0x00121824ff33ffff &&
-		gRDP.tnl.TriCull && gRDP.otherMode.aa_en && gRDP.otherMode.z_cmp && gRDP.otherMode.z_upd)
+		gRSP.bCullFront && gRDP.otherMode.aa_en && gRDP.otherMode.z_cmp && gRDP.otherMode.z_upd )
 	{
 		SetZCompare(FALSE);
 	}
