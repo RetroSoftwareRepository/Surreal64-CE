@@ -23,6 +23,7 @@ CTextureManager gTextureManager;
 
 bool g_bUseSetTextureMem = true;
 DWORD g_maxTextureMemUsage = (5*1024*1024);
+BOOL bPurgeOldBeforeIGM = FALSE;
 
 
 static const DWORD MEM_KEEP_FREE = (2*1024*1024); // keep 2MB free
@@ -180,7 +181,12 @@ void CTextureManager::PurgeOldTextures()
 	{
 		gTextureManager.CleanUp();
 		m_currentTextureMemUsage = 0;
+		bPurgeOldBeforeIGM = FALSE;
 		return;
+	}
+	else if(bPurgeOldBeforeIGM)
+	{
+		bPurgeOldBeforeIGM = FALSE;
 	}
 	else if(options.enableHackForGames != HACK_FOR_QUAKE_2)
 	{
