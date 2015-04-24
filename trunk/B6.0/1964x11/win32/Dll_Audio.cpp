@@ -189,7 +189,7 @@ BOOL LoadAudioPlugin(char *libname)
 		//_AUDIO_AiUpdate		 				= _AUDIO_M64P_AiUpdate;
 		_AUDIO_ProcessAList	 				= _AUDIO_M64P_ProcessAList;
 		//_AUDIO_ProcessAList_Count_Cycles	= _AUDIO_M64P_ProcessAListCountCycles;
-		//_AUDIO_IsMusyX					= _AUDIO_M64P_IsMusyX;
+		_AUDIO_IsMusyX					= _AUDIO_M64P_IsMusyX;
 		_AUDIO_AudioBoost		 			= _AUDIO_M64P_AudioBoost;
 			break;
 #endif //_AUDIO_M64P

@@ -1022,3 +1022,8 @@ void _AUDIO_M64P_AudioBoost (BOOL Boost)
 	//bAudioBoostJttL = Boost;
 	SDL_AudioBoost(Boost ? 1 : 0);
 }
+
+int _AUDIO_M64P_IsMusyX(void)
+{
+	return 1;
+}
