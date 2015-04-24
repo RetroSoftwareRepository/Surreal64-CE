@@ -228,7 +228,7 @@ BOOL _AUDIO_M64P_PauseAudio (BOOL Pause);
 //const char * _AUDIO_M64P_VolumeGetString(void);
 
 void _AUDIO_M64P_AudioBoost (BOOL Boost);
-
+int _AUDIO_M64P_IsMusyX(void);
 #if defined(__cplusplus)
 }
 #endif

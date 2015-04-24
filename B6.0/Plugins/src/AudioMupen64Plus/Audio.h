@@ -158,7 +158,8 @@ typedef struct
   input:    none
   output:   none
 *******************************************************************/ 
- void  _AUDIO_M64P_RomClosed (void); void _AUDIO_M64P_AudioBoost (BOOL Boost);
+ void  _AUDIO_M64P_RomClosed (void); void _AUDIO_M64P_AudioBoost (BOOL Boost);int _AUDIO_M64P_IsMusyX (void);
+
 #if defined(__cplusplus)
 }
 #endif
