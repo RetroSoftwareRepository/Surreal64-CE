@@ -157,7 +157,7 @@ int ControllerReset[19]  =
 		   0x0D,0x17,0x0F};
 
 //Skin.ini Defaults
-char BoxartName[32] = "Cbagys3DArt";
+char BoxartName[32] = "Cbagys3DBoxCart";
 
 //Font Colors
 DWORD dwTitleColor = 0xFF53B77F;
