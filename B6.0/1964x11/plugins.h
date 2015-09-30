@@ -251,6 +251,10 @@ typedef struct {
 #endif //_RSP_PJ64_LLE
 
 // Audio Plugins
+#if defined(_AUDIO_AZIAUD)
+#include <AudioAziAudioDS8.h>
+#endif //_AUDIO_AZIAUD
+
 #if defined(_AUDIO_AZIMER)
 #include <AudioAzimer.h>
 #endif //_AUDIO_AZIMER

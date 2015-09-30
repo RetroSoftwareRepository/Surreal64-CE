@@ -13254,6 +13254,24 @@ Resolution Height=-1
 Culling=1
 Emulate Clear=0
 
+[635A42C5-BDC58EDC-C:45]
+Good Name=Super Mario 74 (U) 
+Internal Name=SUPER MARIO 64
+RDRAM Size=8
+Counter Factor=2
+Save Type=First Save Type
+CPU Type=Recompiler
+Self-modifying code Method=Cache
+Use TLB=Yes
+Linking=Global
+Reg Cache=Yes
+Use Large Buffer=No
+Delay SI=No
+SP Hack=No
+Status=Compatible
+Plugin Note=[video] missing dissolve effect (see GameFAQ)
+Core Note=
+
 [D6FBA4A8-6326AA2C-C:4A]
 Good Name=Super Mario 64 Shindou Edition (J) 
 Internal Name=SUPERMARIO64

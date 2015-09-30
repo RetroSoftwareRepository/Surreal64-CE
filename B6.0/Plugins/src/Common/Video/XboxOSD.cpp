@@ -273,9 +273,11 @@ __forceinline void XboxDrawDebugInfo()
 		case _AudioPluginLleRsp:	swprintf(debugaudio,L"Using LLE RSP Audio");	break;
 		case _AudioPluginBasic:		swprintf(debugaudio,L"Basic Audio");	break;
 		case _AudioPluginJttl:		swprintf(debugaudio,L"JttL Audio 1.2");		break;
-		case _AudioPluginAzimer:	swprintf(debugaudio,L"Azimer Audio 0.55");	break;
-		case _AudioPluginMusyX:		swprintf(debugaudio,L"1964Audio 2.6");	break;
+		case _AudioPluginAzimer:	swprintf(debugaudio,L"AziAudio 0.55");	break;
+		case _AudioPluginMusyX:		swprintf(debugaudio,L"1964Audio 2.7");	break;
 		case _AudioPluginM64P:		swprintf(debugaudio,L"Using HLE RSP Audio");	break;
+		case _AudioPluginAziDS8:	swprintf(debugaudio,L"AziAudio 0.7");	break;
+
 	}
 
 	// RSP Plugin

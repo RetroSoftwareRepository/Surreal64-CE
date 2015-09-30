@@ -207,6 +207,22 @@ extern void _AUDIO_MUSYX_AiUpdate			(BOOL Wait);
 extern BOOL _AUDIO_MUSYX_InitiateAudio		(AUDIO_INFO Audio_Info);
 extern void _AUDIO_MUSYX_ProcessAList		(void);
 extern void _AUDIO_MUSYX_AudioBoost			(BOOL Boost);
+
+#elif defined(_AUDIO_AZIAUD)
+//07.2015 weinerschnitzel - AziAudio 0.7
+
+extern void _AUDIO_AZIAUD_CloseDLL			(void);
+extern void _AUDIO_AZIAUD_RomClosed			(void);
+extern void _AUDIO_AZIAUD_DllConfig			( HWND hParent );
+extern void _AUDIO_AZIAUD_GetDllInfo		(PLUGIN_INFO *PluginInfo);
+extern void _AUDIO_AZIAUD_AiDacrateChanged	(int SystemType);
+extern void _AUDIO_AZIAUD_AiLenChanged		(void);
+extern DWORD _AUDIO_AZIAUD_AiReadLength		(void);
+extern void _AUDIO_AZIAUD_AiUpdate			(BOOL Wait);
+extern BOOL _AUDIO_AZIAUD_InitiateAudio		(AUDIO_INFO Audio_Info);
+extern void _AUDIO_AZIAUD_ProcessAList		(void);
+//extern void _AUDIO_AZIAUD_AudioBoost		(BOOL Boost);
+
 #else
 
 // mupen 1.5 audio
@@ -399,6 +415,23 @@ BOOL LoadAudioDll(void) {
 		
 		_AUDIO_LINK_AudioBoost		 	= _AUDIO_MUSYX_AudioBoost;
 	}
+#elif defined(_AUDIO_AZIAUD)
+	{
+		_AUDIO_LINK_AiDacrateChanged 	= _AUDIO_AZIAUD_AiDacrateChanged;
+		_AUDIO_LINK_AiLenChanged	 	= _AUDIO_AZIAUD_AiLenChanged;
+		_AUDIO_LINK_AiReadLength	 	= _AUDIO_AZIAUD_AiReadLength;
+		_AUDIO_LINK_AiUpdate		 	= _AUDIO_AZIAUD_AiUpdate;
+		_AUDIO_LINK_CloseDLL		 	= _AUDIO_AZIAUD_CloseDLL;
+		//_AUDIO_LINK_DllAbout		 	= _AUDIO_AZIAUD_DllAbout;
+		_AUDIO_LINK_DllConfig		 	= _AUDIO_AZIAUD_DllConfig;
+		//_AUDIO_LINK_DllTest			 	= _AUDIO_AZIAUD_DllTest;
+		_AUDIO_LINK_GetDllInfo		 	= _AUDIO_AZIAUD_GetDllInfo;
+		_AUDIO_LINK_InitiateAudio	 	= _AUDIO_AZIAUD_InitiateAudio;
+		_AUDIO_LINK_ProcessAList	 	= _AUDIO_AZIAUD_ProcessAList;
+		_AUDIO_LINK_RomClosed		 	= _AUDIO_AZIAUD_RomClosed;
+		
+		//_AUDIO_LINK_AudioBoost		 	= _AUDIO_AZIAUD_AudioBoost;
+	}
 #else
 	/* This plugin only cooperates with 1964x11, partially
 	if (g_iAudioPlugin == _AudioPluginM64P) // so it doesn't break for now
@@ -492,7 +525,7 @@ BOOL LoadAudioDll(void) {
 		
 		_AUDIO_LINK_AudioBoost		 	= _AUDIO_AZIMER_AudioBoost;
 	}
-
+	
 #endif
 
 	__try
@@ -929,6 +962,8 @@ BOOL LoadRSPDll(void) {
 		//_RSP_LINK_InitiateRSP_1_0	= _RSP_HLE_InitiateRSP;
 		_RSP_LINK_InitiateRSP_1_1	= _RSP_HLE_InitiateRSP;
 	}
+#ifndef _AUDIO_AZIAUD
+	// BSmiles RSP is included with AziAudio 0.7. 
 	else if(g_iRspPlugin == _RSPPluginM64P)
 	{
 		_RSP_LINK_DoRspCycles 		= _RSP_M64p_DoRspCycles;
@@ -940,6 +975,7 @@ BOOL LoadRSPDll(void) {
 		//_RSP_LINK_InitiateRSP_1_0	= _RSP_M64p_InitiateRSP;
 		_RSP_LINK_InitiateRSP_1_1	= _RSP_M64p_InitiateRSP;
 	}
+#endif
 	/*
 	else if(g_iRspPlugin == _RSPPluginCXD4)
 	{
