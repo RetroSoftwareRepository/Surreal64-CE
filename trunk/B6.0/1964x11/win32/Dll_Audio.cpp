@@ -71,12 +71,15 @@ static void (__cdecl *_SetDebuggerCallBack)(void (_cdecl *DbgCallBackFun)(char *
  =======================================================================================================================
  =======================================================================================================================
  */
+BOOL _AUDIO_AZIAUD_IsMusyX(){ return 1;}
 BOOL LoadAudioPlugin(char *libname)
 {
 #ifdef _XBOX
 #if defined(_AUDIO_SOLO)
 #if defined(_AUDIO_AZIMER)
 	g_iAudioPlugin = _AudioPluginAzimer;
+#elif defined(_AUDIO_AZIAUD)
+	g_iAudioPlugin = _AudioPluginAziDS8;
 #elif defined(_AUDIO_BASIC)
 	g_iAudioPlugin = _AudioPluginBasic;
 #elif defined(_AUDIO_DAEDALUS)
@@ -115,6 +118,27 @@ BOOL LoadAudioPlugin(char *libname)
 		_AUDIO_AudioBoost		 			= _AUDIO_AZIMER_AudioBoost;
 			break;
 #endif //_AUDIO_AZIMER
+
+#if defined(_AUDIO_AZIAUD)
+
+	case _AudioPluginAziDS8 :
+		_AUDIO_RomClosed		 			= _AUDIO_AZIAUD_RomClosed;
+		_AUDIO_DllClose		 				= _AUDIO_AZIAUD_CloseDLL;
+		//_AUDIO_DllConfig		 			= _AUDIO_AZIAUD_DllConfig;
+		//_AUDIO_About		 				= _AUDIO_AZIAUD_DllAbout;
+		//_AUDIO_Test			 			= _AUDIO_AZIAUD_DllTest;
+		_AUDIO_GetDllInfo		 			= _AUDIO_AZIAUD_GetDllInfo;
+		_AUDIO_Initialize	 				= _AUDIO_AZIAUD_InitiateAudio;
+		_AUDIO_AiDacrateChanged 			= _AUDIO_AZIAUD_AiDacrateChanged;
+		_AUDIO_AiLenChanged	 				= _AUDIO_AZIAUD_AiLenChanged;
+		_AUDIO_AiReadLength	 				= _AUDIO_AZIAUD_AiReadLength;
+		_AUDIO_AiUpdate		 				= _AUDIO_AZIAUD_AiUpdate;
+		_AUDIO_ProcessAList	 				= _AUDIO_AZIAUD_ProcessAList;
+		//_AUDIO_ProcessAList_Count_Cycles	= _AUDIO_AZIAUD_ProcessAListCountCycles;
+		_AUDIO_IsMusyX					=  _AUDIO_AZIAUD_IsMusyX;
+		//_AUDIO_AudioBoost		 			= _AUDIO_AZIAUD_AudioBoost;
+			break;
+#endif //_AUDIO_AZIAUD
 
 #if defined(_AUDIO_BASIC)
 	case _AudioPluginBasic :

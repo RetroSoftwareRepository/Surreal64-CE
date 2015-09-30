@@ -272,9 +272,10 @@ string GetAudioPluginName(int p_iAudioPlugin)
 		case _AudioPluginLleRsp : szAudioPlugin = "LLE RSP"; break;//leave this here to preserve ini settings
 		case _AudioPluginBasic : szAudioPlugin = "Basic"; break;
 		case _AudioPluginJttl : szAudioPlugin = "JttL"; break;
-		case _AudioPluginAzimer : szAudioPlugin = "Azimer"; break;
-		case _AudioPluginMusyX : szAudioPlugin = "MusyX"; break;
-		case _AudioPluginM64P : szAudioPlugin = "M64Plus"; break;
+		case _AudioPluginAzimer : szAudioPlugin = "AziAudio 0.55"; break;
+		case _AudioPluginMusyX : szAudioPlugin = "1964Audio"; break;
+		case _AudioPluginM64P : szAudioPlugin = "BSmiles RSP"; break;
+		case _AudioPluginAziDS8 : szAudioPlugin = "AziAudio 0.7"; break;
 		//case _AudioPluginMissing : 
 		default : szAudioPlugin = "JttL"; break;//freakdave - set JttL plugin as default
 	}	

@@ -327,6 +327,9 @@
 				RelativePath=".\X86.h">
 			</File>
 		</Filter>
+		<File
+			RelativePath="..\..\..\PJ64x\PJ64-X 6.12 Azimer.vcproj">
+		</File>
 	</Files>
 	<Globals>
 	</Globals>

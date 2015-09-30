@@ -24,6 +24,8 @@
 
 #if defined(USE_MUSYX)
 #include <AudioMusyX.h>
+#elif defined(_AUDIO_AZIAUD)
+#include <AudioAziAudioDS8.h>
 #else
 //#include <AudioM64Plus.h>
 #include <AudioJttL.h>

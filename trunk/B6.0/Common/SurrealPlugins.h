@@ -41,6 +41,7 @@ enum AudioPlugins
 	_AudioPluginAzimer,
 	_AudioPluginMusyX,
 	_AudioPluginM64P,
+	_AudioPluginAziDS8,
 	_AudioPluginMissing
 };
 
