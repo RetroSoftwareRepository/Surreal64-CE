@@ -576,11 +576,35 @@ extern uint8* pAsmStart;
 
 uint32 CalculateRDRAMCRC(void *pPhysicalAddress, uint32 left, uint32 top, uint32 width, uint32 height, uint32 size, uint32 pitchInBytes )
 {
-	dwAsmCRC = 0;
 	dwAsmdwBytesPerLine = ((width<<size)+1)/2;
+#if 1
+    //Fast Hash used by default unless using a texturepack //Corn
+    if( !options.bLoadHiResTextures )
+    {
+	    dwAsmCRC = (uint32)pPhysicalAddress;
+		register uint32 *pStart = (uint32*)(pPhysicalAddress);
+		register uint32 *pEnd = pStart;
 
+		uint32 pitch = pitchInBytes>>2;
+		pStart += (top * pitch) + (((left<<size)+1)>>3);
+		pEnd += ((top+height) * pitch) + ((((left+width)<<size)+1)>>3);
+
+		uint32 SizeInDWORD = (uint32)(pEnd-pStart);
+        uint32 pinc = SizeInDWORD >> 2; 
+
+		if( pinc < 1 ) pinc = 1;
+        if( pinc > 23 ) pinc = 23;
+
+        do
+        {
+            dwAsmCRC = ((dwAsmCRC << 1) | (dwAsmCRC >> 31)) ^ *pStart;	//This combines to a single instruction in ARM assembler EOR ...,ROR #31 :)
+            pStart += pinc;
+        }while(pStart < pEnd);
+	}
+#else
 	if( currentRomOptions.bFastTexCRC && !options.bLoadHiResTextures && (height>=32 || (dwAsmdwBytesPerLine>>2)>=16))
 	{
+		dwAsmCRC = 0;
 		uint32 realWidthInDWORD = dwAsmdwBytesPerLine>>2;
 		uint32 xinc = realWidthInDWORD / FAST_CRC_CHECKING_INC_X;	
 		if( xinc < FAST_CRC_MIN_X_INC )
@@ -652,8 +676,10 @@ endloop1:
 			pop		esi;
 		}
 	}
+#endif
 	else
 	{
+		dwAsmCRC = 0;
 		try{
 			dwAsmdwBytesPerLine = ((width<<size)+1)/2;
 
