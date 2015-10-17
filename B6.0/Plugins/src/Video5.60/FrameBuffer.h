@@ -795,8 +795,32 @@ DWORD CalculateRDRAMCRC(void *pPhysicalAddress, DWORD left, DWORD top, DWORD wid
 	dwAsmCRC = 0;
 	dwAsmdwBytesPerLine = ((width<<size)+1)/2;
 
+#if 1
+    //Fast Hash used by default unless using a texturepack //Corn
+	dwAsmCRC = (DWORD)pPhysicalAddress;
+	register DWORD *pStart = (DWORD*)(pPhysicalAddress);
+	register DWORD *pEnd = pStart;
+
+	DWORD pitch = pitchInBytes>>2;
+	pStart += (top * pitch) + (((left<<size)+1)>>3);
+	pEnd += ((top+height) * pitch) + ((((left+width)<<size)+1)>>3);
+
+	DWORD SizeInDWORD = (DWORD)(pEnd-pStart);
+    DWORD pinc = SizeInDWORD >> 2; 
+
+	if( pinc < 1 ) pinc = 1;
+	if( pinc > 23 ) pinc = 23;
+
+	do
+	{
+		dwAsmCRC = ((dwAsmCRC << 1) | (dwAsmCRC >> 31)) ^ *pStart;	//This combines to a single instruction in ARM assembler EOR ...,ROR #31 :)
+		pStart += pinc;
+	}while(pStart < pEnd);
+
+#else
 	if( currentRomOptions.bFastTexCRC && (height>=32 || (dwAsmdwBytesPerLine>>2)>=16))
 	{
+		dwAsmCRC = 0;
 		DWORD realWidthInDWORD = dwAsmdwBytesPerLine>>2;
 		DWORD xinc = realWidthInDWORD / FAST_CRC_CHECKING_INC_X;	
 		if( xinc < FAST_CRC_MIN_X_INC )
@@ -869,6 +893,7 @@ endloop1:
 	}
 	else
 	{
+		dwAsmCRC = 0;
 		try{
 			dwAsmdwBytesPerLine = ((width<<size)+1)/2;
 
@@ -928,6 +953,7 @@ l1:	mov esi, [ecx+ebx]
 			TRACE0("Exception in texture CRC calculation");
 		}
 	}
+#endif
 	return dwAsmCRC;
 }
 
