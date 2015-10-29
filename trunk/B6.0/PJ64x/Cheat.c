@@ -34,9 +34,11 @@
 #include "cheats.h"
 #include "cpu.h"
 #include "resource.h"
+#ifdef _XBOX
 //#include "../simpleini.h" // ini parser
 //extern char romCRC[32];
-//extern char szPathSaves[256];
+extern char szPathSaves[256];
+#endif
 
 
 //#define UM_CLOSE_CHEATS         (WM_USER + 132)
@@ -405,7 +407,27 @@ void ApplyCheats (void) {
 
 ********************************************************************************************/
 BOOL CheatActive (char * Name) {
-/*
+
+
+	char *String = NULL, File[350], Identifier[100];
+	sprintf(File, "%s%08X\\Cheats\\%08X-%08X-%02X.pj64.cht", g_szPathSaves, *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x14)), *((BYTE *)(RomHeader + 0x3D)));
+	sprintf(Identifier,"%08X-%08X-C:%X",*(DWORD *)(&RomHeader[0x10]),*(DWORD *)(&RomHeader[0x14]),RomHeader[0x3D]);
+	if(PathFileExists(File)) {
+		OutputDebugString("Cheat File Found!\n");
+		sprintf(String,"%s.Active",Name);
+		_GetPrivateProfileString2(Identifier,Name,"",&String,File);
+		if (atoi(String) != 1) {
+		if (String) { free(String); }
+		return FALSE;		
+		}
+		else
+		{
+		if (String) { free(String); }
+		return TRUE;	
+		}
+	}
+
+	/*
 	CSimpleIniA ini;
 	SI_Error rc;
 	ini.SetUnicode(true);
@@ -448,12 +470,13 @@ BOOL CheatActive (char * Name) {
 		RegCloseKey(hKeyResults);
 		if (lResult == ERROR_SUCCESS) { return Active; } // if no errors return active state
 	}
-	return FALSE;*/
+	return FALSE;
+	*/
 
 	return FALSE;
 
     // Need to check an ini entry that says if cheats were/are active. 
-	//sprintf(File, "%s%08X\\%08X-%08X-%02X.eep", g_szPathCheats, *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x14)), *((BYTE *)(RomHeader + 0x3D)));
+	//sprintf(File, "%s%08X\\%08X-%08X-%02X.ini", g_szPathCheats, *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x14)), *((BYTE *)(RomHeader + 0x3D)));
 
 }
 
@@ -684,6 +707,7 @@ BOOL GetCheatName(int CheatNo, char * CheatName, int CheatNameLen) {
 BOOL LoadCheatExt(char * CheatName, char * CheatExt, int MaxCheatExtLen) {
 	
 /*
+
 	CSimpleIniA ini;
 	SI_Error rc;
 	ini.SetUnicode(true);
@@ -705,9 +729,22 @@ BOOL LoadCheatExt(char * CheatName, char * CheatExt, int MaxCheatExtLen) {
 	OutputDebugStringA(" Successfully Loaded!\n");
 
 	sprintf(String,"%s.exten",CheatName);
-	//CheatExt = ini.GetValue("Settings", String, "");
+	CheatExt = ini.GetValue("CheatExt", String, "");
 	return TRUE;
-	
+*/
+	char *String = NULL, Identifier[100], FilePath[350];
+	sprintf(FilePath, "%s%08X\\Cheats\\%08X-%08X-%02X.pj64.cht.ext", g_szPathSaves, *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x14)), *((BYTE *)(RomHeader + 0x3D)));
+	sprintf(Identifier,"%08X-%08X-C:%X",*(DWORD *)(&RomHeader[0x10]),*(DWORD *)(&RomHeader[0x14]),RomHeader[0x3D]);
+	if(PathFileExists(FilePath)) {
+		OutputDebugString("Cheat Ext Exists!\n");
+		sprintf(String,"%s.exten",CheatName);
+		_GetPrivateProfileString(Identifier,CheatName,String,CheatExt,MaxCheatExtLen,FilePath);
+		return TRUE;
+	}
+	else
+	{
+		return FALSE;
+	}
 
 /*
 
@@ -854,14 +891,31 @@ void LoadCheats (void) {
 }
 
 void SaveCheat(char * CheatName, BOOL Active) {
-	/*
-	char String[300], Identifier[100];
-	DWORD Disposition = 0;
-	//HKEY hKeyResults = 0;
-	long lResult;
 	
+	char *String = NULL, Identifier[100], FilePath[350];
+	sprintf(FilePath, "%s%08X\\Cheats\\%08X-%08X-%02X.pj64.cht", g_szPathSaves, *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x14)), *((BYTE *)(RomHeader + 0x3D)));
 	sprintf(Identifier,"%08X-%08X-C:%X",*(DWORD *)(&RomHeader[0x10]),*(DWORD *)(&RomHeader[0x14]),RomHeader[0x3D]);
-	sprintf(String,"Software\\N64 Emulation\\%s\\Cheats\\%s",AppName,Identifier);
+	if(PathFileExists(FilePath)) {
+		OutputDebugString("T:\\Cheat File Found!\n");
+		sprintf(String,"%s.Active",CheatName);
+		_WritePrivateProfileString(Identifier,String,(CONST BYTE *)(&Active),FilePath);
+		OutputDebugString("Cheat Saved!\n");
+	}
+	else
+	{
+		HANDLE hFile;
+		hFile = CreateFile(FilePath,GENERIC_WRITE | GENERIC_READ, FILE_SHARE_READ,
+				NULL,OPEN_ALWAYS,FILE_ATTRIBUTE_NORMAL | FILE_FLAG_RANDOM_ACCESS, NULL);
+		if (hFile == INVALID_HANDLE_VALUE)
+		{
+			OutputDebugString("Cannot Create T:\\Cheat File!\n");
+		}
+		OutputDebugString("T:\\Cheat File Created!\n");
+		sprintf(String,"%s.Active",CheatName);
+		_WritePrivateProfileString(Identifier,String,(CONST BYTE *)(&Active),FilePath);
+		OutputDebugString("Cheat Saved!\n");
+	}
+	/*
 	//lResult = RegCreateKeyEx( HKEY_CURRENT_USER, String,0,"", REG_OPTION_NON_VOLATILE,
 	//	KEY_ALL_ACCESS,NULL, &hKeyResults,&Disposition);
 	// Open ini file, check for rom name
@@ -886,6 +940,30 @@ void SaveCheat(char * CheatName, BOOL Active) {
 
 ********************************************************************************************/
 void SaveCheatExt(char * CheatName, char * CheatExt) {
+	
+	char *String = NULL, Identifier[100], FilePath[350];
+	sprintf(FilePath, "%s%08X\\Cheats\\%08X-%08X-%02X.pj64.cht.ext", g_szPathSaves, *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x14)), *((BYTE *)(RomHeader + 0x3D)));
+	sprintf(Identifier,"%08X-%08X-C:%X",*(DWORD *)(&RomHeader[0x10]),*(DWORD *)(&RomHeader[0x14]),RomHeader[0x3D]);
+	if(PathFileExists(FilePath)) {
+		OutputDebugString("T:\\Cheat Ext File Found!\n");
+		sprintf(String,"%s.exten",CheatName);
+		_WritePrivateProfileString(Identifier,String,(CONST BYTE *)(&CheatExt),FilePath);
+		OutputDebugString("Cheat Ext Saved!\n");
+	}
+	else
+	{
+		HANDLE hFile;
+		hFile = CreateFile(FilePath,GENERIC_WRITE | GENERIC_READ, FILE_SHARE_READ,
+				NULL,OPEN_ALWAYS,FILE_ATTRIBUTE_NORMAL | FILE_FLAG_RANDOM_ACCESS, NULL);
+		if (hFile == INVALID_HANDLE_VALUE)
+		{
+			OutputDebugString("Cannot Create T:\\Cheat Ext File!\n");
+		}
+		OutputDebugString("T:\\Cheat Ext File Created!\n");
+		sprintf(String,"%s.exten",CheatName);
+		_WritePrivateProfileString(Identifier,String,(CONST BYTE *)(&CheatExt),FilePath);
+		OutputDebugString("Cheat Ext Saved!\n");
+	}
 	/*
 	char String[300], Identifier[100];
 	DWORD Disposition = 0;

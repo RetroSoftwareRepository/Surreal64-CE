@@ -225,7 +225,7 @@ void _RSP_M64p_GetDllInfo(PLUGIN_INFO * PluginInfo)
 {
     PluginInfo->Version = 0x0101;
 	PluginInfo->Type = PLUGIN_TYPE_RSP;
-	strcpy(PluginInfo->Name, "Mupen64Plus HLE RSP Plugin");
+	//strcpy(PluginInfo->Name, "Mupen64Plus HLE RSP Plugin");
 	PluginInfo->NormalMemory = 1;
 	PluginInfo->MemoryBswaped = 1;
 }

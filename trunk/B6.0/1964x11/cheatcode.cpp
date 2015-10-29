@@ -93,7 +93,22 @@ void CodeList_Clear(void)
 
 /*
  =======================================================================================================================
-    According cheat code from file for current loaded rom ?    Cheat Code file name: 1964.cht ?    File layout: ?    File contents entries for different rom ?    Entry Layout: ?    [Rom Name] ?    Name1=b,12345678-xxxx,12345678-xxxx ?    Name2=b,12345678-xxxx,12345678-xxxx ?    b=0, 1 ?    b=0 -> this group is not active ?    b=1 -> this group is active ?    Limition: ?    Support upto 30 games per rom ?    Support upto 10 code per group ?    Activation: ?    Codes in a group will be activated/deactivated together
+    According cheat code from file for current loaded rom ?
+	Cheat Code file name: 1964.cht ?
+	File layout: ?
+	File contents entries for different rom ?
+	Entry Layout: ?
+	[Rom Name] ?
+	Name1=b,12345678-xxxx,12345678-xxxx ?
+	Name2=b,12345678-xxxx,12345678-xxxx ?
+	b=0, 1 ?
+	b=0 -> this group is not active ?
+	b=1 -> this group is active ?
+	Limition: ?
+	Support upto 30 games per rom ?
+	Support upto 10 code per group ?
+	Activation: ?
+	Codes in a group will be activated/deactivated together
  =======================================================================================================================
  */
 BOOL __cdecl CodeList_ReadCode(char *intername_rom_name, char *filename)
@@ -151,7 +166,8 @@ BOOL __cdecl CodeList_ReadCode(char *intername_rom_name, char *filename)
 		/*~~~~~~~~~~~~~~~*/
 
 		/*
-		 * Read all code for current rom only ?		 * Step 1, read the number of groups
+		 * Read all code for current rom only ?
+		 * Step 1, read the number of groups
 		 */
 		if(fgets(line, 256, stream))
 		{
