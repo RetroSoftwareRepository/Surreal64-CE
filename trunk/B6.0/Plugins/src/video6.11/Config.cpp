@@ -942,6 +942,7 @@ void GenerateCurrentRomOptions()
 	currentRomOptions.bAccurateTextureMapping	=g_curRomInfo.dwAccurateTextureMapping;
 
 	options.enableHackForGames = NO_HACK_FOR_GAME;
+	options.enableHackTextureSeams = FALSE;
 	if ((strncmp(g_curRomInfo.szGameName, "BANJO TOOIE", 11) == 0))
 	{
 		options.enableHackForGames = HACK_FOR_BANJO_TOOIE;
@@ -1085,6 +1086,10 @@ void GenerateCurrentRomOptions()
 	else if ((stricmp(g_curRomInfo.szGameName, "QUAKE II") == 0))
 	{
 		options.enableHackForGames = HACK_FOR_QUAKE_2;
+	}
+	else if ((stricmp(g_curRomInfo.szGameName, "CALIFORNIA SPEED") == 0))
+	{
+		options.enableHackTextureSeams = TRUE;
 	}
 
 	if( currentRomOptions.N64FrameBufferEmuType == 0 )		currentRomOptions.N64FrameBufferEmuType = defaultRomOptions.N64FrameBufferEmuType;

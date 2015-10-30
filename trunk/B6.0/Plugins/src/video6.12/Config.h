@@ -197,6 +197,7 @@ enum HACK_FOR_GAMES
 	HACK_FOR_ZELDA_MM,
 	HACK_FOR_MARIO_KART,
 	HACK_FOR_QUAKE_2,
+	HACK_FOR_TEXTURE_SEAMS,
 };
 
 enum {
@@ -249,6 +250,7 @@ typedef struct {
 	uint32	colorQuality;
 
 	HACK_FOR_GAMES	enableHackForGames;
+	BOOL			enableHackTextureSeams;
 } GlobalOptions;
 
 extern GlobalOptions options;
