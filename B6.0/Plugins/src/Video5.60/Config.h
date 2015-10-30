@@ -230,6 +230,7 @@ typedef struct {
 	DWORD	colorQuality;
 
 	HACK_FOR_GAMES	enableHackForGames;
+	BOOL			enableHackTextureSeams;
 } GlobalOptions;
 
 extern GlobalOptions options;

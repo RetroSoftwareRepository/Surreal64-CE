@@ -248,6 +248,7 @@ typedef struct {
 	uint32	colorQuality;
 
 	HACK_FOR_GAMES	enableHackForGames;
+	BOOL			enableHackTextureSeams;
 } GlobalOptions;
 
 extern GlobalOptions options;
