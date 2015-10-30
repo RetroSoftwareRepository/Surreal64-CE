@@ -22,7 +22,7 @@
 				Optimization="0"
 				OptimizeForProcessor="2"
 				AdditionalIncludeDirectories="..\Plugins\include;..\Include"
-				PreprocessorDefinitions="DEBUG;_XBOX"
+				PreprocessorDefinitions="DEBUG;_XBOX;_UXLE"
 				BasicRuntimeChecks="0"
 				RuntimeLibrary="0"
 				StructMemberAlignment="4"
@@ -65,9 +65,9 @@
 				Name="XboxImageTool"
 				FileName="$(TargetDir)UltraHLE.xbe"
 				StackSize="65536"
+				IncludeDebugInfo="TRUE"
 				LimitAvailableMemoryTo64MB="FALSE"
 				DontMountUD="FALSE"
-				IncludeDebugInfo="TRUE"
 				NoLibWarn="TRUE"
 				TitleID="0x64CE64CE"
 				TitleName="Surreal 64 CE - UltraXLE ($(ConfigurationName))"/>
@@ -90,7 +90,7 @@
 				EnableFiberSafeOptimizations="TRUE"
 				OptimizeForProcessor="2"
 				AdditionalIncludeDirectories="..\Plugins\include;..\Include"
-				PreprocessorDefinitions="NDEBUG;_XBOX;PROFILE"
+				PreprocessorDefinitions="NDEBUG;_XBOX;PROFILE;_UXLE"
 				StringPooling="TRUE"
 				RuntimeLibrary="0"
 				StructMemberAlignment="4"
@@ -139,8 +139,8 @@
 				IncludeDebugInfo="TRUE"
 				LimitAvailableMemoryTo64MB="FALSE"
 				DontMountUD="FALSE"
-				UDCluster="3"
 				NoLibWarn="TRUE"
+				UDCluster="3"
 				TitleID="0x64CE64CE"
 				TitleName="Surreal 64 CE - UltraXLE ($(ConfigurationName))"/>
 		</Configuration>
@@ -162,7 +162,7 @@
 				EnableFiberSafeOptimizations="TRUE"
 				OptimizeForProcessor="2"
 				AdditionalIncludeDirectories="..\Plugins\include;..\Include"
-				PreprocessorDefinitions="NDEBUG;_XBOX;PROFILE;FASTCAP"
+				PreprocessorDefinitions="NDEBUG;_XBOX;PROFILE;FASTCAP;_UXLE"
 				StringPooling="TRUE"
 				RuntimeLibrary="0"
 				StructMemberAlignment="4"
@@ -212,8 +212,8 @@
 				IncludeDebugInfo="TRUE"
 				LimitAvailableMemoryTo64MB="FALSE"
 				DontMountUD="FALSE"
-				UDCluster="3"
 				NoLibWarn="TRUE"
+				UDCluster="3"
 				TitleID="0x64CE64CE"
 				TitleName="Surreal 64 CE - UltraXLE ($(ConfigurationName))"/>
 		</Configuration>
@@ -236,7 +236,7 @@
 				EnableFiberSafeOptimizations="TRUE"
 				OptimizeForProcessor="2"
 				AdditionalIncludeDirectories="..\Plugins\include;..\Include"
-				PreprocessorDefinitions="NDEBUG;_XBOX"
+				PreprocessorDefinitions="NDEBUG;_XBOX;_UXLE"
 				StringPooling="TRUE"
 				RuntimeLibrary="0"
 				StructMemberAlignment="4"
@@ -284,8 +284,8 @@
 				StackSize="65536"
 				LimitAvailableMemoryTo64MB="FALSE"
 				DontMountUD="FALSE"
-				UDCluster="3"
 				NoLibWarn="TRUE"
+				UDCluster="3"
 				TitleID="0x64CE64CE"
 				TitleName="Surreal 64 CE - UltraXLE"/>
 		</Configuration>
@@ -308,7 +308,7 @@
 				EnableFiberSafeOptimizations="TRUE"
 				OptimizeForProcessor="2"
 				AdditionalIncludeDirectories="..\Plugins\include;..\Include"
-				PreprocessorDefinitions="NDEBUG;_XBOX;LTCG"
+				PreprocessorDefinitions="NDEBUG;_XBOX;LTCG;_UXLE"
 				StringPooling="TRUE"
 				RuntimeLibrary="0"
 				StructMemberAlignment="4"
@@ -356,8 +356,8 @@
 				StackSize="65536"
 				LimitAvailableMemoryTo64MB="FALSE"
 				DontMountUD="FALSE"
-				UDCluster="3"
 				NoLibWarn="TRUE"
+				UDCluster="3"
 				TitleID="0x64CE64CE"
 				TitleName="Surreal 64 CE - UltraXLE"/>
 		</Configuration>
@@ -628,15 +628,21 @@
 					RelativePath="..\Include\xbprofiling.cpp">
 					<FileConfiguration
 						Name="Debug|Xbox"
-						ExcludedFromBuild="true">
+						ExcludedFromBuild="TRUE">
+						<Tool
+							Name="VCCLCompilerTool"/>
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Release|Xbox"
-						ExcludedFromBuild="true">
+						ExcludedFromBuild="TRUE">
+						<Tool
+							Name="VCCLCompilerTool"/>
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Release_LTCG|Xbox"
-						ExcludedFromBuild="true">
+						ExcludedFromBuild="TRUE">
+						<Tool
+							Name="VCCLCompilerTool"/>
 					</FileConfiguration>
 				</File>
 				<File

@@ -29,7 +29,7 @@ extern BOOL _INPUT_IsIngameMenuWaiting();
 extern void _INPUT_RumblePause(bool bPause);
 
 //fd - more debug output
-extern bool FrameSkip;
+extern int FrameSkip;
 extern int VSync;
 extern int DefaultPak;
 
