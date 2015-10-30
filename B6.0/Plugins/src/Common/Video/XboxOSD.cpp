@@ -16,7 +16,9 @@
 #define DEBUGSIZE 20
 #define DEBUGHDSIZE 30
 
+#ifndef _UXLE
 extern "C" float __EMU_GetVIPerSecond(void);
+#endif
 extern BOOL g_bTempMessage;
 extern DWORD g_dwTempMessageStart;
 extern char g_szTempMessage[100];
@@ -245,10 +247,15 @@ __forceinline void XboxDrawDebugInfo()
 	frameCount++;
 	WCHAR str[128];
 	swprintf(str,L"%i FPS", lastTickFPS);
-	
+
+
 	// VI/s
 	WCHAR VICount[128];
+#ifndef _UXLE
 	swprintf(VICount ,L"%.1f VI/s", __EMU_GetVIPerSecond());
+#else
+	swprintf(VICount ,L"--.- VI/s ");
+#endif
 
 	// Emu name
 	WCHAR debugemu[256];
