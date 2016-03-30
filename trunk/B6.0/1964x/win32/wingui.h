@@ -112,6 +112,8 @@ enum { LOAD_1964_CREATED_PJ64_STATE, LOAD_PJ64_CREATED_PJ64_STATE, SAVE_1964_CRE
 extern void __EMU_GetStateFilename(int index, char *filename, int mode);
 extern void __EMU_Get1964StateFilename(int index, char *filename, int mode);
 extern void __EMU_GetPJ64StateFilename(int index, char *filename, int mode);
+extern BOOL __EMU_AudioMute(BOOL Mute);
+extern BOOL _AUDIO_LINK_AudioMute(BOOL Mute);
 
 #define INVALID_FILE_ATTRIBUTES ((DWORD)-1)
 extern BOOL PathFileExists(const char *pszPath);

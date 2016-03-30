@@ -28,6 +28,7 @@ extern BOOL _INPUT_IsIngameMenuWaiting();
 extern BOOL _INPUT_UpdatePaks();
 extern BOOL _INPUT_UpdateControllerStates();
 extern void _INPUT_RumblePause(bool bPause);
+extern "C" BOOL __EMU_AudioMute(BOOL Mute);
 extern "C" BOOL ReInitVirtualDynaMemory(boolean charge);
 extern int TextureMode;
 extern int FrameSkip;
@@ -794,6 +795,7 @@ void DLParser_Process(OSTask * pTask)
 {
 	static int skipframe=0;
 	BOOL menuWaiting = FALSE;
+	BOOL MuteAudio = FALSE;
 
 	dlistMtxCount = 0;
 	bHalfTxtScale = false;
@@ -941,6 +943,12 @@ void DLParser_Process(OSTask * pTask)
 		// Disable any active rumble
 		_INPUT_RumblePause(true);
 
+		//Mute 1964audio
+		try
+		{
+			MuteAudio = __EMU_AudioMute(TRUE);
+		}
+		catch(...){};
 
 		// Check free memory and decommit dynablock if necessary.
 		if (ms.dwAvailPhys < (8*1024*1024))
@@ -970,6 +978,14 @@ void DLParser_Process(OSTask * pTask)
 		
 		// Reenable rumble
 		_INPUT_RumblePause(false);
+
+		//UnMute 1964audio
+		try
+		{
+			if(MuteAudio != FALSE)
+				__EMU_AudioMute(FALSE);
+		}
+		catch(...){};
 	}
 #endif
 	if( gRSP.ucode >= 17)

@@ -162,6 +162,11 @@ extern "C" void __EMU_GetPJ64StateFilename(int index, char *filename, int mode)
 	return;
 }
 
+extern "C" BOOL __EMU_AudioMute(BOOL Mute)
+{
+	return AUDIO_AudioMute(Mute);
+}
+
 extern void loadinis();
 
 extern int loaddw1964PagingMem();
