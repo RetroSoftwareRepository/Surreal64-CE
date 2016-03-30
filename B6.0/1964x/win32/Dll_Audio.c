@@ -67,6 +67,7 @@ void (*_AUDIO_LINK_RomClosed)(void) = NULL;
 //DWORD (*_AUDIO_LINK_ProcessAListCountCycles)(void) = NULL;
 
 void (*_AUDIO_LINK_AudioBoost)(BOOL Boost) = NULL;
+BOOL (*_AUDIO_LINK_AudioMute)(BOOL Mute) = NULL;
 
 /*
  =======================================================================================================================
@@ -94,6 +95,7 @@ BOOL LoadAudioPlugin()
 		//_AUDIO_LINK_ProcessAListCountCycles = _AUDIO_MUSYX_ProcessAListCountCycles;
 		
 		_AUDIO_LINK_AudioBoost		 	= _AUDIO_MUSYX_AudioBoost;
+		_AUDIO_LINK_AudioMute			= _AUDIO_MUSYX_AudioMute;
 	}
 #else
 /* This plugin only cooperates with 1964x11, partially.
@@ -360,6 +362,12 @@ void AUDIO_AiUpdate(BOOL update)
 {
 	_AUDIO_LINK_AiUpdate(update);
 }
+
+BOOL AUDIO_AudioMute(BOOL Mute)
+{
+	return _AUDIO_LINK_AudioMute(Mute);
+}
+
 /*
 DWORD AUDIO_ProcessAListCountCycles(void)
 {

@@ -191,6 +191,11 @@ extern void __EMU_GetPJ64StateFilename(int index, char *filename, int mode)
 	return;
 }
 
+extern BOOL __EMU_AudioMute(BOOL Mute)
+{
+	return AUDIO_AudioMute(Mute);
+}
+
 int avail;
 MEMORYSTATUS stat;
 char buf[100];

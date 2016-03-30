@@ -89,6 +89,7 @@ extern void _AUDIO_MUSYX_AiUpdate(BOOL Wait);
 extern BOOL _AUDIO_MUSYX_InitiateAudio (AUDIO_INFO Audio_Info);
 extern void _AUDIO_MUSYX_ProcessAList(void);
 extern void _AUDIO_MUSYX_AudioBoost (BOOL Boost);
+extern BOOL _AUDIO_MUSYX_AudioMute (BOOL Mute);
 
 #elif defined(_AUDIO_AZIAUD)
 //07.2015 AziAudio 0.7
@@ -187,6 +188,7 @@ void (*_AUDIO_LINK_ProcessAList)(void) = NULL;
 void (*_AUDIO_LINK_RomClosed)(void) = NULL;
 
 void (*_AUDIO_LINK_AudioBoost)(BOOL Boost) = NULL;
+BOOL (*_AUDIO_LINK_AudioMute)(BOOL Mute) = NULL;
 
 extern void _RSP_GetDllInfo ( PLUGIN_INFO * PluginInfo );
 extern void _RSP_RomClosed (void);
@@ -288,6 +290,7 @@ BOOL LoadAudioDll(void) {
 		_AUDIO_LINK_RomClosed		 	= _AUDIO_MUSYX_RomClosed;
 		
 		_AUDIO_LINK_AudioBoost		 	= _AUDIO_MUSYX_AudioBoost;
+		_AUDIO_LINK_AudioMute		 	= _AUDIO_MUSYX_AudioMute;
 	}
 
 #elif defined(_AUDIO_AZIAUD)

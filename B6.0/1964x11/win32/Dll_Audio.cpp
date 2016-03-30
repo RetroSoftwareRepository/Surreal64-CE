@@ -57,6 +57,7 @@ void (CALL *_AUDIO_Under_Selecting_Test) (HWND) = NULL;
 
 #ifdef _XBOX
 void (CALL *_AUDIO_AudioBoost)(BOOL Boost) = NULL; // increase audio db on xbox
+BOOL (CALL *_AUDIO_AudioMute)(BOOL Mute) = NULL; // mute audio for pausing 1964audio on xbox
 #endif //_XBOX
 
 #ifdef _DEBUG
@@ -235,6 +236,7 @@ BOOL LoadAudioPlugin(char *libname)
 		_AUDIO_ProcessAList_Count_Cycles	= _AUDIO_MUSYX_ProcessAListCountCycles;
 		_AUDIO_IsMusyX						= _AUDIO_MUSYX_IsMusyX;
 		_AUDIO_AudioBoost		 			= _AUDIO_MUSYX_AudioBoost;
+		_AUDIO_AudioMute		 			= _AUDIO_MUSYX_AudioMute;
 			break;
 #endif //_AUDIO_MUSYX
 
@@ -633,6 +635,11 @@ void AUDIO_AiUpdate(BOOL update)
 		Trigger_AIInterrupt();
 	}
 #endif //_XBOX
+}
+
+BOOL AUDIO_AudioMute(BOOL Mute)
+{
+	return _AUDIO_AudioMute(Mute);
 }
 
 /*

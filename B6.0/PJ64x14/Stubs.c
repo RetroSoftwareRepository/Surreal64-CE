@@ -993,6 +993,11 @@ void __EMU_GetPJ64StateFilename(int index, char *filename, int mode)
 	return;
 }
 
+extern BOOL __EMU_AudioMute(BOOL Mute)
+{
+	return _AUDIO_LINK_AudioMute(Mute);
+}
+
 // GogoAckman - free up 4Mb for the menu
 BOOL __fastcall ReInitVirtualDynaMemory(boolean charge)
 {

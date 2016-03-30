@@ -40,6 +40,7 @@ extern void		AUDIO_AiLenChanged(void);
 extern DWORD	AUDIO_AiReadLength(void);
 extern void		AUDIO_AiUpdate(BOOL);
 extern void		AUDIO_RomClosed(void);
+extern BOOL		AUDIO_AudioMute(BOOL);
 
 
 /* Used when selecting plugin */

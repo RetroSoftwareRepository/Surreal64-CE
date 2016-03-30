@@ -1081,4 +1081,18 @@ FUNC_TYPE(void) NAME_DEFINE(AudioBoost) (BOOL Boost)
 {
 	bAudioBoostMusyX = Boost;
 }
+
+FUNC_TYPE(BOOL) NAME_DEFINE(AudioMute) (BOOL Mute)
+{
+	if(Mute != FALSE){
+		DSB_SetVolume(lpdsbuf, DSBVOLUME_MIN);
+		DSB_Play(lpdsbuf, 0, 0, DSBPLAY_LOOPING );
+		return TRUE;
+	}else{
+		DSB_SetVolume(lpdsbuf, DSBVOLUME_MAX);
+		DSB_Play(lpdsbuf, 0, 0, DSBPLAY_LOOPING );
+		return FALSE;
+	}
+}
+
 #endif
