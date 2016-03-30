@@ -888,6 +888,7 @@ FUNC_TYPE(void) NAME_DEFINE(ViWidthChanged) (void)
 	CRender::g_pRender->UpdateClipRectangle();
 	g_CritialSection.Unlock();
 }
+#ifndef _XBOX
 EXPORT BOOL CALL GetFullScreenStatus(void);
 __declspec(dllexport) void CALL SetOnScreenText (char *msg)
 {
@@ -907,6 +908,7 @@ __declspec(dllexport) BOOL CALL GetFullScreenStatus(void)
 		return FALSE;
 	}
 }
+#endif
 
 FUNC_TYPE(BOOL) NAME_DEFINE(InitiateGFX)(GFX_INFO Gfx_Info)
 {

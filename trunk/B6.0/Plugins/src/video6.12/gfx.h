@@ -26,12 +26,6 @@ extern "C" {
 /* Plugin types */
 #define PLUGIN_TYPE_GFX				2
 
-#ifndef EXPORT
-#define EXPORT						__declspec(dllexport)
-#endif
-
-#define CALL						_cdecl
-
 /***** Structures *****/
 typedef struct {
 	uint16 Version;        /* Set to 0x0103 */

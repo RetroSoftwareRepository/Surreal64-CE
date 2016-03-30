@@ -28,8 +28,16 @@ extern "C" {
 
 #define PLUGIN_TYPE_AUDIO			3
 
-#define EXPORT						__declspec(dllexport)
-#define CALL						_cdecl
+#if defined(_WIN32) && !defined(_XBOX)
+#define EXPORT      __declspec(dllexport)
+#define CALL        __cdecl
+#elif (__GNUC__)
+#define EXPORT      __attribute__((visibility("default")))
+#define CALL
+#else
+#define EXPORT extern
+#define CALL
+#endif
 
 #define SYSTEM_NTSC					0
 #define SYSTEM_PAL					1
