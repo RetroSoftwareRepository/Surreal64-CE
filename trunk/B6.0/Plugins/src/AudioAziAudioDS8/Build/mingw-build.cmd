@@ -114,9 +114,9 @@ set BUILDDIR=bin/%OUTDIR%
 set CFLAGS= %CFLAGS_BUILD% -msse2 -DSSE2_SUPPORT -mstackrealign
 set LDFLAGS= -static-libstdc++ -static-libgcc
 set RESFLAGS= %RESFLAGS_BUILD%
-set XA_FLAGS= -I"3rd Party/directx/include" -I"3rd Party" -Wno-attributes
-set DS_FLAGS= -DXAUDIO_LIBRARIES_UNAVAILABLE -I"3rd Party/directx/include" -Wno-conversion-null
-set SRCDIR=AziAudio
+set SRCDIR=../AziAudio
+set XA_FLAGS= -I"%SRCDIR%/../3rd Party/directx/include" -I"%SRCDIR%/../3rd Party" -Wno-attributes
+set DS_FLAGS= -DXAUDIO_LIBRARIES_UNAVAILABLE -I"%SRCDIR%/../3rd Party/directx/include" -Wno-conversion-null
 SET OBJS=
 SET XA_OBJS=
 SET DS_OBJS=
@@ -140,6 +140,7 @@ ECHO Compiling Sources...
 CALL:gppcust HLEMain ALL
 CALL:gppcust main ALL
 CALL:gppcust SoundDriver ALL
+CALL:gppcust NoSoundDriver ALL
 CALL:gppcust XAudio2SoundDriver XA
 CALL:gppcust DirectSoundDriver DS
 CALL:gpp WaveOut

@@ -14,7 +14,7 @@
  * name-mangling needed to statically link the zilmar-spec plugin within
  * Surreal64, which requires unique function names per each "plugin"
  */
-#if 0
+#if 1
 #define AiDacrateChanged        _AUDIO_AZIAUD_##AiDacrateChanged
 #define AiLenChanged            _AUDIO_AZIAUD_##AiLenChanged
 #define AiReadLength            _AUDIO_AZIAUD_##AiReadLength

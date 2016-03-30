@@ -10,40 +10,46 @@
 ****************************************************************************/
 
 #include "common.h"
-#include "../Audio.h"
+#include "AudioSpec.h"
+
 #ifdef USE_XAUDIO2
 #include "XAudio2SoundDriver.h"
-#else
+#elif defined(_WIN32)
 #include "DirectSoundDriver.h"
+#else
+#include "SDLSoundDriver.h"
 #endif
+#include "NoSoundDriver.h"
+
 #include "audiohle.h"
 //#include "rsp/rsp.h"
-#include <stdio.h>
+
+#ifdef _WIN32
 #include <conio.h>
-#include <fcntl.h>
 #include <io.h>
+#endif
+
+#include <stdio.h>
+#include <fcntl.h>
 #include <ios>
 #include "resource.h"
 
 using namespace std;
 
-#if defined(XAUDIO_LIBRARIES_UNAVAILABLE) || !defined(USE_XAUDIO2)
-DirectSoundDriver snd;// = AudioCode();
-#else
-XAudio2SoundDriver snd;// = AudioCode();
-#endif
+SoundDriver *snd = NULL;
 
 // Dialog Procedures
-#if !defined(_XBOX)
+#if defined(_WIN32)
 INT_PTR CALLBACK ConfigProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
 #endif
 
-// Direct Sound selection
-char DSoundDeviceName[10][100];
+// DirectSound selection
+#ifdef _WIN32
 LPGUID DSoundGUID[10];
+#endif
+char DSoundDeviceName[10][100];
 int DSoundCnt;
 int SelectedDSound;
-
 
 // RSP Test stuff
 
@@ -66,6 +72,8 @@ static bool	bAbortAiUpdate = false;
 #ifdef __GNUC__
 extern "C"
 #endif
+
+#ifdef _WIN32
 BOOL WINAPI DllMain(
   HINSTANCE hinstDLL,  // handle to DLL module
   DWORD fdwReason,     // reason for calling function
@@ -81,42 +89,64 @@ BOOL WINAPI DllMain(
 	
 	return TRUE;
 }
+#endif
 
- FUNC_TYPE(void) NAME_DEFINE(DllAbout) (HWND hParent) 
-{
+EXPORT void CALL DllAbout(HWND hParent) {
+#if defined(_WIN32) || defined(_XBOX)
 	MessageBoxA(hParent, "No About yet... ", "About Box", MB_OK);
-}
-
-FUNC_TYPE(void) NAME_DEFINE(DllConfig) (HWND hParent)
-{
-#if defined(_XBOX) || 0
-	MessageBox(hParent, "We don't use config dialog... ", "", MB_OK);
 #else
-	DialogBox(hInstance, MAKEINTRESOURCE(IDD_CONFIG), hParent, ConfigProc);
+	puts(PLUGIN_VERSION);
 #endif
 }
 
-FUNC_TYPE(void) NAME_DEFINE(DllTest) (HWND hParent)
+EXPORT void CALL DllConfig(HWND hParent)
 {
+#if defined(_WIN32) && !defined(_XBOX)
+	DialogBox(hInstance, MAKEINTRESOURCE(IDD_CONFIG), hParent, ConfigProc);
+#else
+	fputs("To do:  Implement saving configuration settings.\n", stderr);
+#endif
+}
+
+EXPORT void CALL DllTest(HWND hParent) {
+#if defined(_WIN32)
 	MessageBoxA(hParent, "Nothing to test yet... ", "Test Box", MB_OK);
+#else
+	puts("DllTest");
+#endif
 }
 
 // Initialization / Deinitalization Functions
 
 // Note: We call CloseDLL just in case the audio plugin was already initialized...
 AUDIO_INFO AudioInfo;
-DWORD Dacrate = 0;
+u32 Dacrate = 0;
 
 // TODO: Instead of checking for an initialized state, we should default to a no-sound audio processing state and give a warning
-BOOL audioIsInitialized = FALSE;
+// Boolean audioIsInitialized = FALSE;
 
 //TODO: Do away with these from main.cpp.  They are only needed for HLE and available in AudioInfo
 u8 * DMEM;
 u8 * IMEM;
 u8 * DRAM;
 
-FUNC_TYPE(BOOL) NAME_DEFINE(InitiateAudio) (AUDIO_INFO Audio_Info) 
-{
+EXPORT Boolean CALL InitiateAudio(AUDIO_INFO Audio_Info) {
+	if (snd != NULL)
+	{
+		snd->AI_Shutdown();
+		delete snd;
+	}
+
+/*
+ * To do:  We currently have no sound-playing device for Unix-based platforms.
+ */
+#if !defined(LEGACY_SOUND_DRIVER) || !defined(_WIN32)
+	snd = new NoSoundDriver();
+#elif defined(USE_XAUDIO2)
+	snd = new XAudio2SoundDriver();
+#else
+	snd = new DirectSoundDriver();
+#endif
 
 	//RedirectIOToConsole();
 	Dacrate = 0;
@@ -126,34 +156,36 @@ FUNC_TYPE(BOOL) NAME_DEFINE(InitiateAudio) (AUDIO_INFO Audio_Info)
 //	if ( (DirectSoundEnumerate(DSEnumProc, NULL)) != DS_OK ) { printf("Unable to enumerate DirectSound devices\n"); }
 
 	// TODO: Move from SoundDriver to a configuration class
-	snd.configAIEmulation = true;
-	snd.configSyncAudio   = true;
-	snd.configForceSync   = false;
-	snd.configMute		  = false;
-	snd.configHLE		  = true;
-	snd.configRSP		  = true;
-	safe_strcpy(snd.configAudioLogFolder, 499, "D:\\");
+	snd->configAIEmulation = true;
+	snd->configSyncAudio   = true;
+	snd->configForceSync   = false;
+	snd->configMute		  = false;
+	snd->configHLE		  = true;
+	snd->configRSP		  = true;
+	safe_strcpy(snd->configAudioLogFolder, 499, "D:\\");
 
-	//snd.configDevice = 0;
-	snd.configVolume = 0;
+	//snd->configDevice = 0;
+	snd->configVolume = 0;
 
 	memcpy(&AudioInfo, &Audio_Info, sizeof(AUDIO_INFO));
 	DRAM = Audio_Info.RDRAM;
 	DMEM = Audio_Info.DMEM;
 	IMEM = Audio_Info.IMEM;
 
-	snd.AI_Startup(AudioInfo.hwnd);
+	snd->AI_Startup();
 
 	return TRUE;
 }
 
-FUNC_TYPE(void) NAME_DEFINE(CloseDLL) (void) 
-{
-	snd.AI_Shutdown();
+EXPORT void CALL CloseDLL(void) {
+	if (snd != NULL)
+	{
+		snd->AI_Shutdown();
+		delete snd;
+	}
 }
 
-FUNC_TYPE(void) NAME_DEFINE(GetDllInfo) (PLUGIN_INFO * PluginInfo) 
-{
+EXPORT void CALL GetDllInfo(PLUGIN_INFO * PluginInfo) {
 	PluginInfo->MemoryBswaped = TRUE;
 	PluginInfo->NormalMemory  = FALSE;
 	safe_strcpy(PluginInfo->Name, 100, PLUGIN_VERSION);
@@ -161,30 +193,36 @@ FUNC_TYPE(void) NAME_DEFINE(GetDllInfo) (PLUGIN_INFO * PluginInfo)
 	PluginInfo->Version = 0x0101; // Set this to retain backwards compatibility
 }
 
-FUNC_TYPE(void) NAME_DEFINE(ProcessAList) (void)
-{
-	if (snd.configHLE) 
+EXPORT void CALL ProcessAList(void) {
+	if (snd == NULL)
+		return;
+	if (snd->configHLE) 
 	{
 		HLEStart ();
 	}
 }
 
-FUNC_TYPE(void) NAME_DEFINE(RomOpen) (void) 
+EXPORT void CALL RomOpen(void) 
 {
+	if (snd == NULL)
+		return;
 	Dacrate = 0;
-	snd.AI_ResetAudio();
+	snd->AI_ResetAudio();
 }
 
-FUNC_TYPE(void) NAME_DEFINE(RomClosed) (void) 
+EXPORT void CALL RomClosed(void) 
 {
+	if (snd == NULL)
+		return;
 	Dacrate = 0;
-	snd.AI_ResetAudio();
+	snd->AI_ResetAudio();
 }
 
-FUNC_TYPE(void) NAME_DEFINE(AiDacrateChanged) (int SystemType)
-{
-	DWORD Frequency, video_clock;
+EXPORT void CALL AiDacrateChanged(int SystemType) {
+	u32 Frequency, video_clock;
 
+	if (snd == NULL)
+		return;
 	if (Dacrate == *AudioInfo.AI_DACRATE_REG)
 		return;
 
@@ -199,26 +237,28 @@ FUNC_TYPE(void) NAME_DEFINE(AiDacrateChanged) (int SystemType)
 		);
 #endif
 	switch (SystemType) {
-		default         :  MessageBoxA(NULL, "Invalid SystemType.", NULL, MB_ICONERROR);
+		default         :  assert(FALSE);
 		case SYSTEM_NTSC:  video_clock = 48681812; break;
 		case SYSTEM_PAL :  video_clock = 49656530; break;
 		case SYSTEM_MPAL:  video_clock = 48628316; break;
 	}
 	Frequency = video_clock / (Dacrate + 1);
-	snd.AI_SetFrequency(Frequency);
+	snd->AI_SetFrequency(Frequency);
 }
 
-FUNC_TYPE(void) NAME_DEFINE(AiLenChanged)(void) 
+EXPORT void CALL AiLenChanged(void) 
 {
-	snd.AI_LenChanged (
+	if (snd == NULL)
+		return;
+	snd->AI_LenChanged(
 		(AudioInfo.RDRAM + (*AudioInfo.AI_DRAM_ADDR_REG & 0x00FFFFF8)), 
 		*AudioInfo.AI_LEN_REG & 0x3FFF8);
 }
 
-FUNC_TYPE(DWORD) NAME_DEFINE(AiReadLength)(void) 
-{
-	if (audioIsInitialized == FALSE) return 0;
-	*AudioInfo.AI_LEN_REG = snd.AI_ReadLength();
+EXPORT u32 CALL AiReadLength(void) {
+	if (snd == NULL)
+		return 0;
+	*AudioInfo.AI_LEN_REG = snd->AI_ReadLength();
 	return *AudioInfo.AI_LEN_REG;
 
 }
@@ -226,24 +266,35 @@ FUNC_TYPE(DWORD) NAME_DEFINE(AiReadLength)(void)
 // Deprecated Functions
 
 
-FUNC_TYPE(void) NAME_DEFINE(AiUpdate) (BOOL Wait) 
-{
+EXPORT void CALL AiUpdate(Boolean Wait) {
 	static int intCount = 0;
+
+	if (snd == NULL)
+	{
+#if defined(_WIN32) || defined(_XBOX)
+		Sleep(1);
+#endif
+		return;
+	}
 	if (Wait)
 	{
 		if (bAbortAiUpdate == true) 
 		{
+#if defined(_WIN32) || defined(_XBOX)
 			if (intCount > 10) 
 				ExitThread(0);
+#else
+			assert(intCount <= 10);
+#endif
 			intCount++;
 			return;
 		}
-		Sleep(10);
+		snd->AI_Update(Wait);
 	}
 	return;
 }
 
-#if !defined(_XBOX)
+#if defined(_WIN32) && !defined(_XBOX)
 INT_PTR CALLBACK ConfigProc(
 	HWND hDlg,  // handle to dialog box
 	UINT uMsg,     // message
@@ -259,28 +310,28 @@ INT_PTR CALLBACK ConfigProc(
 			SendMessage(GetDlgItem(hDlg, IDC_DEVICE), CB_ADDSTRING, 0, (long)DSoundDeviceName[x]);
 		}
 		SendMessage(GetDlgItem(hDlg, IDC_DEVICE), CB_SETCURSEL, SelectedDSound, 0);
-		SendMessage(GetDlgItem(hDlg, IDC_OLDSYNC), BM_SETCHECK, snd.configForceSync ? BST_CHECKED : BST_UNCHECKED, 0);
-		SendMessage(GetDlgItem(hDlg, IDC_AUDIOSYNC), BM_SETCHECK, snd.configSyncAudio ? BST_CHECKED : BST_UNCHECKED, 0);
-		SendMessage(GetDlgItem(hDlg, IDC_AI), BM_SETCHECK, snd.configAIEmulation ? BST_CHECKED : BST_UNCHECKED, 0);
+		SendMessage(GetDlgItem(hDlg, IDC_OLDSYNC), BM_SETCHECK, snd->configForceSync ? BST_CHECKED : BST_UNCHECKED, 0);
+		SendMessage(GetDlgItem(hDlg, IDC_AUDIOSYNC), BM_SETCHECK, snd->configSyncAudio ? BST_CHECKED : BST_UNCHECKED, 0);
+		SendMessage(GetDlgItem(hDlg, IDC_AI), BM_SETCHECK, snd->configAIEmulation ? BST_CHECKED : BST_UNCHECKED, 0);
 		SendMessage(GetDlgItem(hDlg, IDC_VOLUME), TBM_SETRANGEMIN, FALSE, 0);
 		SendMessage(GetDlgItem(hDlg, IDC_VOLUME), TBM_SETRANGEMAX, FALSE, 100);
-		SendMessage(GetDlgItem(hDlg, IDC_MUTE), BM_SETCHECK, snd.configMute ? BST_CHECKED : BST_UNCHECKED, 0);
-		if (snd.configMute) SendMessage(GetDlgItem(hDlg, IDC_VOLUME), TBM_SETPOS, FALSE, 100);
-		else SendMessage(GetDlgItem(hDlg, IDC_VOLUME), TBM_SETPOS, FALSE, snd.configVolume);
+		SendMessage(GetDlgItem(hDlg, IDC_MUTE), BM_SETCHECK, snd->configMute ? BST_CHECKED : BST_UNCHECKED, 0);
+		if (snd->configMute) SendMessage(GetDlgItem(hDlg, IDC_VOLUME), TBM_SETPOS, FALSE, 100);
+		else SendMessage(GetDlgItem(hDlg, IDC_VOLUME), TBM_SETPOS, FALSE, snd->configVolume);
 		SendMessage(GetDlgItem(hDlg, IDC_VOLUME), TBM_SETTICFREQ, 20, 0);
-		SendMessage(GetDlgItem(hDlg, IDC_HLE), BM_SETCHECK, snd.configHLE ? BST_CHECKED : BST_UNCHECKED, 0);
-		SendMessage(GetDlgItem(hDlg, IDC_RSP), BM_SETCHECK, snd.configRSP ? BST_CHECKED : BST_UNCHECKED, 0);
+		SendMessage(GetDlgItem(hDlg, IDC_HLE), BM_SETCHECK, snd->configHLE ? BST_CHECKED : BST_UNCHECKED, 0);
+		SendMessage(GetDlgItem(hDlg, IDC_RSP), BM_SETCHECK, snd->configRSP ? BST_CHECKED : BST_UNCHECKED, 0);
 		break;
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case IDOK:
-			snd.configForceSync = SendMessage(GetDlgItem(hDlg, IDC_OLDSYNC), BM_GETSTATE, 0, 0) == BST_CHECKED ? true : false;
-			snd.configSyncAudio = SendMessage(GetDlgItem(hDlg, IDC_AUDIOSYNC), BM_GETSTATE, 0, 0) == BST_CHECKED ? true : false;
-			snd.configAIEmulation = SendMessage(GetDlgItem(hDlg, IDC_AI), BM_GETSTATE, 0, 0) == BST_CHECKED ? true : false;
-			snd.configHLE = SendMessage(GetDlgItem(hDlg, IDC_HLE), BM_GETSTATE, 0, 0) == BST_CHECKED ? true : false;
-			snd.configRSP = SendMessage(GetDlgItem(hDlg, IDC_RSP), BM_GETSTATE, 0, 0) == BST_CHECKED ? true : false;
+			snd->configForceSync = SendMessage(GetDlgItem(hDlg, IDC_OLDSYNC), BM_GETSTATE, 0, 0) == BST_CHECKED ? true : false;
+			snd->configSyncAudio = SendMessage(GetDlgItem(hDlg, IDC_AUDIOSYNC), BM_GETSTATE, 0, 0) == BST_CHECKED ? true : false;
+			snd->configAIEmulation = SendMessage(GetDlgItem(hDlg, IDC_AI), BM_GETSTATE, 0, 0) == BST_CHECKED ? true : false;
+			snd->configHLE = SendMessage(GetDlgItem(hDlg, IDC_HLE), BM_GETSTATE, 0, 0) == BST_CHECKED ? true : false;
+			snd->configRSP = SendMessage(GetDlgItem(hDlg, IDC_RSP), BM_GETSTATE, 0, 0) == BST_CHECKED ? true : false;
 			SelectedDSound = (int)SendMessage(GetDlgItem(hDlg, IDC_DEVICE), CB_GETCURSEL, 0, 0);
-			safe_strcpy(snd.configDevice, 99, DSoundDeviceName[SelectedDSound]);
+			safe_strcpy(snd->configDevice, 99, DSoundDeviceName[SelectedDSound]);
 			EndDialog(hDlg, 0);
 			break;
 		case IDCANCEL:
@@ -289,14 +340,14 @@ INT_PTR CALLBACK ConfigProc(
 		case IDC_MUTE:
 			if (IsDlgButtonChecked(hDlg, IDC_MUTE))
 			{
-				snd.SetVolume(100);
-				snd.configMute = true;
+				snd->SetVolume(100);
+				snd->configMute = true;
 				SendMessage(GetDlgItem(hDlg, IDC_VOLUME), TBM_SETPOS, TRUE, 100);
 			}
 			else {
-				snd.SetVolume(snd.configVolume);
-				snd.configMute = false;
-				SendMessage(GetDlgItem(hDlg, IDC_VOLUME), TBM_SETPOS, TRUE, snd.configVolume);
+				snd->SetVolume(snd->configVolume);
+				snd->configMute = false;
+				SendMessage(GetDlgItem(hDlg, IDC_VOLUME), TBM_SETPOS, TRUE, snd->configVolume);
 			}
 			break;
 		}
@@ -312,21 +363,21 @@ INT_PTR CALLBACK ConfigProc(
 
 			position = SendMessage(GetDlgItem(hDlg, IDC_VOLUME), TBM_GETPOS, 0, 0);
 			dwPosition = (position > 100) ? 100 : (DWORD)position;
-			snd.SetVolume(dwPosition);
-			if (!snd.configMute)
+			snd->SetVolume(dwPosition);
+			if (!snd->configMute)
 			{
-				snd.configVolume = dwPosition;
+				snd->configVolume = dwPosition;
 			}
 			else if (dwPosition != 100)
 			{
 				SendMessage(GetDlgItem(hDlg, IDC_MUTE), BM_SETCHECK, BST_UNCHECKED, 0);
-				snd.configMute = false;
-				snd.configVolume = dwPosition;
+				snd->configMute = false;
+				snd->configVolume = dwPosition;
 			}
 			if (dwPosition == 100)
 			{
 				SendMessage(GetDlgItem(hDlg, IDC_MUTE), BM_SETCHECK, BST_CHECKED, 0);
-				snd.configMute = true;
+				snd->configMute = true;
 			}
 		}
 		break;
@@ -338,6 +389,7 @@ INT_PTR CALLBACK ConfigProc(
 #endif
 
 // TODO: I think this can safely be removed
+#ifdef _WIN32
 BOOL CALLBACK DSEnumProc(LPGUID lpGUID, LPCTSTR lpszDesc, LPCTSTR lpszDrvName, LPVOID lpContext)
 {
 	UNREFERENCED_PARAMETER(lpszDrvName);
@@ -345,7 +397,7 @@ BOOL CALLBACK DSEnumProc(LPGUID lpGUID, LPCTSTR lpszDesc, LPCTSTR lpszDrvName, L
 	//HWND hDlg = (HWND)lpContext;
 	safe_strcpy(DSoundDeviceName[DSoundCnt], 99, lpszDesc);
 	DSoundGUID[DSoundCnt] = lpGUID;
-	if (strcmp(lpszDesc, snd.configDevice) == 0)
+	if (strcmp(lpszDesc, snd->configDevice) == 0)
 	{
 		SelectedDSound = DSoundCnt;
 	}
@@ -353,10 +405,11 @@ BOOL CALLBACK DSEnumProc(LPGUID lpGUID, LPCTSTR lpszDesc, LPCTSTR lpszDrvName, L
 
 	return TRUE;
 }
+#endif
 
 int safe_strcpy(char* dst, size_t limit, const char* src)
 {
-#if (_MSC_VER > 1400)
+#if defined(_MSC_VER) && !defined(_XBOX)
     return strcpy_s(dst, limit, src);
 #else
     size_t bytes;

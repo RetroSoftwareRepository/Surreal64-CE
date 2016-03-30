@@ -9,6 +9,9 @@
 *                                                                           *
 ****************************************************************************/
 
+/* memset() and memcpy() */
+#include <string.h>
+
 #include "audiohle.h"
 
 void CLEARBUFF() {
@@ -41,8 +44,11 @@ void DMEMMOVE() {
 
 	u32 count = ((t9 + 3) & 0xfffc);
 
-	for (cnt = 0; cnt < count; cnt++) {
-		*(u8 *)(BufferSpace + BES(cnt + v1)) = *(u8 *)(BufferSpace + BES(cnt + v0));
+	for (cnt = 0; cnt < count; cnt += 4) {
+		BufferSpace[BES(v1 + cnt + 0)] = BufferSpace[BES(v0 + cnt + 0)];
+		BufferSpace[BES(v1 + cnt + 1)] = BufferSpace[BES(v0 + cnt + 1)];
+		BufferSpace[BES(v1 + cnt + 2)] = BufferSpace[BES(v0 + cnt + 2)];
+		BufferSpace[BES(v1 + cnt + 3)] = BufferSpace[BES(v0 + cnt + 3)];
 	}
 }
 
@@ -60,8 +66,11 @@ void DMEMMOVE2() { // Needs accuracy verification...
 	//v1 = (v1) & 0xfffc;
 
 	//memcpy (dmem+v1, dmem+v0, count-1);
-	for (cnt = 0; cnt < count; cnt++) {
-		*(u8 *)(BufferSpace + BES(cnt + v1)) = *(u8 *)(BufferSpace + BES(cnt + v0));
+	for (cnt = 0; cnt < count; cnt += 4) {
+		BufferSpace[BES(v1 + cnt + 0)] = BufferSpace[BES(v0 + cnt + 0)];
+		BufferSpace[BES(v1 + cnt + 1)] = BufferSpace[BES(v0 + cnt + 1)];
+		BufferSpace[BES(v1 + cnt + 2)] = BufferSpace[BES(v0 + cnt + 2)];
+		BufferSpace[BES(v1 + cnt + 3)] = BufferSpace[BES(v0 + cnt + 3)];
 	}
 }
 
@@ -73,17 +82,20 @@ void DMEMMOVE3() { // Needs accuracy verification...
 	u32 count = ((t9 + 3) & 0xfffc);
 
 	//memcpy (dmem+v1, dmem+v0, count-1);
-	for (cnt = 0; cnt < count; cnt++) {
-		*(u8 *)(BufferSpace + BES(cnt + v1)) = *(u8 *)(BufferSpace + BES(cnt + v0));
+	for (cnt = 0; cnt < count; cnt += 4) {
+		BufferSpace[BES(v1 + cnt + 0)] = BufferSpace[BES(v0 + cnt + 0)];
+		BufferSpace[BES(v1 + cnt + 1)] = BufferSpace[BES(v0 + cnt + 1)];
+		BufferSpace[BES(v1 + cnt + 2)] = BufferSpace[BES(v0 + cnt + 2)];
+		BufferSpace[BES(v1 + cnt + 3)] = BufferSpace[BES(v0 + cnt + 3)];
 	}
 }
 
 void DUPLICATE2() {
-	WORD Count = (k0 >> 16) & 0xff;
-	WORD In = k0 & 0xffff;
-	WORD Out = (t9 >> 16);
+	u16 Count = (k0 >> 16) & 0xff;
+	u16 In = k0 & 0xffff;
+	u16 Out = (t9 >> 16);
 
-	WORD buff[64];
+	u16 buff[64];
 
 	memcpy(buff, BufferSpace + In, 128);
 

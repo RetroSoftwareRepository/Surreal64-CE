@@ -5,25 +5,33 @@
 
 #include "hle_external.h"
 #include "hle_internal.h"
-#include "../../Audio.h"
-#pragma warning(disable : 4100)
-void HleWarnMessage(void* UNUSED(user_defined), const char *message, ...)
+#include "../AudioSpec.h"
+
+void HleWarnMessage(void* user_defined, const char *message, ...)
 {
 	va_list args;
 	va_start(args, message);
 	//DebugMessage(M64MSG_WARNING, message, args);
 	va_end(args);
+
+	if (user_defined == NULL)
+		return;
+ /* user_defined possibly as a HWND, FILE pointer, window ID, ... ? */
 }
 
 
-void HleVerboseMessage(void* UNUSED(user_defined), const char *message, ...)
+void HleVerboseMessage(void* user_defined, const char *message, ...)
 {
 	va_list args;
 	va_start(args, message);
 	//DebugMessage(M64MSG_VERBOSE, message, args);
 	va_end(args);
+
+	if (user_defined == NULL)
+		return;
+ /* user_defined possibly as a HWND, FILE pointer, window ID, ... ? */
 }
-#pragma warning(default : 4100)
+
 
 static struct hle_t _hle;
 
