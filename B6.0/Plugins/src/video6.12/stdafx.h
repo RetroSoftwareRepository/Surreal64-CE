@@ -12,7 +12,17 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#define EXPORT				__declspec(dllexport)
+
+#if defined(_WIN32) && !defined(_XBOX)
+#define EXPORT      __declspec(dllexport)
+#define CALL        __cdecl
+#elif (__GNUC__)
+#define EXPORT      __attribute__((visibility("default")))
+#define CALL
+#else
+#define EXPORT	extern
+#define CALL
+#endif
 #define VC_EXTRALEAN		// Exclude rarely-used stuff from Windows headers
 
 #define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
