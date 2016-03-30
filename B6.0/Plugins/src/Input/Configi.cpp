@@ -329,18 +329,23 @@ DWORD Config::GetN64ButtonValue(DWORD controller, byte n64Button)
 		}
 		else // if we are mapping this axis to an xbox button
 		{
-			// slowly increment the axis when the button is down
+			
 			if (GetXboxButtonValue(controller, xboxButton))
 			{
-				m_cur64ThumbVal[controller][n64Button] += 1;
-
-				if (m_cur64ThumbVal[controller][n64Button] > 115)
-					m_cur64ThumbVal[controller][n64Button] = 115;
+				// emulate full push on the axis when the button is down
+				m_cur64ThumbVal[controller][n64Button] = 115;
+				
+				// slowly increment the axis when the button is down
+				//if (m_cur64ThumbVal[controller][n64Button] > 115)
+				//	m_cur64ThumbVal[controller][n64Button] = 115;
 			}
-			else // reduce the axis by half when the button is released
+			else
 			{
-				//m_cur64ThumbVal[controller][n64Button] /= 2;
+				 // release the axis by when the button is released
                 m_cur64ThumbVal[controller][n64Button] = 0;
+
+				// reduce the axis by half when the button is released
+				//m_cur64ThumbVal[controller][n64Button] /= 2;
 			}
 
 			return m_cur64ThumbVal[controller][n64Button];
