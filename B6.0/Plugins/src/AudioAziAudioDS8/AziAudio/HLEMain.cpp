@@ -9,6 +9,9 @@
 *                                                                           *
 ****************************************************************************/
 
+/* memset() and memcpy() */
+#include <string.h>
+
 #include "audiohle.h"
 //#include "RSP/rsp.h"
 
@@ -320,7 +323,14 @@ s16 pack_signed(s32 slice)
     xmm = _mm_cvtsi32_si128(slice);
     xmm = _mm_packs_epi32(xmm, xmm);
     return (s16)_mm_cvtsi128_si32(xmm); /* or:  return _mm_extract_epi16(xmm, 0); */
+#elif defined(MMX_SUPPORT)
+	__m64 mmx;
+
+	mmx = _mm_cvtsi32_si64(slice);
+	mmx = _mm_packs_pi32(mmx, mmx);
+	return (s16)_mm_cvtsi64_si32(mmx);
 #else
+
     s32 result;
 
     result = slice;
@@ -346,29 +356,6 @@ void vsats128(s16* vd, s32* vs)
         vd[i] = pack_signed(vs[i]);
 #endif
 }
-void vsats64 (s16* vd, s32* vs)
-{
-#if defined (_M_X64)
-    __m128i xmm;
-
-    xmm = _mm_loadu_si128((__m128i *)vs);
-    xmm = _mm_packs_epi32(xmm, xmm);
-    *(i64 *)vd = _mm_cvtsi128_si64(xmm);
-#elif defined(SSE1_SUPPORT) || defined(SSE2_SUPPORT)
-    __m64 result, mmx_hi, mmx_lo;
-
-    mmx_hi = *(__m64 *)&vs[0];
-    mmx_lo = *(__m64 *)&vs[2];
-    result = _mm_packs_pi32(mmx_hi, mmx_lo);
-    *(__m64 *)vd = result;
-    _mm_empty();
-#else
-    register size_t i;
-
-    for (i = 0; i < 4; i++)
-        vd[i] = pack_signed(vs[i]);
-#endif
-}
 #endif
 
 void copy_vector(void * vd, const void * vs)
@@ -376,9 +363,9 @@ void copy_vector(void * vd, const void * vs)
 #if defined(SSE2_SUPPORT)
  /* MOVDQU  XMMWORD PTR[vd], XMMWORD PTR[vs] */
     _mm_storeu_si128((__m128i *)vd, _mm_loadu_si128((__m128i *)vs));
-#elif defined(SSE1_SUPPORT)
- /* MOVUPS  XMMWORD PTR[vd], XMMWORD PTR[vs] */
-    _mm_storeu_ps((float *)vd, _mm_loadu_ps((float *)vs));
+//#elif defined(SSE1_SUPPORT)
+// /* MOVUPS  XMMWORD PTR[vd], XMMWORD PTR[vs] */
+//    _mm_storeu_ps((float *)vd, _mm_loadu_ps((float *)vs));
 #elif 0
  /* MOVDQA  XMMWORD PTR[vd], XMMWORD PTR[vs] */
  /* MOVAPS  XMMWORD PTR[vd], XMMWORD PTR[vs] */

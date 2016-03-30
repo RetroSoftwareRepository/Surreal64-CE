@@ -67,10 +67,20 @@
  */
 #define N       8
 
+/*
+ * Sometimes the audio HLE code has variables named "k0", after the MIPS GPR.
+ *
+ * With some compilers (like GCC with -masm=intel), this creates assembler
+ * error messages because k0 conflicts with the assembly language syntax.
+ *
+ * Just a little bit of name-mangling should fix this collision.
+ */
+#define k0      GPR_k0
+
 //------------------------------------------------------------------------------------------
 
 // Use these functions to interface with the HLE Audio...
-#include "../Audio.h"
+#include "AudioSpec.h"
 
 extern u32 t9, k0;
 
@@ -141,14 +151,19 @@ extern s16 acc_clamped[N];
 #endif
 
 /* ... or if compiled with the right preprocessor token on other compilers */
+#define MMX_SUPPORT
+#define SSE1_SUPPORT
 #ifdef SSE2_SUPPORT
 #include <emmintrin.h>
+#elif defined(MMX_SUPPORT)
+#include <mmintrin.h>
 #endif
 
 /* The SSE1 and SSE2 headers always define these macro functions: */
 #undef SSE2_SUPPORT
 #if defined(_MM_SHUFFLE) && defined(_MM_SHUFFLE2)
-#define SSE2_SUPPORT
+//#define SSE2_SUPPORT
+#define MMX_SUPPORT
 #endif
 
 #if 0
@@ -187,11 +202,8 @@ extern s16 pack_signed(s32 slice);
 #define vsats128(vd, vs) {      \
 vd[0] = pack_signed(vs[0]); vd[1] = pack_signed(vs[1]); \
 vd[2] = pack_signed(vs[2]); vd[3] = pack_signed(vs[3]); }
-#define vsats64(vd, vs) {       \
-vd[0] = pack_signed(vs[0]); vd[1] = pack_signed(vs[1]); }
 #else
 extern void vsats128(s16* vd, s32* vs); /* Clamp vectors using SSE2. */
-extern void vsats64 (s16* vd, s32* vs); /* Clamp vectors using MMX. */
 #endif
 
 /*

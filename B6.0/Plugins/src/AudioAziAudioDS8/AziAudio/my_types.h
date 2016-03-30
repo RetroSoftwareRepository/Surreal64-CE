@@ -310,7 +310,7 @@ typedef void(*p_func)(void);
  * helper macros with exporting functions for shared objects or dynamically
  * loaded libraries
  */
-#if defined(_XBOX) // Explicit define for XBox
+#if defined(_XBOX)
 #define EXPORT      
 #define CALL        
 #elif defined(_WIN32)
@@ -432,6 +432,19 @@ typedef struct {
     unsigned opcode:  6;
     unsigned target:  26;
 } MIPS_type_J;
+#endif
+
+/*
+ * Saying "int" all the time for variables of true/false meaning can be sort
+ * of misleading.  (So can adding dumb features to C99, like "bool".)
+ *
+ * Boolean is a proper noun, so the correct name has a capital 'B'.
+ */
+typedef int Boolean;
+
+#if !defined(FALSE) && !defined(TRUE)
+#define FALSE           0
+#define TRUE            1
 #endif
 
 #endif

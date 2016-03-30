@@ -272,7 +272,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="XboxDeploymentTool"
-				RemotePath="xe:\Surreal64 CE\PJ64-612M.xbe"/>
+				RemotePath="xe:\Surreal64 CE\PJ64-612A.xbe"/>
 			<Tool
 				Name="XboxImageTool"
 				FileName="$(TargetDir)/PJ64x16-612A.xbe"
