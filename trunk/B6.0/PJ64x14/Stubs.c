@@ -992,10 +992,13 @@ void __EMU_GetPJ64StateFilename(int index, char *filename, int mode)
 	}
 	return;
 }
-
+extern int g_iAudioPlugin;
 extern BOOL __EMU_AudioMute(BOOL Mute)
 {
-	return _AUDIO_LINK_AudioMute(Mute);
+	if(g_iAudioPlugin == _AudioPluginMusyX)
+		return _AUDIO_LINK_AudioMute(Mute);
+	else
+		return Mute;
 }
 
 // GogoAckman - free up 4Mb for the menu

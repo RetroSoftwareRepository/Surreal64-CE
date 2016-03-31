@@ -965,11 +965,7 @@ void DLParser_Process()
 		_INPUT_RumblePause(true);
 
 		//Mute 1964audio
-		try
-		{
-			MuteAudio = __EMU_AudioMute(TRUE);
-		}
-		catch(...){};
+		MuteAudio = __EMU_AudioMute(TRUE);
 
 		// Check free memory and decommit dynablock if necessary.
 		if (ms.dwAvailPhys < (8*1024*1024))
@@ -1001,12 +997,8 @@ void DLParser_Process()
 		_INPUT_RumblePause(false);
 
 		//UnMute 1964audio
-		try
-		{
-			if(MuteAudio != FALSE)
-				__EMU_AudioMute(FALSE);
-		}
-		catch(...){};
+		if(MuteAudio != FALSE)
+			__EMU_AudioMute(FALSE);
 	}
 #endif
 	CRender::g_pRender->EndRendering();
