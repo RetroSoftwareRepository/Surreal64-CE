@@ -164,7 +164,10 @@ extern "C" void __EMU_GetPJ64StateFilename(int index, char *filename, int mode)
 
 extern "C" BOOL __EMU_AudioMute(BOOL Mute)
 {
-	return AUDIO_AudioMute(Mute);
+	if(g_iAudioPlugin == _AudioPluginMusyX)
+		return AUDIO_AudioMute(Mute);
+	else
+		return Mute;
 }
 
 extern void loadinis();
