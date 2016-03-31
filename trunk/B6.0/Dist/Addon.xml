@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="emulator.console.nintendo64.surreal64ce" name="Nintendo64 (Surreal64CE)" version="B6.1" provider-name="weinerschnitzel">
+   <requires>
+      <import addon="xbmc.python" version="2.0"/>
+   </requires>
+   <extension point="xbox.core.os" library="default.xbe">
+      <provides>emulator</provides>
+   </extension>
+   <extension point="xbmc.addon.metadata">
+      <summary lang="en">Nintendo64 emulator for the Microsoft Xbox</summary>
+      <description lang="en">Surreal64CE is a combination of 3 Zilmar Spec N64 emulators ported to Xbox, with multiple versions of cores and plugins included to afford the best compatibility.</description>
+      <platform>xbox</platform>
+      <emulates>Nintendo64</emulates>
+      <language>en</language>
+   </extension>
+</addon>
