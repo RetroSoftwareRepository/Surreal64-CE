@@ -37,6 +37,8 @@ extern "C" int loaddwUltraCodeMem();
 extern "C" int loaddwUltraGroupMem();
 
 extern "C" int loadiPagingMethod();
+extern "C" int loadbReloadSaveState();
+extern "C" int SetReloadSaveType(int DISABLE);
 
 extern "C" int loadbAudioBoost();
 extern "C" void GetPathSaves(char *pszPathSaves);
@@ -103,6 +105,8 @@ int iPagingMethod=_PagingXXX; //XXX
 bool EnableBGMusic=1;
 bool RandomBGMusic=false;
 bool bAudioBoost=false;
+extern bool bReloadSaveState=false; //Load SaveState on restart
+extern int ReloadSaveType=5; 
 
 //DWORD dwLastRomCRC;
 char romCRC[32];
@@ -567,6 +571,8 @@ int ConfigAppSave2()
 	ini.SetBoolValue("Settings", "EnableController4", EnableController4);
 	
 	ini.SetLongValue("Settings", "ShowDebug", showdebug);
+	ini.SetBoolValue("Settings", "ReloadSaveState", bReloadSaveState);
+	ini.SetLongValue("Settings", "ReloadSaveType", ReloadSaveType);
 
 	char szFloatBuf[64];
 	
@@ -691,6 +697,8 @@ int ConfigAppLoad2()
 	EnableController2 = ini.GetBoolValue("Settings", "EnableController2", EnableController2 );
 	EnableController3 = ini.GetBoolValue("Settings", "EnableController3", EnableController3 );
 	EnableController4 = ini.GetBoolValue("Settings", "EnableController4", EnableController4 );
+	bReloadSaveState = ini.GetBoolValue("Settings", "ReloadSaveState", bReloadSaveState );
+	ReloadSaveType = ini.GetLongValue("Settings", "ReloadSaveType", ReloadSaveType );
 	
 	char szFloatBuf[64];
 	
@@ -1325,6 +1333,8 @@ int loaddwUltraCodeMem(){ return dwUltraCodeMem;}
 int loaddwUltraGroupMem(){ return dwUltraGroupMem;}
 
 int loadiPagingMethod(){ return iPagingMethod;}
+int loadbReloadSaveState(){ if(bReloadSaveState){bReloadSaveState=0; ConfigAppSave2(); return 1;} return 0;}
+int SetReloadSaveType(int DISABLE){ if (DISABLE==1) ReloadSaveType=0; ConfigAppSave2(); return ReloadSaveType;}
 int loadbAudioBoost() { if (bAudioBoost) return 1; return 0; };
 
 int loadiCF5toCF3StepUp(){return CF5toCF3StepUp;}

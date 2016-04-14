@@ -39,6 +39,8 @@ extern int iRspPlugin;
 extern bool bUseRspAudio; // control a listing
 extern bool bDisableEEPROMSaves;
 extern int iPagingMethod;
+extern bool bReloadSaveState;
+extern int ReloadSaveType;
 
 // ultrahle mem settings
 extern int dwUltraCodeMem;

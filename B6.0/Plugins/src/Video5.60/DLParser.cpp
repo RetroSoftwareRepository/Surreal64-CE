@@ -843,6 +843,7 @@ extern "C" BOOL __EMU_AudioMute(BOOL Mute);
 extern "C" BOOL ReInitVirtualDynaMemory(boolean charge);
 extern int TextureMode;
 extern int FrameSkip;
+extern BOOL bReadyToLoad;
 
 void DLParser_Process()
 {
@@ -1028,6 +1029,7 @@ void DLParser_Process()
 
 
 #ifdef _XBOX
+	bReadyToLoad = TRUE;
 	if (_INPUT_IsIngameMenuWaiting())
 	{
 		bool Memdecommit = 0;

@@ -31,6 +31,7 @@ extern "C" BOOL __EMU_AudioMute(BOOL Mute);
 extern "C" BOOL ReInitVirtualDynaMemory(boolean charge);
 extern int TextureMode;
 extern int FrameSkip;
+extern BOOL bReadyToLoad;
 
 #include <xgraphics.h>
 
@@ -1130,6 +1131,8 @@ void DLParser_Process(OSTask * pTask)
 	StopProfiler(PROFILE_ALL);
 
 #ifdef _XBOX
+	
+	bReadyToLoad = TRUE;
 	if (_INPUT_IsIngameMenuWaiting())
 	{
 		BOOL MuteAudio = FALSE;

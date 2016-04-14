@@ -15,11 +15,7 @@ WORD wRumbleMotorSpeedRight[4];
 WORD wRumbleMotorSpeedLeft[4];
 
 static void UpdateRumble(int Control);
-#ifdef _1964vid
 extern "C" void _VIDEO_DisplayTemporaryMessage(const char *msg);
-#else
-extern void _VIDEO_DisplayTemporaryMessage(const char *msg);
-#endif
 
 void _INPUT_CloseDLL(){}
 

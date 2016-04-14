@@ -28,7 +28,9 @@ void CreateSaveStatePreview(unsigned int index);
 bool LoadSaveStatePreview(unsigned int index, int emulator);
 bool bNoPreview = false;
 
-extern void _VIDEO_DisplayTemporaryMessage(const char *msg);
+extern "C" void _VIDEO_DisplayTemporaryMessage(const char *msg);
+extern char romCRC[32];
+extern bool bReloadSaveState;
 
 //weinerschnitzel - Skin Control
 extern char emuname[256];
@@ -165,12 +167,22 @@ void Load1964State2();
 void Load1964State3();
 void Load1964State4();
 void Load1964State5();
+void ReLoad1964State1();
+void ReLoad1964State2();
+void ReLoad1964State3();
+void ReLoad1964State4();
+void ReLoad1964State5();
 void LoadPJ64StateMenu();
 void LoadPJ64State1();
 void LoadPJ64State2();
 void LoadPJ64State3();
 void LoadPJ64State4();
 void LoadPJ64State5();
+void ReLoadPJ64State1();
+void ReLoadPJ64State2();
+void ReLoadPJ64State3();
+void ReLoadPJ64State4();
+void ReLoadPJ64State5();
 void LoadStateMenu();
 void LoadState1();
 void LoadState2();
@@ -643,23 +655,23 @@ void LoadPJ64StateMenu(void)
 	
 	GetStateTimestamp(1, 2, timestamp);
 	swprintf(currentname,L"%S",timestamp);
-	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,currentname,LoadPJ64State1);
+	XLMenu_AddItem2(m_pSettingsMenu,MITEM_ROUTINE,currentname,LoadPJ64State1,ReLoadPJ64State1);
 	
 	GetStateTimestamp(2, 2, timestamp);
 	swprintf(currentname,L"%S",timestamp);
-	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,currentname,LoadPJ64State2);
+	XLMenu_AddItem2(m_pSettingsMenu,MITEM_ROUTINE,currentname,LoadPJ64State2,ReLoadPJ64State2);
 	
 	GetStateTimestamp(3, 2, timestamp);
 	swprintf(currentname,L"%S",timestamp);
-	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,currentname,LoadPJ64State3);
+	XLMenu_AddItem2(m_pSettingsMenu,MITEM_ROUTINE,currentname,LoadPJ64State3,ReLoadPJ64State3);
 	
 	GetStateTimestamp(4, 2, timestamp);
 	swprintf(currentname,L"%S",timestamp);
-	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,currentname,LoadPJ64State4);
+	XLMenu_AddItem2(m_pSettingsMenu,MITEM_ROUTINE,currentname,LoadPJ64State4,ReLoadPJ64State4);
 
 	GetStateTimestamp(5, 2, timestamp);
 	swprintf(currentname,L"%S",timestamp);
-	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,currentname,LoadPJ64State5);
+	XLMenu_AddItem2(m_pSettingsMenu,MITEM_ROUTINE,currentname,LoadPJ64State5,ReLoadPJ64State5);
 
 	XLMenu_Activate(m_pSettingsMenu);
 
@@ -811,6 +823,140 @@ void LoadPJ64State5()
 	XLMenu_CurMenu = NULL;
 }
 
+void ReLoadPJ64State1()
+{
+	char buf[260];
+	char buf2[260];
+	// Prevent preview texture from loading and clean up
+	bNoPreview = true;
+	if (pStateTexture) {
+		pStateTexture->Release();
+		pStateTexture = NULL;
+	}
+	ClearIGM();
+
+	//Copy State to temp area
+	__EMU_GetPJ64StateFilename(1,buf,0);	
+	sprintf(buf2, "%s%s\\%s.temp", szPathSaves, romCRC, romCRC);
+	CopyFile(buf, buf2, false);
+
+	// Seed a Load State
+	bReloadSaveState=true;
+	ConfigAppSave2();
+	ResetRom();
+
+	// Disable Menu to exit
+	XLMenu_CurRoutine = NULL;
+	XLMenu_CurMenu = NULL;
+}
+
+void ReLoadPJ64State2()
+{
+	char buf[260];
+	char buf2[260];
+	// Prevent preview texture from loading and clean up
+	bNoPreview = true;
+	if (pStateTexture) {
+		pStateTexture->Release();
+		pStateTexture = NULL;
+	}
+	ClearIGM();
+
+	//Copy State to temp area
+	__EMU_GetPJ64StateFilename(1,buf,0);	
+	sprintf(buf2, "%s%s\\%s.temp", szPathSaves, romCRC, romCRC);
+	CopyFile(buf, buf2, false);
+
+	// Seed a Load State
+	bReloadSaveState=true;
+	ConfigAppSave2();
+	ResetRom();
+
+	// Disable Menu to exit
+	XLMenu_CurRoutine = NULL;
+	XLMenu_CurMenu = NULL;
+}
+
+void ReLoadPJ64State3()
+{
+	char buf[260];
+	char buf2[260];
+	// Prevent preview texture from loading and clean up
+	bNoPreview = true;
+	if (pStateTexture) {
+		pStateTexture->Release();
+		pStateTexture = NULL;
+	}
+	ClearIGM();
+
+	//Copy State to temp area
+	__EMU_GetPJ64StateFilename(1,buf,0);	
+	sprintf(buf2, "%s%s\\%s.temp", szPathSaves, romCRC, romCRC);
+	CopyFile(buf, buf2, false);
+
+	// Seed a Load State
+	bReloadSaveState=true;
+	ConfigAppSave2();
+	ResetRom();
+
+	// Disable Menu to exit
+	XLMenu_CurRoutine = NULL;
+	XLMenu_CurMenu = NULL;
+}
+
+void ReLoadPJ64State4()
+{
+	char buf[260];
+	char buf2[260];
+	// Prevent preview texture from loading and clean up
+	bNoPreview = true;
+	if (pStateTexture) {
+		pStateTexture->Release();
+		pStateTexture = NULL;
+	}
+	ClearIGM();
+
+	//Copy State to temp area
+	__EMU_GetPJ64StateFilename(1,buf,0);	
+	sprintf(buf2, "%s%s\\%s.temp", szPathSaves, romCRC, romCRC);
+	CopyFile(buf, buf2, false);
+
+	// Seed a Load State
+	bReloadSaveState=true;
+	ConfigAppSave2();
+	ResetRom();
+
+	// Disable Menu to exit
+	XLMenu_CurRoutine = NULL;
+	XLMenu_CurMenu = NULL;
+}
+
+void ReLoadPJ64State5()
+{
+	char buf[260];
+	char buf2[260];
+	// Prevent preview texture from loading and clean up
+	bNoPreview = true;
+	if (pStateTexture) {
+		pStateTexture->Release();
+		pStateTexture = NULL;
+	}
+	ClearIGM();
+
+	//Copy State to temp area
+	__EMU_GetPJ64StateFilename(1,buf,0);	
+	sprintf(buf2, "%s%s\\%s.temp", szPathSaves, romCRC, romCRC);
+	CopyFile(buf, buf2, false);
+
+	// Seed a Load State
+	bReloadSaveState=true;
+	ConfigAppSave2();
+	ResetRom();
+
+	// Disable Menu to exit
+	XLMenu_CurRoutine = NULL;
+	XLMenu_CurMenu = NULL;
+}
 
 void Load1964StateMenu(void)
 {
@@ -833,23 +979,23 @@ void Load1964StateMenu(void)
 	
 	GetStateTimestamp(1, 1, timestamp);
 	swprintf(currentname,L"%S",timestamp);
-	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,currentname,Load1964State1);
+	XLMenu_AddItem2(m_pSettingsMenu,MITEM_ROUTINE,currentname,Load1964State1,ReLoad1964State1);
 	
 	GetStateTimestamp(2, 1, timestamp);
 	swprintf(currentname,L"%S",timestamp);
-	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,currentname,Load1964State2);
+	XLMenu_AddItem2(m_pSettingsMenu,MITEM_ROUTINE,currentname,Load1964State2, ReLoad1964State2);
 	
 	GetStateTimestamp(3, 1, timestamp);
 	swprintf(currentname,L"%S",timestamp);
-	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,currentname,Load1964State3);
+	XLMenu_AddItem2(m_pSettingsMenu,MITEM_ROUTINE,currentname,Load1964State3, ReLoad1964State3);
 	
 	GetStateTimestamp(4, 1, timestamp);
 	swprintf(currentname,L"%S",timestamp);
-	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,currentname,Load1964State4);
+	XLMenu_AddItem2(m_pSettingsMenu,MITEM_ROUTINE,currentname,Load1964State4, ReLoad1964State4);
 
 	GetStateTimestamp(5, 1, timestamp);
 	swprintf(currentname,L"%S",timestamp);
-	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,currentname,Load1964State5);
+	XLMenu_AddItem2(m_pSettingsMenu,MITEM_ROUTINE,currentname,Load1964State5, ReLoad1964State5);
 
 	XLMenu_Activate(m_pSettingsMenu);
 
@@ -996,6 +1142,143 @@ void Load1964State5()
 	bSatesUpdated=true;
 	bload1964state[5]=true;
 	
+	// Disable Menu to exit
+	XLMenu_CurRoutine = NULL;
+	XLMenu_CurMenu = NULL;
+}
+
+
+void ReLoad1964State1()
+{
+	char buf[260];
+	char buf2[260];
+	// Prevent preview texture from loading and clean up
+	bNoPreview = true;
+	if (pStateTexture) {
+		pStateTexture->Release();
+		pStateTexture = NULL;
+	}
+	ClearIGM();
+
+	//Copy State to temp area
+	__EMU_Get1964StateFilename(1,buf,0);	
+	sprintf(buf2, "%s%s\\%s.temp", szPathSaves, romCRC, romCRC);
+	CopyFile(buf, buf2, false);
+
+	// Seed a Load State
+	bReloadSaveState=true;
+	ConfigAppSave2();
+	ResetRom();
+
+	// Disable Menu to exit
+	XLMenu_CurRoutine = NULL;
+	XLMenu_CurMenu = NULL;
+}
+
+
+void ReLoad1964State2()
+{
+	char buf[260];
+	char buf2[260];
+	// Prevent preview texture from loading and clean up
+	bNoPreview = true;
+	if (pStateTexture) {
+		pStateTexture->Release();
+		pStateTexture = NULL;
+	}
+	ClearIGM();
+
+	//Copy State to temp area
+	__EMU_Get1964StateFilename(2,buf,0);	
+	sprintf(buf2, "%s%s\\%s.temp", szPathSaves, romCRC, romCRC);
+	CopyFile(buf, buf2, false);
+
+	// Seed a Load State
+	bReloadSaveState=true;
+	ConfigAppSave2();
+	ResetRom();
+
+	// Disable Menu to exit
+	XLMenu_CurRoutine = NULL;
+	XLMenu_CurMenu = NULL;
+}
+
+void ReLoad1964State3()
+{
+	char buf[260];
+	char buf2[260];
+	// Prevent preview texture from loading and clean up
+	bNoPreview = true;
+	if (pStateTexture) {
+		pStateTexture->Release();
+		pStateTexture = NULL;
+	}
+	ClearIGM();
+
+	//Copy State to temp area
+	__EMU_Get1964StateFilename(3,buf,0);	
+	sprintf(buf2, "%s%s\\%s.temp", szPathSaves, romCRC, romCRC);
+	CopyFile(buf, buf2, false);
+
+	// Seed a Load State
+	bReloadSaveState=true;
+	ConfigAppSave2();
+	ResetRom();
+
+	// Disable Menu to exit
+	XLMenu_CurRoutine = NULL;
+	XLMenu_CurMenu = NULL;
+}
+
+void ReLoad1964State4()
+{
+	char buf[260];
+	char buf2[260];
+	// Prevent preview texture from loading and clean up
+	bNoPreview = true;
+	if (pStateTexture) {
+		pStateTexture->Release();
+		pStateTexture = NULL;
+	}
+	ClearIGM();
+
+	//Copy State to temp area
+	__EMU_Get1964StateFilename(4,buf,0);	
+	sprintf(buf2, "%s%s\\%s.temp", szPathSaves, romCRC, romCRC);
+	CopyFile(buf, buf2, false);
+
+	// Seed a Load State
+	bReloadSaveState=true;
+	ConfigAppSave2();
+	ResetRom();
+
+	// Disable Menu to exit
+	XLMenu_CurRoutine = NULL;
+	XLMenu_CurMenu = NULL;
+}
+
+void ReLoad1964State5()
+{
+	char buf[260];
+	char buf2[260];
+	// Prevent preview texture from loading and clean up
+	bNoPreview = true;
+	if (pStateTexture) {
+		pStateTexture->Release();
+		pStateTexture = NULL;
+	}
+	ClearIGM();
+
+	//Copy State to temp area
+	__EMU_Get1964StateFilename(5,buf,0);	
+	sprintf(buf2, "%s%s\\%s.temp", szPathSaves, romCRC, romCRC);
+	CopyFile(buf, buf2, false);
+
+	// Seed a Load State
+	bReloadSaveState=true;
+	ConfigAppSave2();
+	ResetRom();
+
 	// Disable Menu to exit
 	XLMenu_CurRoutine = NULL;
 	XLMenu_CurMenu = NULL;

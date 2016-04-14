@@ -21,6 +21,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #ifdef _XBOX
 BOOL g_bTempMessage = FALSE;
+BOOL bReadyToLoad = FALSE;
 DWORD g_dwTempMessageStart = 0;
 char g_szTempMessage[100];
 #endif
@@ -1197,6 +1198,11 @@ void _VIDEO_DisplayTemporaryMessage(const char *Message)
 	strncpy(g_szTempMessage, Message, 99);
 	g_dwTempMessageStart = GetTickCount();
 #endif
+}
+
+int _VIDEO_ReadyForLoadState()
+{
+	return bReadyToLoad;
 }
 
 #ifdef _XBOX

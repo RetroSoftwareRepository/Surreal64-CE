@@ -136,7 +136,8 @@ extern char generalText[];
 
 void SetVIScales();
 
-extern void _VIDEO_DisplayTemporaryMessage(const char *msg);
+extern "C" void _VIDEO_DisplayTemporaryMessage(const char *msg);
+extern "C" int _VIDEO_ReadyForLoadState();
 
 enum Emulators
 {

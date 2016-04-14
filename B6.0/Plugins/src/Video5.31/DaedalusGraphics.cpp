@@ -20,6 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "_BldNum.h"
 
 BOOL g_bTempMessage = FALSE;
+BOOL bReadyToLoad = FALSE;
 DWORD g_dwTempMessageStart = 0;
 char g_szTempMessage[100];
 
@@ -1118,6 +1119,11 @@ void _VIDEO_RICE_531_SetMaxTextureMem(DWORD mem)
 		g_bUseSetTextureMem = true;
 		g_maxTextureMemUsage = mem * 1024 * 1024;
 	}
+}
+
+int _VIDEO_ReadyForLoadState()
+{
+	return bReadyToLoad;
 }
 
 void _VIDEO_DisplayTemporaryMessage(const char *msg)

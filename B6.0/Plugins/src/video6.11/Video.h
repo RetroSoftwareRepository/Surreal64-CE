@@ -159,7 +159,8 @@ extern char generalText[];
 
 void SetVIScales();
 //extern void _VIDEO_DisplayTemporaryMessage2(const char *msg, ...);
-extern void _VIDEO_DisplayTemporaryMessage(const char *msg);
+extern "C" void _VIDEO_DisplayTemporaryMessage(const char *msg);
+extern "C" int _VIDEO_ReadyForLoadState();
 extern void XBOX_Debugger_Log(const char *Message, ...);
 
 // reinstate max video mem

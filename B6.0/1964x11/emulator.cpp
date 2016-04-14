@@ -25,7 +25,8 @@
 //#include "rompaging.h"
 extern int DoState;
 extern int stateindex;
-extern int			loadbDisableEEPROMSaves(void);
+extern int loadbDisableEEPROMSaves(void);
+extern "C" void _VIDEO_DisplayTemporaryMessage(const char *msg);
 #else //win32
 
 #include "romlist.h"
@@ -1026,6 +1027,7 @@ void CPU_Check_Interrupts(void)
 #ifdef _XBOX
 		//Check for pending Save/Load State task
 		char buf[260];
+		char buf2[260];
 		switch(DoState){
 			case LOAD_1964_CREATED_PJ64_STATE:
 				sprintf(buf, "%s%08x\\%08X-%08X-%02X.%i.1964", g_szPathSaves, currentromoptions.crc1, currentromoptions.crc1, currentromoptions.crc2, currentromoptions.countrycode, stateindex);
@@ -1046,11 +1048,32 @@ void CPU_Check_Interrupts(void)
 				break;
 
 			case SAVE_1964_CREATED_PJ64_STATE:
-				sprintf(buf, "%s%08x\\%08X-%08X-%02X.%i.1964", g_szPathSaves, currentromoptions.crc1, currentromoptions.crc1, currentromoptions.crc2, currentromoptions.countrycode, stateindex);
+				sprintf(buf, "%s%08x\\%08X-%08X-%02X.%i.temp", g_szPathSaves, currentromoptions.crc1, currentromoptions.crc1, currentromoptions.crc2, currentromoptions.countrycode, stateindex);
+				DeleteFile(buf);
 				Sleep(1000);
 				FileIO_ExportPJ64State(buf);
 				Sleep(1000);
-				FileIO_ImportPJ64State(buf); // Necessary...
+				if(PathFileExists(buf))
+				{
+					sprintf(buf2, "%s%08x\\%08X-%08X-%02X.%i.1964", g_szPathSaves, currentromoptions.crc1, currentromoptions.crc1, currentromoptions.crc2, currentromoptions.countrycode, stateindex);
+					CopyFile(buf,buf2,false);
+					DeleteFile(buf);
+					FileIO_ImportPJ64State(buf2); // Necessary...
+				}
+				else
+				{
+					FileIO_ImportPJ64State(buf); // Necessary...
+					_VIDEO_DisplayTemporaryMessage("Save State Failed!");
+				}
+				Init_Count_Down_Counters();
+				RefreshDynaDuringGamePlay();
+				DoState = DO_NOT_DO_PJ64_STATE;
+				break;
+			case LOAD_TEMP_SAVE_STATE:
+				sprintf(buf, "%s%08x\\%08X.temp", g_szPathSaves, currentromoptions.crc1, currentromoptions.crc1);
+				Sleep(1000);
+				FileIO_ImportPJ64State(buf);
+				DeleteFile(buf);
 				Init_Count_Down_Counters();
 				RefreshDynaDuringGamePlay();
 				DoState = DO_NOT_DO_PJ64_STATE;

@@ -22,6 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //#include "./Menu/MenuMain.h"
 
 BOOL g_bTempMessage = FALSE;
+BOOL bReadyToLoad = FALSE;
 DWORD g_dwTempMessageStart = 0;
 char g_szTempMessage[100];
 
@@ -1031,6 +1032,11 @@ void _VIDEO_DisplayTemporaryMessage(const char *msg)
 	g_bTempMessage = TRUE;
 	strncpy(g_szTempMessage, msg, 99);
 	g_dwTempMessageStart = GetTickCount();
+}
+
+int _VIDEO_ReadyForLoadState()
+{
+	return bReadyToLoad;
 }
 
 void InitGammaValues()
