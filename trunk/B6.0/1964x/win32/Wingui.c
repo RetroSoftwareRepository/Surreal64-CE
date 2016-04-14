@@ -216,6 +216,7 @@ extern int loadiAudioPlugin();
 //extern int loaddwMaxVideoMem();
 
 extern int loadiPagingMethod();
+extern int loadbReloadSaveState();
 extern int loadbAudioBoost();
 
 extern void GetPathSaves(char *pszPathSaves);
@@ -268,8 +269,10 @@ void __cdecl main()
 	//PhysRam128();
 
 	g_dwRecompCodeSize = loaddw1964DynaMem() * 1024 * 1024;
-	
-	
+
+	if (loadbReloadSaveState())
+		DoState = LOAD_TEMP_SAVE_STATE;
+		
 	g_iPagingMethod = loadiPagingMethod();
 	if (g_iPagingMethod == _PagingXXX) {
 		g_dwPageSize = 0x40000;

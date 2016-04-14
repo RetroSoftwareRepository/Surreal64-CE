@@ -789,6 +789,8 @@ extern int loaddwMaxVideoMem();
 extern int loadiPagingMethod();
 extern int loadbAudioBoost();
 
+extern BOOL loadbReloadSaveState(void);
+
 char g_szPathSaves[256] = "D:\\Saves\\";
 extern void GetPathSaves(char *pszPathSaves);
 
@@ -880,6 +882,12 @@ VOID __cdecl main()
 				OutputDebugStringA(" Could Not Be Created!\n");
 			}
 		}
+	}
+
+	//Seed a Reload State
+	if(loadbReloadSaveState()){
+		CPU_Action.RestoreTempState = TRUE;
+		CPU_Action.DoSomething = TRUE;
 	}
 	
 	switch (CPU_Type) {

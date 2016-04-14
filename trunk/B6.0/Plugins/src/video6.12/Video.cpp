@@ -55,6 +55,7 @@ bool frameWriteByCPURectFlag[20][20];
 std::vector<uint32> frameWriteRecord;
 
 BOOL g_bTempMessage = FALSE;
+BOOL bReadyToLoad = FALSE;
 DWORD g_dwTempMessageStart = 0;
 char g_szTempMessage[100];
 
@@ -1199,6 +1200,11 @@ void _VIDEO_DisplayTemporaryMessage(const char *Message)
 	strncpy(g_szTempMessage, Message, 99);
 	g_dwTempMessageStart = GetTickCount();
 #endif
+}
+
+int _VIDEO_ReadyForLoadState()
+{
+	return bReadyToLoad;
 }
 
 #ifdef _XBOX

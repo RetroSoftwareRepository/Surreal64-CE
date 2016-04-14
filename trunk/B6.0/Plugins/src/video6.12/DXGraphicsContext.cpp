@@ -212,7 +212,7 @@ __forceinline void CDXGraphicsContext::UpdateFrame(bool swaponly)
 {
 	//HRESULT hr; //unreferenced
 
-	if (bSatesUpdated) {
+	/*if (bSatesUpdated) {
 		bSatesUpdated = false;
 		
 		for (int i=0; i<MAX_SAVE_STATES; i++) {
@@ -227,7 +227,7 @@ __forceinline void CDXGraphicsContext::UpdateFrame(bool swaponly)
 				break;
 			}
 		}
-	}
+	}*/
 
 	status.gFrameCount++;
 

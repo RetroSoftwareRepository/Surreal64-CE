@@ -52,6 +52,7 @@ typedef struct {
 	BOOL SaveState;
 	BOOL RestorePJ64State;
 	BOOL Restore1964State;
+	BOOL RestoreTempState;
 	BOOL DoInterrupt;
 	BOOL Stepping;
 } CPU_ACTION;
@@ -83,8 +84,7 @@ void GetAutoSaveDir				( char * Directory );
 void GetInstantSaveDir			( char * Directory );
 void InPermLoop					( void );
 void InitiliazeCPUFlags			( void );
-BOOL Machine_LoadPJ64State		( void );
-BOOL Machine_Load1964State		( void );
+BOOL Machine_LoadState			( char FileName[255] );
 BOOL Machine_SaveState			( void );
 void PauseCpu					( void );
 void RefreshScreen				( void );

@@ -23,6 +23,7 @@ extern bool bEnableHDTV;
 extern bool bFullScreen;
 
 BOOL g_bTempMessage = FALSE;
+BOOL bReadyToLoad = FALSE;
 DWORD g_dwTempMessageStart = 0;
 char g_szTempMessage[100];
 
@@ -1136,6 +1137,11 @@ void _VIDEO_DisplayTemporaryMessage(const char *msg)
 	g_bTempMessage = TRUE;
 	strncpy(g_szTempMessage, msg, 99);
 	g_dwTempMessageStart = GetTickCount();
+}
+
+int _VIDEO_ReadyForLoadState()
+{
+	return bReadyToLoad;
 }
 
 typedef struct

@@ -107,7 +107,7 @@ extern int					game_country_tvsystem;
 
 void LoadPlugins();
 
-enum { LOAD_1964_CREATED_PJ64_STATE, LOAD_PJ64_CREATED_PJ64_STATE, SAVE_1964_CREATED_PJ64_STATE, DO_NOT_DO_PJ64_STATE};
+enum { LOAD_1964_CREATED_PJ64_STATE, LOAD_PJ64_CREATED_PJ64_STATE, SAVE_1964_CREATED_PJ64_STATE, LOAD_TEMP_SAVE_STATE, DO_NOT_DO_PJ64_STATE};
 
 extern void __EMU_GetStateFilename(int index, char *filename, int mode);
 extern void __EMU_Get1964StateFilename(int index, char *filename, int mode);

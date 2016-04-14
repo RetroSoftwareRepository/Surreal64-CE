@@ -21,8 +21,7 @@
 
 #include <xtl.h>
 
-extern void FileIO_ExportPJ64State(const char * filename);
-extern void FileIO_ImportPJ64State(const char * filename);
+
 #include <process.h>
 #include "globals.h"
 #include "debug_option.h"
@@ -48,6 +47,9 @@ extern void FileIO_ImportPJ64State(const char * filename);
 //#include "romlist.h"
 #include "rompaging.h"
 
+extern void FileIO_ExportPJ64State(const char * filename);
+extern void FileIO_ImportPJ64State(const char * filename);
+extern void _VIDEO_DisplayTemporaryMessage(const char *msg);
 
 
 /*#ifdef DEBUG_COMMON
@@ -855,6 +857,7 @@ void CPU_Check_Interrupts(void)
 		else
 #endif*/
 		char buf[260];
+		char buf2[260];
 		//Check for pending Save/Load State task
 		switch(DoState){
 			case LOAD_1964_CREATED_PJ64_STATE:
@@ -876,11 +879,32 @@ void CPU_Check_Interrupts(void)
 				break;
 
 			case SAVE_1964_CREATED_PJ64_STATE:
-				sprintf(buf, "%s%08x\\%08X-%08X-%02X.%i.1964", g_szPathSaves, currentromoptions.crc1, currentromoptions.crc1, currentromoptions.crc2, currentromoptions.countrycode, stateindex);
+				sprintf(buf, "%s%08x\\%08X-%08X-%02X.%i.temp", g_szPathSaves, currentromoptions.crc1, currentromoptions.crc1, currentromoptions.crc2, currentromoptions.countrycode, stateindex);
+				DeleteFile(buf);
 				Sleep(1000);
 				FileIO_ExportPJ64State(buf);
 				Sleep(1000);
-				FileIO_ImportPJ64State(buf); // Necessary...
+				if(PathFileExists(buf))
+				{
+					sprintf(buf2, "%s%08x\\%08X-%08X-%02X.%i.1964", g_szPathSaves, currentromoptions.crc1, currentromoptions.crc1, currentromoptions.crc2, currentromoptions.countrycode, stateindex);
+					CopyFile(buf,buf2,0);
+					DeleteFile(buf);
+					FileIO_ImportPJ64State(buf2); // Necessary...
+				}
+				else
+				{
+					FileIO_ImportPJ64State(buf); // Necessary...
+					_VIDEO_DisplayTemporaryMessage("Save State Failed!");
+				}
+				Init_Count_Down_Counters();
+				RefreshDynaDuringGamePlay();
+				DoState = DO_NOT_DO_PJ64_STATE;
+				break;
+			case LOAD_TEMP_SAVE_STATE:
+				sprintf(buf, "%s%08x\\%08X.temp", g_szPathSaves, currentromoptions.crc1, currentromoptions.crc1);
+				Sleep(1000);
+				FileIO_ImportPJ64State(buf);
+				DeleteFile(buf);
 				Init_Count_Down_Counters();
 				RefreshDynaDuringGamePlay();
 				DoState = DO_NOT_DO_PJ64_STATE;

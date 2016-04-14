@@ -110,7 +110,9 @@ typedef struct {
 } PluginStatus;
 
 extern PluginStatus status;
-extern void _VIDEO_DisplayTemporaryMessage(const char *msg);
+extern "C" void _VIDEO_DisplayTemporaryMessage(const char *msg);
+extern "C" int _VIDEO_ReadyForLoadState();
+
 enum Emulators
 {
 	_1964x085,

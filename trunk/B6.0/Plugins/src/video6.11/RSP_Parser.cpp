@@ -32,6 +32,7 @@ extern "C" BOOL __EMU_AudioMute(BOOL Mute);
 extern "C" BOOL ReInitVirtualDynaMemory(boolean charge);
 extern int TextureMode;
 extern int FrameSkip;
+extern BOOL bReadyToLoad;
 #endif
 
 //////////////////////////////////////////////////////////
@@ -927,6 +928,7 @@ void DLParser_Process(OSTask * pTask)
 	CRender::g_pRender->EndRendering();
 
 #ifdef _XBOX
+	bReadyToLoad = TRUE;
 	if (_INPUT_IsIngameMenuWaiting())
 	{
 		bool Memdecommit = 0;

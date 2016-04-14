@@ -182,6 +182,7 @@ extern int loadiAudioPlugin();
 extern int loaddwMaxVideoMem();
 
 extern int loadiPagingMethod();
+extern bool loadbReloadSaveState();
 extern int loadbAudioBoost();
 
 extern int loadiCF5toCF3StepUp();
@@ -239,6 +240,8 @@ void __cdecl main()
 
 	//freakdave - check for 128mb
 	//PhysRam128();
+	if (loadbReloadSaveState())
+		DoState = LOAD_TEMP_SAVE_STATE;
 
 	
 #ifdef USE_ROM_PAGING
