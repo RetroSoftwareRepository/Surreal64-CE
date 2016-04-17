@@ -554,10 +554,10 @@ void GenerateCurrentRomOptions()
 	{
 		options.enableHackForGames = HACK_FOR_NASCAR;
 	}
-	else if ((strstr(g_curRomInfo.szGameName, "ZELDA") != 0) && (strstr(g_curRomInfo.szGameName, "MASK") != 0))
-	{
-		options.enableHackForGames = HACK_FOR_ZELDA_MM;
-	}
+	//else if ((strstr(g_curRomInfo.szGameName, "ZELDA") != 0) && (strstr(g_curRomInfo.szGameName, "MASK") != 0))
+	//{
+	//	options.enableHackForGames = HACK_FOR_ZELDA_MM;
+	//}
 	else if ((strstr(g_curRomInfo.szGameName, "ZELDA") != 0))
 	{
 		options.enableHackForGames = HACK_FOR_ZELDA;
