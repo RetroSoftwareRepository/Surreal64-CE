@@ -196,10 +196,7 @@ void			Trigger_Interrupt_Without_Mask(unsigned __int32 interrupt);
 void			EnableFPUUnusableException(void);
 void			DisableFPUUnusableException(void);
 void			TriggerFPUUnusableException(void);
-
-//void			Clear_MIInterrupt(uint32);
-void			Clear_MIInterrupt(unsigned __int32 clear_mask); // should work on win32 and xbox
-
+void			Clear_MIInterrupt(uint32);
 void			HandleInterrupts(unsigned __int32 vt);
 void			HandleExceptions(unsigned __int32 evt);
 

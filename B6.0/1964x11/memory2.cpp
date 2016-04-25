@@ -957,7 +957,7 @@ uint32 *read_mem_cheatcode_block(uint32 addr)
 		__asm popad;
 #endif
 		//Reapply the cheat code
-		CodeList_ApplyCode_At_Address(cheatCodeBlockMap[block][addr&0xFFF], addr);		
+		//CodeList_ApplyCode_At_Address(cheatCodeBlockMap[block][addr&0xFFF], addr);		
 		__asm mov eax, addr;
 		__asm call read_mem_rdram_not_at_0x20000000_eax_only;
 		__asm mov retval, eax;

@@ -179,7 +179,6 @@ void TLB_TRANSLATE_PC_INDIRECT(void)
  =======================================================================================================================
  */
 extern void StoreImm_HI(int k, int i);
-extern int UnmappedMemoryExceptionHelper(unsigned int addr);
 void TLB_TRANSLATE_PC(uint32 pc)
 {
 	/*~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -253,7 +252,7 @@ void DisplayPC(void)
 	static uint32	pc = 0;
 	/*~~~~~~~~~~~~~~~~~~~*/
 
-	if(pc != gHWS_pc){TRACE1("PC=%08X", gHWS_pc);}
+	if(pc != gHWS_pc) TRACE1("PC=%08X", gHWS_pc);
 	pc = gHWS_pc;
 
 	/* DisplayError("PC=%08X", gHWS_pc); */

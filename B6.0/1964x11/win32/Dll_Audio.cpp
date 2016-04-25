@@ -321,17 +321,9 @@ BOOL LoadAudioPlugin(char *libname)
 
 					_AUDIO_RomClosed = (void(__cdecl *) (void)) GetProcAddress(hinstLibAudio, "RomClosed");
 
-					if( strstr(Plugin_Info.Name, "Jabo") != NULL || strstr(Plugin_Info.Name, "jabo") != NULL )
-					{
-						CoreDoingAIUpdate = FALSE;
-						if( emuoptions.UsingRspPlugin == FALSE )
-						{
-							DisplayError("Warning, Jabo DirectSound Plugin is selected and loaded, but RSP Plugin is not "\
-										"selected, Jabo DirectSound Plugin does not produce sound without RSP plugin. You can activate "\
-										"RSP Plugin in plugin setting, or you can change to other audio plugins");
-						}
-					}
-					else if( strstr(Plugin_Info.Name, "0.40 Beta 2") != NULL )
+					if( strstr(Plugin_Info.Name, "Jabo") != NULL   ||
+						strstr(Plugin_Info.Name, "Azimer") != NULL ||
+						strstr(Plugin_Info.Name, "Shunyuan") != NULL )
 					{
 						CoreDoingAIUpdate = FALSE;
 					}

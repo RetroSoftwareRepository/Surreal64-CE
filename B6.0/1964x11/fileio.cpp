@@ -1308,7 +1308,6 @@ void FileIO_gzWriteHardwareState_085(gzFile *stream)
 {
 	gHWS_COP0Reg[COUNT] = Get_COUNT_Register();	//Refresh the COUNT register
 
-//#ifndef _XBOX // works on xbox?
 #ifndef _DEBUG
 	if(currentromoptions.Assume_32bit == ASSUME_32BIT_YES)
 	{
@@ -1321,7 +1320,6 @@ void FileIO_gzWriteHardwareState_085(gzFile *stream)
 		gHardwareSaveState.grhi = (_int64) (_int32)gHardwareSaveState.grhi;
 	}
 #endif
-//#endif
 
 	memcpy(&gHardwareSaveState_085.GPR, &r.r_.gpr, sizeof(gHardwareSaveState_085.GPR));
 	gHardwareSaveState_085.GPR[32]=r.r_.grlo;
@@ -1369,7 +1367,6 @@ void FileIO_gzWriteHardwareState(gzFile *stream)
     //new in version 0.9.9
     memcpy(&gHardwareSaveState.COP0Con, &gHardwareState.COP0Con, sizeof(gHardwareState.COP0Con));
 
-//#ifndef _XBOX // works on xbox?
 #ifndef _DEBUG
     if(currentromoptions.Assume_32bit == ASSUME_32BIT_YES)
     {
@@ -1383,7 +1380,6 @@ void FileIO_gzWriteHardwareState(gzFile *stream)
         gHardwareSaveState.grhi = (_int64) (_int32)gHardwareSaveState.grhi;
     }
 #endif
-//#endif
 
     gzwrite(stream, (uint8 *)(&gHardwareSaveState), (sizeof(gHardwareSaveState)));
 }
@@ -1460,6 +1456,7 @@ void FileIO_gzSaveStateFile_085(const char *filename)
  =======================================================================================================================
  =======================================================================================================================
  */
+UINT32 old_vi_status, old_dacrate;
 void FileIO_gzLoadState(void)
 {
 	/* Open File to write, file should be named as rom name */
@@ -1487,8 +1484,8 @@ void FileIO_gzLoadStateFile(const char *filename)
 
 	Init_Dynarec();
 	
-	AUDIO_RomClosed(); //Fixes losing audio on a loadstate.
-
+	old_vi_status = VI_STATUS_REG;
+	old_dacrate = AI_DACRATE_REG;
     
     stream = (gzFile*)gzopen(filename, "rb");
 	if(stream == NULL)
@@ -1568,8 +1565,8 @@ void FileIO_gzLoadStateFile(const char *filename)
 	gzclose(stream);
 
 	DoOthersAfterLoadState();
-	AUDIO_AiLenChanged(); //to fix losing audio on a zelda load state
-	Trigger_AIInterrupt(); //to fix losing audio on a zelda (and Hydro Thunder) load state
+//	AUDIO_AiLenChanged(); //to fix losing audio on a zelda load state
+//	Trigger_AIInterrupt(); //to fix losing audio on a zelda (and Hydro Thunder) load state
 }
 
 /*
@@ -1679,6 +1676,8 @@ void FileIO_ImportPJ64State(const char *filename)
 	DWORD	dummy;
 	/*~~~~~~~~~~~~~~~~~*/
 
+	old_vi_status = VI_STATUS_REG;
+	old_dacrate = AI_DACRATE_REG;
 	stream = fopen(filename, "rb");
 	if(stream == NULL)
 	{
