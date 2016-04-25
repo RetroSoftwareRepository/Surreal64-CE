@@ -127,6 +127,7 @@ void FastPIMemoryCopy(void)
 	register int				i;
 	unsigned register __int32	target; /* = PIDMATargetMemory+PIDMATargetAddress; */
 	unsigned register __int32	source; /* = PIDMASourceMemory+PIDMASourceAddress; */
+	unsigned register __int32	len;
 	/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 	if(PIDMAInProgress == DMA_PI_WRITE && currentromoptions.Code_Check == CODE_CHECK_PROTECT_MEMORY)
@@ -147,9 +148,8 @@ void FastPIMemoryCopy(void)
 		}
 	}
 	
-#ifdef USE_ROM_PAGING //_XBOX
-// Ez0n3 - some changes by oDD i'm not too sure about
-// - MEMORY ISSUE MARKER -
+#ifdef USE_ROM_PAGING_oDD //_XBOX
+// oDD 1.1
 
 	// added by oDD
 	if (CheckIfInRom(PIDMASourceAddress))
@@ -162,6 +162,7 @@ void FastPIMemoryCopy(void)
 		target = (uint32) PMEM_READ_UWORD(PIDMATargetAddress);
 		source = (uint32) PMEM_READ_UWORD(PIDMASourceAddress);
 	}
+	//len = PIDMALength;
 
 	// changed by oDD
 	if (CheckIfInRom(PIDMASourceAddress))
@@ -271,50 +272,262 @@ void FastPIMemoryCopy(void)
 			return;
 		}
 	}
+#endif
 
-#else // win32 - no paging
-	target = (uint32) PMEM_READ_UWORD(PIDMATargetAddress);
-	source = (uint32) PMEM_READ_UWORD(PIDMASourceAddress);
-	
-	if((target & 3) == 0 && (source & 3) == 0 && (PIDMALength & 3) == 0)		/* DWORD align */
+#ifdef USE_ROM_PAGING //_XBOX
+// AIO RP
+
+	// added by oDD
+	if (1)//CheckIfInRom(PIDMASourceAddress))
 	{
-		/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-		int i = -(((__int32) PIDMALength) >> 2);
-		/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
-		__asm
-		{
-			pushad
-			mov eax, i
-			mov edx, target
-			mov ebx, source
-			align 16
-_Label :
-			and eax, eax
-			jz _Label2
-			mov ecx, dword ptr[ebx]
-			inc eax
-			mov dword ptr[edx], ecx
-			add ebx, 4
-			add edx, 4
-			jmp _Label
-_Label2 :
-			popad
-		}
+		target = (uint32) PMEM_READ_UWORD(PIDMATargetAddress);
+		source = (uint32) PIDMASourceAddress;
+	}
+	else
+	{
+		target = (uint32) PMEM_READ_UWORD(PIDMATargetAddress);
+		source = (uint32) PMEM_READ_UWORD(PIDMASourceAddress);
 	}
 
-	else if((target & 1) == 0 && (source & 1) == 0 && (PIDMALength & 1) == 0)	/* WORD align */
+	len = PIDMALength;
+	if(1)//(CheckIfInRom(PIDMASourceAddress))
 	{
-		for(i = -(((__int32) PIDMALength) >> 1); i < 0; i++)
+		if((target & 3) == 0 && (source & 3) == 0 && (len & 3) == 0)		/* DWORD align */
 		{
-			*(uint16 *) (target ^ 2) = *(uint16 *) (source ^ 2);
-			target += 2;
-			source += 2;
+		// Cannot read from file, need to use ASM routine...
+		// Why? Reading slow, or len too large?
+		{
+			FILE *tmpFile = fopen(g_temporaryRomPath, "rb");
+			fseek(tmpFile, 0, SEEK_SET);
+			fread((void*)target, sizeof(uint8), len, tmpFile);
+			fclose(tmpFile);
+		}
+			
+			/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+			//int i = -(((__int32) len) >> 2);
+			/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+/*
+			__asm
+			{
+				pushad
+				mov ecx, i //mov eax, i
+				mov edx, target
+				//mov ebx, source
+				align 16
+	_Label :
+				//test ecx, ecx //surreal old - 0.85
+				and ecx, ecx //and eax, eax //surreal new 1.1 - etempp
+
+				jz _Label2
+				push ecx //added
+				push edx //added
+				mov ecx, source
+				//mov ecx, dword ptr[ebx]
+				call ReadUWORDFromROM //added
+				pop edx //added
+				pop ecx //added
+				//inc ecx // inc eax //1.1 location //etempp
+				mov dword ptr[edx], eax //mov dword ptr[edx], ecx
+				add source, 4 //add ebx, 4
+				add edx, 4
+				inc ecx //0.85 location
+				jmp _Label
+	_Label2 :
+				popad
+			}
+
+			return;
+*/
+		}
+		else if((target & 1) == 0 && (source & 1) == 0 && (len & 1) == 0)	/* WORD align */
+		{
+			if ((len & 2) == 0)
+			{
+				if ((target & 2) == 0)
+				{
+					for (i = 0; i < len; i += 4)
+					{
+						*(uint16 *)((target + i) + 2) = ReadUHALFFromROM((source + i) - 2);
+						*(uint16 *)((target + i) + 0) = ReadUHALFFromROM((source + i) + 4);
+					}
+				}
+				else
+				{
+					if ((source & 2) == 0)
+					{
+						for (i = 0; i < len; i += 4)
+						{
+							*(uint16 *)((target + i) - 2) = ReadUHALFFromROM((source + i) + 2);
+							*(uint16 *)((target + i) + 4) = ReadUHALFFromROM((source + i) + 0);
+						}
+					}
+					else
+					{
+						for (i = 0; i < len; i += 4)
+						{
+							*(uint16 *)((target + i) - 2) = ReadUHALFFromROM((source + i) - 2);
+							*(uint16 *)((target + i) + 4) = ReadUHALFFromROM((source + i) + 4);
+						}
+					}
+				}
+			}
+			else
+			{
+				for (i = -(((__int32)len) >> 1); i < 0; i++)
+				{
+					*(uint16 *)(target ^ 2) = ReadUHALFFromROM(source ^ 2);
+					target += 2;
+					source += 2;
+				}
+			}
+		}
+		else	/* not align */
+		{
+			for (i = -(__int32)len; i < 0; i++)
+			{
+				*(uint8 *) (target++ ^ 0x3) = ReadUBYTEFromROM(source++ ^ 0x3);
+			}
+		}
+	}
+	else
+	{
+		if((target & 3) == 0 && (source & 3) == 0 && (len & 3) == 0)		/* DWORD align */
+		{
+			// Cannot memcpy here. 
+			//memcpy((void*)target, (void*)source, len);
+
+			/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+			int i = -(((__int32) len) >> 2);
+			/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+			__asm
+			{
+				pushad
+				mov eax, i
+				mov edx, target
+				mov ebx, source
+				align 16
+	_Label3 :
+				and eax, eax
+				jz _Label4
+				mov ecx, dword ptr[ebx]
+				mov dword ptr[edx], ecx
+				//inc eax
+				add ebx, 4
+				add edx, 4
+				inc eax // oDD :)
+				jmp _Label3
+	_Label4 :
+				popad
+			}
+			return;
+		}
+		else if((target & 1) == 0 && (source & 1) == 0 && (len & 1) == 0)	/* WORD align */
+		{
+			if ((len & 2) == 0)
+			{
+				if ((target & 2) == 0)
+				{
+					for (i = 0; i < len; i += 4)
+					{
+						*(uint16 *)((target + i) + 2) = *(uint16 *)((source + i) - 2);
+						*(uint16 *)((target + i) + 0) = *(uint16 *)((source + i) + 4);
+					}
+				}
+				else
+				{
+					if ((source & 2) == 0)
+					{
+						for (i = 0; i < len; i += 4)
+						{
+							*(uint16 *)((target + i) - 2) = *(uint16 *)((source + i) + 2);
+							*(uint16 *)((target + i) + 4) = *(uint16 *)((source + i) + 0);
+						}
+					}
+					else
+					{
+						for (i = 0; i < len; i += 4)
+						{
+							*(uint16 *)((target + i) - 2) = *(uint16 *)((source + i) - 2);
+							*(uint16 *)((target + i) + 4) = *(uint16 *)((source + i) + 4);
+						}
+					}
+				}
+			}
+			else
+			{
+				for (i = -(((__int32)len) >> 1); i < 0; i++)
+				{
+					*(uint16 *)(target ^ 2) = *(uint16 *)(source ^ 2);
+					target += 2;
+					source += 2;
+				}
+			}
+		}
+		else	/* not align */
+		{
+			for (i = -(__int32)len; i < 0; i++)
+			{
+				*(uint8 *) (target++ ^ 0x3) = *(uint8 *) (source++ ^ 0x3);
+			}
+		}
+	}
+#endif
+#if !defined(USE_ROM_PAGING)
+	target = (uint32) PMEM_READ_UWORD(PIDMATargetAddress);
+	source = (uint32) PMEM_READ_UWORD(PIDMASourceAddress);
+
+	len = PIDMALength;
+
+	if((target & 3) == 0 && (source & 3) == 0 && (len & 3) == 0)		/* DWORD align */
+	{
+		memcpy((void*)target, (void*)source, len);
+	}
+	else if((target & 1) == 0 && (source & 1) == 0 && (len & 1) == 0)	/* WORD align */
+	{
+		if ((len & 2) == 0)
+		{
+			if ((target & 2) == 0)
+			{
+				for (i = 0; i < len; i += 4)
+				{
+					*(uint16 *)((target + i) + 2) = *(uint16 *)((source + i) - 2);
+					*(uint16 *)((target + i) + 0) = *(uint16 *)((source + i) + 4);
+				}
+			}
+			else
+			{
+				if ((source & 2) == 0)
+				{
+					for (i = 0; i < len; i += 4)
+					{
+						*(uint16 *)((target + i) - 2) = *(uint16 *)((source + i) + 2);
+						*(uint16 *)((target + i) + 4) = *(uint16 *)((source + i) + 0);
+					}
+				}
+				else
+				{
+					for (i = 0; i < len; i += 4)
+					{
+						*(uint16 *)((target + i) - 2) = *(uint16 *)((source + i) - 2);
+						*(uint16 *)((target + i) + 4) = *(uint16 *)((source + i) + 4);
+					}
+				}
+			}
+		}
+		else
+		{
+			for (i = -(((__int32)len) >> 1); i < 0; i++)
+			{
+				*(uint16 *)(target ^ 2) = *(uint16 *)(source ^ 2);
+				target += 2;
+				source += 2;
+			}
 		}
 	}
 	else	/* not align */
 	{
-		for(i = -(__int32) PIDMALength; i < 0; i++) 
+		for (i = -(__int32)len; i < 0; i++)
 		{
 			*(uint8 *) (target++ ^ 0x3) = *(uint8 *) (source++ ^ 0x3);
 		}

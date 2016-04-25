@@ -323,30 +323,27 @@ int FindFreeRegister()
  */
 void FetchEBP_Params(int mips_reg)
 {
-	if (mips_reg != 0)
+	if (mips_reg == 0)
+		DisplayError("Fetch Error");
+	else
+
+	if(mips_reg < 17)
 	{
-		if(mips_reg < 17)
-		{
-			// negative 8bit displacement 
-			x86params.ModRM = ModRM_disp8_EBP;
-			x86params.Address = -128 + ((mips_reg-1) << 3);
-		}
-		else if(mips_reg < 32)
-		{
-			// positive 8bit displacement 
-			x86params.ModRM = ModRM_disp8_EBP;
-			x86params.Address = (((mips_reg-1) - 16) << 3);
-		}
-		else
-		{
-			// positive 32bit displacement. Only GPR_HI/GPR_LO use this. 
-			x86params.ModRM = ModRM_disp32;
-			x86params.Address = (_u32) & gHWS_GPR(0) + (((mips_reg)) << 3);
-		}
+		// negative 8bit displacement 
+		x86params.ModRM = ModRM_disp8_EBP;
+		x86params.Address = -128 + ((mips_reg-1) << 3);
+	}
+	else if(mips_reg < 32)
+	{
+		// positive 8bit displacement 
+		x86params.ModRM = ModRM_disp8_EBP;
+		x86params.Address = (((mips_reg-1) - 16) << 3);
 	}
 	else
 	{
-	//DisplayError("Fetch Error");
+		// positive 32bit displacement. Only GPR_HI/GPR_LO use this. 
+		x86params.ModRM = ModRM_disp32;
+		x86params.Address = (_u32) & gHWS_GPR(0) + (((mips_reg)) << 3);
 	}
 }
 

@@ -27,6 +27,8 @@ extern int DoState;
 extern int stateindex;
 extern int loadbDisableEEPROMSaves(void);
 extern "C" void _VIDEO_DisplayTemporaryMessage(const char *msg);
+extern "C" void _VIDEO_DisplayTemporaryMessage(const char *msg);
+extern "C" void _VIDEO_DisplayTemporaryMessage(const char *msg);
 #else //win32
 
 #include "romlist.h"
@@ -171,7 +173,7 @@ BOOL PauseEmulator(void)
 
 	pauseEntryCount++;
 
-		AUDIO_RomClosed(); //Fixes losing audio.
+//	AUDIO_RomClosed(); //Fixes losing audio.
 
     
 	emustatus.reason_to_stop = EMUPAUSE;
@@ -191,12 +193,6 @@ BOOL PauseEmulator(void)
 		Sleep(50);
 	}
 
-	if (!MenuCausedPause)
-	{
-		sprintf(generalmessage, "%s - %s", gui.szWindowTitle, TranslateStringByString("Paused"));
-		SetStatusBarText(0, generalmessage);
-		SetWindowText(gui.hwnd1964main, generalmessage);
-	}
 #endif
 
 	if( !(Audio_Is_Initialized == 1 && CoreDoingAIUpdate == 0 ) )
@@ -240,7 +236,7 @@ void ResumeEmulator(int action_after_pause)
 
 	sprintf(generalmessage, "%s - %s", gui.szWindowTitle, TranslateStringByString("Running"));
 	SetStatusBarText(0, generalmessage);
-	SetWindowText(gui.hwnd1964main, generalmessage);
+	//SetWindowText(gui.hwnd1964main, generalmessage);
 #endif
 	SetEvent( ResumeEmulatorEvent );
 	QueryPerformanceCounter(&LastSecondTime);
@@ -816,12 +812,16 @@ void PauseEmulating(void)
 N64::CRegisters r;
 void RunTheInterpreter(void)
 {
-	register uint32 Instruction;
-	N64::CInterpretedOpcodes* interpreter = new N64::CInterpretedOpcodes;
+	unsigned __int32 opcode_;
+
+	uint32 Instruction;
 
 _DoOtherTask:
 	Instruction = FetchInstruction();	/* Fetch instruction at PC */
-	interpreter->executeFunction(_OPCODE_, r, Instruction);
+	
+	opcode_ = _OPCODE_;
+	CPU_instruction[opcode_](Instruction);
+
 	gHWS_GPR(0) = 0;
 	INTERPRETER_DEBUG_INSTRUCTION(Instruction);
 
@@ -853,9 +853,6 @@ _DoOtherTask:
 
 out:
 	if(Is_CPU_Doing_Other_Tasks() || CPUdelay != 0) goto _DoOtherTask;
-
-	if (interpreter)
-		delete interpreter;
 }
 
 /*
@@ -923,11 +920,10 @@ static void RunTheRegCacheNoCheck(void)
 	__asm align 16
     
 
-    char buf[260];
+    
 	while(emustatus.Emu_Keep_Running)
 	{
 _NextBlock:
-
 		__asm
 		{
 l1:        mov eax, r.r_.g_LookupPtr
@@ -1436,6 +1432,7 @@ void DoOthersBeforeSaveState()
 }
 
 extern void InitFrameBufferProtection(void);
+extern UINT32 old_vi_status, old_dacrate;
 void DoOthersAfterLoadState()
 {
 	emustatus.Emu_Is_Resetting = 1;//well, it's not resetting, but we don't want InitEmu() to reload the video plugin.
@@ -1462,11 +1459,28 @@ void DoOthersAfterLoadState()
 		}
 	}
 
+	if (old_vi_status != VI_STATUS_REG)
+	{
+		if (emustatus.Emu_Is_Paused)
+		{
+			if (VIDEO_ViStatusChanged != NULL)
+			{
+				VIDEO_ViStatusChanged();
+			}
+		}
+		else
+		{
+			VI_STATUS_REG = 0;
+		}
+	}
     
-    if(rominfo.TV_System == TV_SYSTEM_NTSC)
-		AUDIO_AiDacrateChanged(SYSTEM_NTSC);
-	else
-		AUDIO_AiDacrateChanged(SYSTEM_PAL);
+	if (old_dacrate != AI_DACRATE_REG)
+	{
+		if(rominfo.TV_System == TV_SYSTEM_NTSC)
+			AUDIO_AiDacrateChanged(0);
+		else
+			AUDIO_AiDacrateChanged(1);
+	}
 
     AI_LEN_REG = AUDIO_AiReadLength();
 
@@ -1479,4 +1493,7 @@ void DoOthersAfterLoadState()
 	{
 		InitFrameBufferProtection();
 	}
+
+	(MI_INTR_REG_R) |= MI_INTR_AI;
+	AI_STATUS_REG &= 0x7FFFFFFF;
 }

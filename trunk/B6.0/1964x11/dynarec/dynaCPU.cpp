@@ -936,7 +936,7 @@ resrvd(OP_PARAMS)
 
 // _____________________________________________________________________________
 //
-extern void r4300i_lwl_32bit(uint32 Intrsuction);
+
 void lwl(OP_PARAMS)
 {
     OpcodePrologue(1, &r4300i_lwl, 0, PASS_PARAMS);
@@ -952,7 +952,6 @@ void lwl(OP_PARAMS)
 
 // _____________________________________________________________________________
 //
-extern void r4300i_lwr_32bit(uint32 Intrsuction);
 void lwr(OP_PARAMS)
 {
     OpcodePrologue(1, &r4300i_lwr, 0, PASS_PARAMS);

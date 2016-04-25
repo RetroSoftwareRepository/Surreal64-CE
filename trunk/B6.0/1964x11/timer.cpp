@@ -34,7 +34,7 @@ BOOL	CPUNeedToCheckInterrupt = FALSE;
 BOOL	CPUNeedToCheckException = FALSE;
 int		CounterFactor = COUTERFACTOR_3;
 int     AutoCounterFactor = 3;
-
+float	DOUBLE_COUNT = 1.0f;
 AudioStatusType audioStatus;
 
 int		viframeskipcount=0;
@@ -65,20 +65,6 @@ void	DoPIDMASegment(void);
 void	DoSPDMASegment(void);
 void	DoSIDMASegment(void);
 
-enum COUNTER_TARGET_TYPE
-{
-	VI_COUNTER_TYPE,
-	COMPARE_COUNTER_TYPE,
-	PI_DMA_COUNTER_TYPE,
-	SI_DMA_COUNTER_TYPE,
-	SI_IO_COUNTER_TYPE,
-	SP_DMA_COUNTER_TYPE,
-	SP_DLIST_COUNTER_TYPE,
-	SP_ALIST_COUNTER_TYPE,
-	CHECK_INTERRUPT_COUNTER_TYPE,
-	DELAY_AI_INTERRUPT_COUNTER_TYPE,
-	DP_DLIST_COUNTER_TYPE,
-};
 
 struct Counter_Node
 {
@@ -647,6 +633,16 @@ void Trigger_Timer_Event(void)
 		MI_INTR_REG_R |= MI_INTR_AI;
 		CPU_Check_Interrupts();
 		break;
+	case RSP_Timer:
+		Remove_1st_Timer_Event(RSP_Timer);
+		if ((SP_STATUS_REG & SP_STATUS_HALT) == 0)
+		{
+			if ((SP_STATUS_REG & SP_STATUS_BROKE) == 0)
+			{
+				RunSPTask();
+			}
+		}
+		break;
 	default:
 		DisplayError("Invalid timer event is triggered, should never happens");
 		break;
@@ -781,7 +777,7 @@ void Check_VI_and_COMPARE_Interrupt(void)
 	Set_Countdown_Counter();
 }
 
-#define DOUBLE_COUNT	1
+//#define DOUBLE_COUNT	1
 
 /*
  =======================================================================================================================
@@ -928,7 +924,7 @@ void Init_VI_Counter(int tv_type)
 		max_vi_count = NTSC_VI_MAGIC_NUMBER;	/* 883120;//813722;//813196;//NTSC_VI_MAGIC_NUMBER; */
 		max_vi_lines = NTSC_MAX_VI_LINE;
 	}
-
+	max_vi_count *= DOUBLE_COUNT;
 	vi_count_per_line = max_vi_count / max_vi_lines;
 }
 
@@ -939,6 +935,7 @@ void Init_VI_Counter(int tv_type)
 void Set_VI_Counter_By_VSYNC(void)
 {
 	max_vi_count = (VI_V_SYNC_REG + 1) * 1500;
+	max_vi_count *= DOUBLE_COUNT;
 	if((VI_V_SYNC_REG % 1) != 0)
 	{
 		max_vi_count -= 38;

@@ -110,10 +110,7 @@ DWORD DoRspCycles( DWORD cycles )
 	if( _DoRspCycles )
 	{
 		DWORD retval;
-		DWORD sp_pc_save = SP_PC_REG;
-		SP_PC_REG &= 0xFFC;
 		retval = _DoRspCycles(cycles);
-		SP_PC_REG = sp_pc_save;
 		return retval;
 	}
 	else

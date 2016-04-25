@@ -60,7 +60,7 @@ unsigned char	Scratch0[700];
 unsigned char	Scratch1[700];
 unsigned char	Scratch2[700];
 unsigned char	DistConditions[800];	/* GNU Redistribution Conditions */
-
+extern float DOUBLE_COUNT;
 
 unsigned int		cfmenulist[8] = {
 	ID_CF_CF1,	ID_CF_CF2,	ID_CF_CF3,	ID_CF_CF4,
@@ -138,6 +138,7 @@ void					LoadROMSpecificPlugins();
 void					SetXPThemes(DWORD flag);
 void					ProcessToolTips(LPARAM lParam);
 BOOL					LinkBoxArtImageByDialog(void);
+void					SetOCOptions(void);
 
 typedef struct {
 	UINT	id;
@@ -292,7 +293,7 @@ void CALLBACK TimerProc(HWND hwnd, UINT uMsg, UINT idEvent, DWORD dwTime)
 					{
 						TranslateMessage(&msg);
 						DispatchMessage(&msg);
-                        Sleep(10);
+                        Sleep(1);
 					}
 				}
 			}
@@ -637,7 +638,7 @@ int APIENTRY aWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCm
 	if(hPrevInstance) return FALSE;
 	SaveCmdLineParameter(lpszCmdLine);
 
-	gui.szBaseWindowTitle = "1964 1.0";
+	gui.szBaseWindowTitle = "1964 1.1 X";
 	gui.hwnd1964main = NULL;		/* handle to main window */
 	gui.hwndRomList = NULL;			/* Handle to the rom list child window */
 	gui.hStatusBar = NULL;			/* Window Handle of the status bar */
@@ -656,6 +657,7 @@ int APIENTRY aWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCm
 	emustatus.Emu_Is_Paused = FALSE;
 	emustatus.Emu_Keep_Running = FALSE;
 	emustatus.processing_exception = FALSE;
+	DWORD dwTempOC=REGISTRY_ReadDWORD("OCSpeed",100);
 
 	if( REGISTRY_ReadDWORD("1964RunningStatus", FALSE) == TRUE )
 	{
@@ -810,6 +812,7 @@ int APIENTRY aWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCm
     Set_Ready_Message();
 	RomListLoadCurrentPosFromRegistry();
 	SetFocus(gui.hwnd1964main);
+	SetOCOptions();
 
     //DisplayError("Note: This is a debug build of 1964. Be sure to disable these messageboxes for release by disabling the DisplayError() function.");
    
@@ -837,7 +840,7 @@ _HOPPITY:
 		{
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
-            Sleep(10);
+            Sleep(1);
 		}
 	}
 	else
@@ -846,6 +849,37 @@ _HOPPITY:
 	}
 
 	goto _HOPPITY;
+}
+
+void SetOCOptions(void)
+{
+	CheckMenuItem( gui.hMenu1964main,ID_OVERCLOCK_25MHZ, MF_UNCHECKED);
+	CheckMenuItem( gui.hMenu1964main,ID_OVERCLOCK_50MHZ, MF_UNCHECKED);
+	CheckMenuItem( gui.hMenu1964main,ID_OVERCLOCK_100MHZ, MF_UNCHECKED);
+	CheckMenuItem( gui.hMenu1964main,ID_OVERCLOCK_200MHZ, MF_UNCHECKED);
+	CheckMenuItem( gui.hMenu1964main,ID_OVERCLOCK_300MHZ, MF_UNCHECKED);
+	CheckMenuItem( gui.hMenu1964main,ID_OVERCLOCK_400MHZ, MF_UNCHECKED);
+	CheckMenuItem( gui.hMenu1964main,ID_OVERCLOCK_500MHZ, MF_UNCHECKED);
+	CheckMenuItem( gui.hMenu1964main,ID_OVERCLOCK_600MHZ, MF_UNCHECKED);
+
+	if(DOUBLE_COUNT == 0.25f)
+		CheckMenuItem( gui.hMenu1964main, ID_OVERCLOCK_25MHZ, MF_CHECKED);
+	else if(DOUBLE_COUNT == 0.5f)
+		CheckMenuItem( gui.hMenu1964main, ID_OVERCLOCK_50MHZ, MF_CHECKED);
+	else if(DOUBLE_COUNT == 1.0f)
+		CheckMenuItem( gui.hMenu1964main, ID_OVERCLOCK_100MHZ, MF_CHECKED);
+	else if(DOUBLE_COUNT == 2.0f)
+		CheckMenuItem( gui.hMenu1964main, ID_OVERCLOCK_200MHZ, MF_CHECKED);
+	else if(DOUBLE_COUNT == 3.0f)
+		CheckMenuItem( gui.hMenu1964main, ID_OVERCLOCK_300MHZ, MF_CHECKED);
+	else if(DOUBLE_COUNT == 4.0f)
+		CheckMenuItem( gui.hMenu1964main, ID_OVERCLOCK_400MHZ, MF_CHECKED);
+	else if(DOUBLE_COUNT == 5.0f)
+		CheckMenuItem( gui.hMenu1964main, ID_OVERCLOCK_500MHZ, MF_CHECKED);
+	else if(DOUBLE_COUNT == 6.0f)
+		CheckMenuItem( gui.hMenu1964main, ID_OVERCLOCK_600MHZ, MF_CHECKED);
+
+	REGISTRY_WriteDWORD("OCSpeed",(DWORD)(DOUBLE_COUNT*100));	
 }
 
 /*
@@ -865,7 +899,7 @@ HWND InitWin98UI(HANDLE hInstance, int nCmdShow)
 	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
 	wc.hbrBackground = (HBRUSH) GetStockObject(BLACK_BRUSH);
 	wc.lpszMenuName = "WINGUI_MENU";
-	wc.lpszClassName = "WinGui";
+	wc.lpszClassName = "Project64";
 	RegisterClass(&wc);
 
 	guistatus.clientwidth = REGISTRY_ReadDWORD("ClientWindowWidth", 640);
@@ -879,7 +913,7 @@ HWND InitWin98UI(HANDLE hInstance, int nCmdShow)
 
 	gui.hwnd1964main = CreateWindow
 		(
-			"WinGui",
+			"Project64",
 			gui.szBaseWindowTitle,
 			WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN,
 			guistatus.window_position.left,
@@ -1203,9 +1237,7 @@ MF_UNCHECKED :
 		{
 			if(emustatus.Emu_Is_Running)
 			{
-				SuspendThread(CPUThreadHandle);
 				AUDIO_DllConfig(hWnd);
-				ResumeThread(CPUThreadHandle);
 			}
 			else
 			{
@@ -1518,6 +1550,47 @@ MF_UNCHECKED :
 	case ID_EXIT:
 		Exit1964();
 		break;
+
+	case ID_OVERCLOCK_25MHZ:
+		DOUBLE_COUNT = 0.25f;
+		SetOCOptions();
+		break;
+
+	case ID_OVERCLOCK_50MHZ:
+		DOUBLE_COUNT = 0.5f;
+		SetOCOptions();
+		break;
+
+	case ID_OVERCLOCK_100MHZ:
+		DOUBLE_COUNT = 1.0f;
+		SetOCOptions();
+		break;
+
+	case ID_OVERCLOCK_200MHZ:
+		DOUBLE_COUNT = 2.0f;
+		SetOCOptions();
+		break;
+
+	case ID_OVERCLOCK_300MHZ:
+		DOUBLE_COUNT = 3.0f;
+		SetOCOptions();
+		break;
+
+	case ID_OVERCLOCK_400MHZ:
+		DOUBLE_COUNT = 4.0f;
+		SetOCOptions();
+		break;
+
+	case ID_OVERCLOCK_500MHZ:
+		DOUBLE_COUNT = 5.0f;
+		SetOCOptions();
+		break;
+
+	case ID_OVERCLOCK_600MHZ:
+		DOUBLE_COUNT = 6.0f;
+		SetOCOptions();
+		break;
+
 	default:
 		if( LOWORD(wParam) >= NEW_LANGUAGE_MENU_START && LOWORD(wParam) < NEW_LANGUAGE_MENU_START + 200 )
 		{
@@ -1667,7 +1740,7 @@ void ProcessKeyboardInput(UINT message, WPARAM wParam, LPARAM lParam)
 	}
 }
 
-int			MenuCausedPause = FALSE;
+//int MenuCausedPause = FALSE;
 
 /*
  =======================================================================================================================
@@ -1831,39 +1904,39 @@ long FAR PASCAL MainWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 		ProcessMenuCommand(hWnd, message, wParam, lParam);
 	break;
 
-	case WM_INITMENUPOPUP:
-		if (MenuCausedPause)
-		{
-			if(guioptions.ok_to_pause_at_menu)
-			if(emustatus.Emu_Is_Running && !emustatus.Emu_Is_Paused )
-			{
-				PauseEmulator();
-			}
-			emustatus.Emu_Is_Paused = 1;
-		}
-	break;
-	case WM_ENTERMENULOOP:
-	// To pause game when user enters the menu bar
-	{
-		if (emustatus.Emu_Is_Running && !emustatus.Emu_Is_Paused && Kaillera_Is_Running == FALSE )
-			MenuCausedPause = 1;
-	}
-	break;
-
-	case WM_EXITMENULOOP:
-		/* To resume game when user leaves the menu bar */
-		if( NeedToApplyXPTheme == TRUE )
-		{
-			NeedToApplyXPTheme = FALSE;
-			SetXPThemes(7);
-		}
-
-		if(guioptions.ok_to_pause_at_menu && MenuCausedPause)
-		{
-			ResumeEmulator(DO_NOTHING_AFTER_PAUSE);
-			MenuCausedPause = 0;
-		}
-	break;
+//	case WM_INITMENUPOPUP:
+//		if (MenuCausedPause)
+//		{
+//			if(guioptions.ok_to_pause_at_menu)
+//			if(emustatus.Emu_Is_Running && !emustatus.Emu_Is_Paused )
+//			{
+//				PauseEmulator();
+//			}
+//			emustatus.Emu_Is_Paused = 1;
+//		}
+//	break;
+//	case WM_ENTERMENULOOP:
+//	// To pause game when user enters the menu bar
+//	{
+//		if (emustatus.Emu_Is_Running && !emustatus.Emu_Is_Paused && Kaillera_Is_Running == FALSE )
+//			MenuCausedPause = 1;
+//	}
+//	break;
+//
+//	case WM_EXITMENULOOP:
+//		/* To resume game when user leaves the menu bar */
+//		if( NeedToApplyXPTheme == TRUE )
+//		{
+//			NeedToApplyXPTheme = FALSE;
+//			SetXPThemes(7);
+//		}
+//
+//		if(guioptions.ok_to_pause_at_menu && MenuCausedPause)
+//		{
+//			ResumeEmulator(DO_NOTHING_AFTER_PAUSE);
+//			MenuCausedPause = 0;
+//		}
+//	break;
 
 	case WM_CLOSE:
 		Exit1964();
@@ -1992,7 +2065,7 @@ void __cdecl Play(BOOL WithFullScreen)
 		if(emustatus.Emu_Is_Running) 
 		{
 			Stop();
-            Sleep(1000); //Fix for Reset: if user holds down F2 long time it works, and does not crash.
+            Sleep(500); //Fix for Reset: if user holds down F2 long time it works, and does not crash.
 		}
 
 
@@ -2083,8 +2156,8 @@ void __cdecl Play(BOOL WithFullScreen)
 		CPUThreadHandle = CreateThread(NULL,0,(LPTHREAD_START_ROUTINE)StartCPUThread,NULL,0, &ThreadID);
 
 
-		sprintf(generalmessage, "%s - %s", gui.szWindowTitle, TranslateStringByString("Running"));
-		SetWindowText(gui.hwnd1964main, generalmessage);
+	//	sprintf(generalmessage, "%s - %s", gui.szWindowTitle, TranslateStringByString("Running"));
+	//	SetWindowText(gui.hwnd1964main, generalmessage);
 
 		if(WithFullScreen && (emustatus.Emu_Is_Resetting == 0))
 		{
@@ -2563,9 +2636,9 @@ BOOL __cdecl WinLoadRomStep2(char *szFileName)
 	gHWS_pc = 0xA4000040;	/* We do it in r4300i_inithardware */
 	
 	UpdateCIC();
-	sprintf(generalmessage, "%s - %s", gui.szWindowTitle, TranslateStringByString("Loaded"));
-	SetWindowText(gui.hwnd1964main, generalmessage);
-	Set_Ready_Message();
+//	sprintf(generalmessage, "%s - %s", gui.szWindowTitle, TranslateStringByString("Loaded"));
+//	SetWindowText(gui.hwnd1964main, generalmessage);
+//	Set_Ready_Message();
 	
 	EnableMenuItem(gui.hMenu1964main, ID_ROM_PAUSE, MF_GRAYED);
 	return TRUE;
@@ -4005,8 +4078,8 @@ void AfterStop(void)
 	ShowWindow(gui.hStatusBar, SW_SHOW);
 	SetStatusBarText(3, defaultoptions.RDRAM_Size == RDRAMSIZE_4MB ? "4MB" : "8MB");
 
-	sprintf(generalmessage, "%s - %s", gui.szWindowTitle, TranslateStringByString("Stopped"));
-	SetWindowText(gui.hwnd1964main, generalmessage);
+//	sprintf(generalmessage, "%s - %s", gui.szWindowTitle, TranslateStringByString("Stopped"));
+//	SetWindowText(gui.hwnd1964main, generalmessage);
 	
 	Set_Ready_Message();
 	SetStatusBarText(1, " 0 VI/s");

@@ -138,9 +138,26 @@ void					Set_SI_IO_Timer_Event(unsigned __int32 len);
 void					Set_VI_Timer_Event(unsigned __int32 len);
 void					Set_Delay_AI_Interrupt_Timer_Event(unsigned __int32 delay);
 void					Trigger_Timer_Event(void);
+void                    Add_New_Timer_Event(uint64 newtimer, int type);
 BOOL					Is_CPU_Doing_Other_Tasks(void);
 
 void					Init_Count_Down_Counters(void);
+
+enum COUNTER_TARGET_TYPE
+{
+	VI_COUNTER_TYPE,
+	COMPARE_COUNTER_TYPE,
+	PI_DMA_COUNTER_TYPE,
+	SI_DMA_COUNTER_TYPE,
+	SI_IO_COUNTER_TYPE,
+	SP_DMA_COUNTER_TYPE,
+	SP_DLIST_COUNTER_TYPE,
+	SP_ALIST_COUNTER_TYPE,
+	CHECK_INTERRUPT_COUNTER_TYPE,
+	DELAY_AI_INTERRUPT_COUNTER_TYPE,
+	DP_DLIST_COUNTER_TYPE,
+	RSP_Timer
+};
 
 #ifdef SAVEOPCOUNTER
 #define SAVE_OP_COUNTER_INCREASE(val)				SUB_ImmToMemory((_u32) & countdown_counter, val);
