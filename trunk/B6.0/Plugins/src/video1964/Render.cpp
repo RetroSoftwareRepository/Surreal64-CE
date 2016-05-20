@@ -1315,7 +1315,7 @@ void CRender::SetVertexTextureUVCoord(TLITVERTEX &v, float fTex0S, float fTex0T)
 }
 void CRender::SetVertexTextureUVCoord(TLITVERTEX &v, float fTex0S, float fTex0T, float fTex1S, float fTex1T)
 {
-	if( options.enableHackForGames == HACK_FOR_ZELDA && m_Mux == 0x00262a60150c937f && gRSP.curTile == 0 )
+	if( (options.enableHackForGames == HACK_FOR_ZELDA||options.enableHackForGames == HACK_FOR_ZELDA_MM) && m_Mux == 0x00262a60150c937f && gRSP.curTile == 0 )
 	{
 		// Hack for Zelda Sun
 		Tile &t0 = gRDP.tiles[0];
