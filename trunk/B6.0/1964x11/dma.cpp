@@ -278,7 +278,7 @@ void FastPIMemoryCopy(void)
 // AIO RP
 
 	// added by oDD
-	if (1)//CheckIfInRom(PIDMASourceAddress))
+	if (CheckIfInRom(PIDMASourceAddress))
 	{
 		target = (uint32) PMEM_READ_UWORD(PIDMATargetAddress);
 		source = (uint32) PIDMASourceAddress;
@@ -290,23 +290,23 @@ void FastPIMemoryCopy(void)
 	}
 
 	len = PIDMALength;
-	if(1)//(CheckIfInRom(PIDMASourceAddress))
+	if(CheckIfInRom(PIDMASourceAddress))
 	{
 		if((target & 3) == 0 && (source & 3) == 0 && (len & 3) == 0)		/* DWORD align */
 		{
 		// Cannot read from file, need to use ASM routine...
 		// Why? Reading slow, or len too large?
-		{
+		/*{
 			FILE *tmpFile = fopen(g_temporaryRomPath, "rb");
 			fseek(tmpFile, 0, SEEK_SET);
 			fread((void*)target, sizeof(uint8), len, tmpFile);
 			fclose(tmpFile);
-		}
+		}*/
 			
 			/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-			//int i = -(((__int32) len) >> 2);
+			int i = -(((__int32) len) >> 2);
 			/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-/*
+
 			__asm
 			{
 				pushad
@@ -337,7 +337,7 @@ void FastPIMemoryCopy(void)
 			}
 
 			return;
-*/
+
 		}
 		else if((target & 1) == 0 && (source & 1) == 0 && (len & 1) == 0)	/* WORD align */
 		{
