@@ -647,6 +647,27 @@ bool CalculateTileSizes_method_2(int tileno, TMEMLoadMapInfo *info, TxtrInfo &gt
 		gti.TopToLoad = (info->tl<<info->dwSize)>>tile.dwSize;
 	}
 
+	if( options.enableHackForGames == HACK_FOR_MARIO_KART )
+	{
+		if( loadwidth-maskwidth == 1 && tile.dwMaskS )
+		{
+			loadwidth--;
+			if( loadheight%2 )	loadheight--;
+		}
+
+		if( loadheight-maskheight == 1 && tile.dwMaskT )
+		{
+			loadheight--;
+			if(loadwidth%2)	loadwidth--;
+		}
+
+		if( loadwidth - ((g_TI.dwWidth<<g_TI.dwSize)>>tile.dwSize) == 1 )
+		{
+			loadwidth--;
+			if( loadheight%2 )	loadheight--;
+		}
+	}
+
 	// Limit the texture size
 	if( g_curRomInfo.bUseSmallerTexture )
 	{
