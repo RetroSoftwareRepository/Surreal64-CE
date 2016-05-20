@@ -2575,7 +2575,7 @@ HRESULT CD3DDevWrapper::SetRenderState(D3DRENDERSTATETYPE State,DWORD Value)
 {
 	if( m_pD3DDev != NULL )
 	{
-#ifndef _RICE612
+#ifndef _XBOX // Confirmed needed on Xbox
 		if( m_savedRenderStates[State] != Value )
 #else
 		if (m_savedRenderStates[State] != Value || !m_savedRenderStates[State])
@@ -2672,7 +2672,7 @@ HRESULT CD3DDevWrapper::SetPixelShaderConstant(DWORD Register, float* pfdata)
 {
 	if( m_pD3DDev != NULL )
 	{
-#ifndef _RICE612
+#ifndef _XBOX // Confirmed needed on Xbox
 		if( m_savedPixelShaderConstants[Register][0] != pfdata[0] ||
 			m_savedPixelShaderConstants[Register][1] != pfdata[1] ||
 			m_savedPixelShaderConstants[Register][2] != pfdata[2] ||
@@ -2698,7 +2698,7 @@ HRESULT CD3DDevWrapper::SetViewport(MYD3DVIEWPORT* pViewport)
 {
 	if( m_pD3DDev != NULL )
 	{
-#ifndef _RICE612
+#ifndef _XBOX // Confirmed needed on Xbox
 		if( m_savedViewport.X		!= pViewport->X ||
 			m_savedViewport.Y		!= pViewport->Y ||
 			m_savedViewport.Width	!= pViewport->Width ||
@@ -2755,7 +2755,7 @@ HRESULT CD3DDevWrapper::SetVertexShader(DWORD Handle)
 {
 	if( m_pD3DDev != NULL )
 	{
-#ifndef _RICE612
+#ifndef _XBOX // Confirmed needed on Xbox
 		if( m_savedVertexShaderHander != Handle )
 #endif
 		{

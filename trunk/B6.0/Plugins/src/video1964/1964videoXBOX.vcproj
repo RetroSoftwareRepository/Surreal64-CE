@@ -61,7 +61,7 @@
 				OmitFramePointers="TRUE"
 				OptimizeForProcessor="2"
 				AdditionalIncludeDirectories="..\..\..\Include"
-				PreprocessorDefinitions="NDEBUG;_XBOX;_LIB;_OLDCLIPPER;_XBOX_HACK;_RICE612;_XBOX_HACK2"
+				PreprocessorDefinitions="NDEBUG;_XBOX;_LIB;_OLDCLIPPER;_XBOX_HACK;_XBOX_HACK2"
 				StringPooling="TRUE"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="TRUE"
