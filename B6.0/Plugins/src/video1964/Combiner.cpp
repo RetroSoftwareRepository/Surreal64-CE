@@ -20,8 +20,6 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "stdafx.h"
 
 
-//static BOOL g_bHiliteRGBAHack = FALSE;
-#ifndef _XBOX // Excluded in Rice 6.11
 const char * sc_colcombtypes32[32] =
 {
 	"Combined    ", "Texel0      ",
@@ -59,9 +57,7 @@ const char *sc_colcombtypes8[8] =
 	"Shade       ", "Environment ",
 	"1           ", "0           ",
 };
-#endif
 
-#ifdef _DEBUG
 char *constStrs[] = {
 	"MUX_0",
 	"MUX_1",
@@ -101,7 +97,6 @@ char* constStr(uint32 op)
 		return "Invalid-Const";
 	}
 }
-#endif
 
 void swap(uint8 &a, uint8 &b)
 {

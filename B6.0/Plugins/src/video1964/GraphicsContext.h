@@ -63,8 +63,12 @@ public:
 	virtual int ToggleFullscreen()=0;		// return 0 as the result is windowed
 
 	// Render-To-Texture functions
+#ifdef _RICE560
+	virtual int SetTextureBuffer(SetImgInfo &CIinfo, int ciInfoIdx=-1, bool toSaveBackBuffer=false);
+#else
 	virtual void SetTextureBuffer(void);
 	virtual int SetBackBufferAsTextureBuffer(SetImgInfo &CIinfo, int ciInfoIdx);
+#endif
 	virtual bool IsRenderingToTexture() {return m_isRenderingToTexture;}
 	virtual void CloseTextureBuffer(bool toSave);
 	virtual void RestoreNormalBackBuffer();					// restore the normal back buffer
@@ -73,7 +77,9 @@ public:
 	int			 CheckTxtrBufsWithNewCI(SetImgInfo &CIinfo, uint32 height, bool byNewTxtrBuf);
 	void		 LoadTextureFromTextureBuffer(TxtrCacheEntry* pEntry, int infoIdx);
 	virtual void StoreTextureBufferToRDRAM(int infoIdx = -1) {}
+#ifndef _DISABLE_VID1964
 	virtual void FirstDrawToNewCI(void);
+#endif
 	uint32		 ComputeTextureBufferCRCInRDRAM(int infoIdx);
 
 	// Frame buffer functions

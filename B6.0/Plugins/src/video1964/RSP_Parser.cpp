@@ -20,6 +20,20 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "stdafx.h"
 
 #include "ucode.h"
+#ifdef _XBOX
+//#include "menu/menumain.h"
+extern void RunIngameMenu();
+
+extern BOOL _INPUT_IsIngameMenuWaiting();
+extern BOOL _INPUT_UpdatePaks();
+extern BOOL _INPUT_UpdateControllerStates();
+extern void _INPUT_RumblePause(bool bPause);
+extern "C" BOOL __EMU_AudioMute(BOOL Mute);
+extern "C" int ReInitVirtualDynaMemory(boolean charge);
+extern int TextureMode;
+extern int FrameSkip;
+extern BOOL bReadyToLoad;
+#endif
 
 //////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////
@@ -559,12 +573,12 @@ static uint32 DLParser_IdentifyUcodeFromString( const CHAR * str_ucode )
 	const CHAR str_ucode0[] = "RSP SW Version: 2.0";
 	const CHAR str_ucode1[] = "RSP Gfx ucode ";
 
-	if ( strnicmp( str_ucode, str_ucode0, strlen(str_ucode0) ) == 0 )
+	if ( _strnicmp( str_ucode, str_ucode0, strlen(str_ucode0) ) == 0 )
 	{
 		return 0;
 	}
 
-	if ( strnicmp( str_ucode, str_ucode1, strlen(str_ucode1) ) == 0 )
+	if ( _strnicmp( str_ucode, str_ucode1, strlen(str_ucode1) ) == 0 )
 	{
 		if( strstr(str_ucode,"1.") != 0 )
 		{
@@ -703,8 +717,12 @@ uint32 DLParser_CheckUcode(uint32 ucStart, uint32 ucDStart, uint32 ucSize, uint3
 extern int dlistMtxCount;
 extern bool bHalfTxtScale;
 
-void DLParser_Process(OSTask * pTask)
+void DLParser_Process()
 {
+#ifdef _XBOX
+	BOOL menuWaiting = FALSE;
+	BOOL MuteAudio = FALSE;
+#endif
 	static int skipframe=0;
 
 	dlistMtxCount = 0;
@@ -734,10 +752,20 @@ void DLParser_Process(OSTask * pTask)
 		CGraphicsContext::g_pGraphicsContext->CheckTxtrBufsCRCInRDRAM();
 	}
 
-	g_pOSTask = pTask;
 	
+#ifdef _XBOX
+	status.bScreenIsDrawn = true;
+#endif
+
 	status.gRDPTime = timeGetTime();
-	status.gDlistCount++;
+	status.gDlistCount++;	
+
+	OSTask * pTask = (OSTask *)(g_GraphicsInfo.DMEM + 0x0FC0);
+	uint32 code_base = (uint32)pTask->t.ucode & 0x1fffffff;
+	uint32 code_size = pTask->t.ucode_size;
+	uint32 data_base = (uint32)pTask->t.ucode_data & 0x1fffffff;
+	uint32 data_size = pTask->t.ucode_data_size;
+	uint32 stack_size = pTask->t.dram_stack_size >> 6;
 
 	if ( lastUcodeInfo.ucStart != (uint32)(pTask->t.ucode) )
 	{
@@ -771,6 +799,7 @@ void DLParser_Process(OSTask * pTask)
 
 	SetVIScales();
 	CRender::g_pRender->RenderReset();
+	CRender::g_pRender->ResetMatrices(stack_size);
 	CRender::g_pRender->BeginRendering();
 	CRender::g_pRender->SetViewport(0, 0, windowSetting.uViWidth, windowSetting.uViHeight, 0x3FF);
 	CRender::g_pRender->SetFillMode(options.bWinFrameMode? RICE_FILLMODE_WINFRAME : RICE_FILLMODE_SOLID);
@@ -798,8 +827,64 @@ void DLParser_Process(OSTask * pTask)
 		TriggerDPInterrupt();
 	}
 
-	CRender::g_pRender->EndRendering();
 
+
+
+#ifdef _XBOX
+	bReadyToLoad = TRUE;
+	if (_INPUT_IsIngameMenuWaiting())
+	{
+		bool Memdecommit = 0;
+		MEMORYSTATUS ms;
+		GlobalMemoryStatus(&ms);	
+		
+		// Clear Rice's textures before loading the menu.
+		bPurgeOldBeforeIGM = TRUE;
+		gTextureManager.PurgeOldTextures();
+		gTextureManager.CleanUp();
+		RDP_Cleanup();
+				
+		// Disable any active rumble
+		_INPUT_RumblePause(true);
+
+		//Mute 1964audio
+		MuteAudio = __EMU_AudioMute(TRUE);
+
+		// Check free memory and decommit dynablock if necessary.
+		if (ms.dwAvailPhys < (8*1024*1024))
+		{
+			if(ReInitVirtualDynaMemory(false))
+			{
+				Memdecommit = 1;
+				RunIngameMenu();
+			}
+		}
+		else
+		{
+			RunIngameMenu();
+		}
+		
+		// Restore dynablock if we previously decommitted.
+		while(Memdecommit)
+		{
+			if(ReInitVirtualDynaMemory(true))
+				Memdecommit = 0;
+		}
+
+		// Update settings that the menu changed
+		options.forceTextureFilter=TextureMode;
+		_INPUT_UpdatePaks();
+		_INPUT_UpdateControllerStates();
+		
+		// Reenable rumble
+		_INPUT_RumblePause(false);
+
+		//UnMute 1964audio
+		if(MuteAudio != FALSE)
+			__EMU_AudioMute(FALSE);
+	}
+#endif
+	CRender::g_pRender->EndRendering();
 	if( gRSP.ucode >= 17)
 		TriggerDPInterrupt();
 	TriggerSPInterrupt();
@@ -862,6 +947,7 @@ void RSP_GFX_InitGeometryMode()
 void DLParser_SetKeyGB(Gfx *gfx)
 {
 	DP_Timing(DLParser_SetKeyGB);
+
 
 	gRDP.keyB = ((gfx->words.w1)>>8)&0xFF;
 	gRDP.keyG = ((gfx->words.w1)>>24)&0xFF;
@@ -1025,11 +1111,15 @@ void DLParser_SetScissor(Gfx *gfx)
 
 		}
 	}
-
+#ifndef _RICE560
 	if( gRDP.scissor.left != tempScissor.left || gRDP.scissor.top != tempScissor.top ||
 		gRDP.scissor.right != tempScissor.right || gRDP.scissor.bottom != tempScissor.bottom ||
 		gRSP.real_clip_scissor_left != tempScissor.left || gRSP.real_clip_scissor_top != tempScissor.top ||
 		gRSP.real_clip_scissor_right != tempScissor.right || gRSP.real_clip_scissor_bottom != tempScissor.bottom)
+#else
+	if( gRDP.scissor.left != tempScissor.left || gRDP.scissor.top != tempScissor.top ||
+		gRDP.scissor.right != tempScissor.right || gRDP.scissor.bottom != tempScissor.bottom )
+#endif
 	{
 		memcpy(&(gRDP.scissor), &tempScissor, sizeof(ScissorType) );
 		if( !status.bHandleN64TextureBuffer )
@@ -1148,8 +1238,11 @@ void DLParser_FillRect(Gfx *gfx)
 	}
 	else if( status.bHandleN64TextureBuffer )
 	{
+#ifndef _DISABLE_VID1964
 		if( !status.bCIBufferIsRendered ) CGraphicsContext::g_pGraphicsContext->FirstDrawToNewCI();
-
+#else
+		status.bCIBufferIsRendered = true;
+#endif
 		status.leftRendered = status.leftRendered<0 ? x0 : min((int)x0,status.leftRendered);
 		status.topRendered = status.topRendered<0 ? y0 : min((int)y0,status.topRendered);
 		status.rightRendered = status.rightRendered<0 ? x1 : max((int)x1,status.rightRendered);
@@ -1221,15 +1314,25 @@ void DLParser_FillRect(Gfx *gfx)
 	{
 		if( frameBufferOptions.bSupportTxtBufs || frameBufferOptions.bCheckBackBufs )
 		{
+#ifndef _DISABLE_VID1964
 			if( !status.bCIBufferIsRendered ) CGraphicsContext::g_pGraphicsContext->FirstDrawToNewCI();
-
+#else
+			status.bCIBufferIsRendered = true;
+#endif
 			status.leftRendered = status.leftRendered<0 ? x0 : min((int)x0,status.leftRendered);
 			status.topRendered = status.topRendered<0 ? y0 : min((int)y0,status.topRendered);
 			status.rightRendered = status.rightRendered<0 ? x1 : max((int)x1,status.rightRendered);
 			status.bottomRendered = status.bottomRendered<0 ? y1 : max((int)y1,status.bottomRendered);
+#ifdef _RICE560			
+			CGraphicsContext::g_pGraphicsContext->CheckTxtrBufsWithNewCI(g_CI,gRDP.scissor.bottom,false);
+#endif
 		}
 
+#ifdef _RICE612
+		if(1)
+#else
 		if( gRDP.otherMode.cycle_type == CYCLE_TYPE_FILL )
+#endif
 		{
 			if( !status.bHandleN64TextureBuffer || g_pTextureBufferInfo->CI_Info.dwSize == TXT_SIZE_16b )
 			{

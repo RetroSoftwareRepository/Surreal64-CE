@@ -90,5 +90,7 @@ extern char szPathSkins[MAX_FILE_PATH];
 extern char szPathSaves[MAX_FILE_PATH];
 extern char szPathScreenshots[MAX_FILE_PATH];
 
+#ifndef INVALID_FILE_ATTRIBUTES
 #define INVALID_FILE_ATTRIBUTES ((DWORD)-1)
-extern bool PathFileExists(const char *pszPath);
+#endif
+extern BOOL PathFileExists(const char *pszPath);

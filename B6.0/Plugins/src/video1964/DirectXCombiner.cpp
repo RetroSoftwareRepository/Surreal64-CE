@@ -399,7 +399,9 @@ void CDirectXColorCombiner::InitCombinerCycleCopy(void)
 	gD3DDevWrapper.SetRenderState(D3DRS_ALPHABLENDENABLE,FALSE);
 	gD3DDevWrapper.SetRenderState(D3DRS_ALPHATESTENABLE,TRUE);
 	
+#ifndef _XBOX
 	SetNumStages(0);
+#endif
 	m_pD3DRender->m_curCombineInfo.stages[0].bTextureUsed = true;
 	m_pD3DRender->m_curCombineInfo.nStages = 1;
 
@@ -424,11 +426,8 @@ void CDirectXColorCombiner::InitCombinerCycle12(void)
 
 	BOOL AlphaIsEnable = (m_pD3DRender->m_curCombineInfo.blendingFunc!=DISABLE_ALPHA&&m_pD3DRender->m_curCombineInfo.blendingFunc!=DISABLE_BOTH);
 
-#ifndef _XBOX
 	if( !AlphaIsEnable ) 
-
 		gD3DDevWrapper.SetRenderState(D3DRS_ALPHABLENDENABLE,AlphaIsEnable);
-#endif
 
 	if( m_pD3DRender->m_curCombineInfo.blendingFunc==DISABLE_ALPHA )	//Disable Alpha Channel
 	{
@@ -522,7 +521,7 @@ void CDirectXColorCombiner::InitCombinerCycle12(void)
 					gD3DDevWrapper.SetTextureStageState( i, D3DTSS_ALPHAARG0, m_pD3DRender->m_curCombineInfo.stages[i].alphaOp.Arg0 );
 				}
 			}
-#ifdef _XBOX
+#ifndef _RICE560
 			else
 			{
 				gD3DDevWrapper.SetTextureStageState( i, D3DTSS_ALPHAOP, D3DTOP_SELECTARG1 );
@@ -653,7 +652,9 @@ void CDirectXColorCombiner::InitCombinerBlenderForSimpleTextureDraw(uint32 tile)
 	gD3DDevWrapper.SetRenderState(D3DRS_ALPHATESTENABLE,TRUE);
 	//gD3DDevWrapper.SetRenderState(D3DRS_ALPHATESTENABLE,FALSE);
 	
+#ifndef _XBOX
 	SetNumStages(0);
+#endif
 	m_pD3DRender->m_curCombineInfo.stages[0].bTextureUsed = true;
 
 	gD3DDevWrapper.SetTexture( 0, MYLPDIRECT3DTEXTURE(g_textures[tile].m_lpsTexturePtr) );

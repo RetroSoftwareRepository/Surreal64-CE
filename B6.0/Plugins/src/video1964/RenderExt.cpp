@@ -276,7 +276,11 @@ void CRender::LoadSprite2D(Sprite2DInfo &info, uint32 ucode)
 
 void CRender::DrawSprite2D(Sprite2DInfo &info, uint32 ucode)
 {
+#ifndef _DISABLE_VID1964
 	if( !status.bCIBufferIsRendered ) CGraphicsContext::g_pGraphicsContext->FirstDrawToNewCI();
+#else
+	status.bCIBufferIsRendered = true;
+#endif
 
 	if( status.bHandleN64TextureBuffer )
 	{
@@ -352,7 +356,11 @@ void CRender::DrawSprite2D(Sprite2DInfo &info, uint32 ucode)
 
 void CRender::DrawSpriteR(uObjTxSprite &sprite, bool initCombiner, uint32 tile, uint32 left, uint32 top, uint32 width, uint32 height)	// With Rotation
 {
+#ifndef _DISABLE_VID1964
 	if( !status.bCIBufferIsRendered ) CGraphicsContext::g_pGraphicsContext->FirstDrawToNewCI();
+#else
+	status.bCIBufferIsRendered = true;
+#endif
 
 	if( status.bHandleN64TextureBuffer )
 	{
@@ -461,8 +469,11 @@ void CRender::DrawFrameBuffer(bool useVIreg, uint32 left, uint32 top, uint32 wid
 
 void CRender::DrawObjBGCopy(uObjBg &info)
 {
+#ifndef _DISABLE_VID1964
 	if( !status.bCIBufferIsRendered ) CGraphicsContext::g_pGraphicsContext->FirstDrawToNewCI();
-
+#else
+	status.bCIBufferIsRendered = true;
+#endif
 	if( status.bHandleN64TextureBuffer )
 	{
 		g_pTextureBufferInfo->maxUsedHeight = g_pTextureBufferInfo->N64Height;
@@ -525,10 +536,10 @@ void CRender::DrawObjBGCopy(uObjBg &info)
 		DrawSimple2DTexture(x0, y0, x1, y1, u0, v0, 
 			s1/g_textures[0].m_fTexWidth, t1/g_textures[0].m_fTexHeight, difColor, speColor, depth, 1);
 	}
-	else if( x2 > x1 )
+	else if( x2 >= x1 )
 	{
 		float s1 = (x1-x0) + s0;
-		if( y2 > y1 )
+		if( y2 >= y1 )
 		{
 			float t1 = (y1-y0) + t0;
 			DrawSimple2DTexture(x0, y0, x1, y1, u0, v0, 
@@ -544,7 +555,7 @@ void CRender::DrawObjBGCopy(uObjBg &info)
 	}
 	else
 	{
-		if( y2 > y1 )
+		if( y2 >= y1 )
 		{
 			float t1 = (y1-y0) + t0;
 			DrawSimple2DTexture(x0, y0, x2, y1, u0, v0, 
@@ -565,7 +576,11 @@ void CRender::DrawObjBGCopy(uObjBg &info)
 
 void CRender::DrawObjBG1CYC(uObjScaleBg &bg, bool scaled)	//Without Ratation
 {
+#ifndef _DISABLE_VID1964
 	if( !status.bCIBufferIsRendered ) CGraphicsContext::g_pGraphicsContext->FirstDrawToNewCI();
+#else
+	status.bCIBufferIsRendered = true;
+#endif
 
 	if( g_curRomInfo.bDisableObjBG )
 		return;
@@ -620,10 +635,10 @@ void CRender::DrawObjBG1CYC(uObjScaleBg &bg, bool scaled)	//Without Ratation
 		DrawSimple2DTexture(x0, y0, x1, y1, u0, v0, 
 			s1/g_textures[0].m_fTexWidth, t1/g_textures[0].m_fTexHeight, difColor, speColor, depth, 1);
 	}
-	else if( x2 > x1 )
+	else if( x2 >= x1 )
 	{
 		float s1 = (x1-x0)*scaleX + s0;
-		if( y2 > y1 )
+		if( y2 >= y1 )
 		{
 			float t1 = (y1-y0)*scaleY + t0;
 			DrawSimple2DTexture(x0, y0, x1, y1, u0, v0, 
@@ -639,7 +654,7 @@ void CRender::DrawObjBG1CYC(uObjScaleBg &bg, bool scaled)	//Without Ratation
 	}
 	else
 	{
-		if( y2 > y1 )
+		if( y2 >= y1 )
 		{
 			float t1 = (y1-y0)*scaleY + t0;
 			DrawSimple2DTexture(x0, y0, x2, y1, u0, v0, 
@@ -661,8 +676,11 @@ void CRender::DrawObjBG1CYC(uObjScaleBg &bg, bool scaled)	//Without Ratation
 
 void CRender::DrawSprite(uObjTxSprite &sprite, bool rectR)	//Without Ratation
 {
+#ifndef _DISABLE_VID1964
 	if( !status.bCIBufferIsRendered ) CGraphicsContext::g_pGraphicsContext->FirstDrawToNewCI();
-
+#else
+	status.bCIBufferIsRendered = true;
+#endif
 	if( status.bHandleN64TextureBuffer )
 	{
 		g_pTextureBufferInfo->maxUsedHeight = g_pTextureBufferInfo->N64Height;

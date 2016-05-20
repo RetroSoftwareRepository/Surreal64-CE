@@ -18,6 +18,10 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include "stdafx.h"
+#ifdef _XBOX
+#include <d3d8.h>
+#include "../../../config.h"
+#endif
 
 #define RICEFVF_TEXRECTFVERTEX ( D3DFVF_XYZRHW | /*D3DFVF_DIFFUSE |*/ D3DFVF_TEX2 )
 #define RICE_FVF_FILLRECTVERTEX ( D3DFVF_XYZRHW | D3DFVF_DIFFUSE  )
@@ -40,11 +44,35 @@ UVFlagMap DirectXUVFlagMaps[] =
 //*****************************************************************************
 // Creator function for singleton
 //*****************************************************************************
-D3DRender::D3DRender()
+D3DRender::D3DRender() 
 {
 	m_dwrsZEnable=D3DZB_FALSE;
 	m_dwrsZWriteEnable=FALSE;
+#ifdef _INIT_COMBINER
+	memset(&m_D3DCombStages, 0, sizeof(D3DCombinerStage)*8);
 
+	for (int i = 0; i < 8; i++)
+	{
+		m_D3DCombStages[i].dwColorOp = D3DTOP_DISABLE;
+		m_D3DCombStages[i].dwColorArg1 = D3DTA_CURRENT;
+		m_D3DCombStages[i].dwColorArg2 = D3DTA_CURRENT;
+		m_D3DCombStages[i].dwColorArg0 = D3DTA_CURRENT;
+		m_D3DCombStages[i].dwAlphaOp = D3DTOP_DISABLE;
+		m_D3DCombStages[i].dwAlphaArg1 = D3DTA_CURRENT;
+		m_D3DCombStages[i].dwAlphaArg2 = D3DTA_CURRENT;
+		m_D3DCombStages[i].dwAlphaArg0 = D3DTA_CURRENT;
+
+		m_D3DCombStages[i].dwMinFilter = D3DTEXF_NONE;
+		m_D3DCombStages[i].dwMagFilter = D3DTEXF_NONE;
+
+		m_D3DCombStages[i].dwAddressUMode = 0;
+		m_D3DCombStages[i].dwAddressVMode = 0;
+		m_D3DCombStages[i].dwAddressW = 0xFFFF;
+
+		m_D3DCombStages[i].dwTexCoordIndex = 0xFFFF;
+		m_D3DCombStages[i].pTexture = NULL;
+	}
+#endif
 	m_Mux = 0;
 	memset(&m_curCombineInfo, 0, sizeof( m_curCombineInfo) );
 
@@ -101,10 +129,25 @@ bool D3DRender::InitDeviceObjects()
 	gD3DDevWrapper.SetRenderState( D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
 	gD3DDevWrapper.SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
 	
+#ifdef _XBOX
+
+	if(AntiAliasMode>1){
+		gD3DDevWrapper.SetRenderState( D3DRS_MULTISAMPLEANTIALIAS , TRUE);
+	}else if(AntiAliasMode==1){
+		gD3DDevWrapper.SetRenderState( D3DRS_MULTISAMPLEANTIALIAS , FALSE);
+		gD3DDevWrapper.SetRenderState( D3DRS_ALPHABLENDENABLE , TRUE);
+		gD3DDevWrapper.SetRenderState( D3DRS_EDGEANTIALIAS , TRUE);
+	}else{
+		gD3DDevWrapper.SetRenderState( D3DRS_MULTISAMPLEANTIALIAS , FALSE);
+	}
+
+#else
+
 	if( ((CDXGraphicsContext*)CGraphicsContext::g_pGraphicsContext)->IsFSAAEnable() )
 		gD3DDevWrapper.SetRenderState( D3DRS_MULTISAMPLEANTIALIAS , TRUE);
 	else
 		gD3DDevWrapper.SetRenderState( D3DRS_MULTISAMPLEANTIALIAS, FALSE);
+#endif
 
 	// Initialize all the renderstate to our defaults.
 	SetShadeMode( gRSP.shadeMode );
@@ -113,8 +156,15 @@ bool D3DRender::InitDeviceObjects()
 	gD3DDevWrapper.SetRenderState( D3DRS_FOGENABLE, FALSE);
 	float density = 1.0f;
 	gD3DDevWrapper.SetRenderState(D3DRS_FOGDENSITY,   *(uint32 *)(&density));
-	gD3DDevWrapper.SetRenderState(D3DRS_RANGEFOGENABLE, TRUE);
-	gD3DDevWrapper.SetRenderState( D3DRS_FOGTABLEMODE, D3DFOG_LINEAR );
+	
+#ifdef _XBOX
+	if(options.bUseLinearFog)
+		gD3DDevWrapper.SetRenderState( D3DRS_FOGTABLEMODE, D3DFOG_LINEAR );
+	else
+		gD3DDevWrapper.SetRenderState(D3DRS_RANGEFOGENABLE, TRUE);
+#else
+	//gD3DDevWrapper.SetRenderState( D3DRS_FOGTABLEMODE, D3DFOG_LINEAR );
+#endif
 
 	// Dafault is ZBuffer disabled
 	gD3DDevWrapper.SetRenderState(D3DRS_ZENABLE, m_dwrsZEnable );
@@ -126,10 +176,36 @@ bool D3DRender::InitDeviceObjects()
 	m_dwrsZEnable=D3DZB_FALSE;
 	m_dwrsZWriteEnable=FALSE;
 
+#ifdef _INIT_COMBINER
+	memset(&m_D3DCombStages, 0, sizeof(D3DCombinerStage)*8);
+
+	for (int i = 0; i < 8; i++)
+	{
+		m_D3DCombStages[i].dwColorOp = D3DTOP_DISABLE;
+		m_D3DCombStages[i].dwColorArg1 = D3DTA_CURRENT;
+		m_D3DCombStages[i].dwColorArg2 = D3DTA_CURRENT;
+		m_D3DCombStages[i].dwColorArg0 = D3DTA_CURRENT;
+		m_D3DCombStages[i].dwAlphaOp = D3DTOP_DISABLE;
+		m_D3DCombStages[i].dwAlphaArg1 = D3DTA_CURRENT;
+		m_D3DCombStages[i].dwAlphaArg2 = D3DTA_CURRENT;
+		m_D3DCombStages[i].dwAlphaArg0 = D3DTA_CURRENT;
+
+		m_D3DCombStages[i].dwMinFilter = D3DTEXF_NONE;
+		m_D3DCombStages[i].dwMagFilter = D3DTEXF_NONE;
+
+		m_D3DCombStages[i].dwAddressUMode = 0xFFFF;
+		m_D3DCombStages[i].dwAddressVMode = 0xFFFF;
+		m_D3DCombStages[i].dwAddressW = 0xFFFF;
+
+		m_D3DCombStages[i].dwTexCoordIndex = 0xFFFF;
+	}
+#endif
 	m_Mux = 0;
 	memset(&m_curCombineInfo, 0, sizeof( m_curCombineInfo) );
 
+#ifndef _XBOX
 	gD3DDevWrapper.Initalize();
+#endif
 
 	m_dwrsZEnable = 0xEEEE;
 	m_dwrsZWriteEnable = 0xEEEE;
@@ -140,7 +216,11 @@ bool D3DRender::InitDeviceObjects()
 	m_dwrsAlphaRef = 0xEEEE;
 	m_dwrsZBias = 0xEEEE;
 
-	for(int i = 0; i < 8; i++) 
+#ifdef _XBOX
+	for(int i = 0; i < 4; i++) 
+#else
+	for(int i = 0; i < 8; i++) //Crashes with this on XBOX
+#endif
 	{ 
 		// Texturing stuff 
 		D3DSetMinFilter( i, D3DTEXF_LINEAR ); 
@@ -167,9 +247,16 @@ bool D3DRender::InitDeviceObjects()
 	} 
 	
 	((CDirectXColorCombiner*)m_pColorCombiner)->Initialize();
-	
+#ifndef _OLDCLIPPER
 	status.curScissor = UNKNOWN_SCISSOR;
+#endif
 
+#ifdef _XBOX
+	g_pD3DDev->SetTextureStageState(0, D3DTSS_MINFILTER, TextureMode);
+	g_pD3DDev->SetTextureStageState(0, D3DTSS_MAGFILTER, TextureMode);
+	g_pD3DDev->SetFlickerFilter(FlickerFilter);
+	g_pD3DDev->SetSoftDisplayFilter(SoftDisplayFilter);
+#endif
 	return true;	
 }
 
@@ -202,7 +289,8 @@ bool D3DRender::RenderFlushTris()
 	if( options.bForceSoftwareClipper )
 	{
 		ClipVertexes();
-		g_pD3DDev->DrawPrimitiveUP(D3DPT_TRIANGLELIST, g_clippedVtxCount/3, g_clippedVtxBuffer, sizeof(TLITVERTEX));
+		if( g_clippedVtxCount > 0 )
+			g_pD3DDev->DrawPrimitiveUP(D3DPT_TRIANGLELIST, g_clippedVtxCount/3, g_clippedVtxBuffer, sizeof(TLITVERTEX));
 	}
 	else
 	{
@@ -372,13 +460,16 @@ void D3DRender::SetZBias(int bias)
 	}
 }
 
-TextureFilterMap DXTexFilterMap[2]=
+//freakdave
+TextureFilterMap DXTexFilterMap[6]=
 {
+	{FILTER_NONE, D3DTEXF_NONE},
 	{FILTER_POINT, D3DTEXF_POINT},
 	{FILTER_LINEAR, D3DTEXF_LINEAR},
-	//{FILTER_LINEAR, D3DTEXF_ANISOTROPIC},
-	//{FILTER_LINEAR, D3DTEXF_FLATCUBIC},
-	//{FILTER_LINEAR, D3DTEXF_GAUSSIANCUBIC},
+	{FILTER_ANISOTROPIC, D3DTEXF_ANISOTROPIC},
+	//{FILTER_FLATCUBIC, D3DTEXF_FLATCUBIC}, //wtf is going on here ??
+	{FILTER_FLATCUBIC, 4}, //it works this way though,hm,strange...
+	{FILTER_GAUSSIANCUBIC, D3DTEXF_GAUSSIANCUBIC},
 };
 
 void D3DRender::ApplyTextureFilter()
@@ -520,7 +611,8 @@ void D3DRender::SetFogEnable(bool bEnable)
 		gD3DDevWrapper.SetRenderState( D3DRS_FOGENABLE, TRUE);
 		gD3DDevWrapper.SetRenderState(D3DRS_FOGCOLOR, gRDP.fogColor);
 #ifdef _XBOX
-		gD3DDevWrapper.SetRenderState(D3DRS_RANGEFOGENABLE, TRUE);
+		if(!options.bUseLinearFog)
+			gD3DDevWrapper.SetRenderState(D3DRS_RANGEFOGENABLE, TRUE);
 #endif
 		gD3DDevWrapper.SetRenderState(D3DRS_FOGSTART, *(uint32 *)(&gRSPfFogMin));
 		gD3DDevWrapper.SetRenderState(D3DRS_FOGEND,   *(uint32 *)(&gRSPfFogMax));
@@ -567,10 +659,10 @@ void D3DRender::UpdateScissor()
 		MYD3DVIEWPORT vp = {0, 0, (uint32)(width*windowSetting.fMultX), (uint32)(height*windowSetting.fMultY), 0, 1};
 		if( !gRSP.bNearClip )
 			vp.MinZ = -10000;
-
+#ifndef _OLDCLIPPER
 		if( vp.Width+vp.X > (DWORD)windowSetting.uDisplayWidth-1) vp.Width = windowSetting.uDisplayWidth-1-vp.X;
 		if( vp.Height+vp.Y > (DWORD)windowSetting.uDisplayHeight-1) vp.Height = windowSetting.uDisplayHeight-1-vp.Y;
-
+#endif
 		gD3DDevWrapper.SetViewport(&vp);
 	}
 	else
@@ -581,8 +673,9 @@ void D3DRender::UpdateScissor()
 
 void D3DRender::ApplyRDPScissor(bool force)
 {
+#ifndef _OLDCLIPPER
 	if( !force && status.curScissor == RDP_SCISSOR )	return;
-
+#endif
 	if( options.bEnableHacks && g_CI.dwWidth == 0x200 && gRDP.scissor.right == 0x200 && g_CI.dwWidth>(*g_GraphicsInfo.VI_WIDTH_REG & 0xFFF) )
 	{
 		// Hack for RE2
@@ -591,10 +684,10 @@ void D3DRender::ApplyRDPScissor(bool force)
 		MYD3DVIEWPORT vp = {0, 0, (uint32)(width*windowSetting.fMultX), (uint32)(height*windowSetting.fMultY), 0, 1};
 		if( !gRSP.bNearClip )
 			vp.MinZ = -10000;
-
+#ifndef _OLDCLIPPER
 		if( vp.Width+vp.X > (DWORD)windowSetting.uDisplayWidth-1) vp.Width = windowSetting.uDisplayWidth-1-vp.X;
 		if( vp.Height+vp.Y > (DWORD)windowSetting.uDisplayHeight-1) vp.Height = windowSetting.uDisplayHeight-1-vp.Y;
-
+#endif
 		gD3DDevWrapper.SetViewport(&vp);
 	}
 	else
@@ -607,19 +700,22 @@ void D3DRender::ApplyRDPScissor(bool force)
 		};
 		if( !gRSP.bNearClip )
 			vp.MinZ = -10000;
-
+#ifndef _OLDCLIPPER
 		if( vp.Width+vp.X > (DWORD)windowSetting.uDisplayWidth-1) vp.Width = windowSetting.uDisplayWidth-1-vp.X;
 		if( vp.Height+vp.Y > (DWORD)windowSetting.uDisplayHeight-1) vp.Height = windowSetting.uDisplayHeight-1-vp.Y;
-
+#endif
 		gD3DDevWrapper.SetViewport(&vp);
 	}
-
+#ifndef _OLDCLIPPER
 	status.curScissor = RDP_SCISSOR;
+#endif
 }
 
 void D3DRender::ApplyScissorWithClipRatio(bool force)
 {
+#ifndef _OLDCLIPPER
 	if( !force && status.curScissor == RSP_SCISSOR )	return;
+#endif
 
 	MYD3DVIEWPORT vp = {
 		(uint32)(gRSP.real_clip_scissor_left*windowSetting.fMultX), 
@@ -629,12 +725,15 @@ void D3DRender::ApplyScissorWithClipRatio(bool force)
 	};
 	if( !gRSP.bNearClip )
 		vp.MinZ = -10000;
-
+#ifndef _OLDCLIPPER
 	if( vp.Width+vp.X > (DWORD)windowSetting.uDisplayWidth-1) vp.Width = windowSetting.uDisplayWidth-1-vp.X;
 	if( vp.Height+vp.Y > (DWORD)windowSetting.uDisplayHeight-1) vp.Height = windowSetting.uDisplayHeight-1-vp.Y;
-
+#endif
 	gD3DDevWrapper.SetViewport(&vp);
+	
+#ifndef _OLDCLIPPER
 	status.curScissor = RSP_SCISSOR;
+#endif
 }
 
 void D3DRender::BeginRendering(void) 

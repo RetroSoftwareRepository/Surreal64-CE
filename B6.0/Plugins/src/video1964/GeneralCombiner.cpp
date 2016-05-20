@@ -457,21 +457,46 @@ int	CGeneralCombiner::GenCI_Type_A_B_C_D(int curN64Stage, int curStage, GeneralC
 	{
 		if( isTex(m.a) && !isTex(m.c) && curN64Stage == 0 && isTex(m.d) && toTex(m.a) != toTex(m.d) )
 		{
-			op->op = CM_MODULATE;
-			op->Arg1 = m.a;
-			op->Arg2 = m.c;
-			op->Arg0 = CM_IGNORE;
-			gci.stages[curStage].dwTexture = toTex(m.a);
-			textureUsedInStage[curStage][curN64Stage%2] = true;
-			NextStage(curStage);
-			op = ((StageOperate*)(&(gci.stages[curStage].colorOp))) + (curN64Stage%2);
-			op->op = CM_ADD;
-			op->Arg1 = MUX_COMBINED;
-			op->Arg2 = m.d;
-			op->Arg0 = CM_IGNORE;
-			gci.stages[curStage].dwTexture = toTex(m.d);
-			textureUsedInStage[curStage][curN64Stage%2] = true;
-			resultIsGood = false;
+#ifdef _XBOX_HACK
+			if( m_dwGeneralMaxStages >= 4 )
+#else
+			if(0)
+#endif
+			{
+				op->op = CM_SUBTRACT;
+				op->Arg1 = m.a;
+				op->Arg2 = m.b;
+				op->Arg0 = CM_IGNORE;
+				gci.stages[curStage].dwTexture = toTex(m.a);
+				textureUsedInStage[curStage][curN64Stage%2] = true;
+				NextStage(curStage);
+				op = ((StageOperate*)(&(gci.stages[curStage].colorOp))) + (curN64Stage%2);
+				op->op = CM_MULTIPLYADD;
+				op->Arg1 = MUX_COMBINED;
+				op->Arg2 = m.c;
+				op->Arg0 = m.d;
+				gci.stages[curStage].dwTexture = toTex(m.d);
+				textureUsedInStage[curStage][curN64Stage%2] = true;
+				resultIsGood = true;
+			}
+			else
+			{
+				op->op = CM_MODULATE;
+				op->Arg1 = m.a;
+				op->Arg2 = m.c;
+				op->Arg0 = CM_IGNORE;
+				gci.stages[curStage].dwTexture = toTex(m.a);
+				textureUsedInStage[curStage][curN64Stage%2] = true;
+				NextStage(curStage);
+				op = ((StageOperate*)(&(gci.stages[curStage].colorOp))) + (curN64Stage%2);
+				op->op = CM_ADD;
+				op->Arg1 = MUX_COMBINED;
+				op->Arg2 = m.d;
+				op->Arg0 = CM_IGNORE;
+				gci.stages[curStage].dwTexture = toTex(m.d);
+				textureUsedInStage[curStage][curN64Stage%2] = true;
+				resultIsGood = false;
+			}
 		}
 		else
 		{
@@ -498,30 +523,34 @@ int	CGeneralCombiner::GenCI_Type_A_B_C_D(int curN64Stage, int curStage, GeneralC
 	}
 	else if( CountTexel1Cycle(m) == 1 )
 	{
+#if 1 //_XBOX_HACK
 		if( m_dwGeneralMaxStages < 4 )
+#else
+		if(1)
+#endif
 		{
-		Check1TxtrForAlpha(curN64Stage, curStage, gci, GetTexelNumber(m));
-		op->Arg1 = (MUX_TEXEL0+GetTexelNumber(m));
-		if( (*m_ppGeneralDecodedMux)->isUsedInCycle(MUX_SHADE, curN64Stage) )
-		{
-			op->op =CM_MODULATE;
-			op->Arg2 = MUX_SHADE;
+			Check1TxtrForAlpha(curN64Stage, curStage, gci, GetTexelNumber(m));
+			op->Arg1 = (MUX_TEXEL0+GetTexelNumber(m));
+			if( (*m_ppGeneralDecodedMux)->isUsedInCycle(MUX_SHADE, curN64Stage) )
+			{
+				op->op =CM_MODULATE;
+				op->Arg2 = MUX_SHADE;
+			}
+			else
+			{
+				op->op =CM_REPLACE;
+				op->Arg2 = 0;
+			}
+			op->Arg0 = CM_IGNORE;
+			gci.stages[curStage].dwTexture = GetTexelNumber(m);
+			textureUsedInStage[curStage][curN64Stage%2] = true;
 		}
 		else
 		{
-			op->op =CM_REPLACE;
-			op->Arg2 = 0;
-		}
-		op->Arg0 = CM_IGNORE;
-		gci.stages[curStage].dwTexture = GetTexelNumber(m);
-		textureUsedInStage[curStage][curN64Stage%2] = true;
-		} // Rice 6.11 max stages > 4
-		else
-		{
-		curStage = GenCI_Type_A_SUB_B_MOD_C(curN64Stage, curStage, gci);
-		m.a = MUX_COMBINED;
-		NextStage(curStage);
-		curStage = GenCI_Type_A_ADD_D(curN64Stage, curStage, gci);
+			curStage = GenCI_Type_A_SUB_B_MOD_C(curN64Stage, curStage, gci);
+			m.a = MUX_COMBINED;
+			NextStage(curStage);
+			curStage = GenCI_Type_A_ADD_D(curN64Stage, curStage, gci);
 		}
 	}
 	else
@@ -836,8 +865,11 @@ int CGeneralCombiner::ParseDecodedMux()
 	{
 		gci.stages[i].bTextureUsed = IsTextureUsedInStage(gci.stages[i]);
 	}
-#ifndef _XBOX
+#ifdef _XBOX_HACK
+	if( !resultIsGood && gci.nStages >= m_dwGeneralMaxStages )
+#else
 	if( !resultIsGood )
+#endif
 	{
 		extern int noOfTwoStages;
 		extern GeneralCombinerInfo twostages[];
@@ -857,7 +889,6 @@ int CGeneralCombiner::ParseDecodedMux()
 			}
 		}
 	}
-#endif
 
 #ifdef _DEBUG
 	if( !resultIsGood )

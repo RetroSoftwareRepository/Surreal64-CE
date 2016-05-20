@@ -53,6 +53,31 @@ std::vector<RECT> frameWriteByCPURects;
 RECT frameWriteByCPURectArray[20][20];
 bool frameWriteByCPURectFlag[20][20];
 std::vector<uint32> frameWriteRecord;
+#ifdef _XBOX
+BOOL g_bTempMessage = FALSE;
+BOOL bReadyToLoad = FALSE;
+DWORD g_dwTempMessageStart = 0;
+char g_szTempMessage[100];
+
+//XFONT *g_defaultTrueTypeFont = NULL;
+extern bool g_bUseSetTextureMem;
+extern DWORD g_maxTextureMemUsage;
+
+#include "../../../config.h"
+extern bool bloadstate[MAX_SAVE_STATES];
+extern bool bsavestate[MAX_SAVE_STATES];
+extern bool bload1964state[MAX_SAVE_STATES];
+extern bool bloadPJ64state[MAX_SAVE_STATES];
+extern "C" void __EMU_SaveState(int index);
+extern "C" void __EMU_LoadState(int index);
+extern "C" void __EMU_Load1964State(int index);
+extern "C" void __EMU_LoadPJ64State(int index);
+extern bool bSatesUpdated;
+extern int preferedemu;
+
+bool bSatesUpdated2 = false;
+char tempmsg[260]; 
+#endif
 
 //---------------------------------------------------------------------------------------
 
@@ -86,7 +111,7 @@ BOOL APIENTRY DllMain(HINSTANCE hinstDLL,  // DLL module handle
 void GetPluginDir( char * Directory ) 
 {
 #ifdef _XBOX
-	strcpy(Directory, "D:\\");
+	strcpy(Directory, "T:\\");
 #else //win32
 	char path_buffer[_MAX_PATH], drive[_MAX_DRIVE] ,dir[_MAX_DIR];
 	char fname[_MAX_FNAME],ext[_MAX_EXT];
@@ -146,6 +171,7 @@ EXPORT_TYPE(void) EXPORT_NAME(DllConfig) ( HWND hParent )
 
 void ChangeWindowStep2()
 {
+#ifndef _XBOX
 	status.bDisableFPS = true;
 	windowSetting.bDisplayFullscreen = 1-windowSetting.bDisplayFullscreen;
 	g_CritialSection.Lock();
@@ -177,6 +203,7 @@ void ChangeWindowStep2()
 	g_CritialSection.Unlock();
 	status.bDisableFPS = false;
 	status.ToToggleFullScreen = FALSE;
+#endif
 }
 
 EXPORT_TYPE(void) EXPORT_NAME(ChangeWindow) ()
@@ -267,7 +294,7 @@ void StartVideo(void)
 	ROM_ByteSwap_3210( &g_curRomInfo.romheader, sizeof(ROMHeader) );
 	ROM_GetRomNameFromHeader(g_curRomInfo.szGameName, &g_curRomInfo.romheader);
 	Ini_GetRomOptions(&g_curRomInfo);
-#ifdef _XBOX
+
 	char *p = g_curRomInfo.szGameName + (lstrlen(g_curRomInfo.szGameName) -1);		// -1 to skip null
 	while (p >= g_curRomInfo.szGameName)
 	{
@@ -275,7 +302,6 @@ void StartVideo(void)
 			*p = '-';
 		p--;
 	}
-#endif
 	GenerateCurrentRomOptions();
 	status.dwTvSystem = CountryCodeToTVSystem(g_curRomInfo.romheader.nCountryID);
 	if( status.dwTvSystem == TV_SYSTEM_NTSC )
@@ -718,6 +744,74 @@ EXPORT_TYPE(void) EXPORT_NAME(UpdateScreen) (void)
 #else
 	 UpdateScreenStep2();
 #endif
+
+#ifdef _XBOX
+	if(bSatesUpdated2)
+	{
+		_VIDEO_DisplayTemporaryMessage(tempmsg);
+		bSatesUpdated2=false;
+	}
+
+	if(bSatesUpdated)
+	{
+	bSatesUpdated=false;
+	bSatesUpdated2=true;
+	
+		for (int i=1; i<=MAX_SAVE_STATES; i++) 
+		{
+			if (bloadstate[i]) // This will never be true, unless UHLE accepts plugins. 
+			{
+				try{
+					__EMU_LoadState(i);
+				}catch(...){};
+
+				sprintf(tempmsg, "Loaded UHLE State %d", i);
+				bloadstate[i]=false;
+				
+				break;
+			}
+			else if (bload1964state[i]) 
+			{
+				try{
+					__EMU_Load1964State(i);
+				}catch(...){};
+
+				sprintf(tempmsg, "Loaded 1964 State %d", i);
+				bload1964state[i]=false;
+
+				break;
+			}
+			else if (bloadPJ64state[i]) 
+			{
+				try{
+					__EMU_LoadPJ64State(i);
+				}catch(...){};
+
+				sprintf(tempmsg, "Loaded PJ64 State %d", i);
+				bloadPJ64state[i]=false;
+
+				break;
+			}
+			else if (bsavestate[i]) 
+			{
+				try{
+					__EMU_SaveState(i);
+				}catch(...){};
+
+				if(preferedemu == _UltraHLE)
+					sprintf(tempmsg, "Saved UHLE State %d", i); // Unused until UHLE becomes zilmar spec 
+				else if((preferedemu == _1964x11)||(preferedemu == _1964x085))
+					sprintf(tempmsg, "Saved 1964 State %d", i);
+				else if((preferedemu == _PJ64x16)||(preferedemu == _PJ64x14))
+					sprintf(tempmsg, "Saved PJ64 State %d", i);
+				
+				bsavestate[i]=false;
+
+				break;
+			}
+		}
+	}
+#endif
 }
 
 //---------------------------------------------------------------------------------------
@@ -791,7 +885,7 @@ void __cdecl MsgInfo (char * Message, ...)
 	va_end( ap );
 
 	sprintf(generalText, "%s %d.%d.%d",project_name, FILE_VERSION0,FILE_VERSION1,FILE_VERSION2);
-	MessageBox(NULL,Msg,generalText,MB_OK|MB_ICONINFORMATION);
+	//MessageBox(NULL,Msg,generalText,MB_OK|MB_ICONINFORMATION);
 }
 
 void __cdecl ErrorMsg (char * Message, ...)
@@ -804,10 +898,12 @@ void __cdecl ErrorMsg (char * Message, ...)
 	va_end( ap );
 	
 	sprintf(generalText, "%s %d.%d.%d",project_name, FILE_VERSION0,FILE_VERSION1,FILE_VERSION2);
+#ifndef _XBOX
 	if( status.ToToggleFullScreen || (CGraphicsContext::g_pGraphicsContext && !CGraphicsContext::g_pGraphicsContext->IsWindowed()) )
 		SetWindowText(g_GraphicsInfo.hStatusBar,Msg);
 	else
 		MessageBox(NULL,Msg,generalText,MB_OK|MB_ICONERROR);
+#endif
 }
 
 //---------------------------------------------------------------------------------------
@@ -836,7 +932,7 @@ void ProcessDListStep2(void)
 
 	try
 	{
-		DLParser_Process((OSTask *)(g_GraphicsInfo.DMEM + 0x0FC0));
+		DLParser_Process();
 	}
 	catch (...)
 	{
@@ -862,7 +958,7 @@ EXPORT_TYPE(uint32) EXPORT_NAME(ProcessDListCountCycles) (void)
 	status.DPCycleCount = 0;
 	try
 	{
-		DLParser_Process((OSTask *)(g_GraphicsInfo.DMEM + 0x0FC0));
+		DLParser_Process();
 	}
 	catch (...)
 	{
@@ -1066,6 +1162,7 @@ EXPORT_TYPE(void) EXPORT_NAME(ShowCFB) (void)
 
 EXPORT_TYPE(void) EXPORT_NAME(CaptureScreen) ( char * Directory )
 {
+#ifndef _XBOX
 	if( status.bGameIsRunning && status.gDlistCount > 0 )
 	{
 		if( !PathFileExists(Directory) )
@@ -1098,10 +1195,11 @@ EXPORT_TYPE(void) EXPORT_NAME(CaptureScreen) ( char * Directory )
 		strcpy(status.screenCaptureFilename, tempname);
 		status.toCaptureScreen = true;
 	}
+#endif
 }
 
 #ifdef _XBOX
-extern "C" EXPORT_TYPE(void) EXPORT_NAME(DisplayTemporaryMessage) (const char *Message)
+void _VIDEO_DisplayTemporaryMessage (const char *Message)
 {
 	/*
 	g_bTempMessage = TRUE;

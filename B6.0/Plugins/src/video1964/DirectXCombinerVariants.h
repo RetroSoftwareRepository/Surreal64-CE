@@ -37,17 +37,23 @@ typedef struct {
 #ifdef _XBOX
 	bool   bPrimLOD;
 	bool   bFog;
-#else
-	ID3DXBuffer* pVS;
+#endif
+#ifndef _XBOX_PS
+	D3DPIXELSHADERDEF *pVS;
 #endif
 	char *pShaderText;
+#if DIRECTX_VERSION > 8
+	IDirect3DPixelShader9* pShader;
+#endif
 } PixelShaderEntry;
 
 class CDirectXPixelShaderCombiner : public CDirectXColorCombiner
 {
 public:
 	void CleanUp(void);
-
+#ifdef _XBOX_PS
+	bool Initialize();
+#endif
 protected:
 	friend class DirectXDeviceBuilder;
 	CDirectXPixelShaderCombiner(CRender *pRender);
@@ -57,9 +63,6 @@ protected:
 	int GeneratePixelShaderFromMux(void);
 	int FindCompiledShader(void);
 
-#ifdef _XBOX
-	bool Initialize();
-#endif
 	std::vector<PixelShaderEntry> m_pixelShaderList;
 
 #define PIXELSHADERTEXTBUFSIZE	16000

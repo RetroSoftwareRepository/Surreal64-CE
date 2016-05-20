@@ -19,6 +19,16 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "stdafx.h"
 
+#ifdef _XBOX
+#include "../../../config.h"
+
+static const DWORD MEM_KEEP_FREE = (2*1024*1024); // keep 2MB free
+
+bool g_bUseSetTextureMem = true;
+DWORD g_maxTextureMemUsage = (5*1024*1024);
+BOOL bPurgeOldBeforeIGM = FALSE;
+#endif
+
 CTextureManager gTextureManager;
 extern RecentCIInfo* g_uRecentCIInfoPtrs[];
 
@@ -79,6 +89,11 @@ CTextureManager::CTextureManager() :
 	m_numOfCachedTxtrList(809)
 {
 	m_numOfCachedTxtrList = GetNextPrime(800);
+#ifdef _XBOX
+	m_currentTextureMemUsage	= 0;
+	m_pYoungestTexture			= NULL;
+	m_pOldestTexture			= NULL;
+#endif
 
 	m_pCacheTxtrList = new TxtrCacheEntry *[m_numOfCachedTxtrList];
 	SAFE_CHECK(m_pCacheTxtrList);
@@ -96,6 +111,18 @@ CTextureManager::CTextureManager() :
 CTextureManager::~CTextureManager()
 {
 	CleanUp();
+#ifdef _XBOX
+	{
+		while (m_pHead)
+		{
+			TxtrCacheEntry * pVictim = m_pHead;
+			m_pHead = pVictim->pNext;
+			
+			delete pVictim;
+		}
+	}
+	m_currentTextureMemUsage	= 0;
+#endif
 
 	delete []m_pCacheTxtrList;
 	m_pCacheTxtrList = NULL;	
@@ -128,6 +155,9 @@ bool CTextureManager::CleanUp()
 	memset(&m_LODFracTextureEntry, 0, sizeof(TxtrCacheEntry));
 	memset(&m_PrimLODFracTextureEntry, 0, sizeof(TxtrCacheEntry));
 
+#ifdef _XBOX
+	m_currentTextureMemUsage = 0;
+#endif
 	return true;
 }
 
@@ -136,6 +166,25 @@ void CTextureManager::PurgeOldTextures()
 {
 	if (m_pCacheTxtrList == NULL)
 		return;
+#ifdef _XBOX
+	// PurgeOldTextures breaks OOT and possibly others
+	// Quake 2 needs it otherwise it leaks pretty bad. 
+	if(!g_bUseSetTextureMem)
+	{
+		gTextureManager.CleanUp();
+		m_currentTextureMemUsage = 0;
+		bPurgeOldBeforeIGM = FALSE;
+		return;
+	}
+	else if(bPurgeOldBeforeIGM)
+	{
+		bPurgeOldBeforeIGM = FALSE;
+	}
+	else if(options.enableHackForGames != HACK_FOR_QUAKE_2)
+	{
+		return;
+	}
+#endif
 	
 	static const uint32 dwFramesToKill = 5*30;			// 5 secs at 30 fps
 	static const uint32 dwFramesToDelete = 30*30;		// 30 secs at 30 fps
@@ -178,6 +227,9 @@ void CTextureManager::PurgeOldTextures()
 			if (pPrev != NULL) pPrev->pNext        = pCurr->pNext;
 			else			   m_pHead = pCurr->pNext;
 			
+#ifdef _XBOX
+			m_currentTextureMemUsage -= (pCurr->pTexture->m_dwWidth * pCurr->pTexture->m_dwHeight * 2);
+#endif
 			delete pCurr;
 			pCurr = pNext;	
 		}
@@ -196,7 +248,12 @@ void CTextureManager::RecycleAllTextures()
 	
 	uint32 dwCount = 0;
 	uint32 dwTotalUses = 0;
-	
+
+#ifdef _XBOX	
+	m_pYoungestTexture			= NULL;
+	m_pOldestTexture			= NULL;
+#endif
+
 	for (uint32 i = 0; i < m_numOfCachedTxtrList; i++)
 	{
 		while (m_pCacheTxtrList[i])
@@ -206,8 +263,13 @@ void CTextureManager::RecycleAllTextures()
 			
 			dwTotalUses += pTVictim->dwUses;
 			dwCount++;
+#ifdef _XBOX
+			m_currentTextureMemUsage -= (pTVictim->pTexture->m_dwWidth * pTVictim->pTexture->m_dwHeight * 2);
 			
+			delete pTVictim;
+#else
 			RecycleTexture(pTVictim);
+#endif
 		}
 	}
 }
@@ -216,6 +278,7 @@ void CTextureManager::RecycleAllTextures()
 // Add to the recycle list
 void CTextureManager::RecycleTexture(TxtrCacheEntry *pEntry)
 {
+#ifndef _XBOX
 	if( CDeviceBuilder::GetGeneralDeviceType() == OGL_DEVICE )
 	{
 		// Fix me, why I can not reuse the texture in OpenGL,
@@ -236,11 +299,15 @@ void CTextureManager::RecycleTexture(TxtrCacheEntry *pEntry)
 		SAFE_DELETE(pEntry->pEnhancedTexture);
 		m_pHead = pEntry;
 	}
+#else
+return;
+#endif
 }
 
 // Search for a texture of the specified dimensions to recycle
 TxtrCacheEntry * CTextureManager::ReviveTexture( uint32 width, uint32 height )
 {
+#ifndef _XBOX
 	TxtrCacheEntry * pPrev;
 	TxtrCacheEntry * pCurr;
 	
@@ -262,7 +329,7 @@ TxtrCacheEntry * CTextureManager::ReviveTexture( uint32 width, uint32 height )
 		pPrev = pCurr;
 		pCurr = pCurr->pNext;
 	}
-	
+#endif
 	return NULL;
 }
 
@@ -274,7 +341,47 @@ uint32 CTextureManager::Hash(uint32 dwValue)
 	return (dwValue>>2) % m_numOfCachedTxtrList;
 }
 
+void CTextureManager::MakeTextureYoungest(TxtrCacheEntry *pEntry)
+{
+	if (pEntry == m_pYoungestTexture)
+		return;
 
+	// if its the oldest, then change the oldest pointer
+	if (pEntry == m_pOldestTexture)
+	{
+		m_pOldestTexture = pEntry->pNextYoungest;
+	}
+
+	// if its a not a new texture, close the gap in the age list
+	// where pEntry use to reside
+	if (pEntry->pNextYoungest != NULL || pEntry->pLastYoungest != NULL)
+	{
+		if (pEntry->pNextYoungest != NULL)
+		{
+			pEntry->pNextYoungest->pLastYoungest = pEntry->pLastYoungest;
+		}
+		if (pEntry->pLastYoungest != NULL)
+		{
+			pEntry->pLastYoungest->pNextYoungest = pEntry->pNextYoungest;
+		}
+	}
+
+	// this texture is now the youngest, so place it on the end of the list
+	if (m_pYoungestTexture != NULL)
+	{
+		m_pYoungestTexture->pNextYoungest = pEntry;
+	}
+
+	pEntry->pNextYoungest = NULL;
+	pEntry->pLastYoungest = m_pYoungestTexture;
+	m_pYoungestTexture = pEntry;
+	 
+	// if this is the first texture in memory then its also the oldest
+	if (m_pOldestTexture == NULL)
+	{
+		m_pOldestTexture = pEntry;
+	}
+}
 
 void CTextureManager::AddTexture(TxtrCacheEntry *pEntry)
 {	
@@ -288,6 +395,10 @@ void CTextureManager::AddTexture(TxtrCacheEntry *pEntry)
 	// Add to head (not tail, for speed - new textures are more likely to be accessed next)
 	pEntry->pNext = m_pCacheTxtrList[dwKey];
 	m_pCacheTxtrList[dwKey] = pEntry;
+#ifdef _XBOX
+	// Move the texture to the top of the age list
+	MakeTextureYoungest(pEntry);
+#endif
 }
 
 
@@ -305,7 +416,12 @@ TxtrCacheEntry * CTextureManager::GetTxtrCacheEntry(TxtrInfo * pti)
 	for (pEntry = m_pCacheTxtrList[dwKey]; pEntry; pEntry = pEntry->pNext)
 	{
 		if ( pEntry->ti == *pti )
+		{
+#ifdef _XBOX
+			MakeTextureYoungest(pEntry);
+#endif
 			return pEntry;
+		}
 	}
 
 	return NULL;
@@ -334,23 +450,90 @@ void CTextureManager::RemoveTexture(TxtrCacheEntry * pEntry)
 		{
 			if (pPrev != NULL) pPrev->pNext = pCurr->pNext;
 			else			   m_pCacheTxtrList[dwKey] = pCurr->pNext;
+#ifdef _XBOX
+			// remove the texture from the age list
+			if (pEntry->pNextYoungest != NULL)
+			{
+				pEntry->pNextYoungest->pLastYoungest = pEntry->pLastYoungest;
+			}
+			if (pEntry->pLastYoungest != NULL)
+			{
+				pEntry->pLastYoungest->pNextYoungest = pEntry->pNextYoungest;
+			}
+			m_currentTextureMemUsage -= (pEntry->pTexture->m_dwWidth * pEntry->pTexture->m_dwHeight * 2);
+			delete pEntry;
+#endif
 			break;
 		}
 
 		pPrev = pCurr;
 		pCurr = pCurr->pNext;
 	}
-	
+#ifndef _XBOX
 	RecycleTexture(pEntry);
+#endif
+}
+
+#ifdef _XBOX
+void CTextureManager::FreeTextures()
+{
+	MEMORYSTATUS ms;
+	GlobalMemoryStatus(&ms);
+
+	// Clear all textures if memory is low
+	if (ms.dwAvailPhys < MEM_KEEP_FREE)
+	{
+		gTextureManager.PurgeOldTextures();
+		gTextureManager.CleanUp();
+		m_currentTextureMemUsage = 0;
 	}
 	
+}
+#endif
+
 TxtrCacheEntry * CTextureManager::CreateNewCacheEntry(uint32 dwAddr, uint32 dwWidth, uint32 dwHeight)
 {
 	TxtrCacheEntry * pEntry;
 
 	// Find a used texture
+#ifdef _XBOX
+	uint32 widthToCreate = dwWidth;
+	uint32 heightToCreate = dwHeight;
+
+	DWORD freeUpSize = (widthToCreate * heightToCreate * 2);
+
+	FreeTextures();
+
+	// make sure there is enough room for the new texture by deleting old textures
+	if((g_bUseSetTextureMem) && ((m_currentTextureMemUsage + freeUpSize) > g_maxTextureMemUsage))
+	{
+		while ((m_currentTextureMemUsage + freeUpSize) > g_maxTextureMemUsage && m_pOldestTexture != NULL)
+		{
+			TxtrCacheEntry *nextYoungest = m_pOldestTexture->pNextYoungest;
+
+			RemoveTexture(m_pOldestTexture);
+
+			m_pOldestTexture = nextYoungest;
+
+			//OutputDebugString("Freeing Texture\n");
+		}
+	}
+	else if((!g_bUseSetTextureMem) && ((m_currentTextureMemUsage + freeUpSize) > g_maxTextureMemUsage) && (options.enableHackForGames != HACK_FOR_QUAKE_2))
+	{
+		gTextureManager.CleanUp();
+		m_currentTextureMemUsage = 0;
+	}
+	else
+	{
+		pEntry = ReviveTexture(dwWidth, dwHeight);
+	}
+	m_currentTextureMemUsage += (dwWidth * dwHeight * 2);
+	
+	if (pEntry == NULL || g_bUseSetTextureMem)
+#else
 	pEntry = ReviveTexture(dwWidth, dwHeight);
 	if (pEntry == NULL)
+#endif
 	{
 		// Couldn't find on - recreate!
 		pEntry = new TxtrCacheEntry;
@@ -371,12 +554,17 @@ TxtrCacheEntry * CTextureManager::CreateNewCacheEntry(uint32 dwAddr, uint32 dwWi
 	// Initialize
 	pEntry->ti.Address = dwAddr;
 	pEntry->pNext = NULL;
+#ifdef _XBOX
+	pEntry->pNextYoungest = NULL;
+	pEntry->pLastYoungest = NULL;
+#endif
 	pEntry->dwUses = 0;
 	pEntry->dwTimeLastUsed = status.gRDPTime;
 	pEntry->dwCRC = 0;
 	pEntry->FrameLastUsed = status.gDlistCount;
 	pEntry->FrameLastUpdated = 0;
 	pEntry->lastEntry = NULL;
+	pEntry->maxCI = -1;
 
 	// Add to the hash table
 	AddTexture(pEntry);
@@ -471,8 +659,23 @@ TxtrCacheEntry * CTextureManager::GetTexture(TxtrInfo * pgti, bool fromTMEM, boo
 		}
 	}
 
+	int maxCI = 0;
 	if ( doCRCCheck && (pgti->Format == TXT_FMT_CI || (pgti->Format == TXT_FMT_RGBA && pgti->Size <= TXT_SIZE_8b )))
 	{
+#ifdef _RICE612		
+		//maxCI = pgti->Size == TXT_SIZE_8b ? 255 : 15;
+		extern BYTE CalculateMaxCI(void *pPhysicalAddress, uint32 left, uint32 top, uint32 width, uint32 height, uint32 size, uint32 pitchInBytes );
+
+		if( !pEntry || pEntry->dwCRC != dwAsmCRC || pEntry->maxCI < 0 )
+		{
+			maxCI = CalculateMaxCI(pgti->pPhysicalAddress, pgti->LeftToLoad, pgti->TopToLoad, pgti->WidthToLoad, pgti->HeightToLoad, pgti->Size, pgti->Pitch);
+		}
+		else
+		{
+			maxCI = pEntry->maxCI;
+		}
+#endif
+
 		//Check PAL CRC
 		uint8 * pStart;
 		uint32 dwPalSize = 16;
@@ -488,10 +691,17 @@ TxtrCacheEntry * CTextureManager::GetTexture(TxtrInfo * pgti, bool fromTMEM, boo
 		}
 
 		pStart = (uint8*)pgti->PalAddress+dwOffset*2;
+#ifndef _RICE612
 		for (y = 0; y < dwPalSize*2; y+=4)
 		{
 			dwPalCRC = (dwPalCRC + *(uint32*)&pStart[y]);
 		}
+#else
+		uint32 dwAsmCRCSave = dwAsmCRC;
+		//dwPalCRC = CalculateRDRAMCRC(pStart, 0, 0, dwPalSize, 1, TXT_SIZE_16b, dwPalSize*2);
+		dwPalCRC = CalculateRDRAMCRC(pStart, 0, 0, maxCI+1, 1, TXT_SIZE_16b, dwPalSize*2);
+		dwAsmCRC = dwAsmCRCSave;
+#endif
 	}
 
 	if (pEntry && doCRCCheck )
@@ -531,7 +741,9 @@ TxtrCacheEntry * CTextureManager::GetTexture(TxtrInfo * pgti, bool fromTMEM, boo
 	pEntry->ti = *pgti;
 	pEntry->dwCRC = dwAsmCRC;
 	pEntry->dwPalCRC = dwPalCRC;
+	pEntry->maxCI = maxCI;
 
+#ifndef _RICE612
 	if( pEntry->pTexture->m_dwCreatedTextureWidth < pgti->WidthToCreate )
 	{
 		pEntry->ti.WidthToLoad = pEntry->pTexture->m_dwCreatedTextureWidth;
@@ -544,11 +756,26 @@ TxtrCacheEntry * CTextureManager::GetTexture(TxtrInfo * pgti, bool fromTMEM, boo
 		pEntry->pTexture->m_bScaledT = false;
 		pEntry->pTexture->m_bScaledS = false;
 	}
+#endif
 
 	try 
 	{
 		if (pEntry->pTexture != NULL)
 		{
+#ifdef _RICE612			
+				if( pEntry->pTexture->m_dwCreatedTextureWidth < pgti->WidthToCreate )
+				{
+					pEntry->ti.WidthToLoad = pEntry->pTexture->m_dwCreatedTextureWidth;
+					pEntry->pTexture->m_bScaledS = false;
+					pEntry->pTexture->m_bScaledT = false;
+				}
+				if( pEntry->pTexture->m_dwCreatedTextureHeight < pgti->HeightToCreate )
+				{
+					pEntry->ti.HeightToLoad = pEntry->pTexture->m_dwCreatedTextureHeight;
+					pEntry->pTexture->m_bScaledT = false;
+					pEntry->pTexture->m_bScaledS = false;
+				}
+#endif
 			TextureFmt dwType = pEntry->pTexture->GetSurfaceFormat();
 			SAFE_DELETE(pEntry->pEnhancedTexture);
 			pEntry->dwEnhancementFlag = TEXTURE_NO_ENHANCEMENT;
@@ -1205,3 +1432,28 @@ void CTextureManager::updateColorTexture(CTexture *ptexture, uint32 color)
 	ptexture->EndUpdate(&di);
 }
 
+void ConvertTextureRGBAtoI(TxtrCacheEntry* pEntry, bool alpha)
+{
+	DrawInfo srcInfo;	
+	if( pEntry->pTexture->StartUpdate(&srcInfo) )
+	{
+		uint32 *buf;
+		uint32 val;
+		uint32 r,g,b,a,i;
+
+		for(int nY = 0; nY < srcInfo.dwCreatedHeight; nY++)
+		{
+			buf = (uint32*)((uint8*)srcInfo.lpSurface+nY*srcInfo.lPitch);
+			for(int nX = 0; nX < srcInfo.dwCreatedWidth; nX++)
+			{
+				val = buf[nX];
+				b = (val>>0)&0xFF;
+				g = (val>>8)&0xFF;
+				r = (val>>16)&0xFF;
+				i = (r+g+b)/3;
+				a = alpha?(val&0xFF000000):(i<<24);
+				buf[nX] = (a|(i<<16)|(i<<8)|i);
+			}
+		}
+		pEntry->pTexture->EndUpdate(&srcInfo);	}
+}

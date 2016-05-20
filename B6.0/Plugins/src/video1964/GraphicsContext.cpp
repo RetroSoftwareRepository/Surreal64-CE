@@ -440,7 +440,6 @@ int CGraphicsContext::CheckTxtrBufsWithNewCI(SetImgInfo &CIinfo, uint32 height, 
 
 extern RecentCIInfo *g_uRecentCIInfoPtrs[5];
 TextureBufferInfo newTextureBufInfo;
-
 int FindASlot(void)
 {
 	int idx;
@@ -479,6 +478,185 @@ int FindASlot(void)
 	return idx;
 }
 
+#ifdef _RICE560
+int CGraphicsContext::SetTextureBuffer(SetImgInfo &CIinfo, int ciInfoIdx, bool toSaveBackBuffer)
+{
+	TextureUsage usage = AS_RENDER_TARGET;
+
+	if(!toSaveBackBuffer)
+		status.bHandleN64TextureBuffer = true;
+
+	TextureBufferInfo tempInfo;
+	memcpy(&(tempInfo.CI_Info), &CIinfo, sizeof(SetImgInfo));
+
+	if( toSaveBackBuffer )
+	{
+		tempInfo.N64Width = g_uRecentCIInfoPtrs[ciInfoIdx]->dwLastWidth;
+		tempInfo.N64Height = g_uRecentCIInfoPtrs[ciInfoIdx]->dwLastHeight;
+		tempInfo.knownHeight = true;
+		usage = AS_BACK_BUFFER_SAVE;
+	}
+	else
+	{
+		tempInfo.N64Width = tempInfo.CI_Info.dwWidth;
+		tempInfo.knownHeight = ComputeCImgHeight(CIinfo, tempInfo.N64Height);
+	}
+	tempInfo.maxUsedHeight = 0;
+
+	if( !toSaveBackBuffer )
+	{
+		if( defaultRomOptions.bInN64Resolution )
+		{
+			tempInfo.bufferWidth = tempInfo.N64Width;
+			tempInfo.bufferHeight = tempInfo.N64Height;
+		}
+		else if( defaultRomOptions.bDoubleSizeForSmallTxtrBuf && tempInfo.N64Width<=128 && tempInfo.N64Height<=128)
+		{
+			tempInfo.bufferWidth = tempInfo.N64Width*2;
+			tempInfo.bufferHeight = tempInfo.N64Height*2;
+		}
+		else
+		{
+			tempInfo.bufferWidth = tempInfo.N64Width;
+			tempInfo.bufferHeight = tempInfo.N64Height;
+		}
+	}
+	else
+	{
+		tempInfo.bufferWidth = windowSetting.uDisplayWidth;
+		tempInfo.bufferHeight = windowSetting.uDisplayHeight;
+	}
+
+	tempInfo.scaleX = tempInfo.bufferWidth / float(tempInfo.N64Width);
+	tempInfo.scaleY = tempInfo.bufferHeight / float(tempInfo.N64Height);
+
+	status.bFrameBufferIsDrawn = false;
+	status.bFrameBufferDrawnByTriangles = false;
+
+	tempInfo.updateAtFrame = status.gDlistCount;
+	tempInfo.updateAtUcodeCount = status.gUcodeCount;
+
+	// Checking against previous texture buffer infos
+	int matchidx = -1;
+
+	uint32 memsize = ((tempInfo.N64Height*tempInfo.N64Width)>>1)<<tempInfo.CI_Info.dwSize;
+
+	matchidx = CheckTxtrBufsWithNewCI(CIinfo,tempInfo.N64Height,true);
+
+	int idxToUse=-1;
+	if( matchidx >= 0 )
+	{
+		// Reuse the matched slot
+		idxToUse = matchidx;
+		if( gTextureBufferInfos[matchidx].pTxtBuffer == NULL )
+		{
+			if( tempInfo.knownHeight == RDP_SETSCISSOR && tempInfo.CI_Info.dwAddr == g_ZI.dwAddr )
+			{
+				gTextureBufferInfos[matchidx].pTxtBuffer = 
+					new CDXTextureBuffer(gRDP.scissor.right, tempInfo.bufferHeight, &gTextureBufferInfos[matchidx], usage);
+			}
+			else
+			{
+				gTextureBufferInfos[matchidx].pTxtBuffer = 
+					new CDXTextureBuffer(tempInfo.bufferWidth, tempInfo.bufferHeight, &gTextureBufferInfos[matchidx], usage);
+			}
+		}
+	}
+	else
+	{
+		// Find an empty slot
+		bool found = false;
+		for( int i=0; i<numOfTxtBufInfos; i++ )
+		{
+			if( !gTextureBufferInfos[i].isUsed )
+			{
+				found = true;
+				idxToUse = i;
+				break;
+			}
+		}
+
+		// If cannot find an empty slot, find the oldest slot and reuse the slot
+		if( !found )
+		{
+			uint32 oldestCount=0xFFFFFFFF;
+			uint32 oldestIdx = 0;
+			for( int i=0; i<numOfTxtBufInfos; i++ )
+			{
+				if( gTextureBufferInfos[i].updateAtUcodeCount < oldestCount )
+				{
+					oldestCount = gTextureBufferInfos[i].updateAtUcodeCount;
+					oldestIdx = i;
+				}
+			}
+
+			idxToUse = oldestIdx;
+		}
+
+		SAFE_DELETE(gTextureBufferInfos[idxToUse].pTxtBuffer) ;
+
+		// After get the slot
+		// create a new texture buffer and assign it to this slot
+		if( tempInfo.knownHeight == RDP_SETSCISSOR && tempInfo.CI_Info.dwAddr == g_ZI.dwAddr )
+		{
+			gTextureBufferInfos[idxToUse].pTxtBuffer = 
+				new CDXTextureBuffer(gRDP.scissor.right, tempInfo.bufferHeight, &gTextureBufferInfos[idxToUse], usage);
+		}
+		else
+		{
+			gTextureBufferInfos[idxToUse].pTxtBuffer = 
+				new CDXTextureBuffer(tempInfo.bufferWidth, tempInfo.bufferHeight, &gTextureBufferInfos[idxToUse], usage); 
+		}
+	}
+
+	// Need to set all variables for gTextureBufferInfos[idxToUse]
+	CTextureBuffer *pTxtBuffer = gTextureBufferInfos[idxToUse].pTxtBuffer;
+	memcpy(&gTextureBufferInfos[idxToUse], &tempInfo, sizeof(TextureBufferInfo) );
+	gTextureBufferInfos[idxToUse].pTxtBuffer = pTxtBuffer;
+	gTextureBufferInfos[idxToUse].isUsed = true;
+	gTextureBufferInfos[idxToUse].txtEntry.pTexture = pTxtBuffer->m_pTexture;
+	gTextureBufferInfos[idxToUse].txtEntry.txtrBufIdx = idxToUse+1;
+
+	if( !toSaveBackBuffer )
+	{
+		g_pTextureBufferInfo = &gTextureBufferInfos[idxToUse];
+
+		// Active the texture buffer
+		if( m_curTextureBufferIndex >= 0 && gTextureBufferInfos[m_curTextureBufferIndex].isUsed && gTextureBufferInfos[m_curTextureBufferIndex].pTxtBuffer )
+		{
+			gTextureBufferInfos[m_curTextureBufferIndex].pTxtBuffer->SetAsRenderTarget(false);
+			m_isRenderingToTexture = false;
+		}
+
+		if( gTextureBufferInfos[idxToUse].pTxtBuffer->SetAsRenderTarget(true) )
+		{
+			m_isRenderingToTexture = true;
+
+			//Clear(CLEAR_COLOR_AND_DEPTH_BUFFER,0x80808080,1.0f);
+			if( frameBufferOptions.bFillRectNextTextureBuffer )
+				Clear(CLEAR_COLOR_BUFFER,gRDP.fillColor,1.0f);
+			else if( options.enableHackForGames == HACK_FOR_MARIO_TENNIS && g_pTextureBufferInfo->N64Width > 64 && g_pTextureBufferInfo->N64Width < 300 )
+			{
+				Clear(CLEAR_COLOR_BUFFER,0,1.0f);
+			}
+			else if( options.enableHackForGames == HACK_FOR_MARIO_TENNIS && g_pTextureBufferInfo->N64Width < 64 && g_pTextureBufferInfo->N64Width > 32 )
+			{
+				Clear(CLEAR_COLOR_BUFFER,0,1.0f);
+			}
+
+			m_curTextureBufferIndex = idxToUse;
+
+			status.bDirectWriteIntoRDRAM = false;
+
+			SetScreenMult(gTextureBufferInfos[m_curTextureBufferIndex].scaleX, gTextureBufferInfos[m_curTextureBufferIndex].scaleY);
+			CRender::g_pRender->UpdateClipRectangle();
+			D3DVIEWPORT8 vp = {0,0,gTextureBufferInfos[idxToUse].bufferWidth,gTextureBufferInfos[idxToUse].bufferHeight};
+			g_pD3DDev->SetViewport(&vp);
+		}
+	}
+	return idxToUse;
+}
+#else // refactored in 1964video.
 
 void CGraphicsContext::SetTextureBuffer(void)
 {
@@ -580,6 +758,7 @@ int CGraphicsContext::SetBackBufferAsTextureBuffer(SetImgInfo &CIinfo, int ciInf
 
 	return idxToUse;
 }
+#endif //1964video refactor
 
 void CGraphicsContext::CloseTextureBuffer(bool toSave)
 {
@@ -873,6 +1052,7 @@ void CGraphicsContext::InitDeviceParameters(void)
 	CDXGraphicsContext::InitDeviceParameters();
 }
 
+#ifndef _DISABLE_VID1964
 void CGraphicsContext::FirstDrawToNewCI(void)
 {
 	status.bCIBufferIsRendered = true;
@@ -983,3 +1163,4 @@ void CGraphicsContext::FirstDrawToNewCI(void)
 		CGraphicsContext::g_pGraphicsContext->CheckTxtrBufsWithNewCI(g_CI,gRDP.scissor.bottom,false);
 	}
 }
+#endif

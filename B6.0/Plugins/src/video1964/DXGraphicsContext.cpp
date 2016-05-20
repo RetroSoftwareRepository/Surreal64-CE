@@ -18,7 +18,25 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "stdafx.h"
 #include "Debugger.h" // To be used for XBOX debug functions
-//#include "xbapp.h"
+
+#ifdef _XBOX
+#include "../../../config.h"
+#include "typedefs.h"
+//#include "../../../ingamemenu/panel.h"
+
+#include <xbapp.h>
+#include <xbresource.h>
+
+extern void XboxDrawOSD();
+extern int AntiAliasMode;
+char emuvidname[128];
+
+extern "C" void _INPUT_LoadButtonMap(int *cfgData); 
+extern int ControllerConfig[76];
+extern void 	CreateRenderTarget();
+extern void     SetAsRenderTarget();
+extern void     RestoreRenderTarget();
+#endif
 
 MYLPDIRECT3DDEVICE g_pD3DDev = NULL;
 CD3DDevWrapper    gD3DDevWrapper;
@@ -26,19 +44,11 @@ MYD3DCAPS g_D3DDeviceCaps;
 
 int FormatToSize(D3DFORMAT fmt)
 {
-	switch(fmt)
-	{
 #ifdef _XBOX
-	case D3DFMT_A8R8G8B8:
-	case D3DFMT_X8R8G8B8:
-	case D3DFMT_D24S8:
-	case TEXTURE_FMT_A8R8G8B8:
-		return 32;
-	default:
-	case D3DFMT_R5G6B5:
-	case D3DFMT_D16:
 		return 16;
 #else
+	switch(fmt)
+	{
 	case D3DFMT_R8G8B8:
 	case D3DFMT_A8R8G8B8:
 	case D3DFMT_X8R8G8B8:
@@ -72,9 +82,51 @@ int FormatToSize(D3DFORMAT fmt)
 		case D3DFMT_D16:
 		*/
 		return 16;
-#endif
+
 	}
+#endif
 }
+
+#ifdef _XBOX
+//-----------------------------------------------------------------------------
+// Name: SetAntiAliasMode()
+// Desc: Surreal64 function to set the antialiasing mode determined by the
+//       Launcher. Edge AntiAliasing may work better on the xbox compared to
+//	     the FSAA modes. 4x Gaussian is the reccomended then to 2x Quincunx if 
+//	     the framerate plunges. Linear modes are also available if those
+//	     methods are prefered.
+//-----------------------------------------------------------------------------
+DWORD SetAntiAliasMode(int AAMode){
+	DWORD useAAMode;
+	switch (AAMode)
+	{
+		case 0:
+			useAAMode = D3DMULTISAMPLE_NONE;
+		break;
+
+		case 1:
+			useAAMode = D3DMULTISAMPLE_NONE;
+		break;
+
+		case 2:
+			useAAMode = D3DMULTISAMPLE_2_SAMPLES_MULTISAMPLE_LINEAR;
+		break;
+
+		case 3:
+			useAAMode = D3DMULTISAMPLE_2_SAMPLES_MULTISAMPLE_QUINCUNX;
+		break;
+
+		case 4:
+			useAAMode = D3DMULTISAMPLE_4_SAMPLES_MULTISAMPLE_LINEAR;
+		break;
+
+		case 5:
+			useAAMode = D3DMULTISAMPLE_4_SAMPLES_MULTISAMPLE_GAUSSIAN;
+		break;
+	}
+	return useAAMode;
+}
+#endif
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -150,11 +202,12 @@ void CDXGraphicsContext::UpdateFrame(bool swaponly)
 	HRESULT hr;
 
 	status.gFrameCount++;
-
+#ifndef _RICE560
 	if( CRender::g_pRender )	
 	{
 		CRender::g_pRender->BeginRendering();
 	}
+#endif
 
 	CGraphicsContext::UpdateFrameBufferBeforeUpdateFrame();
 
@@ -182,12 +235,25 @@ void CDXGraphicsContext::UpdateFrame(bool swaponly)
 			DrawText(status.CPUCoreMsgToDisplay, rect2,1);
 		}
 	}
-#ifdef _XBOX // missing in Rice 5.60
+#ifndef _RICE560 // missing in Rice 5.60
 	if( CRender::g_pRender )
 	{
 		CRender::g_pRender->EndRendering();
 	}
 #endif
+
+#ifdef _XBOX
+	// Free Textures
+	gTextureManager.FreeTextures();
+
+	if( !g_curRomInfo.bForceScreenClear )	
+			Clear(CLEAR_DEPTH_BUFFER);
+	XboxDrawOSD();
+
+	m_pd3dDevice->Present( NULL, NULL, NULL, NULL );
+	status.bScreenIsDrawn = false;
+	if( g_curRomInfo.bForceScreenClear )	needCleanScene = true;
+#else
 	
 	Lock();
 	if (m_pd3dDevice == NULL)
@@ -196,7 +262,6 @@ void CDXGraphicsContext::UpdateFrame(bool swaponly)
 	}
 	else
 	{
-#ifndef _XBOX
 		// Test the cooperative level to see if it's okay to render
 		if( FAILED( hr = m_pd3dDevice->TestCooperativeLevel() ) )
 
@@ -229,11 +294,10 @@ void CDXGraphicsContext::UpdateFrame(bool swaponly)
 			// return hr
 			goto exit;
 		}
-#endif
+
 		if( !g_curRomInfo.bForceScreenClear )	
 			Clear(CLEAR_DEPTH_BUFFER);
 
-#ifndef _XBOX
 		if( m_bWindowed )
 		{
 			RECT dstrect={0,windowSetting.toolbarHeight,windowSetting.uDisplayWidth,windowSetting.toolbarHeight+windowSetting.uDisplayHeight};
@@ -241,7 +305,6 @@ void CDXGraphicsContext::UpdateFrame(bool swaponly)
 			hr = m_pd3dDevice->Present( &srcrect, &dstrect, NULL, NULL );
 		}
 		else
-#endif
 		{
 			hr = m_pd3dDevice->Present( NULL, NULL, NULL, NULL );
 		}
@@ -249,16 +312,17 @@ void CDXGraphicsContext::UpdateFrame(bool swaponly)
 		m_backBufferIsSaved = false;
 
 	}
-#ifndef _XBOX
+
 exit:
 
 	
 	Unlock();
-#endif
 
 	m_pd3dDevice->Present( NULL, NULL, NULL, NULL );
 	status.bScreenIsDrawn = false;
 	if( g_curRomInfo.bForceScreenClear )	needCleanScene = true;
+
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -404,16 +468,20 @@ BOOL CDXGraphicsContext::FindDepthStencilFormat( UINT iAdapter, D3DDEVTYPE Devic
 //
 //*****************************************************************************
 extern void WriteConfiguration(void);
+extern "C" void _INPUT_LoadButtonMap(int *cfgData); 
+extern int ControllerConfig[76];
+
 bool CDXGraphicsContext::Initialize(HWND hWnd, HWND hWndStatus,
 									 uint32 dwWidth, uint32 dwHeight,
 									 BOOL bWindowed )
 {
 	HRESULT hr;
-
+#ifndef _XBOX
 	if( g_GraphicsInfo.hStatusBar )
 	{
 		SetWindowText(g_GraphicsInfo.hStatusBar,"Initializing DirectX Device, please wait");
 	}
+#endif
 
 	Lock();
 
@@ -433,6 +501,7 @@ bool CDXGraphicsContext::Initialize(HWND hWnd, HWND hWndStatus,
 	// Build a list of Direct3D adapters, modes and devices. The
     // ConfirmDevice() callback is used to confirm that only devices that
     // meet the app's requirements are considered.
+#ifdef _RICE560
     if( FAILED( hr = BuildDeviceList() ) )
     {
         if ( m_pD3D )
@@ -444,6 +513,7 @@ bool CDXGraphicsContext::Initialize(HWND hWnd, HWND hWndStatus,
         DisplayD3DErrorMsg( hr, MSGERR_APPMUSTEXIT );
 		return false;
     }
+#endif
 
 	CGraphicsContext::Initialize(hWnd, hWndStatus, dwWidth, dwHeight, bWindowed );
 	
@@ -497,10 +567,22 @@ bool CDXGraphicsContext::Initialize(HWND hWnd, HWND hWndStatus,
 		g_pD3DDev->SetSoftwareVertexProcessing(FALSE);
 #endif
 
+#ifndef _XBOX
 	if( g_GraphicsInfo.hStatusBar )
 	{
 		SetWindowText(g_GraphicsInfo.hStatusBar,"DirectX device is ready");
 	}
+#else
+
+
+	// GogoAckman
+	g_pd3dDevice = g_pD3DDev;
+	sprintf(emuvidname,"Video 1964");
+    //d3dpp = m_d3dpp;
+
+	//CreateRenderTarget();
+	_INPUT_LoadButtonMap(ControllerConfig);
+#endif
 
 	return hr==S_OK;
 }
@@ -512,7 +594,6 @@ bool CDXGraphicsContext::Initialize(HWND hWnd, HWND hWndStatus,
 //-----------------------------------------------------------------------------
 static int _cdecl SortModesCallback( const VOID* arg1, const VOID* arg2 )
 {
-//#ifndef _XBOX // Still used in Rice 5.60
 	D3DDISPLAYMODE* p1 = (D3DDISPLAYMODE*)arg1;
 	D3DDISPLAYMODE* p2 = (D3DDISPLAYMODE*)arg2;
 
@@ -530,7 +611,9 @@ static int _cdecl SortModesCallback( const VOID* arg1, const VOID* arg2 )
 // This is a static function, will be called when the plugin DLL is initialized
 void CDXGraphicsContext::InitDeviceParameters()
 {
+#ifndef _XBOX
 	SetWindowText(m_hWndStatus, "Initialize DirectX Device");
+#endif
 
 	// Create Direct3D object
 	MYLPDIRECT3D pD3D;
@@ -545,10 +628,8 @@ void CDXGraphicsContext::InitDeviceParameters()
 		return;
 	}
 
-#ifndef _XBOX
 	// Get number of adapters
 	int numAvailableAdapters = pD3D->GetAdapterCount();
-#endif
 
 	// For the 1st adapter, looking through each of its devices
 	int iAdapter=0;
@@ -573,7 +654,11 @@ void CDXGraphicsContext::InitDeviceParameters()
 		pD3D->GetDeviceCaps( iAdapter, DeviceTypes[iDevice], &pDevice->d3dCaps );
 
 		pDevice->dwNumModes     = 0;
+#ifdef _XBOX
+		pDevice->MultiSampleType = SetAntiAliasMode(AntiAliasMode);
+#else
 		pDevice->MultiSampleType = D3DMULTISAMPLE_NONE;
+#endif
 	}
 
 	// Check FSAA maximum
@@ -667,34 +752,49 @@ HRESULT CDXGraphicsContext::Create3D( BOOL bWindowed )
 
 HRESULT CDXGraphicsContext::InitializeD3D()
 {
-    HRESULT hr;
-
-    D3DAdapterInfo* pAdapterInfo = &m_Adapters[m_dwAdapter];
-    //D3DDeviceInfo*  pDeviceInfo  = &pAdapterInfo->devices[pAdapterInfo->dwCurrentDevice];
-	D3DDeviceInfo*  pDeviceInfo  = &pAdapterInfo->devices[options.DirectXDevice];
-    D3DModeInfo*    pModeInfo    = &pDeviceInfo->modes[FindCurrentDisplayModeIndex()];
-	
-    // Prepare window for possible windowed/fullscreen change
-    AdjustWindowForChange();
-
-	windowSetting.statusBarHeightToUse = 0;
-	windowSetting.toolbarHeightToUse = 0;
+	HRESULT hr;
 
     // Set up the presentation parameters
     ZeroMemory( &m_d3dpp, sizeof(m_d3dpp) );
 #ifdef _XBOX
-	bool bEnableHDTV = FALSE;
-	m_d3dpp.BackBufferWidth					= 640;
-    m_d3dpp.BackBufferHeight				= 480;
-    m_d3dpp.BackBufferFormat				= D3DFMT_A8R8G8B8;
-    m_d3dpp.BackBufferCount					= 1;
-    m_d3dpp.EnableAutoDepthStencil			= TRUE;
-    m_d3dpp.AutoDepthStencilFormat			= D3DFMT_D16;
-	m_d3dpp.hDeviceWindow					= m_hWnd;
-    m_d3dpp.SwapEffect						= D3DSWAPEFFECT_COPY;
-	m_d3dpp.Flags							= D3DPRESENTFLAG_PROGRESSIVE;
-	m_d3dpp.FullScreen_PresentationInterval	= D3DPRESENT_INTERVAL_IMMEDIATE;//D3DPRESENT_INTERVAL_DEFAULT; //->VSYNC(D3DPRESENT_INTERVAL_ONE)
-	m_d3dpp.FullScreen_RefreshRateInHz		= 60;
+	windowSetting.statusBarHeightToUse = 0;
+	windowSetting.toolbarHeightToUse = 0;
+
+	m_d3dpp.Windowed               = FALSE;
+	m_d3dpp.BackBufferCount        = 1;
+	m_d3dpp.BackBufferWidth	= 640;
+	m_d3dpp.BackBufferHeight = 480;
+	m_d3dpp.BackBufferFormat =  D3DFMT_A8R8G8B8;//D3DFMT_LIN_R5G6B5;
+	m_d3dpp.MultiSampleType        = SetAntiAliasMode(AntiAliasMode);
+	//m_d3dpp.SwapEffect             = bufferSettings[curBufferSetting].swapEffect;
+	m_d3dpp.SwapEffect             =  D3DSWAPEFFECT_COPY;
+	m_d3dpp.EnableAutoDepthStencil = TRUE; /*m_bUseDepthBuffer;*/
+	//m_d3dpp.AutoDepthStencilFormat = pModeInfo->DepthStencilFormat;
+	m_d3dpp.AutoDepthStencilFormat = D3DFMT_D16;
+	m_d3dpp.hDeviceWindow          = m_hWnd;
+
+	switch (VSync){
+		case 0 : 	m_d3dpp.FullScreen_PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
+			break;
+		case 1 : 	m_d3dpp.FullScreen_PresentationInterval = D3DPRESENT_INTERVAL_ONE;
+			break;
+		case 2 : 	m_d3dpp.FullScreen_PresentationInterval = D3DPRESENT_INTERVAL_ONE_OR_IMMEDIATE;
+			break;
+/*		case 2 : 	m_d3dpp.FullScreen_PresentationInterval = D3DPRESENT_INTERVAL_TWO;
+			break;
+		case 3 : 	m_d3dpp.FullScreen_PresentationInterval = D3DPRESENT_INTERVAL_THREE;
+			break;
+		case 4 : 	m_d3dpp.FullScreen_PresentationInterval = D3DPRESENT_INTERVAL_DEFAULT;
+			break;
+		case 5 : 	m_d3dpp.FullScreen_PresentationInterval = D3DPRESENT_INTERVAL_ONE_OR_IMMEDIATE;
+			break;
+		case 6 : 	m_d3dpp.FullScreen_PresentationInterval = D3DPRESENT_INTERVAL_TWO_OR_IMMEDIATE;
+			break;
+		case 7 : 	m_d3dpp.FullScreen_PresentationInterval = D3DPRESENT_INTERVAL_THREE_OR_IMMEDIATE;
+			break;*/
+	}
+	m_d3dpp.FullScreen_RefreshRateInHz = 60;
+	
 
 	DWORD videoFlags = XGetVideoFlags();
 	if(XGetVideoStandard() == XC_VIDEO_STANDARD_PAL_I)
@@ -705,58 +805,72 @@ HRESULT CDXGraphicsContext::InitializeD3D()
 			m_d3dpp.FullScreen_RefreshRateInHz = 50;
 	}
 
-
-    if(XGetAVPack() == XC_AV_PACK_HDTV)
-        {
-                if(videoFlags & XC_VIDEO_FLAGS_HDTV_1080i)
-                {
-                       /* m_d3dpp.Flags            = D3DPRESENTFLAG_WIDESCREEN | D3DPRESENTFLAG_INTERLACED;
-                        m_d3dpp.BackBufferWidth  = 1920;
-                        m_d3dpp.BackBufferHeight = 1080;*/
-                }
-                if(videoFlags & XC_VIDEO_FLAGS_HDTV_720p)
-                {
-                        m_d3dpp.Flags            = D3DPRESENTFLAG_PROGRESSIVE | D3DPRESENTFLAG_WIDESCREEN;
-                        m_d3dpp.BackBufferFormat = D3DFMT_X8R8G8B8;
-						if(bEnableHDTV){
-                        m_d3dpp.BackBufferWidth  = 1280;
-                        m_d3dpp.BackBufferHeight = 720;
-						}else{
-						m_d3dpp.BackBufferWidth  = 640;
-                        m_d3dpp.BackBufferHeight = 480;
-						}
-                }
-				else if(videoFlags & XC_VIDEO_FLAGS_HDTV_480p)
-                {
-                        m_d3dpp.Flags            = D3DPRESENTFLAG_PROGRESSIVE;
-                        m_d3dpp.BackBufferFormat = D3DFMT_X8R8G8B8;
-                        m_d3dpp.BackBufferWidth  = 640;
-                        m_d3dpp.BackBufferHeight = 480;
-                }
-		}
-
 	//Widescreen
 	if((videoFlags & XC_VIDEO_FLAGS_WIDESCREEN) !=0)
 	 {
 		m_d3dpp.Flags = D3DPRESENTFLAG_WIDESCREEN;
 	 }
 	
-	D3DXMATRIX mat;
-	D3DXMatrixOrthoOffCenterLH(&mat, (float)0, (float)m_d3dpp.BackBufferWidth, (float)m_d3dpp.BackBufferHeight, (float)0, 0.0f, 1.0f);
-    
+	 if(XGetAVPack() == XC_AV_PACK_HDTV){
+		//720p
+		if( videoFlags & XC_VIDEO_FLAGS_HDTV_720p && bEnableHDTV){
+			m_d3dpp.BackBufferWidth = 1280;
+			m_d3dpp.BackBufferHeight = 720;
+			m_d3dpp.Flags = D3DPRESENTFLAG_PROGRESSIVE | D3DPRESENTFLAG_WIDESCREEN;
+			m_d3dpp.BackBufferFormat = D3DFMT_A8R8G8B8;
+		}
+		//480p
+		else if( videoFlags & XC_VIDEO_FLAGS_HDTV_480p){
+			m_d3dpp.Flags = D3DPRESENTFLAG_PROGRESSIVE;
+			m_d3dpp.BackBufferFormat = D3DFMT_A8R8G8B8;
+		}
+	 }
+
 	windowSetting.uDisplayWidth = m_d3dpp.BackBufferWidth;
 	windowSetting.uDisplayHeight = m_d3dpp.BackBufferHeight;
 
 	m_desktopFormat = D3DFMT_A8R8G8B8;
-#else
-    m_d3dpp.Windowed               = pDeviceInfo->bWindowed;
-    m_d3dpp.BackBufferCount        = DirectXRenderBufferSettings[options.RenderBufferSetting].number;
-    m_d3dpp.AutoDepthStencilFormat = pModeInfo->DepthStencilFormat;
-	m_d3dpp.AutoDepthStencilFormat = (D3DFORMAT)(DirectXDepthBufferSetting[options.DirectXDepthBufferSetting].number);
-	m_desktopFormat = pAdapterInfo->d3ddmDesktop.Format;
-#endif
-	m_d3dpp.EnableAutoDepthStencil = TRUE; /*m_bUseDepthBuffer;*/
 
+	//freakdave
+	if(VertexMode == 0){
+		// Create the device
+		hr = m_pD3D->CreateDevice( D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL,
+			NULL, D3DCREATE_PUREDEVICE, &m_d3dpp,
+			&m_pd3dDevice );
+	}
+
+
+	else if(VertexMode == 1){ //Xbox doesn't do Software vertex processing. Do Software Vertex Clipper instead.
+		// Create the device
+		hr = m_pD3D->CreateDevice( D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL,
+			NULL, D3DCREATE_HARDWARE_VERTEXPROCESSING, &m_d3dpp,
+			&m_pd3dDevice );
+
+		options.bForceSoftwareClipper = TRUE;
+
+	}
+
+	else if(VertexMode == 2){
+		// Create the device
+		hr = m_pD3D->CreateDevice( D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL,
+			NULL, D3DCREATE_HARDWARE_VERTEXPROCESSING, &m_d3dpp,
+			&m_pd3dDevice );
+
+	}
+
+	else if(VertexMode == 3){
+		// Create the device
+		hr = m_pD3D->CreateDevice( D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL,
+			NULL, D3DCREATE_MIXED_VERTEXPROCESSING, &m_d3dpp,
+			&m_pd3dDevice );
+
+	}
+#else
+	m_d3dpp.Windowed               = pDeviceInfo->bWindowed;
+	m_d3dpp.BackBufferCount        = DirectXRenderBufferSettings[options.RenderBufferSetting].number;
+	m_d3dpp.EnableAutoDepthStencil = TRUE; /*m_bUseDepthBuffer;*/
+	m_d3dpp.AutoDepthStencilFormat = pModeInfo->DepthStencilFormat;
+	m_d3dpp.AutoDepthStencilFormat = (D3DFORMAT)(DirectXDepthBufferSetting[options.DirectXDepthBufferSetting].number);
 	m_d3dpp.hDeviceWindow          = m_hWnd;
 	m_d3dpp.Flags				   = D3DPRESENTFLAG_LOCKABLE_BACKBUFFER;
 
@@ -794,7 +908,7 @@ HRESULT CDXGraphicsContext::InitializeD3D()
 		m_d3dpp.MultiSampleType        = D3DMULTISAMPLE_NONE;
 		SetWindowText(g_GraphicsInfo.hStatusBar, "FSAA is turned off in order to use BackBuffer emulation");
 	}
-#ifndef _XBOX
+
     if( m_bWindowed )
     {
 
@@ -827,13 +941,12 @@ HRESULT CDXGraphicsContext::InitializeD3D()
 			windowSetting.uFullScreenRefreshRate = pModeInfo->RefreshRate;
 		}
     }
-#endif	
+	m_desktopFormat = pAdapterInfo->d3ddmDesktop.Format;
 	m_d3dpp.BackBufferWidth		= windowSetting.uDisplayWidth;
 	m_d3dpp.BackBufferHeight	= windowSetting.uDisplayHeight;
 
 	
     // Create the device
-#ifndef _XBOX
 	hr = m_pD3D->CreateDevice( m_dwAdapter, pDeviceInfo->DeviceType,m_hWnd, pModeInfo->dwBehavior, &m_d3dpp,	&m_pd3dDevice );
 	if( !SUCCEEDED(hr) && m_d3dpp.MultiSampleType == D3DMULTISAMPLE_NONE )
 	{
@@ -842,10 +955,6 @@ HRESULT CDXGraphicsContext::InitializeD3D()
 		m_d3dpp.MultiSampleType        = D3DMULTISAMPLE_NONE;
 		hr = m_pD3D->CreateDevice( m_dwAdapter, pDeviceInfo->DeviceType,m_hWnd, pModeInfo->dwBehavior, &m_d3dpp,	&m_pd3dDevice );
 	}
-#else // Force device type and HW vertex processing
-	hr = m_pD3D->CreateDevice( D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL,
-							   NULL, D3DCREATE_HARDWARE_VERTEXPROCESSING , &m_d3dpp,
-							  &m_pd3dDevice );
 #endif
 
     if( m_pd3dDevice )
@@ -861,18 +970,39 @@ HRESULT CDXGraphicsContext::InitializeD3D()
         // the window size to 1000x600 until after the display mode has
         // changed to 1024x768, because windows cannot be larger than the
         // desktop.
+		
+        // Store device Caps
+        m_pd3dDevice->GetDeviceCaps( &m_d3dCaps );
+
+#ifdef _XBOX
+		//freakdave
+		if(VertexMode == 0){
+			m_dwCreateFlags = D3DCREATE_PUREDEVICE;
+		}
+
+		else if(VertexMode == 1){
+			m_dwCreateFlags = D3DCREATE_SOFTWARE_VERTEXPROCESSING;
+		}
+
+		else if(VertexMode == 2){
+			m_dwCreateFlags = D3DCREATE_HARDWARE_VERTEXPROCESSING;
+		}
+
+		else if(VertexMode == 3){
+			m_dwCreateFlags = D3DCREATE_MIXED_VERTEXPROCESSING;
+		}
+#else
+        m_dwCreateFlags = pModeInfo->dwBehavior;
+		
         if( m_bWindowed )
         {
-#ifndef _XBOX
             SetWindowPos( m_hWnd, HWND_NOTOPMOST,
 						m_rcWindowBounds.left, m_rcWindowBounds.top,
 						( m_rcWindowBounds.right - m_rcWindowBounds.left ),
 						( m_rcWindowBounds.bottom - m_rcWindowBounds.top ),
 						SWP_SHOWWINDOW );
-#endif
         }
-		
-#ifndef _XBOX
+
         // Store device description
         if( pDeviceInfo->DeviceType == D3DDEVTYPE_REF )
             lstrcpy( m_strDeviceStats, "REF" );
@@ -918,10 +1048,7 @@ HRESULT CDXGraphicsContext::InitializeD3D()
 		{
 			SetWindowText(m_hWndStatus, m_strDeviceStats);
 		}
-#else
-		m_pd3dDevice->GetDeviceCaps( &m_d3dCaps );
-		m_dwCreateFlags = D3DCREATE_SOFTWARE_VERTEXPROCESSING;
- 
+		TRACE0(m_strDeviceStats);
 #endif
 	
 		
@@ -947,16 +1074,20 @@ HRESULT CDXGraphicsContext::InitializeD3D()
             return S_OK;
         }
 		
-        // Cleanup before we try again (- shouldn't get here)
+#ifndef _RICE560
+				// Cleanup before we try again (- shouldn't get here)
         CleanDeviceObjects();
+#endif
         SAFE_RELEASE( m_pd3dDevice );
     }
 	else
 	{
+#ifndef _XBOX
 		if( status.ToToggleFullScreen || !m_bWindowed )
 			SetWindowText(g_GraphicsInfo.hStatusBar,"Can not initialize DX8, check your Direct settings");
 		else
 			MsgInfo("Can not initialize DX8, check your Direct settings");
+#endif
 	}
 	
 	/*
@@ -990,7 +1121,6 @@ HRESULT CDXGraphicsContext::InitializeD3D()
 //-----------------------------------------------------------------------------
 HRESULT CDXGraphicsContext::ResizeD3DEnvironment()
 {
-#ifndef _XBOX // comment for now
     HRESULT hr;
 	
     // Release all vidmem objects
@@ -1026,7 +1156,7 @@ HRESULT CDXGraphicsContext::ResizeD3DEnvironment()
 	{
 		CRender::GetRender()->InitDeviceObjects();
 	}
-#endif	
+	
     return S_OK;
 }
 
@@ -1037,13 +1167,13 @@ HRESULT CDXGraphicsContext::ResizeD3DEnvironment()
 //-----------------------------------------------------------------------------
 HRESULT CDXGraphicsContext::DoToggleFullscreen()
 {
- 
+#ifndef _XBOX
     // Get access to current adapter, device, and mode
 	D3DAdapterInfo* pAdapterInfo = &m_Adapters[m_dwAdapter];
 	//D3DDeviceInfo*  pDeviceInfo  = &pAdapterInfo->devices[pAdapterInfo->dwCurrentDevice];
 	D3DDeviceInfo*  pDeviceInfo  = &pAdapterInfo->devices[options.DirectXDevice];
     D3DModeInfo*    pModeInfo    = &pDeviceInfo->modes[FindCurrentDisplayModeIndex()];
-#ifndef _XBOX// Shouldn't need to switch between full screen and windowed mode on XBOX	
+	
     // Need device change if going windowed and the current device
     // can only be fullscreen
 
@@ -1180,69 +1310,6 @@ HRESULT CDXGraphicsContext::ForceWindowed()
 
 #else // Rice 5.60 code below
 
-
-HRESULT hr;
-    D3DAdapterInfo* pAdapterInfoCur = &m_Adapters[m_dwAdapter];
-    //D3DDeviceInfo*  pDeviceInfoCur  = &pAdapterInfoCur->devices[pAdapterInfoCur->dwCurrentDevice];
-	D3DDeviceInfo*  pDeviceInfoCur  = &pAdapterInfoCur->devices[options.DirectXDevice];
-    BOOL bFoundDevice = FALSE;
-	
-    if( pDeviceInfoCur->bCanDoWindowed )
-    {
-        bFoundDevice = TRUE;
-    }
-    else
-    {
-        // Look for a windowable device on any adapter
-        D3DAdapterInfo* pAdapterInfo;
-        int dwAdapter;
-        D3DDeviceInfo* pDeviceInfo;
-        int dwDevice;
-        for( dwAdapter = 0; dwAdapter < m_dwNumAdapters; dwAdapter++ )
-        {
-            pAdapterInfo = &m_Adapters[dwAdapter];
-            for( dwDevice = 0; dwDevice < pAdapterInfo->dwNumDevices; dwDevice++ )
-            {
-                pDeviceInfo = &pAdapterInfo->devices[dwDevice];
-                if( pDeviceInfo->bCanDoWindowed )
-                {
-                    m_dwAdapter = dwAdapter;
-                    pDeviceInfoCur = pDeviceInfo;
-                    pAdapterInfo->dwCurrentDevice = dwDevice;
-                    bFoundDevice = TRUE;
-                    break;
-                }
-            }
-            if( bFoundDevice )
-                break;
-        }
-    }
-	
-    if( !bFoundDevice )
-        return E_FAIL;
-	
-    pDeviceInfoCur->bWindowed = true;
-    m_bWindowed = true;
-	
-    // Now destroy the current 3D device objects, then reinitialize
-	
-    m_bReady = false;
-	
-    // Release all scene objects that will be re-created for the new device
-    CleanDeviceObjects();
-	
-    // Release display objects, so a new device can be created
-	LONG nRefCount = m_pd3dDevice->Release();
-    if( nRefCount > 0L )
-	{
-        return DisplayD3DErrorMsg( D3DAPPERR_NONZEROREFCOUNT, MSGERR_APPMUSTEXIT );
-	}
-	
-    // Create the new device
-    if( FAILED( hr = InitializeD3D() ) )
-        return DisplayD3DErrorMsg( hr, MSGERR_APPMUSTEXIT );
-    m_bReady = true;
-	
     return S_OK;
 #endif // Rice 5.60
 }
@@ -1627,7 +1694,11 @@ int	CDXGraphicsContext::FindCurrentDisplayModeIndex()
 	DebuggerAppendMsg("Cannot find a matching mode");
 	for( m=0; m<device.dwNumModes; m++ )
 	{
-		if( device.modes[m].Width==640 && device.modes[m].Height==480 )
+		if( device.modes[m].Width==1280 && device.modes[m].Height==720 )
+		{
+			return m;
+		}
+		else if( device.modes[m].Width==640 && device.modes[m].Height==480 )
 		{
 			return m;
 		}
@@ -1662,6 +1733,9 @@ HRESULT CDXGraphicsContext::ConfirmDevice( MYD3DCAPS* pCaps, uint32 dwBehavior,
 //-----------------------------------------------------------------------------
 HRESULT CDXGraphicsContext::DisplayD3DErrorMsg( HRESULT hr, uint32 dwType )
 {
+#ifdef _XBOX
+	return S_OK;
+#else
     TCHAR strMsg[512];
 	
     switch( hr )
@@ -1756,14 +1830,13 @@ HRESULT CDXGraphicsContext::DisplayD3DErrorMsg( HRESULT hr, uint32 dwType )
     }
 
 	OutputDebugString( strMsg );
-#ifndef _XBOX
 	if( status.ToToggleFullScreen || !CGraphicsContext::g_pGraphicsContext->IsWindowed() )
 		SetWindowText(g_GraphicsInfo.hStatusBar,strMsg);
 	else
 		MessageBox(NULL,strMsg,"str",MB_OK|MB_ICONERROR);
-#endif
 
     return hr;
+#endif
 }
 
 
@@ -1892,11 +1965,12 @@ extern RecentCIInfo* g_uRecentCIInfoPtrs[3];
 extern TextureBufferInfo gTextureBufferInfos[];
 void CDXGraphicsContext::SaveBackBuffer(int ciInfoIdx, RECT* pSrcRect)
 {
+#ifndef _DISABLE_VID1964
 	if( ciInfoIdx == 1 )	// to save the current front buffer
 	{
 		UpdateFrame(true);
 	}
-
+#endif
 	HRESULT res;
 	SetImgInfo tempinfo;
 	RecentCIInfo &ciInfo = *g_uRecentCIInfoPtrs[ciInfoIdx];
@@ -1905,7 +1979,11 @@ void CDXGraphicsContext::SaveBackBuffer(int ciInfoIdx, RECT* pSrcRect)
 	tempinfo.dwSize = ciInfo.dwSize;
 	tempinfo.dwWidth = ciInfo.dwWidth;
 
-	int idx = SetBackBufferAsTextureBuffer(tempinfo, ciInfoIdx); // 5.60 SetTextureBuffer(tempinfo, ciInfoIdx,true );
+#ifdef _RICE560
+	int idx = SetTextureBuffer(tempinfo, ciInfoIdx,true );
+#else
+	int idx = SetBackBufferAsTextureBuffer(tempinfo, ciInfoIdx);
+#endif
 
 	MYLPDIRECT3DSURFACE pSavedBuffer;
 	MYLPDIRECT3DTEXTURE(gTextureBufferInfos[idx].pTxtBuffer->m_pTexture->GetTexture())->GetSurfaceLevel(0,&pSavedBuffer);
@@ -1998,15 +2076,20 @@ RECT dstrect = {0,0,gTextureBufferInfos[idx].pTxtBuffer->m_pTexture->m_dwWidth,g
 	}
 
 	gTextureBufferInfos[idx].crcCheckedAtFrame = status.gDlistCount;
-	gTextureBufferInfos[idx].crcInRDRAM = ComputeTextureBufferCRCInRDRAM(idx);// Rice 5.60 uses ComputeTextureBufferCRCInRDRAM(m_curTextureBufferIndex);
-
+#ifdef _RICE560	
+	gTextureBufferInfos[idx].crcInRDRAM = ComputeTextureBufferCRCInRDRAM(m_curTextureBufferIndex);
+#else
+	gTextureBufferInfos[idx].crcInRDRAM = ComputeTextureBufferCRCInRDRAM(idx);
+#endif
 	pSavedBuffer->Release();
 	g_uRecentCIInfoPtrs[ciInfoIdx]->bCopied = true;
 
+#ifndef _DISABLE_VID1964	
 	if( ciInfoIdx == 1 )	// to save the current front buffer
 	{
 		UpdateFrame(true);
 	}
+#endif
 }
 
 CDXTextureBuffer::CDXTextureBuffer(int width, int height, TextureBufferInfo* pInfo, TextureUsage usage)
@@ -2492,7 +2575,11 @@ HRESULT CD3DDevWrapper::SetRenderState(D3DRENDERSTATETYPE State,DWORD Value)
 {
 	if( m_pD3DDev != NULL )
 	{
+#ifndef _RICE612
 		if( m_savedRenderStates[State] != Value )
+#else
+		if (m_savedRenderStates[State] != Value || !m_savedRenderStates[State])
+#endif
 		{
 			m_savedRenderStates[State] = Value;
 			return m_pD3DDev->SetRenderState(State, Value);
@@ -2504,7 +2591,11 @@ HRESULT CD3DDevWrapper::SetRenderState(D3DRENDERSTATETYPE State,DWORD Value)
 
 HRESULT CD3DDevWrapper::SetTextureStageState(DWORD Stage,D3DTEXTURESTAGESTATETYPE Type,DWORD Value)
 {
+#ifdef _XBOX_HACK
+	if( m_pD3DDev != NULL && Stage < 4 )
+#else
 	if( m_pD3DDev != NULL )
+#endif
 	{
 		if( m_savedTextureStageStates[Stage][Type] != Value )
 		{
@@ -2551,7 +2642,9 @@ HRESULT CD3DDevWrapper::SetPixelShader(DWORD Handle)
 {
 	if( m_pD3DDev != NULL )
 	{
+#ifndef _XBOX // dipset
 		if( m_savedPixelShaderHander != Handle )
+#endif
 		{
 			m_savedPixelShaderHander = Handle;
 			return m_pD3DDev->SetPixelShader(Handle);
@@ -2579,10 +2672,12 @@ HRESULT CD3DDevWrapper::SetPixelShaderConstant(DWORD Register, float* pfdata)
 {
 	if( m_pD3DDev != NULL )
 	{
+#ifndef _RICE612
 		if( m_savedPixelShaderConstants[Register][0] != pfdata[0] ||
 			m_savedPixelShaderConstants[Register][1] != pfdata[1] ||
 			m_savedPixelShaderConstants[Register][2] != pfdata[2] ||
 			m_savedPixelShaderConstants[Register][3] != pfdata[3] )
+#endif
 		{
 			m_savedPixelShaderConstants[Register][0] = pfdata[0];
 			m_savedPixelShaderConstants[Register][1] = pfdata[1];
@@ -2603,13 +2698,19 @@ HRESULT CD3DDevWrapper::SetViewport(MYD3DVIEWPORT* pViewport)
 {
 	if( m_pD3DDev != NULL )
 	{
+#ifndef _RICE612
 		if( m_savedViewport.X		!= pViewport->X ||
 			m_savedViewport.Y		!= pViewport->Y ||
 			m_savedViewport.Width	!= pViewport->Width ||
 			m_savedViewport.Height	!= pViewport->Height ||
 			m_savedViewport.MinZ	!= pViewport->MinZ ||
 			m_savedViewport.MaxZ	!= pViewport->MaxZ )
+#endif
 		{
+#ifdef _RICE612
+			if( pViewport->Width <= 0 )	pViewport->Width = 1;
+			if( pViewport->Height <= 0 )	pViewport->Height = 1;
+#endif
 			m_savedViewport.X		= pViewport->X;
 			m_savedViewport.Y		= pViewport->Y;
 			m_savedViewport.Width	= pViewport->Width;
@@ -2617,7 +2718,14 @@ HRESULT CD3DDevWrapper::SetViewport(MYD3DVIEWPORT* pViewport)
 			m_savedViewport.MinZ	= pViewport->MinZ;
 			m_savedViewport.MaxZ	= pViewport->MaxZ;
 			
-			return m_pD3DDev->SetViewport(pViewport);
+			
+			try
+			{
+				return m_pD3DDev->SetViewport(pViewport);
+			}
+			catch(...)
+			{
+			}
 		}
 	}
 
@@ -2625,9 +2733,15 @@ HRESULT CD3DDevWrapper::SetViewport(MYD3DVIEWPORT* pViewport)
 }
 HRESULT CD3DDevWrapper::SetTexture(DWORD Stage,MYIDirect3DBaseTexture* pTexture)
 {
+#ifdef _XBOX_HACK
+	if( m_pD3DDev != NULL && Stage < 4 )
+#else
 	if( m_pD3DDev != NULL )
+#endif
 	{
+#ifndef _XBOX
 		if (m_savedTexturePointers[Stage] != pTexture )
+#endif
 		{
 			m_savedTexturePointers[Stage] = pTexture;
 			return m_pD3DDev->SetTexture( Stage, pTexture );
@@ -2641,7 +2755,9 @@ HRESULT CD3DDevWrapper::SetVertexShader(DWORD Handle)
 {
 	if( m_pD3DDev != NULL )
 	{
+#ifndef _RICE612
 		if( m_savedVertexShaderHander != Handle )
+#endif
 		{
 			m_savedVertexShaderHander = Handle;
 #if DX_VERSION == 8

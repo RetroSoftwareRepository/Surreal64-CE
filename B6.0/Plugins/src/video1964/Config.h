@@ -102,10 +102,15 @@ enum {
 };
 
 enum {
-	FORCE_DEFAULT_FILTER,
+	//
+	FORCE_NONE_FILTER,
 	FORCE_POINT_FILTER,
 	FORCE_LINEAR_FILTER,
 	FORCE_BILINEAR_FILTER,
+	FORCE_ANISOTROPIC_FILTER,
+	FORCE_FLATCUBIC_FILTER,
+	FORCE_GAUSSIANCUBIC_FILTER,
+	FORCE_DEFAULT_FILTER,
 };
 
 enum {
@@ -184,6 +189,11 @@ enum HACK_FOR_GAMES
 	HACK_FOR_MLB,
 	HACK_FOR_POLARISSNOCROSS,
 	HACK_FOR_TOPGEARRALLY,
+	HACK_FOR_DUKE_NUKEM,
+	HACK_FOR_ZELDA_MM,
+	HACK_FOR_MARIO_KART,
+	HACK_FOR_QUAKE_2,
+	HACK_FOR_TEXTURE_SEAMS,
 };
 
 enum {
@@ -198,6 +208,7 @@ typedef struct {
 	BOOL	bWinFrameMode;
 	BOOL	bForceSoftwareTnL;
 	BOOL	bForceSoftwareClipper;
+	BOOL	bUseLinearFog;
 	BOOL	bEnableSSE;
 	BOOL	bSkipFrame;
 	BOOL	bDisplayTooltip;
@@ -231,6 +242,7 @@ typedef struct {
 	uint32	colorQuality;
 
 	HACK_FOR_GAMES	enableHackForGames;
+	BOOL			enableHackTextureSeams;
 } GlobalOptions;
 
 extern GlobalOptions options;
