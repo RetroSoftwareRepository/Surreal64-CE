@@ -1261,7 +1261,11 @@ void DLParser_RSP_Last_Legion_0x00(Gfx *gfx)
 
 void DLParser_TexRect_Last_Legion(Gfx *gfx)
 {
+#ifndef _DISABLE_VID1964
 	if( !status.bCIBufferIsRendered ) CGraphicsContext::g_pGraphicsContext->FirstDrawToNewCI();
+#else
+	status.bCIBufferIsRendered = true;
+#endif
 
 	status.primitiveType = PRIM_TEXTRECT;
 

@@ -31,7 +31,7 @@
 				PrecompiledHeaderFile="$(IntDir)\$(ProjectName).pch"
 				BrowseInformation="1"
 				WarningLevel="3"
-				SuppressStartupBanner="true"
+				SuppressStartupBanner="TRUE"
 				DebugInformationFormat="4"
 				CallingConvention="1"/>
 			<Tool
@@ -60,8 +60,8 @@
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="TRUE"
 				OptimizeForProcessor="2"
-				AdditionalIncludeDirectories="..\..\..\Common"
-				PreprocessorDefinitions="NDEBUG;_XBOX;_LIB"
+				AdditionalIncludeDirectories="..\..\..\Include"
+				PreprocessorDefinitions="NDEBUG;_XBOX;_LIB;_OLDCLIPPER;_XBOX_HACK;_RICE612;_XBOX_HACK2"
 				StringPooling="TRUE"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="TRUE"
@@ -70,7 +70,7 @@
 				PrecompiledHeaderFile="$(IntDir)\$(ProjectName).pch"
 				BrowseInformation="1"
 				WarningLevel="3"
-				SuppressStartupBanner="true"
+				SuppressStartupBanner="TRUE"
 				DebugInformationFormat="3"
 				CallingConvention="1"/>
 			<Tool
@@ -384,6 +384,89 @@
 				</File>
 				<File
 					RelativePath=".\IColor.h">
+				</File>
+			</Filter>
+		</Filter>
+		<Filter
+			Name="Xbox Additions"
+			Filter="">
+			<Filter
+				Name="Common"
+				Filter="">
+				<File
+					RelativePath="..\Common\Video\XboxOSD.cpp">
+				</File>
+				<Filter
+					Name="Menu"
+					Filter="">
+					<File
+						RelativePath="..\Common\Video\Menu\Common.h">
+					</File>
+					<File
+						RelativePath="..\Common\Video\Menu\D3DSave.cpp">
+					</File>
+					<File
+						RelativePath="..\Common\Video\Menu\D3DSave.h">
+					</File>
+					<File
+						RelativePath="..\Common\Video\Menu\MenuMain.cpp">
+					</File>
+					<File
+						RelativePath="..\Common\Video\Menu\MenuMain.h">
+					</File>
+					<File
+						RelativePath="..\Common\Video\Menu\Util.cpp">
+					</File>
+					<File
+						RelativePath="..\Common\Video\Menu\Util.h">
+					</File>
+				</Filter>
+			</Filter>
+			<Filter
+				Name="Ingame Menu"
+				Filter="">
+				<File
+					RelativePath="..\..\..\Ingamemenu\controller.cpp">
+				</File>
+				<File
+					RelativePath="..\..\..\Ingamemenu\IoSupport.cpp">
+				</File>
+				<File
+					RelativePath="..\..\..\Ingamemenu\IoSupport.h">
+				</File>
+				<File
+					RelativePath="..\..\..\Ingamemenu\Panel.cpp">
+				</File>
+				<File
+					RelativePath="..\..\..\Ingamemenu\SurrealMenu.cpp">
+				</File>
+				<File
+					RelativePath="..\..\..\Ingamemenu\ui_logo.cpp">
+				</File>
+				<File
+					RelativePath="..\..\..\Ingamemenu\xlmenu.cpp">
+				</File>
+			</Filter>
+			<Filter
+				Name="Include"
+				Filter="">
+				<File
+					RelativePath="..\..\..\Include\xbapp.cpp">
+				</File>
+				<File
+					RelativePath="..\..\..\Include\xbfont.cpp">
+				</File>
+				<File
+					RelativePath="..\..\..\Include\xbinput.cpp">
+				</File>
+				<File
+					RelativePath="..\..\..\Include\xbprofiling.cpp">
+				</File>
+				<File
+					RelativePath="..\..\..\Include\xbresource.cpp">
+				</File>
+				<File
+					RelativePath="..\..\..\Include\xbutil.cpp">
 				</File>
 			</Filter>
 		</Filter>

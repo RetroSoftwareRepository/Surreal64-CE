@@ -42,6 +42,7 @@ void CDeviceBuilder::SelectDeviceType(SupportedDeviceType type)
 	CDeviceBuilder::m_deviceType = type;
 	switch(type)
 	{
+#ifndef _XBOX
 	case OGL_DEVICE:
 	case OGL_1_1_DEVICE:
 	case OGL_1_2_DEVICE:
@@ -52,6 +53,7 @@ void CDeviceBuilder::SelectDeviceType(SupportedDeviceType type)
 	case NVIDIA_OGL_DEVICE:
 		CDeviceBuilder::m_deviceGeneralType = OGL_DEVICE;
 		break;
+#endif
 	case DIRECTX_DEVICE:
 	case DIRECTX_9_DEVICE:
 	case DIRECTX_8_DEVICE:
@@ -78,11 +80,9 @@ CDeviceBuilder* CDeviceBuilder::CreateBuilder(SupportedDeviceType type)
 {
 	if( m_pInstance == NULL )
 	{
-#ifdef _XBOX
-		m_pInstance = new DirectXDeviceBuilder();
-#else
 		switch( type )
 		{
+#ifndef _XBOX
 		case 	OGL_DEVICE:
 		case 	OGL_1_1_DEVICE:
 		case 	OGL_1_2_DEVICE:
@@ -93,6 +93,7 @@ CDeviceBuilder* CDeviceBuilder::CreateBuilder(SupportedDeviceType type)
 		case 	NVIDIA_OGL_DEVICE:
 			m_pInstance = new OGLDeviceBuilder();
 			break;
+#endif
 		case 	DIRECTX_DEVICE:
 		case 	DIRECTX_9_DEVICE:
 		case 	DIRECTX_8_DEVICE:
@@ -106,7 +107,6 @@ CDeviceBuilder* CDeviceBuilder::CreateBuilder(SupportedDeviceType type)
 			ErrorMsg("Error builder type");
 			exit(1);
 		}
-#endif
 
 		SAFE_CHECK(m_pInstance);
 	}
@@ -331,7 +331,9 @@ CGraphicsContext * DirectXDeviceBuilder::CreateGraphicsContext(void)
 {
 	if( g_GraphicsInfo.hStatusBar )
 	{
+#ifndef _XBOX
 		SetWindowText(g_GraphicsInfo.hStatusBar,"Creating DirectX Device Context");
+#endif
 	}
 	if( m_pGraphicsContext == NULL )
 	{
@@ -383,8 +385,6 @@ CColorCombiner * DirectXDeviceBuilder::CreateColorCombiner(CRender *pRender)
 
 #ifdef _XBOX
 		type = DX_PIXEL_SHADER;
-		//type = DX_BEST_FIT;
-		//type = DX_LOW_END;
 #else
 		if( (options.DirectXCombiner == DX_PIXEL_SHADER || options.DirectXCombiner == DX_SEMI_PIXEL_SHADER)
 			&& !canUsePixelShader )

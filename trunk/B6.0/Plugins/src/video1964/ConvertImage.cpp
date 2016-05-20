@@ -1029,9 +1029,9 @@ void ConvertYUV(CTexture *pTexture, const TxtrInfo &tinfo)
 
 				for (x = 0; x < tinfo.WidthToLoad/2; x++)
 				{
-					int y0 = *(uint8*)&pByteSrc[(dwWordOffset  )^nFiddle];
+					int y0 = *(uint8*)&pByteSrc[(dwWordOffset  )^nFiddle]; //+2 Rice 6.12
 					int v0 = *(uint8*)&pByteSrc[(dwWordOffset+1)^nFiddle];
-					int y1 = *(uint8*)&pByteSrc[(dwWordOffset+2)^nFiddle];
+					int y1 = *(uint8*)&pByteSrc[(dwWordOffset+2)^nFiddle]; //+2 Rice 5.60 & 1964video
 					int u0 = *(uint8*)&pByteSrc[(dwWordOffset+3)^nFiddle];
 
 					dwDst[x*2+0] = ConvertYUV16ToR8G8B8(y0,u0,v0);
@@ -1051,10 +1051,10 @@ void ConvertYUV(CTexture *pTexture, const TxtrInfo &tinfo)
 
 				for (x = 0; x < tinfo.WidthToLoad/2; x++)
 				{
-					int y0 = *(uint8*)&pByteSrc[dwByteOffset];
-					int v0 = *(uint8*)&pByteSrc[dwByteOffset+1];
-					int y1 = *(uint8*)&pByteSrc[dwByteOffset+2];
-					int u0 = *(uint8*)&pByteSrc[dwByteOffset+3];
+					int y0 = *(uint8*)&pByteSrc[(dwByteOffset  )]; //+2 Rice 6.12
+					int v0 = *(uint8*)&pByteSrc[(dwByteOffset+1)];
+					int y1 = *(uint8*)&pByteSrc[(dwByteOffset+2)]; //+2 Rice 5.60, 1964video
+					int u0 = *(uint8*)&pByteSrc[(dwByteOffset+3)];
 
 					dwDst[x*2+0] = ConvertYUV16ToR8G8B8(y0,u0,v0);
 					dwDst[x*2+1] = ConvertYUV16ToR8G8B8(y1,u0,v0);
@@ -1072,18 +1072,20 @@ void ConvertYUV(CTexture *pTexture, const TxtrInfo &tinfo)
 
 uint32 ConvertYUV16ToR8G8B8(int Y, int U, int V)
 {
-	uint32 A= 1;
+	//uint32 A= 1;
 
 	/*
 	int R = int(g_convc0 *(Y-16) + g_convc1 * V);
 	int G = int(g_convc0 *(Y-16) + g_convc2 * U - g_convc3 * V);
 	int B = int(g_convc0 *(Y-16) + g_convc4 * U);
 	*/
+	Y += 80; // Verify? Rice 6.12
 
 	int R = int(Y + (1.370705f * (V-128)));
 	int G = int(Y - (0.698001f * (V-128)) - (0.337633f * (U-128)));
 	int B = int(Y + (1.732446f * (U-128)));
 
+	/*
 	R = R<0 ? 0 : R;
 	G = G<0 ? 0 : G;
 	B = B<0 ? 0 : B;
@@ -1091,8 +1093,12 @@ uint32 ConvertYUV16ToR8G8B8(int Y, int U, int V)
 	uint32 R2 = R>255 ? 255 : R;
 	uint32 G2 = G>255 ? 255 : G;
 	uint32 B2 = B>255 ? 255 : B;
+	*/
+	R = R < 0 ? 0 : (R>255 ? 255 : R);
+	G = G < 0 ? 0 : (G>255 ? 255 : G);
+	B = B < 0 ? 0 : (B>255 ? 255 : B);
 
-	return COLOR_RGBA(R2, G2, B2, 0xFF*A);
+	return COLOR_RGBA(R, G, B, 0xFF);
 }
 
 

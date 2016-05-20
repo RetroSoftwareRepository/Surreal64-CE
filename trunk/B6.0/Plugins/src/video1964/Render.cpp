@@ -18,7 +18,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include "stdafx.h"
-
+#ifdef _XBOX
+#include "../../../config.h"
+#endif
 extern FiddledVtx * g_pVtxBase;
 CRender * CRender::g_pRender=NULL;
 int CRender::gRenderReferenceCount=0;
@@ -75,11 +77,12 @@ CRender::CRender() :
 		TileUFlags[i] = TileVFlags[i] = TEXTURE_UV_FLAG_CLAMP;
 	}
 
-
+#ifndef _RICE612
 	for( i=0; i<MAX_VERTS; i++)
 	{
 		g_dwVtxFlags[i] = 0;
 	}
+#endif
 	
 	m_pColorCombiner = CDeviceBuilder::GetBuilder()->CreateColorCombiner(this);
 	m_pColorCombiner->Initialize();
@@ -103,9 +106,13 @@ CRender::~CRender()
 	}
 }
 
-void CRender::ResetMatrices()
+void CRender::ResetMatrices(uint32 size)
 {
 	Matrix mat;
+
+	//Tigger's Honey Hunt
+	if (size == 0)
+		size = RICE_MATRIX_STACK;
 
 	mat.m[0][1] = mat.m[0][2] = mat.m[0][3] =
 	mat.m[1][0] = mat.m[1][2] = mat.m[1][3] =
@@ -118,6 +125,8 @@ void CRender::ResetMatrices()
 	gRSP.modelViewMtxTop = 0;
 	gRSP.projectionMtxs[0] = mat;
 	gRSP.modelviewMtxs[0] = mat;
+	gRSP.mMatStackSize = (size > RICE_MATRIX_STACK) ? RICE_MATRIX_STACK : size;
+
 
 	gRSP.bMatrixIsUpdated = true;
 	UpdateCombinedMatrix();
@@ -137,6 +146,12 @@ void CRender::SetProjection(const Matrix & mat, bool bPush, bool bReplace)
 		{
 			// Load projection matrix
 			gRSP.projectionMtxs[gRSP.projectionMtxTop] = mat;
+
+			// Hack needed to show flashing last heart and map arrows in Zelda OoT & MM
+			// It renders at Z cordinate = 0.0f that gets clipped away
+			// So we translate them a bit along Z to make them stick
+			if( options.enableHackForGames == HACK_FOR_ZELDA || options.enableHackForGames == HACK_FOR_ZELDA_MM)
+			gRSP.projectionMtxs[gRSP.projectionMtxTop]._43 += 0.5f;
 		}
 		else
 		{
@@ -150,6 +165,12 @@ void CRender::SetProjection(const Matrix & mat, bool bPush, bool bReplace)
 		{
 			// Load projection matrix
 			gRSP.projectionMtxs[gRSP.projectionMtxTop] = mat;
+
+			// Hack needed to show flashing last heart and map arrows in Zelda OoT & MM
+			// It renders at Z cordinate = 0.0f that gets clipped away
+			// So we translate them a bit along Z to make them stick
+			if( options.enableHackForGames == HACK_FOR_ZELDA || options.enableHackForGames == HACK_FOR_ZELDA_MM)
+			gRSP.projectionMtxs[gRSP.projectionMtxTop]._43 += 0.5f;
 		}
 		else
 		{
@@ -164,12 +185,9 @@ void CRender::SetProjection(const Matrix & mat, bool bPush, bool bReplace)
 bool mtxPopUpError = false;
 void CRender::SetWorldView(const Matrix & mat, bool bPush, bool bReplace)
 {
-	if (bPush)
+	if (bPush && (gRSP.modelViewMtxTop < gRSP.mMatStackSize))
 	{
-		if (gRSP.modelViewMtxTop >= (RICE_MATRIX_STACK-1))
-			;
-		else
-			gRSP.modelViewMtxTop++;
+		gRSP.modelViewMtxTop++;
 
 		// We should store the current projection matrix...
 		if (bReplace)
@@ -197,6 +215,17 @@ void CRender::SetWorldView(const Matrix & mat, bool bPush, bool bReplace)
 	}
 
 	gRSPmodelViewTop = gRSP.modelviewMtxs[gRSP.modelViewMtxTop];
+/*	
+	if( options.enableHackForGames == HACK_REVERSE_XY_COOR )
+	{
+		gRSPmodelViewTop = gRSPmodelViewTop * reverseXY;
+	}
+	if( options.enableHackForGames == HACK_REVERSE_Y_COOR )
+	{
+		gRSPmodelViewTop = gRSPmodelViewTop * reverseY;
+	}
+	D3DXMatrixTranspose(&gRSPmodelViewTopTranspose, &gRSPmodelViewTop);
+*/
 	gRSP.bMatrixIsUpdated = true;
 }
 
@@ -207,6 +236,17 @@ void CRender::PopWorldView()
 	{
 		gRSP.modelViewMtxTop--;
 		gRSPmodelViewTop = gRSP.modelviewMtxs[gRSP.modelViewMtxTop];
+/*
+		if( options.enableHackForGames == HACK_REVERSE_XY_COOR )
+		{
+			gRSPmodelViewTop = gRSPmodelViewTop * reverseXY;
+		}
+		if( options.enableHackForGames == HACK_REVERSE_Y_COOR )
+		{
+			gRSPmodelViewTop = gRSPmodelViewTop * reverseY;
+		}
+		D3DXMatrixTranspose(&gRSPmodelViewTopTranspose, &gRSPmodelViewTop);
+*/
 		gRSP.bMatrixIsUpdated = true;
 	}
 	else
@@ -258,7 +298,7 @@ void CRender::SetCombinerAndBlender()
 void CRender::RenderReset()
 {
 	UpdateClipRectangle();
-	ResetMatrices();
+	//ResetMatrices();
 	SetZBias(0);
 	gRSP.numVertices = 0;
 	gRSP.curTile = 0;
@@ -319,11 +359,16 @@ bool CRender::FillRect(LONG nX0, LONG nY0, LONG nX1, LONG nY1, uint32 dwColor)
 		{
 			ZBufferEnable(FALSE);
 		}
+#ifndef _RICE612
 		else
 		{
-			//dwColor = PostProcessDiffuseColor(0);
+#ifdef _RICE560
+			dwColor = PostProcessDiffuseColor(0);
+#else
 			dwColor = PostProcessDiffuseColor(gRDP.primitiveColor);
+#endif
 		}
+#endif
 
 		float depth = (gRDP.otherMode.depth_source == 1 ? gRDP.fPrimitiveDepth : 0 );
 
@@ -331,6 +376,9 @@ bool CRender::FillRect(LONG nX0, LONG nY0, LONG nX1, LONG nY1, uint32 dwColor)
 		TurnFogOnOff(false);
 		res = RenderFillRect(dwColor, depth);
 		TurnFogOnOff(gRSP.bFogEnabled);
+#ifdef _OLDCLIPPER
+		ApplyScissorWithClipRatio();// Rice 5.60
+#endif
 
 		if( gRDP.otherMode.cycle_type  >= CYCLE_TYPE_COPY )
 		{
@@ -346,7 +394,11 @@ bool CRender::FillRect(LONG nX0, LONG nY0, LONG nX1, LONG nY1, uint32 dwColor)
 
 bool CRender::Line3D(uint32 dwV0, uint32 dwV1, uint32 dwWidth)
 {
+#ifndef _DISABLE_VID1964
 	if( !status.bCIBufferIsRendered ) CGraphicsContext::g_pGraphicsContext->FirstDrawToNewCI();
+#else
+	status.bCIBufferIsRendered = true;
+#endif
 
 	m_line3DVtx[0].z = (g_vecProjected[dwV0].z + 1.0f) * 0.5f;
 	m_line3DVtx[1].z = (g_vecProjected[dwV1].z + 1.0f) * 0.5f;
@@ -458,6 +510,12 @@ bool CRender::RemapTextureCoordinate
 
 bool CRender::TexRect(LONG nX0, LONG nY0, LONG nX1, LONG nY1, float fS0, float fT0, float fScaleS, float fScaleT, bool colorFlag, uint32 diffuseColor)
 {
+	if( options.enableHackForGames == HACK_FOR_DUKE_NUKEM )
+	{
+		colorFlag = true;
+		diffuseColor = 0;
+	}
+
 	if( status.bVIOriginIsUpdated == true && currentRomOptions.screenUpdateSetting==SCREEN_UPDATE_AT_1ST_PRIMITIVE )
 	{
 		status.bVIOriginIsUpdated=false;
@@ -508,7 +566,22 @@ bool CRender::TexRect(LONG nX0, LONG nY0, LONG nX1, LONG nY1, float fS0, float f
 	if( options.bEnableHacks )
 	{
 		// Goldeneye HACK
-		if( options.bEnableHacks && nY1 - nY0 < 2 ) nY1 = nY1+2;
+		if( options.bEnableHacks && nY1 - nY0 < 2 ) 
+			nY1 = nY1+2;
+#ifdef _RICE612_TEXTEDGE
+		else if( gRDP.otherMode.cycle_type == CYCLE_TYPE_1 && fScaleS == 1 && fScaleT == 1 && 
+			g_textures[gRSP.curTile].m_dwTileWidth == nX1-nX0+1 && g_textures[gRSP.curTile].m_dwTileHeight == nY1-nY0+1 &&
+			g_textures[gRSP.curTile].m_dwTileWidth%2 == 0 && g_textures[gRSP.curTile].m_dwTileHeight%2 == 0 )
+		{
+			nY1++;
+			nX1++;
+		}
+		else if( g_curRomInfo.bIncTexRectEdge )
+		{
+			nX1++;
+			nY1++;
+		}
+#endif
 	}
 
 	// Scale to Actual texture coords
@@ -594,8 +667,11 @@ bool CRender::TexRect(LONG nX0, LONG nY0, LONG nX1, LONG nY1, float fS0, float f
 	if( colorFlag )
 		difColor = PostProcessDiffuseColor(diffuseColor);
 	else
-		//difColor = PostProcessDiffuseColor(0);
+#ifdef _RICE560
+		difColor = PostProcessDiffuseColor(0);
+#else
 		difColor = PostProcessDiffuseColor(gRDP.primitiveColor);
+#endif
 
 	if( g_curRomInfo.bIncTexRectEdge )
 	{
@@ -696,6 +772,9 @@ bool CRender::TexRect(LONG nX0, LONG nY0, LONG nX1, LONG nY1, float fS0, float f
 		ApplyTextureFilter();
 		ApplyRDPScissor();
 		res = RenderTexRect();
+#ifdef _OLDCLIPPER
+	ApplyScissorWithClipRatio(); //Rice 5.60
+#endif
 		m_dwMagFilter = m_dwMinFilter = dwFilter;
 		ApplyTextureFilter();
 	}
@@ -706,6 +785,9 @@ bool CRender::TexRect(LONG nX0, LONG nY0, LONG nX1, LONG nY1, float fS0, float f
 		ApplyTextureFilter();
 		ApplyRDPScissor();
 		res = RenderTexRect();
+#ifdef _OLDCLIPPER
+	ApplyScissorWithClipRatio(); //Rice 5.60
+#endif
 		m_dwMagFilter = m_dwMinFilter = dwFilter;
 		ApplyTextureFilter();
 	}
@@ -713,6 +795,9 @@ bool CRender::TexRect(LONG nX0, LONG nY0, LONG nX1, LONG nY1, float fS0, float f
 	{
 		ApplyRDPScissor();
 		res = RenderTexRect();
+#ifdef _OLDCLIPPER
+	ApplyScissorWithClipRatio(); //Rice 5.60
+#endif
 	}
 	TurnFogOnOff(gRSP.bFogEnabled);
 
@@ -790,7 +875,9 @@ bool CRender::TexRectFlip(LONG nX0, LONG nY0, LONG nX1, LONG nY1, float fS0, flo
 	SetVertexTextureUVCoord(m_texRectTVtx[3], t0u1, t0v0);
 
 	TurnFogOnOff(false);
-	ApplyRDPScissor();
+#ifndef _OLDCLIPPER
+	ApplyRDPScissor(); //Rice 6
+#endif
 	bool res = RenderTexRect();
 
 	TurnFogOnOff(gRSP.bFogEnabled);
@@ -883,11 +970,14 @@ void CRender::SetTexelRepeatFlags(uint32 dwTile)
 {
 	Tile &tile = gRDP.tiles[dwTile];
 
+#ifndef _RICE560_CLAMP
 	if( tile.bForceClampS )
 		SetTextureUFlag(TEXTURE_UV_FLAG_CLAMP, dwTile);
 	else if( tile.bForceWrapS )
 			SetTextureUFlag(TEXTURE_UV_FLAG_WRAP, dwTile);
-	else if( tile.dwMaskS == 0 || tile.bClampS )
+	else 
+#endif
+	if( tile.dwMaskS == 0 || tile.bClampS )
 	{
 		if( gRDP.otherMode.cycle_type  >= CYCLE_TYPE_COPY )
 			SetTextureUFlag(TEXTURE_UV_FLAG_WRAP, dwTile);	// Can not clamp in COPY/FILL mode
@@ -898,12 +988,14 @@ void CRender::SetTexelRepeatFlags(uint32 dwTile)
 		SetTextureUFlag(TEXTURE_UV_FLAG_MIRROR, dwTile);
 	else								
 		SetTextureUFlag(TEXTURE_UV_FLAG_WRAP, dwTile);
-	
+#ifndef _RICE560_CLAMP
 	if( tile.bForceClampT )
 		SetTextureVFlag(TEXTURE_UV_FLAG_CLAMP, dwTile);
 	else if( tile.bForceWrapT )
 		SetTextureVFlag(TEXTURE_UV_FLAG_WRAP, dwTile);
-	else if( tile.dwMaskT == 0 || tile.bClampT)
+	else 
+#endif
+	if( tile.dwMaskT == 0 || tile.bClampT)
 	{
 		if( gRDP.otherMode.cycle_type  >= CYCLE_TYPE_COPY )
 			SetTextureVFlag(TEXTURE_UV_FLAG_WRAP, dwTile);	// Can not clamp in COPY/FILL mode
@@ -1015,8 +1107,11 @@ void CRender::SetViewport(int nLeft, int nTop, int nRight, int nBottom, int maxZ
 extern bool bHalfTxtScale;
 bool CRender::DrawTriangles()
 {
+#ifndef _DISABLE_VID1964
 	if( !status.bCIBufferIsRendered ) CGraphicsContext::g_pGraphicsContext->FirstDrawToNewCI();
-
+#else
+	status.bCIBufferIsRendered = true;
+#endif
 	if( status.bVIOriginIsUpdated == true && currentRomOptions.screenUpdateSetting==SCREEN_UPDATE_AT_1ST_PRIMITIVE )
 	{
 		status.bVIOriginIsUpdated=false;
@@ -1165,8 +1260,9 @@ bool CRender::DrawTriangles()
 	{
 		ZBufferEnable(FALSE);
 	}
-
+#ifndef _OLDCLIPPER
 	ApplyScissorWithClipRatio();
+#endif
 	bool res = RenderFlushTris();
 	g_clippedVtxCount = 0;
 
@@ -1371,6 +1467,24 @@ void CRender::UpdateScissorWithClipRatio()
 	gRSP.real_clip_scissor_right = min(gRSP.real_clip_scissor_right,windowSetting.uViWidth-1);
 	gRSP.real_clip_scissor_bottom = min(gRSP.real_clip_scissor_bottom, windowSetting.uViHeight-1);
 
+#if !defined(_OLDCLIPPER) && defined(_XBOX)
+	WindowSettingStruct &w = windowSetting;
+	w.clipping.left = (uint32)(gRSP.real_clip_scissor_left*windowSetting.fMultX);
+	w.clipping.top	= (uint32)(gRSP.real_clip_scissor_top*windowSetting.fMultY);
+	w.clipping.bottom = (uint32)(gRSP.real_clip_scissor_bottom*windowSetting.fMultY);
+	w.clipping.right = (uint32)(gRSP.real_clip_scissor_right*windowSetting.fMultX);
+	if( w.clipping.left > 0 || w.clipping.top > 0 || w.clipping.right < (uint32)windowSetting.uWindowDisplayWidth-1 ||
+		w.clipping.bottom < (uint32)windowSetting.uWindowDisplayHeight-1 )
+	{
+		w.clipping.needToClip = true;
+	}
+	else
+	{
+		w.clipping.needToClip = false;
+	}
+	w.clipping.width = (uint32)((gRSP.real_clip_scissor_right-gRSP.real_clip_scissor_left+1)*windowSetting.fMultX);
+	w.clipping.height = (uint32)((gRSP.real_clip_scissor_bottom-gRSP.real_clip_scissor_top+1)*windowSetting.fMultY);
+#endif
 	float halfx = gRSP.nVPWidthN/2.0f;
 	float halfy = gRSP.nVPHeightN/2.0f;
 	float centerx = gRSP.nVPLeftN+halfx;
@@ -1407,6 +1521,13 @@ void CRender::InitOtherModes(void)					// Set other modes not covered by color c
 			SetAlphaTestEnable(FALSE);
 		}
 	}
+#ifdef _RICE612_ALPHACOMP
+	else if ( gRDP.otherMode.alpha_compare == 3 )
+	{
+		//RDP_ALPHA_COMPARE_DITHER
+		SetAlphaTestEnable(FALSE);
+	}
+#endif
 	else
 	{
 		if( (gRDP.otherMode.alpha_cvg_sel ) && !gRDP.otherMode.cvg_x_alpha )

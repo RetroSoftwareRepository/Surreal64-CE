@@ -25,7 +25,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 // Constructors / Deconstructors
 
 // Probably shouldn't need more than 4096 * 4096
-static uint8 g_ucTempBuffer[1024*1024*4];
+BYTE g_ucTempBuffer[1024*1024*4];
 
 CTexture::CTexture(uint32 dwWidth, uint32 dwHeight, TextureUsage usage) :
 	m_pTexture(NULL),
@@ -101,7 +101,11 @@ void CTexture::ScaleImageToSurface(bool scaleS, bool scaleT)
 	{
 	case 4:
 		{
+#ifdef _XBOX
 			memcpy((uint8*)g_ucTempBuffer, (uint8*)(di.lpSurface), m_dwHeight*m_dwCreatedTextureWidth*4);
+#else
+			memcpy((uint8*)pTempbuffer, (uint8*)(di.lpSurface), m_dwHeight*m_dwCreatedTextureWidth*4);
+#endif
 
 			uint32 * pDst;
 			uint32 * pSrc;
@@ -113,8 +117,11 @@ void CTexture::ScaleImageToSurface(bool scaleS, bool scaleT)
 				// surfaces are created which results in  /0...
 				//ySrc = (yDst * (m_dwHeight-1)) / (d3dTextureHeight-1);
 				ySrc = (uint32)((yDst * height) / m_dwCreatedTextureHeight+0.49f);
-				
+#ifdef _XBOX
 				pSrc = (uint32*)((uint8*)g_ucTempBuffer + (ySrc * m_dwCreatedTextureWidth * 4));
+#else
+				pSrc = (uint32*)((uint8*)pTempbuffer + (ySrc * m_dwCreatedTextureWidth * 4));
+#endif
 				pDst = (uint32*)((uint8*)di.lpSurface + (yDst * di.lPitch));
 				
 				for (xDst = 0; xDst < m_dwCreatedTextureWidth; xDst++)
@@ -128,7 +135,11 @@ void CTexture::ScaleImageToSurface(bool scaleS, bool scaleT)
 		break;
 	case 2:
 		{
+#ifdef _XBOX
 			memcpy((uint8*)g_ucTempBuffer, (uint8*)(di.lpSurface), m_dwHeight*m_dwCreatedTextureWidth*2);
+#else
+			memcpy((uint8*)pTempbuffer, (uint8*)(di.lpSurface), m_dwHeight*m_dwCreatedTextureWidth*2);
+#endif
 
 			uint16 * pDst;
 			uint16 * pSrc;
@@ -137,8 +148,11 @@ void CTexture::ScaleImageToSurface(bool scaleS, bool scaleT)
 			{
 				// ySrc ranges from 0..m_dwHeight
 				ySrc = (yDst * height) / m_dwCreatedTextureHeight;
-				
+#ifdef _XBOX
 				pSrc = (uint16*)((uint8*)g_ucTempBuffer + (ySrc * m_dwCreatedTextureWidth * 2));
+#else
+				pSrc = (uint16*)((uint8*)pTempbuffer + (ySrc * m_dwCreatedTextureWidth * 2));
+#endif
 				pDst = (uint16*)((uint8*)di.lpSurface + (yDst * di.lPitch));
 				
 				for (xDst = 0; xDst < m_dwCreatedTextureWidth; xDst++)

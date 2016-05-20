@@ -852,28 +852,7 @@ CTexture* MirrorTexture(uint32 dwTile, TxtrCacheEntry *pEntry)
 	return NULL;
 }
 
-void ConvertTextureRGBAtoI(TxtrCacheEntry* pEntry, bool alpha)
-{
-	DrawInfo srcInfo;	
-	if( pEntry->pTexture->StartUpdate(&srcInfo) )
-	{
-		uint32 *buf;
-		uint32 val;
-		uint32 r,g,b,a,i;
 
-		for(int nY = 0; nY < srcInfo.dwCreatedHeight; nY++)
-		{
-			buf = (uint32*)((uint8*)srcInfo.lpSurface+nY*srcInfo.lPitch);
-			for(int nX = 0; nX < srcInfo.dwCreatedWidth; nX++)
-			{
-				val = buf[nX];
-				b = (val>>0)&0xFF;
-				g = (val>>8)&0xFF;
-				r = (val>>16)&0xFF;
-				i = (r+g+b)/3;
-				a = alpha?(val&0xFF000000):(i<<24);
-				buf[nX] = (a|(i<<16)|(i<<8)|i);
-			}
-		}
-		pEntry->pTexture->EndUpdate(&srcInfo);	}
-}
+
+
+

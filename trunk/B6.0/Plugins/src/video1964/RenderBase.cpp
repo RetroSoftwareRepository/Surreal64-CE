@@ -574,6 +574,15 @@ void InitRenderBase()
 	gRSP.real_clip_scissor_top = 0;
 	gRSP.real_clip_scissor_right = 640;
 	gRSP.real_clip_scissor_bottom = 480;
+#ifndef _OLDCLIPPER
+	windowSetting.clipping.left = 0;
+	windowSetting.clipping.top = 0;
+	windowSetting.clipping.right = 640;
+	windowSetting.clipping.bottom = 480;
+	windowSetting.clipping.width = 640;
+	windowSetting.clipping.height = 480;
+	windowSetting.clipping.needToClip = false;
+#endif
 	gRSP.real_clip_ratio_negx = 1;
 	gRSP.real_clip_ratio_negy = 1;
 	gRSP.real_clip_ratio_posx = 1;
@@ -702,13 +711,13 @@ void ComputeLOD(bool openGL)
 
 		x = windowSetting.vpWidthW*x/windowSetting.fMultX/2;
 		y = windowSetting.vpHeightW*y/windowSetting.fMultY/2;
-		d = sqrt(x*x+y*y);
+		d = sqrtf(x*x+y*y);
 	}
 	else
 	{
 		float x = (v0.x - v1.x)/ windowSetting.fMultX;
 		float y = (v0.y - v1.y)/ windowSetting.fMultY;
-		d = sqrt(x*x+y*y);
+		d = sqrtf(x*x+y*y);
 	}
 
 	float s0 = v0.tcord[0].u * tex0.m_fTexWidth;
@@ -716,12 +725,14 @@ void ComputeLOD(bool openGL)
 	float s1 = v1.tcord[0].u * tex0.m_fTexWidth;
 	float t1 = v1.tcord[0].v * tex0.m_fTexHeight;
 
-	dt = sqrt((s0-s1)*(s0-s1)+(t0-t1)*(t0-t1));
+	dt = sqrtf((s0-s1)*(s0-s1)+(t0-t1)*(t0-t1));
 
 	float lod = dt/d;
-	float frac = log10(lod)/log10(2.0f);
-	frac = (lod / pow(2.0f,floor(frac)));
-	frac = frac - floor(frac);
+	int ilod = (int)lod;
+	double intptr;
+	float frac = log10f(lod)/log10f(2.0f);
+	float lod_tile = min((log10f(lod)/log10f(2.0f)), gRSP.curTile + floorf(frac));
+ 	frac = max(modf(lod / pow(2.0f,lod_tile),(float *)&intptr), gRDP.primLODMin / 255.0f);
 	gRDP.LODFrac = (uint32)(frac*255);
 	CRender::g_pRender->SetCombinerAndBlender();
 }
@@ -898,31 +909,7 @@ __m128 icolor128;
 
 __declspec( naked ) uint32  __fastcall SSELightVert()
 {
-	/*
-	register __m128 color128 = _mm_set_ps( gRSP.fAmbientLightR, gRSP.fAmbientLightG, gRSP.fAmbientLightB, 0 );
-	register __m128 normals = _mm_set_ps(norm.x , norm.y , norm.z , 0 );
-
-	for( register unsigned int l=0; l < gRSP.numLights; l++ )
-	{
-	register __m128 lightdir = _mm_set_ps(gRSPlights[l].x, gRSPlights[l].y, gRSPlights[l].z, 0);
-	cosT128 = _mm_mul_ps(lightdir,normals);
-	fcosT = cosT128.m128_f32[3]+cosT128.m128_f32[2]+cosT128.m128_f32[1];
-	if (fcosT > 0)
-	{
-	cosT128 = _mm_set_ps1(fcosT);
-	register __m128 lightcolor = _mm_set_ps(gRSPlights[l].fr, gRSPlights[l].fg, gRSPlights[l].fb, 0);
-	lightcolor = _mm_mul_ps(lightcolor,cosT128);
-	color128 = _mm_add_ps(color128,lightcolor);
-	}
-	}
-
-	color128 = _mm_min_ps(color128,_mm_set_ps1(255.0f));
-	color64 = _mm_cvtps_pi16(color128);
-	register uint32 finalcolor = ((0xff000000)|(color64.m64_u16[3]<<16)|(color64.m64_u16[2]<<8)|color64.m64_u16[1]);
-	_mm_empty();
-
-	//return finalcolor;
-	*/
+	
 #if _MSC_VER > 1200
 	__asm
 	{
@@ -934,7 +921,7 @@ loopback:
 		cmp			ecx, DWORD PTR gRSPnumLights;
 		jae			breakout;
 		mov			eax,ecx;
-		imul		eax,0x28;
+		imul		eax,0x28; //0x48 //Verify? //0x28 is correct. 
 		movups		xmm5, DWORD PTR gRSPlights[eax];		// Light Dir
 		movups		xmm1, DWORD PTR gRSPlights[0x18][eax];	// Light color
 		mulps       xmm5, xmm4;					// Lightdir * normals
@@ -2349,9 +2336,11 @@ bool Clip1TriangleForNegW(TLITVERTEX &v1, TLITVERTEX &v2, TLITVERTEX &v3, int &d
 		ClipFor1LineZ(pts[lno%2], pts[(lno+1)%2], true);	// Clip for near plane
 		if( pts[(lno+1)%2].size() < 3 )
 			return false;
+#ifndef _RICE612
 		ClipFor1LineZ(pts[(lno+1)%2], pts[lno%2], false);	// clip for far plane
 		if( pts[lno%2].size() < 3 )
 			return false;
+#endif
 
 		size = ps.size();
 	}

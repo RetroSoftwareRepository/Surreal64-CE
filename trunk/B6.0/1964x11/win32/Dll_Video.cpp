@@ -122,7 +122,7 @@ BOOL LoadVideoPlugin(char *libname)
 	//_VIDEO_ShowCFB						= _VIDEO_1964_11_ShowCFB;
 	
 	_VIDEO_FrameBufferWrite					= _VIDEO_1964_11_FBWrite;
-	_VIDEO_FrameBufferWriteList				= _VIDEO_1964_11_FBWList;
+	//_VIDEO_FrameBufferWriteList				= _VIDEO_1964_11_FBWList;
 	_VIDEO_FrameBufferRead					= _VIDEO_1964_11_FBRead;
 	_VIDEO_GetFrameBufferInfo				= _VIDEO_1964_11_FBGetFrameBufferInfo;
 	//_VIDEO_SetOnScreenText				= _VIDEO_1964_11_SetOnScreenText;

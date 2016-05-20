@@ -32,7 +32,7 @@ extern "C" {
 #endif
 #define CALL
 
-#define EXPORT_NAME(name) _VIDEO_##name
+#define EXPORT_NAME(name) _VIDEO_1964_11_##name
 #define EXPORT_TYPE(type) EXPORT type
 
 #else //win32

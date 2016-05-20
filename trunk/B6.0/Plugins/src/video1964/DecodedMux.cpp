@@ -1366,6 +1366,11 @@ void DecodedMux::Hack(void)
 		{
 			ReplaceVal(MUX_TEXEL1, MUX_TEXEL0);
 		}
+		else if( m_dwMux1 == 0xff5bfff8 && m_dwMux0 == 0x00121603 )
+		{
+			// The Zelda road trace
+			ReplaceVal(MUX_TEXEL1, MUX_0);
+		}
 	}
 	else if( options.enableHackForGames == HACK_FOR_MARIO_TENNIS )
 	{

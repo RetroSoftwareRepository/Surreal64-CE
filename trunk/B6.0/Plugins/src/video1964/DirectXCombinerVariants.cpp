@@ -151,8 +151,10 @@ void CDirectXPixelShaderCombiner::CleanUp(void)
 			m_pixelShaderList[i].pShaderText = NULL;
 		}
 
-#if DX_VERSION != 9 // Removed in DX9	g_pD3DDev->DeletePixelShader(m_pixelShaderList[i].dwShaderID);
-#elif !defined(_XBOX) // Removed on XBOX, clear should be enough
+#if DX_VERSION != 9 // Removed in DX9	
+g_pD3DDev->DeletePixelShader(m_pixelShaderList[i].dwShaderID);
+#endif
+#ifndef _XBOX // Removed on XBOX, clear should be enough
 		m_pixelShaderList[i].pVS->Release();
 #endif
 	}
@@ -178,7 +180,7 @@ CDirectXPixelShaderCombiner::~CDirectXPixelShaderCombiner()
 	CleanUp();
 }
 
-#ifdef _XBOX
+#ifdef _XBOX_PS
 bool CDirectXPixelShaderCombiner::Initialize()
 {
 	CDirectXColorCombiner::Initialize();
@@ -425,10 +427,10 @@ void Process1Stage(DecodedMux &mux, int cycle, int channel, DWORD &out1, DWORD &
 		out1 = PS_COMBINERINPUTS( PS_ONE, PS_ONE, PS_ZERO, PS_ZERO );
 		out2 = PS_COMBINERINPUTS( func(m.a), func(m.c), func(m.d), PS_ONE );
 		break;
-	//case CM_FMT_TYPE_A_LERP_B_C:
-	//	out1 = PS_COMBINERINPUTS( PS_ONE, PS_ONE, PS_ZERO, PS_ZERO );
-	//	out2 = PS_COMBINERINPUTS( func(m.a), func(m.c), func(m.b), func(m.c)|PS_INPUTMAPPING_UNSIGNED_INVERT );
-	//	break;
+	case CM_FMT_TYPE_A_LERP_B_C:
+		out1 = PS_COMBINERINPUTS( PS_ONE, PS_ONE, PS_ZERO, PS_ZERO );
+		out2 = PS_COMBINERINPUTS( func(m.a), func(m.c), func(m.b), func(m.c)|PS_INPUTMAPPING_UNSIGNED_INVERT );
+		break;
 	case CM_FMT_TYPE_A_SUB_B_MOD_C:
 		out1 = PS_COMBINERINPUTS( PS_ONE, PS_ONE, PS_ZERO, PS_ZERO );
 		out2 = PS_COMBINERINPUTS( func(m.a), func(m.c), func(m.b)|PS_NEG, func(m.c) );
@@ -745,31 +747,32 @@ int CDirectXPixelShaderCombiner::GeneratePixelShaderFromMux(void)
 
 	// Color channel 1
 	sprintf(buf, "sub r1.rgb,     %s, %s\n", MuxToC(m.aRGB0), MuxToC(m.bRGB0) );	strcat(m_textBuf, buf);
-	sprintf(buf, "mad_sat r1.rgb, r1, %s, %s\n", MuxToC(m.cRGB0), MuxToC(m.dRGB0) );	strcat(m_textBuf, buf);
+	sprintf(buf, "mad r1.rgb, r1, %s, %s\n", MuxToC(m.cRGB0), MuxToC(m.dRGB0) );	strcat(m_textBuf, buf);
 
 	// Alpha channel 1
 	sprintf(buf, "sub r1.a,     %s, %s\n", MuxToA(m.aA0), MuxToA(m.bA0) );	strcat(m_textBuf, buf);
-	sprintf(buf, "mad_sat r1.a, r1, %s, %s\n", MuxToA(m.cA0), MuxToA(m.dA0) );	strcat(m_textBuf, buf);
+	sprintf(buf, "mad r1.a, r1, %s, %s\n", MuxToA(m.cA0), MuxToA(m.dA0) );	strcat(m_textBuf, buf);
 
 	// Color channel 2
 	sprintf(buf, "sub r0.rgb,     %s, %s\n", MuxToC(m.aRGB1), MuxToC(m.bRGB1) );	strcat(m_textBuf, buf);
-	sprintf(buf, "mad_sat r0.rgb, r0, %s, %s\n", MuxToC(m.cRGB1), MuxToC(m.dRGB1) );	strcat(m_textBuf, buf);
+	sprintf(buf, "mad r0.rgb, r0, %s, %s\n", MuxToC(m.cRGB1), MuxToC(m.dRGB1) );	strcat(m_textBuf, buf);
 
 
 	// Alpha channel 2
 	sprintf(buf, "sub r0.a,     %s, %s\n", MuxToA(m.aA1), MuxToA(m.bA1) );	strcat(m_textBuf, buf);
-	sprintf(buf, "mad_sat r0.a, r0, %s, %s\n", MuxToA(m.cA1), MuxToA(m.dA1) );	strcat(m_textBuf, buf);
+	sprintf(buf, "mad r0.a, r0, %s, %s\n", MuxToA(m.cA1), MuxToA(m.dA1) );	strcat(m_textBuf, buf);
 
 	// Step 2: Compile the shade text to generate a new pixel shader binary
 
 	PixelShaderEntry newEntry;
+	memset(&newEntry, 0x00, sizeof(PixelShaderEntry));
 	newEntry.mux64 = m_pD3DRender->m_Mux;
-//#ifdef _XBOX 
-	//LPXGBUFFER pCompiledShader;
-	//HRESULT e = XGAssembleShader(NULL, m_textBuf, strlen(m_textBuf), SASMT_PIXELSHADER /*| SASM_OPTIMIZE_PIXELSHADER*/, NULL, &pCompiledShader, NULL, NULL, NULL, NULL, NULL); // Changed in Rice 5.60
-//#else
+#ifdef _XBOX 
+	LPXGBUFFER pCompiledShader;
+	HRESULT e = XGAssembleShader(NULL, m_textBuf, strlen(m_textBuf), SASMT_PIXELSHADER | /*SASM_OPTIMIZE_PIXELSHADER*/1, NULL, &pCompiledShader, NULL, NULL, NULL, NULL, NULL); // Changed in Rice 5.60
+#else
 	HRESULT e = D3DXAssembleShader( m_textBuf, strlen(m_textBuf),  0, NULL, &(newEntry.pVS), NULL );
-//#endif
+#endif
 	if( e != S_OK )
 	{
 #ifdef _DEBUG
@@ -780,21 +783,24 @@ int CDirectXPixelShaderCombiner::GeneratePixelShaderFromMux(void)
 	}
 
 #if DX_VERSION == 8
-/*#ifdef _XBOX
+#ifdef _XBOX
 	newEntry.pVS = (D3DPIXELSHADERDEF *)pCompiledShader->pData;
 	e = g_pD3DDev->CreatePixelShader(newEntry.pVS, (DWORD*)&(newEntry.dwShaderID) );
-#else*/
+#else
 	e = g_pD3DDev->CreatePixelShader( (DWORD*) newEntry.pVS->GetBufferPointer(), (DWORD*)&(newEntry.dwShaderID) );
-//#endif
+#endif
 #elif DX_VERSION == 9
 	//DX8-DX9 migration: 2nd param cast (IDirect3DPixelShader9 **) might be a prob.
-	e = g_pD3DDev->CreatePixelShader( (DWORD*)newEntry.pVS->GetBufferPointer(), (IDirect3DPixelShader9 **)&(newEntry.pVS) );
+	e = g_pD3DDev->CreatePixelShader( (DWORD*)newEntry.pVS->GetBufferPointer(), (IDirect3DPixelShader9 **)&(newEntry.pShader) );
 #endif
 	if( e != S_OK )
 	{
 		DebuggerAppendMsg("Error to create shader");
 		DebuggerAppendMsg(m_textBuf);
 		newEntry.dwShaderID = 0;
+#if DIRECTX_VERSION > 8
+		newEntry.pShader = NULL;
+#endif
 	}
 	
 	newEntry.pShaderText = NULL;
@@ -830,7 +836,7 @@ void CDirectXPixelShaderCombiner::InitCombinerCycle12(void)
 	if( idx < 0 )	idx = GeneratePixelShaderFromMux();
 	dwShaderID = m_pixelShaderList[idx].dwShaderID;
 
-#ifdef _XBOX
+#ifdef _XBOX_PS
 	g_pD3DDev->SetPixelShader(m_pixelShaderList[idx].dwShaderID);
 
 	// Step 2: set constant colors
@@ -850,6 +856,7 @@ void CDirectXPixelShaderCombiner::InitCombinerCycle12(void)
 		g_pD3DDev->SetTexture( 2, MYLPDIRECT3DTEXTURE(entry->pTexture->GetTexture()));
 	}
 #else	
+	
 	gD3DDevWrapper.SetPixelShader(dwShaderID);
 
 	// Step 2: set constant colors
@@ -922,6 +929,7 @@ void CDirectXSemiPixelShaderCombiner::InitCombinerCycle12(void)
 #ifdef _DEBUG
 void CDirectXPixelShaderCombiner::DisplaySimpleMuxString(void)
 {
+#ifndef _XBOX
 	CColorCombiner::DisplaySimpleMuxString();
 	DebuggerAppendMsg("\n");
 
@@ -932,9 +940,11 @@ void CDirectXPixelShaderCombiner::DisplaySimpleMuxString(void)
 		DebuggerAppendMsg(m_pixelShaderList[idx].pShaderText);
 
 	DebuggerAppendMsg("\n\n");
+#endif
 }
 void CDirectXSemiPixelShaderCombiner::DisplaySimpleMuxString(void)
 {
+#ifndef _XBOX
 	m_lastIndex = CGeneralCombiner::FindCompiledMux();
 	if( m_lastIndex < 0 )		// Can not found
 	{
@@ -952,6 +962,7 @@ void CDirectXSemiPixelShaderCombiner::DisplaySimpleMuxString(void)
 		CDirectXPixelShaderCombiner::DisplaySimpleMuxString();
 		CDirectXColorCombiner::DisplaySimpleMuxString();
 	}
+#endif
 }
 
 #endif

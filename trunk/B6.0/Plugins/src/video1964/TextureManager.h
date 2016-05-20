@@ -66,6 +66,7 @@ public:
 	{
 		Format = tile.dwFormat;
 		Size = tile.dwSize;
+		Pitch = tile.dwPitch;
 		Palette = tile.dwPalette;
 		
 		maskS = tile.dwMaskS;
@@ -127,9 +128,13 @@ typedef struct TxtrCacheEntry
 	
 	struct TxtrCacheEntry *pNext;		// Must be first element!
 
+	struct TxtrCacheEntry *pNextYoungest;
+	struct TxtrCacheEntry *pLastYoungest;
+
 	TxtrInfo ti;
 	uint32		dwCRC;
 	uint32		dwPalCRC;
+	int			maxCI;
 
 	uint32	dwUses;			// Total times used (for stats)
 	uint32	dwTimeLastUsed;	// timeGetTime of time of last usage
@@ -204,6 +209,13 @@ protected:
 	TxtrCacheEntry * GetLODFracTexture(uint8 fac);
 	TxtrCacheEntry * GetPrimLODFracTexture(uint8 fac);
 
+#ifdef _XBOX
+	void MakeTextureYoungest(TxtrCacheEntry *pEntry);
+	DWORD m_currentTextureMemUsage;
+	TxtrCacheEntry *m_pYoungestTexture;
+	TxtrCacheEntry *m_pOldestTexture;
+#endif
+
 public:
 	CTextureManager();
 	~CTextureManager();
@@ -215,8 +227,16 @@ public:
 	void PurgeOldTextures();
 	void RecycleAllTextures();
 	bool CleanUp();
+
+#ifdef _XBOX
+	void FreeTextures();
+#endif
 };
 
 extern CTextureManager gTextureManager;		// The global instance of CTextureManager class
-
+#ifdef _XBOX
+extern bool g_bUseSetTextureMem;
+extern DWORD g_maxTextureMemUsage;
+extern BOOL bPurgeOldBeforeIGM;
+#endif
 #endif

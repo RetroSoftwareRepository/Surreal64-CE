@@ -1059,7 +1059,7 @@ void CPU_Check_Interrupts(void)
 				else
 				{
 					FileIO_ImportPJ64State(buf); // Necessary...
-					_VIDEO_DisplayTemporaryMessage("Save State Failed!");
+					//_VIDEO_DisplayTemporaryMessage("Save State Failed!");
 				}
 				Init_Count_Down_Counters();
 				RefreshDynaDuringGamePlay();

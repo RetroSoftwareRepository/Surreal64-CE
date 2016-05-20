@@ -503,7 +503,11 @@ void DLParser_SetCImg(Gfx *gfx)
 		if( options.enableHackForGames != HACK_FOR_CONKER && g_uRecentCIInfoPtrs[0]->bCopied == false )
 		{
 			// Conker is not actually using a backbuffer
+#ifdef _RICE560
+			UpdateRecentCIAddr(g_CI);
+#else
 			//UpdateRecentCIAddr(g_CI);
+#endif
 			if( status.leftRendered != -1 && status.topRendered != -1 && status.rightRendered != -1 && status.bottomRendered != -1 )
 			{
 				RECT rect={status.leftRendered,status.topRendered,status.rightRendered,status.bottomRendered};
@@ -592,12 +596,21 @@ void DLParser_SetCImg(Gfx *gfx)
 		{
 			if( options.enableHackForGames != HACK_FOR_BANJO_TOOIE )
 			{
+#ifdef _RICE560
+				CGraphicsContext::g_pGraphicsContext->SetTextureBuffer(g_CI);
+#else
 				CGraphicsContext::g_pGraphicsContext->SetTextureBuffer();
+#endif
 			}
 		}
 		else
 		{
-			//UpdateRecentCIAddr(g_CI);		// Delay this until the CI buffer is actally drawn
+#ifdef _RICE560
+				UpdateRecentCIAddr(g_CI);
+				CGraphicsContext::g_pGraphicsContext->CheckTxtrBufsWithNewCI(g_CI,g_uRecentCIInfoPtrs[0]->dwHeight,false);
+#else			
+				//UpdateRecentCIAddr(g_CI);		// Delay this until the CI buffer is actally drawn
+#endif
 		}
 		break;
 	}
@@ -728,6 +741,29 @@ uint32 CalculateRDRAMCRC(void *pPhysicalAddress, uint32 left, uint32 top, uint32
 	dwAsmCRC = 0;
 	dwAsmdwBytesPerLine = ((width<<size)+1)/2;
 
+#if FAST_HASH
+    //Fast Hash used by default unless using a texturepack //Corn
+	dwAsmCRC = (DWORD)pPhysicalAddress;
+	register DWORD *pStart = (DWORD*)(pPhysicalAddress);
+	register DWORD *pEnd = pStart;
+
+	DWORD pitch = pitchInBytes>>2;
+	pStart += (top * pitch) + (((left<<size)+1)>>3);
+	pEnd += ((top+height) * pitch) + ((((left+width)<<size)+1)>>3);
+
+	DWORD SizeInDWORD = (DWORD)(pEnd-pStart);
+    DWORD pinc = SizeInDWORD >> 2; 
+
+	if( pinc < 1 ) pinc = 1;
+	if( pinc > 23 ) pinc = 23;
+
+	do
+	{
+		dwAsmCRC = ((dwAsmCRC << 1) | (dwAsmCRC >> 31)) ^ *pStart;	//This combines to a single instruction in ARM assembler EOR ...,ROR #31 :)
+		pStart += pinc;
+	}while(pStart < pEnd);
+
+#else
 	if( currentRomOptions.bFastTexCRC && (height>=32 || (dwAsmdwBytesPerLine>>2)>=16))
 	{
 		uint32 realWidthInDWORD = dwAsmdwBytesPerLine>>2;
@@ -860,6 +896,7 @@ l1:	mov esi, [ecx+ebx]
 		{
 		}
 	}
+#endif
 	return dwAsmCRC;
 }
 
@@ -1034,10 +1071,58 @@ void FrameBufferReadByCPU( uint32 addr )
 
 	if( g_uRecentCIInfoPtrs[index]->bCopied )	return;
 
+#ifdef _RICE560
+	if( status.frameReadByCPU == FALSE )
+#else
 	//if( status.frameReadByCPU == FALSE )
+#endif
 	{
 		uint32 size = 0x1000 - addr%0x1000;
 		CheckAndSaveBackBuffer(addr, size, true);
 
 	}
 }
+
+#ifdef _RICE612
+BYTE CalculateMaxCI(void *pPhysicalAddress, uint32 left, uint32 top, uint32 width, uint32 height, uint32 size, uint32 pitchInBytes )
+{
+	uint32 x, y;
+	BYTE *buf;
+	BYTE val = 0;
+
+	if( TXT_SIZE_8b == size )
+	{
+		for( y = 0; y<height; y++ )
+		{
+			buf = (BYTE*)pPhysicalAddress + left + pitchInBytes * (y+top);
+			for( x=0; x<width; x++ )
+			{
+				if( buf[x] > val )	val = buf[x];
+				if( val == 0xFF )
+					return 0xFF;
+			}
+		}
+	}
+	else
+	{
+		BYTE val1,val2;
+		left >>= 1;
+		width >>= 1;
+		for( y = 0; y<height; y++ )
+		{
+			buf = (BYTE*)pPhysicalAddress + left + pitchInBytes * (y+top);
+			for( x=0; x<width; x++ )
+			{
+				val1 = buf[x]>>4;
+				val2 = buf[x]&0xF;
+				if( val1 > val )	val = val1;
+				if( val2 > val )	val = val2;
+				if( val == 0xF )
+					return 0xF;
+			}
+		}
+	}
+
+	return val;
+}
+#endif

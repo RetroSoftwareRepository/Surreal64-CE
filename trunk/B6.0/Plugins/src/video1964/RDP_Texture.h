@@ -286,7 +286,7 @@ bool CalculateTileSizes_method_1(int tileno, TMEMLoadMapInfo *info, TxtrInfo &gt
 {
 	Tile &tile = gRDP.tiles[tileno];
 	Tile &loadtile = gRDP.tiles[RDP_TXT_LOADTILE];
-
+	uint32 infoTmemAddr = tile.dwTMem;
 	uint32 dwPitch;
 
 	// Now Initialize the texture dimension
@@ -294,6 +294,47 @@ bool CalculateTileSizes_method_1(int tileno, TMEMLoadMapInfo *info, TxtrInfo &gt
 	int dwTileHeight;
 	if( info->bSetBy == CMD_LOADTILE )
 	{
+#ifdef _RICE560_CLAMP
+			if( tile.dwMaskS == 0 || tile.bClampS )
+			{
+				dwTileWidth = tile.hilite_sh - tile.hilite_sl +1;
+				if( dwTileWidth < tile.sh - tile.sl +1 )
+					dwTileWidth = tile.sh - tile.sl +1;
+			}
+			else
+			{
+				if( tile.dwMaskS < 8 )
+					dwTileWidth = (1 << tile.dwMaskS );
+				else
+				{
+					dwTileWidth = info->dwWidth;	// From SetTImage
+					dwTileWidth = dwTileWidth << info->dwSize >> tile.dwSize;
+				}
+			}
+
+			if( tile.dwMaskT == 0 || tile.bClampT )
+			{
+				dwTileHeight= tile.hilite_th - tile.hilite_tl +1;
+				if( dwTileHeight < tile.th - tile.tl +1 )
+					dwTileHeight = tile.th - tile.tl +1;
+			}
+			else
+			{
+				if( tile.dwMaskT < 8 )
+					dwTileHeight = (1 << tile.dwMaskT );
+				else
+				{
+					if( tile.tl >= tile.th )
+					{
+						dwTileHeight= info->th - info->tl + 1;
+					}
+					else
+					{
+						dwTileHeight= tile.th - tile.tl + 1;
+					}
+				}
+			}
+#else
 		if( tile.sl >= tile.sh )
 		{
 			dwTileWidth = info->dwWidth;	// From SetTImage
@@ -312,6 +353,7 @@ bool CalculateTileSizes_method_1(int tileno, TMEMLoadMapInfo *info, TxtrInfo &gt
 		{
 			dwTileHeight= tile.th - tile.tl + 1;
 		}
+#endif
 	}
 	else
 	{
@@ -506,7 +548,7 @@ bool CalculateTileSizes_method_1(int tileno, TMEMLoadMapInfo *info, TxtrInfo &gt
 	if( (info->dwTotalWords>>2) < total64BitWordsToLoad+tile.dwTMem-info->dwTmem - 4 )
 	{
 		// Hack here
-		if( options.enableHackForGames == HACK_FOR_ZELDA && tileno != gRSP.curTile )
+		if( (options.enableHackForGames == HACK_FOR_ZELDA||options.enableHackForGames == HACK_FOR_ZELDA_MM) && tileno != gRSP.curTile )
 		{
 			return false;
 		}
@@ -557,19 +599,27 @@ bool CalculateTileSizes_method_2(int tileno, TMEMLoadMapInfo *info, TxtrInfo &gt
 		loadwidth = abs(tile.sh - tile.sl) +1;
 		if( tile.dwMaskS )	
 		{
+#ifdef _VID1964_FIX
 			if( !tile.bSizeIsValid )	
 				loadwidth = maskwidth;
 			else
 				loadwidth = min(loadwidth, maskwidth);
+#else
+			loadwidth = maskwidth;
+#endif
 		}
 
 		loadheight = abs(tile.th - tile.tl) +1;
 		if( tile.dwMaskT )	
 		{
+#ifdef _VID1964_FIX
 			if( !tile.bSizeIsValid )	
 				loadheight = maskheight;
 			else
 				loadheight = min(loadheight, maskheight);
+#else
+			loadheight = maskheight;
+#endif
 		}
 
 
@@ -600,6 +650,7 @@ bool CalculateTileSizes_method_2(int tileno, TMEMLoadMapInfo *info, TxtrInfo &gt
 	// Limit the texture size
 	if( g_curRomInfo.bUseSmallerTexture )
 	{
+#ifndef _RICE612_CLAMP
 		if( tile.dwMaskS && tile.bClampS && !tile.bMirrorS )
 		{
 			if( clampwidth/maskwidth >= 2 )
@@ -627,6 +678,67 @@ bool CalculateTileSizes_method_2(int tileno, TMEMLoadMapInfo *info, TxtrInfo &gt
 				tile.bForceClampT = true;
 			}
 		}
+#else
+		if( tile.dwMaskS && tile.bClampS )
+		{
+			if( !tile.bMirrorS )
+			{
+				if( clampwidth/maskwidth >= 2 )
+				{
+					clampwidth = maskwidth;
+					tile.bForceWrapS = true;
+				}
+				else if( clampwidth && maskwidth/clampwidth >= 2 )
+				{
+					maskwidth = clampwidth;
+					tile.bForceClampS = true;
+				}
+			}
+			else
+			{
+				if( clampwidth/maskwidth == 2 )
+				{
+					clampwidth = maskwidth*2;
+					tile.bForceWrapS = false;
+				}
+				else if( clampwidth/maskwidth > 2 )
+				{
+					clampwidth = maskwidth*2;
+					tile.bForceWrapS = true;
+				}
+			}
+		}
+
+		if( tile.dwMaskT && tile.bClampT )
+		{
+			if( !tile.bMirrorT )
+			{
+				if( clampheight/maskheight >= 2 )
+				{
+					clampheight = maskheight;
+					tile.bForceWrapT = true;
+				}
+				else if( clampheight && maskheight/clampheight >= 2 )
+				{
+					maskwidth = clampwidth;
+					tile.bForceClampT = true;
+				}
+			}
+			else
+			{
+				if( clampheight/maskheight == 2 )
+				{
+					clampheight = maskheight*2;
+					tile.bForceWrapT = false;
+				}
+				else if( clampheight/maskheight >= 2 )
+				{
+					clampheight = maskheight*2;
+					tile.bForceWrapT = true;
+				}
+			}
+		}
+#endif
 	}
 	else
 	{
@@ -664,7 +776,7 @@ bool CalculateTileSizes_method_2(int tileno, TMEMLoadMapInfo *info, TxtrInfo &gt
 	else
 	{
 		gti.WidthToLoad = loadwidth > 2 ? min(loadwidth,maskwidth) : maskwidth;
-		if( linewidth ) gti.WidthToLoad = min((uint32)linewidth, gti.WidthToLoad );
+		if( linewidth ) gti.WidthToLoad = min( linewidth, (int)gti.WidthToLoad );
 		tile.dwWidth = gti.WidthToCreate = maskwidth;
 	}
 
@@ -682,6 +794,14 @@ bool CalculateTileSizes_method_2(int tileno, TMEMLoadMapInfo *info, TxtrInfo &gt
 		tile.dwHeight = gti.HeightToCreate = maskheight;
 	}
 
+	if( options.enableHackForGames == HACK_FOR_MARIO_KART )
+	{
+		if( gti.WidthToLoad - ((g_TI.dwWidth<<g_TI.dwSize)>>tile.dwSize) == 1 )
+		{
+			gti.WidthToLoad--;
+			if( gti.HeightToLoad%2 )	gti.HeightToLoad--;
+		}
+	}
 
 	// Double check
 	uint32 total64BitWordsToLoad = (gti.HeightToLoad*gti.WidthToLoad)>>(4-tile.dwSize);
@@ -704,7 +824,7 @@ bool CalculateTileSizes_method_2(int tileno, TMEMLoadMapInfo *info, TxtrInfo &gt
 	if( (info->dwTotalWords>>2) < total64BitWordsToLoad+tile.dwTMem-info->dwTmem - 4 )
 	{
 		// Hack here
-		if( options.enableHackForGames == HACK_FOR_ZELDA && tileno != gRSP.curTile )
+		if( (options.enableHackForGames == HACK_FOR_ZELDA||options.enableHackForGames == HACK_FOR_ZELDA_MM) && tileno != gRSP.curTile )
 		{
 			return false;
 		}
@@ -776,10 +896,33 @@ TxtrCacheEntry* LoadTexture(uint32 tileno)
 			return NULL;
 	}
 
+#ifdef _XBOX_HACK
+	// Hack for XBOX, don't use too big textures
+	if( gti.HeightToCreate/gti.HeightToLoad >= 2 && gti.HeightToCreate > 128 )//&& tile.bClampT )//&& tile.dwMaskT )
+	{
+		tile.bClampT = 0;
+		gti.HeightToCreate = gti.HeightToLoad;
+		tile.dwHeight = gti.HeightToLoad;
+	}
+
+	if( gti.WidthToCreate/gti.WidthToLoad >= 2 && gti.WidthToCreate > 128 )//&& tile.bClampS )//&& tile.dwMaskS )
+	{
+		tile.bClampS = 0;
+		gti.WidthToCreate = gti.WidthToLoad;
+		tile.dwWidth = gti.WidthToLoad;
+	}
+#endif
+
 	// Option for faster loading tiles
+#ifndef _RICE560
 	if( g_curRomInfo.bFastLoadTile && status.primitiveType == PRIM_TEXTRECT && 
 		info->bSetBy == CMD_LOADTILE && ((gti.Pitch<<1)>>gti.Size) > 128 &&
 		((gti.Pitch<<1)>>gti.Size) <= 0x400  )
+#else
+	if( g_curRomInfo.bFastLoadTile && info->bSetBy == CMD_LOADTILE && ((gti.Pitch<<1)>>gti.Size) <= 0x400
+		//&& ((gti.Pitch<<1)>>gti.Size) > 128 && status.primitiveType == PRIM_TEXTRECT
+		)
+#endif
 	{
 		uint32 idx = tileno-gRSP.curTile;
 		status.LargerTileRealLeft[idx] = gti.LeftToLoad;
@@ -827,6 +970,7 @@ void PrepareTextures()
 				TxtrCacheEntry *pEntry = LoadTexture(tilenos[i]);
 				if (pEntry && pEntry->pTexture )
 				{
+#ifndef _XBOX
 					if( pEntry->txtrBufIdx <= 0 )
 					{
 						if( pEntry->pEnhancedTexture == NULL )
@@ -839,6 +983,7 @@ void PrepareTextures()
 							EnhanceTexture(pEntry);
 						}
 					}
+#endif
 
 					CRender::g_pRender->SetCurrentTexture( tilenos[i], 
 						(pEntry->pEnhancedTexture)?pEntry->pEnhancedTexture:pEntry->pTexture,
@@ -938,13 +1083,19 @@ void DLParser_LoadBlock(Gfx *gfx)
 	TMEMLoadMapInfo &info = g_tmemLoadAddrMap[tile.dwTMem];
 
 	info.bSwapped = (dxt == 0? TRUE : FALSE);
-
+#if defined(_RICE560) || defined(_RICE612)
+	info.sl = tile.hilite_sl = tile.sl = uls;
+	info.sh = tile.hilite_sh = tile.sh = lrs;
+	info.tl = tile.tl = ult;
+	info.th = tile.th = dxt;
+	tile.bSizeIsValid = false;
+#else // Below used in 1964video
 	info.sl = tile.hilite_sl = tile.sl = uls;
 	info.sh = tile.hilite_tl = tile.tl = lrs;
 	info.tl = tile.sh = ult;
 	info.th = tile.th = dxt;
 	tile.bSizeIsValid = true;
-
+#endif
 	for( int i=0; i<8; i++ )
 	{
 		if( tile.dwTMem == tile.dwTMem )
@@ -1336,7 +1487,11 @@ void DLParser_TexRect(Gfx *gfx)
 {
 	Gtexrect *gtextrect = (Gtexrect *)gfx;
 
+#ifndef _DISABLE_VID1964
 	if( !status.bCIBufferIsRendered ) CGraphicsContext::g_pGraphicsContext->FirstDrawToNewCI();
+#else
+	status.bCIBufferIsRendered = true;
+#endif
 
 	status.primitiveType = PRIM_TEXTRECT;
 
@@ -1408,6 +1563,12 @@ void DLParser_TexRect(Gfx *gfx)
 
 	float fS0 = s16S / 32.0f;
 	float fT0 = s16T / 32.0f;
+
+	if(options.enableHackTextureSeams)
+	{
+		if(s16DSDX<0) fS0 += 1.0f;	//Fix texture seams (California Speed)
+		if(s16DTDY<0) fT0 += 1.0f;	//Fix texture seams (California Speed)
+	}
 
 	float fDSDX = s16DSDX / 1024.0f;
 	float fDTDY = s16DTDY / 1024.0f;
@@ -1515,6 +1676,12 @@ void DLParser_TexRectFlip(Gfx *gfx)
 	
 	float fS0 = (float)dwS / 32.0f;
 	float fT0 = (float)dwT / 32.0f;
+
+	if(options.enableHackTextureSeams)
+	{
+		if(nDSDX<0) fS0 += 1.0f;	//Fix texture seams (California Speed)
+		if(nDTDY<0) fT0 += 1.0f;	//Fix texture seams (California Speed)
+	}
 
 	float fDSDX = (float)nDSDX / 1024.0f;
 	float fDTDY = (float)nDTDY / 1024.0f;

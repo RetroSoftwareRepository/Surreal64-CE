@@ -1444,7 +1444,7 @@ int QuoteRead(char** pszQuote, char** pszEnd, char* szSrc)		// Read a quoted str
 }
 */
 
-bool PathFileExists(const char *pszPath)
+BOOL PathFileExists(const char *pszPath)
 {   
     return GetFileAttributes(pszPath) != INVALID_FILE_ATTRIBUTES;   
 }

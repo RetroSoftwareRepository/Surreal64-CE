@@ -390,11 +390,24 @@ typedef struct
 	uint32			realFlag;
 } UVFlagMap;
 
-
+/*
 typedef enum {
 	FILTER_POINT,
 	FILTER_LINEAR,
 } TextureFilter;
+*/
+
+
+//freakdave
+typedef enum {
+	FILTER_NONE,
+	FILTER_POINT,
+	FILTER_LINEAR,
+	FILTER_ANISOTROPIC,
+	FILTER_FLATCUBIC,
+	FILTER_GAUSSIANCUBIC,
+} TextureFilter;
+
 
 typedef struct 
 {

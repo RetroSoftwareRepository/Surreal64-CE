@@ -27,6 +27,8 @@ char *project_name =	"1964 Video Plugin";
 // Disable the config dialog box to allow Vtune call graph feature to work
 #ifndef _XBOX
 #define ENABLE_CONFIG_DIALOG
+#else
+#include "../../../config.h"
 #endif
 
 char *frameBufferSettings[] =
@@ -121,10 +123,14 @@ const SettingInfo TextureQualitySettings[] =
 
 const SettingInfo ForceTextureFilterSettings[] =
 {
-	"N64 Default Texture Filter",	FORCE_DEFAULT_FILTER,
+	//"N64 Default Texture Filter",	FORCE_DEFAULT_FILTER,
+	"Force No Filter (valid for Mip Mapping only)",	FORCE_NONE_FILTER,
 	"Force Nearest Filter (faster, low quality)",	FORCE_POINT_FILTER,
 	"Force Linear Filter (slower, better quality)",	FORCE_LINEAR_FILTER,
 	//"Force Bilinear Filter (slower, best quality)", FORCE_BILINEAR_FILTER,
+	"Force Anisotropic Filter (even slower, even better quality)", FORCE_ANISOTROPIC_FILTER,
+	"Force Flatcubic Filter (cubic filtering)", FORCE_FLATCUBIC_FILTER,
+	"Force Gaussiancubic Filter (different cubic kernel)", FORCE_GAUSSIANCUBIC_FILTER,
 };
 
 const SettingInfo TextureEnhancementSettings[] =
@@ -191,8 +197,8 @@ BufferSettingInfo DirectXRenderBufferSettings[] =
 {
 	"Copy",			1,		D3DSWAPEFFECT_COPY,
 	"Flip (def)",	1,		D3DSWAPEFFECT_FLIP,
-	//"Double Buffer Copy Sync",	1,		D3DSWAPEFFECT_COPY_VSYNC,
-	//"Double Buffer Discard",	1,		D3DSWAPEFFECT_DISCARD,
+	"Double Buffer Copy Sync",	1,		D3DSWAPEFFECT_COPY_VSYNC,
+	"Double Buffer Discard",	1,		D3DSWAPEFFECT_DISCARD,
 	//"Triple Buffer Flip",		2,		D3DSWAPEFFECT_FLIP,
 	//"Quadruple Buffer Flip",	3,		D3DSWAPEFFECT_FLIP,
 	//"Triple Buffer Discard",	2,		D3DSWAPEFFECT_DISCARD,
@@ -678,19 +684,23 @@ void ReadConfiguration(void)
 		options.bWinFrameMode = FALSE;
 		options.bFullTMEM = TRUE;
 		options.bUseFullTMEM = TRUE;
-		options.bForceSoftwareTnL = TRUE; // Unsupported on XBOX
-		options.bForceSoftwareClipper = FALSE; //TRUE; // just for testing
+		options.bForceSoftwareTnL = FALSE; // Unsupported on XBOX
+		options.bForceSoftwareClipper = (VertexMode == 1);
+		options.bUseLinearFog = (bUseLinFog && (VertexMode == 1));
 		options.bEnableSSE = TRUE;
 		options.RenderBufferSetting=0;
-		options.forceTextureFilter = 1;
+		options.forceTextureFilter = TextureMode;
 		options.textureQuality = TXT_QUALITY_16BIT;
 		options.bTexRectOnly = FALSE;
 		options.bSmallTextureOnly = FALSE;
 		options.DirectXDepthBufferSetting = 0;
 		options.OpenglDepthBufferSetting = 16;
-		options.colorQuality = TEXTURE_FMT_A8R8G8B8;
+		options.colorQuality = TEXTURE_FMT_A4R4G4B4;
 		options.textureEnhancement = 0;
-		options.textureEnhancementControl = 0;
+		options.textureEnhancementControl = 1;
+		if((preferedemu != _1964x11)&&(FrameSkip>1))
+			FrameSkip = 0;
+		options.bSkipFrame = FrameSkip;
 		options.OpenglRenderSetting = OGL_DEVICE;
 		options.bSkipFrame = FALSE;
 		options.bDisplayTooltip = FALSE;
@@ -699,10 +709,10 @@ void ReadConfiguration(void)
 		options.DirectXAntiAliasingValue = 0;
 		options.DirectXCombiner = DX_PIXEL_SHADER; //DX_BEST_FIT; // just for testing
 		options.DirectXDevice = XBOX_DIRECTX_DEVICE;	// HAL device
-		options.DirectXAnisotropyValue = 0;
-		options.DirectXMaxFSAA = 16;
+		options.DirectXAnisotropyValue = 2;
+		options.DirectXMaxFSAA = 4;
 		options.FPSColor = 0xFFFFFFFF;
-		options.DirectXMaxAnisotropy = 16;
+		options.DirectXMaxAnisotropy = 2;
 
 		defaultRomOptions.N64FrameBufferEmuType = FRM_BUF_NONE;
 		defaultRomOptions.N64FrameBufferWriteBackControl = FRM_BUF_WRITEBACK_NORMAL;
@@ -718,12 +728,24 @@ void ReadConfiguration(void)
 		defaultRomOptions.bDoubleSizeForSmallTxtrBuf = FALSE;
 		windowSetting.uFullScreenRefreshRate = 0;	// 0 is the default value, means to use Window default frequency
 
+#ifndef _XBOX
 		WriteConfiguration();
-#ifndef _XBOX //win32
 		return;
-#endif //_XBOX //win32
+#else
+	if(bEnableHDTV){
+			windowSetting.uWindowDisplayWidth = windowSetting.uFullScreenDisplayWidth = 1280;
+			windowSetting.uWindowDisplayHeight = windowSetting.uFullScreenDisplayHeight = 720;
+		}else{
+			windowSetting.uWindowDisplayWidth = windowSetting.uFullScreenDisplayWidth = 640;
+			windowSetting.uWindowDisplayHeight = windowSetting.uFullScreenDisplayHeight = 480;
+		}
+		windowSetting.uDisplayWidth = windowSetting.uWindowDisplayWidth;
+		windowSetting.uDisplayHeight = windowSetting.uWindowDisplayHeight;
+
+		//CDeviceBuilder::SelectDeviceType( DIRECTX_DEVICE );
+#endif
 	}
-	else
+	else // TestRegistry is always false on XBOX. 
 	{
 		windowSetting.uWindowDisplayWidth = (uint16)ReadRegistryDwordVal(MAIN_KEY, "WinModeWidth");
 		if( windowSetting.uWindowDisplayWidth == 0 )
@@ -752,11 +774,7 @@ void ReadConfiguration(void)
 			windowSetting.uFullScreenDisplayHeight = 480;
 		}
 
-#ifdef _XBOX
-		SupportedDeviceType render = DIRECTX_DEVICE;
-		CDeviceBuilder::SelectDeviceType( DIRECTX_DEVICE );
 
-#else //win32
 		defaultRomOptions.N64FrameBufferEmuType = ReadRegistryDwordVal(MAIN_KEY, "FrameBufferSetting");
 		defaultRomOptions.N64FrameBufferWriteBackControl = ReadRegistryDwordVal(MAIN_KEY, "FrameBufferWriteBackControl");
 		defaultRomOptions.N64RenderToTextureEmuType = ReadRegistryDwordVal(MAIN_KEY, "RenderToTexture");
@@ -805,7 +823,6 @@ void ReadConfiguration(void)
 			CDeviceBuilder::SelectDeviceType( DIRECTX_DEVICE );
 		else
 			CDeviceBuilder::SelectDeviceType( (SupportedDeviceType)options.OpenglRenderSetting);
-#endif //_XBOX // win32
 	}
 
 	status.isSSEEnabled = status.isSSESupported && options.bEnableSSE;
@@ -831,11 +848,14 @@ BOOL InitConfiguration(void)
 	strcpy(szIniFileName, INI_FILE);
 
 	if (!ReadIniFile())
-		{
-			ErrorMsg("Unable to read ini file from disk");
+	{
+		ErrorMsg("Unable to read ini file from disk");
+#ifdef _XBOX
+		ReadConfiguration(); //defaults
+#endif
 		WriteIniFile();
-			return FALSE;
-		}
+		return FALSE;
+	}
 
 	ReadConfiguration();
 	return TRUE;
@@ -854,6 +874,7 @@ void GenerateCurrentRomOptions()
 	currentRomOptions.bAccurateTextureMapping	=g_curRomInfo.dwAccurateTextureMapping;
 
 	options.enableHackForGames = NO_HACK_FOR_GAME;
+	options.enableHackTextureSeams = FALSE;
 	if ((strncmp(g_curRomInfo.szGameName, "BANJO TOOIE", 11) == 0))
 	{
 		options.enableHackForGames = HACK_FOR_BANJO_TOOIE;
@@ -982,6 +1003,14 @@ void GenerateCurrentRomOptions()
 	{
 		options.enableHackForGames = HACK_FOR_TOPGEARRALLY;
 	}
+	else if ((stricmp(g_curRomInfo.szGameName, "QUAKE II") == 0))
+	{
+		options.enableHackForGames = HACK_FOR_QUAKE_2;
+	}
+	else if ((stricmp(g_curRomInfo.szGameName, "CALIFORNIA SPEED") == 0))
+	{
+		options.enableHackTextureSeams = TRUE;
+	}
 
 	if( currentRomOptions.N64FrameBufferEmuType == 0 )		currentRomOptions.N64FrameBufferEmuType = defaultRomOptions.N64FrameBufferEmuType;
 	else currentRomOptions.N64FrameBufferEmuType--;
@@ -1007,6 +1036,7 @@ void GenerateCurrentRomOptions()
 	}
 }
 
+
 void Ini_GetRomOptions(LPGAMESETTING pGameSetting)
 {
 	LONG i;
@@ -1016,9 +1046,7 @@ void Ini_GetRomOptions(LPGAMESETTING pGameSetting)
 							  pGameSetting->romheader.nCountryID,
 							  pGameSetting->szGameName);
 
-#ifndef _XBOX
 	lstrcpyn(pGameSetting->szGameName, IniSections[i].name, 50);
-#endif
 
 	pGameSetting->bDisableTextureCRC	= IniSections[i].bDisableTextureCRC;
 	pGameSetting->bDisableCulling		= IniSections[i].bDisableCulling;
@@ -1685,7 +1713,7 @@ BOOL CreateDialogTooltip(void)
 BOOL EnumChildWndTooltip(void)
 {
 #ifdef _XBOX
-    return TRUE;
+    return FALSE;
 #else //win32
 	return (!EnumChildWindows(g_hwndDlg, (WNDENUMPROC) EnumChildProc, 0));
 #endif //_XBOX
@@ -1847,11 +1875,28 @@ BOOL ReadIniFile()
 {
 	std::ifstream inifile;
 	char readinfo[100];
+	char tempreadinfo1[100];
+	char tempreadinfo2[100];
 	char trim[]="{}"; //remove first and last character
 
 	char filename[256];
 	GetPluginDir(filename);
 	strcat(filename,szIniFileName);
+#ifdef _XBOX
+	
+	// try D if it's not on T
+	if (!PathFileExists(filename)) {
+		sprintf(filename, "D:\\%s", szIniFileName);
+		if (!PathFileExists(filename)) {
+			ErrorMsg("%s Failed to Load!", filename);
+			return FALSE;
+		} else {
+			MsgInfo("%s Loaded Successfully!", filename);
+		}
+	} else {
+		MsgInfo("%s Loaded Successfully!", filename);
+	}
+#endif
 	inifile.open(filename);
 
 	if (inifile.fail())
@@ -1882,7 +1927,13 @@ BOOL ReadIniFile()
 				StrTrim(readinfo,trim);
 				strcpy(newsection.crccheck, readinfo);
 #else
-				readinfo[strlen(readinfo)-1]='\0';
+				memset(tempreadinfo2, 0x00, sizeof(tempreadinfo2));
+
+				strcpy(tempreadinfo1,&readinfo[1]);
+				strncpy(tempreadinfo2, tempreadinfo1,strlen(tempreadinfo1) - 1);
+				strcpy(readinfo, tempreadinfo2);
+
+				//readinfo[strlen(readinfo)-1]='\0';
 				strcpy(newsection.crccheck, readinfo+1);
 #endif
 
@@ -2075,8 +2126,8 @@ void WriteIniFile()
 #ifndef _XBOX
 			StrTrim(szBuf,trim);
 #else
-			tidy(szBuf);
-			szBuf[strlen(szBuf)-1]='\0';
+			//tidy(szBuf);
+			//szBuf[strlen(szBuf)-1]='\0';
 #endif
 
 
@@ -2084,7 +2135,7 @@ void WriteIniFile()
 			{
 				if (IniSections[i].bOutput)
 					continue;
-#ifndef _XBOX
+
 				if (lstrcmpi(szBuf, IniSections[i].crccheck) == 0)
 				{
 					// Output this CRC
@@ -2093,16 +2144,6 @@ void WriteIniFile()
 					bFound = TRUE;
 					break;
 				}
-#else
-				if (lstrcmpi(szBuf+1, IniSections[i].crccheck) == 0)
-				{
-					// Output this CRC
-					OutputSectionDetails(i, fhOut);
-					IniSections[i].bOutput = true;
-					bFound = TRUE;
-					break;
-				}
-#endif
 			}
 			if (!bFound)
 			{
