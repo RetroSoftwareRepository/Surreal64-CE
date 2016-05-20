@@ -1328,7 +1328,7 @@ void DLParser_FillRect(Gfx *gfx)
 #endif
 		}
 
-#ifdef _RICE612
+#ifdef _RICE612_FILL
 		if(1)
 #else
 		if( gRDP.otherMode.cycle_type == CYCLE_TYPE_FILL )
