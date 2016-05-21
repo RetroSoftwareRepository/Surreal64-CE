@@ -1085,6 +1085,8 @@ EXPORT_TYPE(void) EXPORT_NAME(FBWrite) (uint32 addr, uint32 size)
 	FrameBufferWriteByCPU(addr, size);
 }
 
+
+
 /************************************************************************
 Function: FBGetFrameBufferInfo
 Purpose:  This function is called by the emulator core to retrieve frame
@@ -1201,16 +1203,18 @@ EXPORT_TYPE(void) EXPORT_NAME(CaptureScreen) ( char * Directory )
 #ifdef _XBOX
 void _VIDEO_DisplayTemporaryMessage (const char *Message)
 {
-	/*
 	g_bTempMessage = TRUE;
 	strncpy(g_szTempMessage, Message, 99);
 	g_dwTempMessageStart = GetTickCount();
-	*/
+}
+
+int _VIDEO_ReadyForLoadState()
+{
+	return bReadyToLoad;
 }
 
 EXPORT_TYPE(void) EXPORT_NAME(SetMaxTextureMem) (DWORD mem)
 {
-	/*
 	if (mem == 0) // auto mem
 	{
 		g_bUseSetTextureMem = false;
@@ -1220,6 +1224,5 @@ EXPORT_TYPE(void) EXPORT_NAME(SetMaxTextureMem) (DWORD mem)
 		g_bUseSetTextureMem = true;
 		g_maxTextureMemUsage = mem * 1024 * 1024;
 	}
-	*/
 }
 #endif

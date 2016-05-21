@@ -82,7 +82,7 @@ BOOL LoadVideoPlugin(char *libname)
 {
 #ifdef _XBOX
 #if defined(_VIDEO_1964_11)
-	GfxPluginVersion						= 0x0103;
+	//GfxPluginVersion						= 0x0103;
 	_VIDEO_InitiateGFX						= _VIDEO_1964_11_InitiateGFX;
 	_VIDEO_ProcessDList						= _VIDEO_1964_11_ProcessDList;
 	_VIDEO_ProcessDList_Count_Cycles		= _VIDEO_1964_11_ProcessDListCountCycles;
@@ -106,10 +106,10 @@ BOOL LoadVideoPlugin(char *libname)
 	_VIDEO_ProcessRDPList					= _VIDEO_1964_11_ProcessRDPList;
 	//_VIDEO_ShowCFB						= _VIDEO_1964_11_ShowCFB;
 	
-	_VIDEO_FrameBufferWrite					= _VIDEO_1964_11_FBWrite;
-	_VIDEO_FrameBufferWriteList				= _VIDEO_1964_11_FBWList;
-	_VIDEO_FrameBufferRead					= _VIDEO_1964_11_FBRead;
-	_VIDEO_GetFrameBufferInfo				= _VIDEO_1964_11_FBGetFrameBufferInfo;
+	//_VIDEO_FrameBufferWrite					= _VIDEO_1964_11_FBWrite;
+	//_VIDEO_FrameBufferWriteList				= _VIDEO_1964_11_FBWList;
+	//_VIDEO_FrameBufferRead					= _VIDEO_1964_11_FBRead;
+	//_VIDEO_GetFrameBufferInfo				= _VIDEO_1964_11_FBGetFrameBufferInfo;
 	//_VIDEO_SetOnScreenText				= _VIDEO_1964_11_SetOnScreenText;
 	//_VIDEO_GetFullScreenStatus			= _VIDEO_1964_11_GetFullScreenStatus;
 	
