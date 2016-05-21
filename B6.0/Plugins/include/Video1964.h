@@ -24,10 +24,10 @@ void	_VIDEO_1964_11_UpdateScreen (void);
 void	_VIDEO_1964_11_ViStatusChanged (void);
 void	_VIDEO_1964_11_ViWidthChanged (void);
 void	_VIDEO_1964_11_FBWrite (DWORD, DWORD);
-void	_VIDEO_1964_11_FBWList (FrameBufferModifyEntry *plist, DWORD size);
+//void	_VIDEO_1964_11_FBWList (FrameBufferModifyEntry *plist, DWORD size);
 void	_VIDEO_1964_11_FBRead (DWORD addr);
 void	_VIDEO_1964_11_FBGetFrameBufferInfo (void *pinfo);
-//void	_VIDEO_1964_11_GetFullScreenStatus (void);
+void	_VIDEO_1964_11_GetFullScreenStatus (void);
 void	_VIDEO_1964_11_SetOnScreenText (char *msg);
 
 void	_VIDEO_1964_11_SetMaxTextureMem (DWORD mem);

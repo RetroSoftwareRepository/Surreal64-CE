@@ -294,6 +294,7 @@ string GetVideoPluginName(int p_iVideoPlugin)
 		case _VideoPluginRice560 : szVideoPlugin = "Rice 5.6.0"; break;
 		case _VideoPluginRice611 : szVideoPlugin = "Rice 6.1.1"; break;
 		case _VideoPluginRice612 : szVideoPlugin = "Rice 6.1.2"; break;
+		case _VideoPluginVid1964 : szVideoPlugin = "1964video 1.0.0"; break;
 		case _VideoPluginMissing : 
 		default : szVideoPlugin = "Unknown"; break;
 	}	
@@ -1293,6 +1294,7 @@ void launch531();
 void launch560();
 void launch611();
 void launch612();
+void launchVid1964();
 extern int actualrom;
 extern void display_compatible();
 
@@ -1312,7 +1314,7 @@ void selectvideomode(void)
 	XLMenu_CurMenu = NULL;
 	XLMenu_SetFont(&m_Font);
 
-	m_pSettingsMenu = XLMenu_Init((float)iLaunchMenuTxtPosX, (float)iLaunchMenuTxtPosY,5, GetMenuFontAlign(iLaunchMenuTxtAlign)|MENU_WRAP, NULL);//210, 160
+	m_pSettingsMenu = XLMenu_Init((float)iLaunchMenuTxtPosX, (float)iLaunchMenuTxtPosY,6, GetMenuFontAlign(iLaunchMenuTxtAlign)|MENU_WRAP, NULL);//210, 160
 
 	m_pSettingsMenu->itemcolor = dwMenuItemColor;
 	m_pSettingsMenu->parent = m_pMainMenu;
@@ -1324,6 +1326,7 @@ void selectvideomode(void)
 	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,L"Rice 5.60",launch560);
 	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,L"Rice 6.11",launch611);
 	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,L"Rice 6.12",launch612);
+	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,L"1964video 1.0.0",launchVid1964);
 
 	XLMenu_Activate(m_pSettingsMenu);
 
@@ -1543,6 +1546,13 @@ ConfigAppSave2();
 Launch();
 }
 
+void launchVid1964()
+{
+videoplugin = 5;
+ConfigAppSave2();
+Launch();
+}
+
 
 // Ez0n3 - launch rom without emulator and video plugin selectors
 void LaunchHideScreens(void)
@@ -1724,7 +1734,7 @@ void VideoSettingsMenu(void)
 	XLMenu_AddItem2(m_pSettingsMenu,MITEM_ROUTINE,currentname,incAAMode,decAAMode);
 
 	// Software Vertex Clipper
-	if((videoplugin !=_VideoPluginRice612)){
+	if((videoplugin !=_VideoPluginRice612)||(videoplugin !=_VideoPluginVid1964)){
 		VertexMode = 2;
 		swprintf(currentname,L"Force Vertex Clipper : Rice 6.12 Only");
 	}else if((VertexMode<1)||(VertexMode >= 2)||(bUseLinFog)){
@@ -1735,9 +1745,9 @@ void VideoSettingsMenu(void)
 	XLMenu_AddItem2(m_pSettingsMenu,MITEM_ROUTINE,currentname,incVertexMode,decVertexMode);
 
 	//Fog Mode
-	if (bUseLinFog && (videoplugin ==_VideoPluginRice612))
+	if (bUseLinFog && ((videoplugin ==_VideoPluginRice612)||(videoplugin ==_VideoPluginVid1964)))
 		swprintf(currentname,L"Fog Mode : Linear");
-	else if(videoplugin ==_VideoPluginRice612)
+	else if((videoplugin ==_VideoPluginRice612)||(videoplugin ==_VideoPluginVid1964))
 		swprintf(currentname,L"Fog Mode : Range");
 	else
 		swprintf(currentname,L"Fog Mode : Rice 6.12 Only");
@@ -2232,17 +2242,17 @@ void ToggleFogMode()
 {
     WCHAR currentname[120];
 	currentItem = m_pSettingsMenu->curitem;
-	if(videoplugin == _VideoPluginRice612)
+	if((videoplugin == _VideoPluginRice612)||(videoplugin == _VideoPluginVid1964))
 	bUseLinFog =! bUseLinFog;
 	
 	XLMenu_CurRoutine = NULL;
 	
-	if (bUseLinFog && (videoplugin == _VideoPluginRice612)){
+	if (bUseLinFog && ((videoplugin == _VideoPluginRice612)||(videoplugin == _VideoPluginVid1964))){
 		VertexMode = 1;
 		swprintf(currentname,L"Force Vertex Clipper : Yes");
 		XLMenu_SetItemText(&m_pSettingsMenu->items[currentItem-1], currentname);
 		swprintf(currentname,L"Fog Mode : Linear");
-	}else if(videoplugin == _VideoPluginRice612)
+	}else if((videoplugin == _VideoPluginRice612)||(videoplugin == _VideoPluginVid1964))
 		swprintf(currentname,L"Fog Mode : Range");
 	else
 		swprintf(currentname,L"Fog Mode : Rice 6.12 Only");
@@ -2367,7 +2377,7 @@ void ToggleVertexMode(bool inc)
 {
     WCHAR currentname[120];
 	currentItem = m_pSettingsMenu->curitem;
-	if(videoplugin ==_VideoPluginRice612)
+	if((videoplugin ==_VideoPluginRice612)||(videoplugin == _VideoPluginVid1964))
 	{
 		if (inc)
 		{
@@ -2385,11 +2395,11 @@ void ToggleVertexMode(bool inc)
 		VertexMode = 2;
 	
 	XLMenu_CurRoutine = NULL;
-	if((videoplugin !=_VideoPluginRice612)){
+	if((videoplugin !=_VideoPluginRice612)&&(videoplugin != _VideoPluginVid1964)){
 		// Not using Rice 6.12, Unsupported
 		VertexMode = 2;
 		swprintf(currentname,L"Force Vertex Clipper : Rice 6.12 Only");
-	}else if(bUseLinFog && (videoplugin == _VideoPluginRice612)){
+	}else if(bUseLinFog && ((videoplugin == _VideoPluginRice612)||(videoplugin == _VideoPluginVid1964))){
 		// Using LinearFog, need to force software vertex clipper
 		VertexMode = 1;
 		swprintf(currentname,L"Force Vertex Clipper : Yes");

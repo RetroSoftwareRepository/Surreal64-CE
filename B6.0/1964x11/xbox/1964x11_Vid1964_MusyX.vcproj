@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.10"
-	Name="1964x11-612M"
+	Name="1964x11-1964VidM"
 	ProjectGUID="{AE93B07A-3290-4453-9045-F4FDFB2E3383}"
 	RootNamespace="1964x11"
 	Keyword="XboxProj">
@@ -21,8 +21,8 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				OptimizeForProcessor="2"
-				AdditionalIncludeDirectories="..\..\..\..\Plugins\Include\;..\..\..\..\Common\"
-				PreprocessorDefinitions="_DEBUG;DEBUG;_XBOX;DYNAREC;ENABLE_64BIT_FPU;WIN32;_WIN32;_WINDOWS;EXTERNAL_RELEASE;_VIDEO_RICE_560;_RSP_PJ64_LLE;_RSP_SOLO;_AUDIO_MUSYX"
+				AdditionalIncludeDirectories="..\..\Plugins\Include\;..\..\Common\"
+				PreprocessorDefinitions="_DEBUG;DEBUG;_XBOX;DYNAREC;ENABLE_64BIT_FPU;WIN32;_WIN32;_WINDOWS;EXTERNAL_RELEASE;_VIDEO_1964_11;_RSP_PJ64_LLE;_RSP_SOLO;_AUDIO_MUSYX;_1964_11"
 				BasicRuntimeChecks="0"
 				RuntimeLibrary="0"
 				StructMemberAlignment="4"
@@ -42,10 +42,10 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xacteng.lib xboxkrnl.lib xbdm.lib xzlib.lib Input.lib VideoRice560.lib RspPJ64LLE.lib AudioMusyX.lib"
+				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xacteng.lib xboxkrnl.lib xbdm.lib xzlib.lib Input.lib Video1964.lib RSP.lib RSPHLE.lib RSPM64P.lib AudioMusyX.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\..\..\Plugins\lib;.\zlib"
+				AdditionalLibraryDirectories="..\..\Plugins\lib;.\zlib"
 				IgnoreAllDefaultLibraries="FALSE"
 				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="TRUE"
@@ -91,7 +91,7 @@
 				EnableFiberSafeOptimizations="TRUE"
 				OptimizeForProcessor="2"
 				AdditionalIncludeDirectories="..\..\..\..\Plugins\Include\;..\..\..\..\Common\"
-				PreprocessorDefinitions="NDEBUG;_XBOX;DYNAREC;ENABLE_64BIT_FPU;WIN32;_WIN32;_WINDOWS;EXTERNAL_RELEASE;PROFILE;_VIDEO_RICE_560;_RSP_PJ64_LLE;_RSP_SOLO;_AUDIO_AZIMER;_AUDIO_JTTL;_AUDIO_NONE"
+				PreprocessorDefinitions="NDEBUG;_XBOX;DYNAREC;ENABLE_64BIT_FPU;WIN32;_WIN32;_WINDOWS;EXTERNAL_RELEASE;PROFILE;_VIDEO_1964_11;_RSP_PJ64_LLE;_RSP_SOLO; _AUDIO_MUSYX"
 				StringPooling="TRUE"
 				RuntimeLibrary="0"
 				StructMemberAlignment="4"
@@ -110,7 +110,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="xapilib.lib d3d8i.lib d3dx8.lib xgraphics.lib dsound.lib dmusici.lib xactengi.lib xboxkrnl.lib xbdm.lib xzlib.lib Input.lib VideoRice560.lib RspPJ64LLE.lib AudioAzimer.lib AudioJttL.lib AudioNone.lib"
+				AdditionalDependencies="xapilib.lib d3d8i.lib d3dx8.lib xgraphics.lib dsound.lib dmusici.lib xactengi.lib xboxkrnl.lib xbdm.lib xzlib.lib Input.lib Video1964.lib RspPJ64LLE.lib AudioMusyX.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\..\Plugins\lib;.\zlib"
@@ -162,7 +162,7 @@
 				EnableFiberSafeOptimizations="TRUE"
 				OptimizeForProcessor="2"
 				AdditionalIncludeDirectories="..\..\..\..\Plugins\Include\;..\..\..\..\Common\"
-				PreprocessorDefinitions="NDEBUG;_XBOX;DYNAREC;ENABLE_64BIT_FPU;WIN32;_WIN32;_WINDOWS;EXTERNAL_RELEASE;PROFILE;FASTCAP;_VIDEO_RICE_560;_RSP_PJ64_LLE;_RSP_SOLO;_AUDIO_AZIMER;_AUDIO_JTTL;_AUDIO_NONE"
+				PreprocessorDefinitions="NDEBUG;_XBOX;DYNAREC;ENABLE_64BIT_FPU;WIN32;_WIN32;_WINDOWS;EXTERNAL_RELEASE;PROFILE;FASTCAP;_VIDEO_1964_11;_RSP_PJ64_LLE;_RSP_SOLO;_AUDIO_MUSYX"
 				StringPooling="TRUE"
 				RuntimeLibrary="0"
 				StructMemberAlignment="4"
@@ -182,7 +182,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="xapilib.lib d3d8i.lib d3dx8.lib xgraphics.lib dsound.lib dmusici.lib xactengi.lib xboxkrnl.lib xbdm.lib xzlib.lib Input.lib VideoRice560.lib RspPJ64LLE.lib AudioAzimer.lib AudioJttL.lib AudioNone.lib"
+				AdditionalDependencies="xapilib.lib d3d8i.lib d3dx8.lib xgraphics.lib dsound.lib dmusici.lib xactengi.lib xboxkrnl.lib xbdm.lib xzlib.lib Input.lib Video1964.lib RspPJ64LLE.lib AudioMusyX.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\..\Plugins\lib;.\zlib"
@@ -234,7 +234,7 @@
 				EnableFiberSafeOptimizations="TRUE"
 				OptimizeForProcessor="2"
 				AdditionalIncludeDirectories="..\..\Plugins\include\;..\..\Common\"
-				PreprocessorDefinitions="NDEBUG;_XBOX;DYNAREC;ENABLE_64BIT_FPU;WIN32;_WIN32;_WINDOWS;EXTERNAL_RELEASE;_VIDEO_RICE_612;_RSP_M64P_HLE;_RSP_SOLO;_AUDIO_MUSYX;_1964_11"
+				PreprocessorDefinitions="NDEBUG;_XBOX;DYNAREC;ENABLE_64BIT_FPU;WIN32;_WIN32;_WINDOWS;EXTERNAL_RELEASE;_VIDEO_1964_11;_AUDIO_MUSYX;_RSP_HACK_HLE;_RSP_PJ64_LLE;_RSP_M64P_HLE;_1964_11"
 				StringPooling="TRUE"
 				RuntimeLibrary="0"
 				StructMemberAlignment="5"
@@ -253,7 +253,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xacteng.lib xboxkrnl.lib xbdm.lib zlib\xzlib.lib AudioMusyX.lib Input.lib RSP.lib RSPHLE.lib RSPM64P.lib VideoRice612.lib"
+				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xacteng.lib xboxkrnl.lib xbdm.lib zlib\xzlib.lib AudioBasic.lib AudioJttl.lib AudioNone.lib AudioAzimer.lib Input.lib RSP.lib RSPHLE.lib RSPM64P.lib Video1964.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\Plugins\lib;.\zlib"
@@ -304,10 +304,10 @@
 				EnableFiberSafeOptimizations="TRUE"
 				OptimizeForProcessor="2"
 				AdditionalIncludeDirectories="..\..\Plugins\Include\;..\..\Common\"
-				PreprocessorDefinitions="NDEBUG;_XBOX;DYNAREC;ENABLE_64BIT_FPU;WIN32;_WIN32;_WINDOWS;EXTERNAL_RELEASE;LTCG;_VIDEO_RICE_612;_RSP_HACK_HLE;_RSP_PJ64_LLE;_RSP_M64P_HLE;_AUDIO_MUSYX;_AUDIO_SOLO;_1964_11"
+				PreprocessorDefinitions="NDEBUG;_XBOX;DYNAREC;ENABLE_64BIT_FPU;WIN32;_WIN32;_WINDOWS;EXTERNAL_RELEASE;LTCG;_VIDEO_1964_11;_RSP_PJ64_LLE;_RSP_HACK_HLE;_RSP_M64P_HLE; _AUDIO_MUSYX;_AUDIO_BASIC;_AUDIO_M64P;_1964_11"
 				StringPooling="TRUE"
 				RuntimeLibrary="0"
-				StructMemberAlignment="4"
+				StructMemberAlignment="5"
 				BufferSecurityCheck="FALSE"
 				EnableFunctionLevelLinking="TRUE"
 				EnableEnhancedInstructionSet="1"
@@ -323,7 +323,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="xapilib.lib d3d8ltcg.lib d3dx8.lib xgraphicsltcg.lib dsound.lib dmusicltcg.lib xactengltcg.lib xboxkrnl.lib xzlib.lib Input.lib VideoRice612.lib RSP.lib RSPHLE.lib RSPM64P.lib AudioMusyX.lib"
+				AdditionalDependencies="xapilib.lib d3d8ltcg.lib d3dx8.lib xgraphicsltcg.lib dsound.lib dmusicltcg.lib xactengltcg.lib xboxkrnl.lib xzlib.lib Input.lib Video1964.lib RSP.lib RSPHLE.lib RSPM64P.lib AudioMusyX.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\Plugins\lib;.\zlib"
@@ -361,7 +361,7 @@
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
 			CharacterSet="2"
-			WholeProgramOptimization="FALSE">
+			WholeProgramOptimization="TRUE">
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="2"
@@ -374,7 +374,7 @@
 				EnableFiberSafeOptimizations="TRUE"
 				OptimizeForProcessor="2"
 				AdditionalIncludeDirectories="..\..\Plugins\include\;..\..\Common\"
-				PreprocessorDefinitions="NDEBUG;_XBOX;DYNAREC;ENABLE_64BIT_FPU;WIN32;_WIN32;_WINDOWS;EXTERNAL_RELEASE;_VIDEO_RICE_612;_RSP_M64P_HLE;_RSP_SOLO;_AUDIO_MUSYX;_1964_11;USE_ICC_LIB"
+				PreprocessorDefinitions="NDEBUG;_XBOX;DYNAREC;ENABLE_64BIT_FPU;WIN32;USE_ICC_LIB;_WIN32;_WINDOWS;EXTERNAL_RELEASE;_VIDEO_1964_11;_AUDIO_MUSYX;_RSP_HACK_HLE;_RSP_PJ64_LLE;_RSP_M64P_HLE;_1964_11"
 				StringPooling="TRUE"
 				RuntimeLibrary="0"
 				StructMemberAlignment="5"
@@ -396,7 +396,7 @@
 				AdditionalOptions="/nodefaultlib:libmmt.lib
 /nodefaultlib:svml_disp.lib
 "
-				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xacteng.lib xboxkrnl.lib xbdm.lib zlib\xzlib.lib AudioMusyX.lib Input.lib RSP.lib RSPHLE.lib RSPM64P_ICC.lib VideoRice612.lib 1964x11_ICC.lib"
+				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib dmusic.lib xacteng.lib xboxkrnl.lib xbdm.lib zlib\xzlib.lib AudioMusyX.lib Input.lib RSP.lib RSPHLE.lib RSPM64P_ICC.lib Video1964.lib 1964x11_ICC.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\Plugins\lib;.\zlib"

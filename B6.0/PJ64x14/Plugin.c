@@ -530,10 +530,10 @@ BOOL LoadGFXDll(char * RspDll) {
 	_VIDEO_LINK_ProcessRDPList					= _VIDEO_1964_11_ProcessRDPList;
 	//_VIDEO_LINK_ShowCFB						= _VIDEO_1964_11_ShowCFB;
 	
-	_VIDEO_LINK_FrameBufferWrite					= _VIDEO_1964_11_FBWrite;
-	_VIDEO_LINK_FrameBufferWriteList				= _VIDEO_1964_11_FBWList;
-	_VIDEO_LINK_FrameBufferRead					= _VIDEO_1964_11_FBRead;
-	_VIDEO_LINK_GetFrameBufferInfo				= _VIDEO_1964_11_FBGetFrameBufferInfo;
+	//_VIDEO_LINK_FrameBufferWrite					= _VIDEO_1964_11_FBWrite;
+	//_VIDEO_LINK_FrameBufferWriteList				= _VIDEO_1964_11_FBWList;
+	//_VIDEO_LINK_FrameBufferRead					= _VIDEO_1964_11_FBRead;
+	//_VIDEO_LINK_GetFrameBufferInfo				= _VIDEO_1964_11_FBGetFrameBufferInfo;
 	//_VIDEO_LINK_SetOnScreenText				= _VIDEO_1964_11_SetOnScreenText;
 	//_VIDEO_LINK_GetFullScreenStatus			= _VIDEO_1964_11_GetFullScreenStatus;
 	
