@@ -24,7 +24,7 @@
 
 #ifdef _XBOX
 #include <xtl.h>
-#include "..\..\..\Include\xbox_depp.h"
+//#include "..\..\..\Include\xbox_depp.h"
 
 #else //win32
 #include <windows.h>

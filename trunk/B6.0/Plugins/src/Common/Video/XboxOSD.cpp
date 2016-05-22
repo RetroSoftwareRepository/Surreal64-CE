@@ -270,6 +270,7 @@ __forceinline void XboxDrawDebugInfo()
 		case _VideoPluginRice560: swprintf(debugvideo,L"Rice Video 5.60"); break;
 		case _VideoPluginRice611: swprintf(debugvideo,L"Rice Video 6.11"); break;
 		case _VideoPluginRice612: swprintf(debugvideo,L"Rice Video 6.12"); break;
+		case _VideoPluginVid1964: swprintf(debugvideo,L"1964Video 1.0.0"); break;
 	}
 
 	// Audio Plugin

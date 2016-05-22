@@ -28,12 +28,14 @@ rem	CONFIG START
 	set SOL_P560=(Project560.sln)
 	set SOL_P611=(Project611.sln)
 	set SOL_P612=(Project612.sln)
+	set SOL_P1964=(Project1964Vid.sln)
 
 	set XBE_SOL_P510_LIST=(1964x085-510.xbe 1964x085-510M.xbe 1964x11-510.xbe 1964x11-510M.xbe PJ64x14-510.xbe PJ64x14-510M.xbe PJ64x16-510.xbe PJ64x16-510M.xbe)
 	set XBE_SOL_P531_LIST=(1964x085-531.xbe 1964x085-531M.xbe 1964x11-531.xbe 1964x11-531M.xbe PJ64x14-531.xbe PJ64x14-531M.xbe PJ64x16-531.xbe PJ64x16-531M.xbe)
 	set XBE_SOL_P560_LIST=(1964x085-560.xbe 1964x085-560M.xbe 1964x11-560.xbe 1964x11-560M.xbe PJ64x14-560.xbe PJ64x14-560M.xbe PJ64x16-560.xbe PJ64x16-560M.xbe)
 	set XBE_SOL_P611_LIST=(1964x085-611.xbe 1964x085-611M.xbe 1964x11-611.xbe 1964x11-611M.xbe PJ64x14-611.xbe PJ64x14-611M.xbe PJ64x16-611.xbe PJ64x16-611M.xbe)
 	set XBE_SOL_P612_LIST=(1964x085-612.xbe 1964x085-612M.xbe 1964x11-612.xbe 1964x11-612M.xbe PJ64x14-612.xbe PJ64x14-612M.xbe PJ64x16-612.xbe PJ64x16-612M.xbe)
+	set XBE_SOL_P1964_LIST=(1964x085-1964Vid.xbe 1964x085-1964VidM.xbe 1964x11-1964Vid.xbe 1964x11-1964VidM.xbe PJ64x14-1964Vid.xbe PJ64x14-1964VidM.xbe PJ64x16-1964Vid.xbe PJ64x16-1964VidM.xbe)
 	set XBE_SOL_MAIN_LIST=(UltraHLE.xbe default.xbe)
 	
 	goto PROMPT_MODE
@@ -178,6 +180,24 @@ rem ---------------------------------------------
 	rmdir %MODE% /S /Q
 	md %MODE%
 
+	for %%i in %SOL_P1964% do (
+		ECHO Cleaning...
+		%NET% %%i /clean %MODE%
+	)
+
+	for %%i in %SOL_P1964% do (
+		ECHO Compiling...
+		%NET% %%i /build %MODE%
+	)
+
+	if %MODE%==release_icc xcopy release\*.xbe preBUILD
+	xcopy %MODE%\*.xbe preBUILD
+
+	if %MODE%==release_icc (rmdir release /S /Q)
+	if %MODE%==release_icc (md release)
+	rmdir %MODE% /S /Q
+	md %MODE%
+
 	for %%i in %SOL_MAIN% do (
 		ECHO Cleaning...
 		%NET% %%i /clean %MODE%
@@ -244,6 +264,7 @@ rem ---------------------------------------------------------------------
 	for %%i in %SOL_P560% do %NET% %%i /clean %MODE%
 	for %%i in %SOL_P611% do %NET% %%i /clean %MODE%
 	for %%i in %SOL_P612% do %NET% %%i /clean %MODE%
+	for %%i in %SOL_P1964% do %NET% %%i /clean %MODE%
 	for %%i in %SOL_MAIN% do %NET% %%i /clean %MODE%
 	ECHO Done!
 	ECHO ------------------------------
@@ -267,6 +288,7 @@ rem ---------------------------------------------------------------------
 	for %%i in %SOL_P560% do %NET% %%i /clean release
 	for %%i in %SOL_P611% do %NET% %%i /clean release
 	for %%i in %SOL_P612% do %NET% %%i /clean release
+	for %%i in %SOL_P1964% do %NET% %%i /clean release
 	for %%i in %SOL_MAIN% do %NET% %%i /clean release
 	ECHO Done!
 	ECHO ------------------------------
