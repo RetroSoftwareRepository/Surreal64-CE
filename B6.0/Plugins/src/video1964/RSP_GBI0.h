@@ -361,7 +361,7 @@ void RSP_GBI1_Texture(Gfx *gfx)
 	CRender::g_pRender->SetTextureEnableAndScale(gfx->texture.tile, gfx->texture.enable_gbi0, fTextureScaleS, fTextureScaleT);
 }
 
-extern void RSP_RDP_InsertMatrix(uint32 word0, uint32 word1);
+extern void RSP_RDP_InsertMatrix(Gfx *gfx);
 void RSP_GBI1_MoveWord(Gfx *gfx)
 {
 	SP_Timing(RSP_GBI1_MoveWord);
@@ -644,37 +644,24 @@ void RSP_RDP_Nothing(Gfx *gfx)
 
 void RSP_RDP_InsertMatrix(Gfx *gfx)
 {
-	float fraction;
+	 UpdateCombinedMatrix();
 
-	UpdateCombinedMatrix();
+    int x = ((gfx->words.w0) & 0x1F) >> 1;
+    int y = x >> 2;
+    x &= 3;
 
 	if ((gfx->words.w0) & 0x20)
-	{
-		int x = ((gfx->words.w0) & 0x1F) >> 1;
-		int y = x >> 2;
-		x &= 3;
+    {
+        gRSPworldProject.m[y][x]   = (float)(int)gRSPworldProject.m[y][x] + ((float)(gfx->words.w1 >> 16) / 65536.0f);
+        gRSPworldProject.m[y][x+1] = (float)(int)gRSPworldProject.m[y][x+1] + ((float)(gfx->words.w1 & 0xFFFF) / 65536.0f);
+    }
+    else
+    {
+        gRSPworldProject.m[y][x] = (float)(short)(gfx->words.w1 >> 16);
+        gRSPworldProject.m[y][x+1] = (float)(short)(gfx->words.w1 & 0xFFFF);
+    }
 
-		fraction = ((gfx->words.w1)>>16)/65536.0f;
-		gRSPworldProject.m[y][x] = (float)(int)gRSPworldProject.m[y][x];
-		gRSPworldProject.m[y][x] += fraction;
+    gRSP.bMatrixIsUpdated = false;
+    gRSP.bCombinedMatrixIsUpdated = true;
 
-		fraction = ((gfx->words.w1)&0xFFFF)/65536.0f;
-		gRSPworldProject.m[y][x+1] = (float)(int)gRSPworldProject.m[y][x+1];
-		gRSPworldProject.m[y][x+1] += fraction;
-	}
-	else
-	{
-		int x = ((gfx->words.w0) & 0x1F) >> 1;
-		int y = x >> 2;
-		x &= 3;
-
-		fraction = (float)fabs(gRSPworldProject.m[y][x] - (int)gRSPworldProject.m[y][x]);
-		gRSPworldProject.m[y][x] = (short)((gfx->words.w1)>>16) + fraction;
-
-		fraction = (float)fabs(gRSPworldProject.m[y][x+1] - (int)gRSPworldProject.m[y][x+1]);
-		gRSPworldProject.m[y][x+1] = (short)((gfx->words.w1)&0xFFFF) + fraction;
-	}
-
-	gRSP.bMatrixIsUpdated = false;
-	gRSP.bCombinedMatrixIsUpdated = true;
 }
