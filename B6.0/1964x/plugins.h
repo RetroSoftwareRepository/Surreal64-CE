@@ -81,6 +81,14 @@ typedef struct
 	uint32	height;
 } FrameBufferInfo;
 
+//Unused, needed for FBWriteList
+typedef struct
+{
+	uint32 addr;
+	uint32 val;
+	uint32 size;				// 1 = BYTE, 2 = WORD, 4=DWORD
+} FrameBufferModifyEntry;
+
 //#include <Video.h>
 #if defined(_VIDEO_1964_11)
 #include <Video1964.h>

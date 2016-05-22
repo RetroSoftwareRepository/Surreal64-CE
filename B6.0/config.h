@@ -93,4 +93,4 @@ extern char szPathScreenshots[MAX_FILE_PATH];
 #ifndef INVALID_FILE_ATTRIBUTES
 #define INVALID_FILE_ATTRIBUTES ((DWORD)-1)
 #endif
-extern BOOL PathFileExists(const char *pszPath);
+extern bool PathFileExists(const char *pszPath);

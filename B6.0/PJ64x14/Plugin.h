@@ -283,6 +283,13 @@ void ( *ViStatusChanged)    ( void );
 void ( *ViWidthChanged)     ( void );
 
 void ( *SetMaxTextureMem)   ( DWORD );
+//Unused, Needed for FBWriteList
+typedef struct
+{
+	DWORD addr;
+	DWORD val;
+	DWORD size;				// 1 = BYTE, 2 = WORD, 4=DWORD
+} FrameBufferModifyEntry;
 
 /************ Audio DLL: Functions *****************/
 void ( *AiCloseDLL)       ( void );

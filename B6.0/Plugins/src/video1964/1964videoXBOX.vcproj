@@ -390,6 +390,18 @@
 		<Filter
 			Name="Xbox Additions"
 			Filter="">
+			<File
+				RelativePath="..\..\..\config.cpp">
+				<FileConfiguration
+					Name="Release|Xbox">
+					<Tool
+						Name="VCCLCompilerTool"
+						ObjectFile="$(IntDir)/$(InputName)1.obj"/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\..\config.h">
+			</File>
 			<Filter
 				Name="Common"
 				Filter="">

@@ -1734,9 +1734,9 @@ void VideoSettingsMenu(void)
 	XLMenu_AddItem2(m_pSettingsMenu,MITEM_ROUTINE,currentname,incAAMode,decAAMode);
 
 	// Software Vertex Clipper
-	if((videoplugin !=_VideoPluginRice612)||(videoplugin !=_VideoPluginVid1964)){
+	if((videoplugin !=_VideoPluginRice612)&&(videoplugin !=_VideoPluginVid1964)){
 		VertexMode = 2;
-		swprintf(currentname,L"Force Vertex Clipper : Rice 6.12 Only");
+		swprintf(currentname,L"Force Vertex Clipper : Modern Plugin Only");
 	}else if((VertexMode<1)||(VertexMode >= 2)||(bUseLinFog)){
 		VertexMode = 2;
 		swprintf(currentname,L"Force Vertex Clipper : No");
@@ -1750,7 +1750,7 @@ void VideoSettingsMenu(void)
 	else if((videoplugin ==_VideoPluginRice612)||(videoplugin ==_VideoPluginVid1964))
 		swprintf(currentname,L"Fog Mode : Range");
 	else
-		swprintf(currentname,L"Fog Mode : Rice 6.12 Only");
+		swprintf(currentname,L"Fog Mode : Modern Plugin Only");
 	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,currentname,ToggleFogMode);
 
 	XLMenu_Activate(m_pSettingsMenu);
@@ -2255,7 +2255,7 @@ void ToggleFogMode()
 	}else if((videoplugin == _VideoPluginRice612)||(videoplugin == _VideoPluginVid1964))
 		swprintf(currentname,L"Fog Mode : Range");
 	else
-		swprintf(currentname,L"Fog Mode : Rice 6.12 Only");
+		swprintf(currentname,L"Fog Mode : Modern Plugin Only");
 	XLMenu_SetItemText(&m_pSettingsMenu->items[currentItem], currentname);
 
 	ConfigAppSave2();
@@ -2398,7 +2398,7 @@ void ToggleVertexMode(bool inc)
 	if((videoplugin !=_VideoPluginRice612)&&(videoplugin != _VideoPluginVid1964)){
 		// Not using Rice 6.12, Unsupported
 		VertexMode = 2;
-		swprintf(currentname,L"Force Vertex Clipper : Rice 6.12 Only");
+		swprintf(currentname,L"Force Vertex Clipper : Modern Plugin Only");
 	}else if(bUseLinFog && ((videoplugin == _VideoPluginRice612)||(videoplugin == _VideoPluginVid1964))){
 		// Using LinearFog, need to force software vertex clipper
 		VertexMode = 1;

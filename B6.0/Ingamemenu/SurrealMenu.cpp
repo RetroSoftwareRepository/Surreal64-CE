@@ -454,6 +454,7 @@ void ResetRom(void)
 			case _VideoPluginRice560: 	sprintf(szVideoPlugin, "-560"); break;
 			case _VideoPluginRice611: 	sprintf(szVideoPlugin, "-611"); break;
 			case _VideoPluginRice612: 	sprintf(szVideoPlugin, "-612"); break;
+			case _VideoPluginVid1964: 	sprintf(szVideoPlugin, "-1964Vid"); break;
 			default:
 				sprintf(szVideoPlugin, "-560"); break;
 		}
