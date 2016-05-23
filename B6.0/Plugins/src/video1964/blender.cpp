@@ -168,7 +168,7 @@ Possible Blending Factors:
 			{
 				Disable(); // Enable/Enable?
 			}
-#ifdef _RICE612
+#ifdef _RICE612_ALPHACOMP
 			render->SetAlphaTestEnable( ((gRDP.otherModeL >> RSP_SETOTHERMODE_SHIFT_ALPHACOMPARE) & 0x3)==1 ? TRUE : FALSE);
 #endif
 			break;
