@@ -61,21 +61,21 @@ UcodeMap *ucodeMaps[] =
 {
 	&ucodeMap0,				// ucode 0 - Mario
 	&ucodeMap1,				// ucode 1 - GBI1
-	NULL,					// ucode 2 - Golden Eye
+	&ucodeMap2,				// ucode 2 - Golden Eye
 	&ucodeMap3,				// ucode 3 - S2DEX GBI2
-	NULL,					// ucode 4 - Wave Racer
+	&ucodeMap4,				// ucode 4 - Wave Racer
 	&ucodeMap5,				// ucode 5 - BGI2
-	NULL,					// ucode 6 - DKR
+	&ucodeMap6,				// ucode 6 - DKR
 	&ucodeMap7,				// ucode 7 - S2DEX
 	NULL,					// ucode 8 - ucode 0 with sprite2D, for Demo Puzzle Master 64
-	NULL,					// ucode 9 - Perfect Dark
-	NULL,					// ucode 10 - Conker
-	NULL,					// ucode 11 - Gemini
+	&ucodeMap9,				// ucode 9 - Perfect Dark
+	&ucodeMap10,					// ucode 10 - Conker
+	&ucodeMap11,			// ucode 11 - Gemini
 	NULL,					// ucode 12 - Silicon Valley, Spacestation
 	NULL,					// ucode 13 - modified ucode S2DEX
 	NULL,					// ucode 14 - OgreBattle Background
 	NULL,					// ucode 15 - ucode 0 with sprite2D
-	NULL,					// ucode 16 - Star War, Shadow of Empire
+	&ucodeMap16,			// ucode 16 - Star War, Shadow of Empire
 	NULL,					// ucode 17 - Star Wars - Rogue Squadron, 
 	NULL,					// ucode 18 - World Driver Championship
 	NULL,					// ucode 19 - Last Legion UX
@@ -265,6 +265,7 @@ uint16	g_wRDPTlut[0x200];
 uint32	g_dwRDPPalCrc[16];
 
 #include "FrameBuffer.h"
+#include "FrameBufferOLD.h"
 #include "RSP_GBI0.h"
 #include "RSP_GBI1.h"
 #include "RSP_GBI2.h"
@@ -272,6 +273,15 @@ uint32	g_dwRDPPalCrc[16];
 #include "RSP_GBI_Others.h"
 #include "RSP_GBI_Sprite2D.h"
 #include "RDP_Texture.h"
+//Custom ucodes
+#include "RSP_WRUS.h" //Wave Race 64
+#include "RSP_LL.h" //Last Legion
+#include "RSP_DKR.h" //Diddy Kong Racing
+#include "RSP_SOTE.h" //Shadow Of The Empire
+#include "RSP_Conker.h" //Conkers Bad Fur Day
+#include "RSP_GE.h" //Golden Eye
+#include "RSP_PD.h" //Perfect Dark
+#include "RSP_RS.h" //Rouge Squadron
 
 //////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////
@@ -354,7 +364,11 @@ void RDP_Cleanup()
 {
 	if( status.bHandleN64TextureBuffer )
 	{
+#ifdef _RICE6FB
+		g_pFrameBufferManager->CloseRenderTexture(false);
+#else
 		CGraphicsContext::g_pGraphicsContext->CloseTextureBuffer(false);
+#endif
 	}
 }
 
@@ -373,7 +387,7 @@ void RDP_SetUcodeMap(int ucode)
 		//LoadedUcodeMap[9]=RSP_GBI1_Sprite2DBase;
 		//LoadedUcodeMap[0xaf]=RSP_GBI1_LoadUCode;
 		//LoadedUcodeMap[0xb0]=RSP_GBI1_BranchZ;
-		LoadedUcodeMap[0xb4]=DLParser_RDPHalf_1_0xb4_GoldenEye;
+		LoadedUcodeMap[0xb4]=DLParser_RDPHalf1_GoldenEye;
 		status.bUseModifiedUcodeMap = true;
 		break;
 	case 3:	// S2DEX GBI2
@@ -391,8 +405,9 @@ void RDP_SetUcodeMap(int ucode)
 	case 5:	// F3DEX GBI2
 		break;
 	case 6: // DKR, Jet Force Gemini, Mickey
+		break;
 	case 11: // DKR, Jet Force Gemini, Mickey
-		memcpy( &LoadedUcodeMap, &ucodeMap0, sizeof(UcodeMap));
+		/*memcpy( &LoadedUcodeMap, &ucodeMap0, sizeof(UcodeMap));
 		LoadedUcodeMap[1]=RSP_Mtx_DKR;
 		LoadedUcodeMap[4]=RSP_Vtx_DKR;
 		if( ucode == 11 )	LoadedUcodeMap[4]=RSP_Vtx_Gemini;
@@ -403,7 +418,7 @@ void RDP_SetUcodeMap(int ucode)
 		//LoadedUcodeMap[9]=RSP_GBI1_Sprite2DBase;
 		//LoadedUcodeMap[0xb0]=RSP_GBI1_BranchZ;
 		//LoadedUcodeMap[0xb2]=RSP_GBI1_ModifyVtx;
-		status.bUseModifiedUcodeMap = true;
+		status.bUseModifiedUcodeMap = true;*/
 		break;
 	case 7: // S2DEX GBI1
 		break;
@@ -415,34 +430,34 @@ void RDP_SetUcodeMap(int ucode)
 		status.bUseModifiedUcodeMap = true;
 		break;
 	case 9:	// Perfect Dark
-		memcpy( &LoadedUcodeMap, &ucodeMap0, sizeof(UcodeMap));
+		/*memcpy( &LoadedUcodeMap, &ucodeMap0, sizeof(UcodeMap));
 		LoadedUcodeMap[4]=RSP_Vtx_PD;
 		LoadedUcodeMap[7]=RSP_Set_Vtx_CI_PD;
 		LoadedUcodeMap[0xb1]=RSP_Tri4_PD;
 		LoadedUcodeMap[0xb4]=DLParser_RDPHalf_1_0xb4_GoldenEye;
-		status.bUseModifiedUcodeMap = true;
+		status.bUseModifiedUcodeMap = true;*/
 		break;
 	case 10: // Conker BFD
 		memcpy( &LoadedUcodeMap, &ucodeMap5, sizeof(UcodeMap));
 		LoadedUcodeMap[1]=RSP_Vtx_Conker;
-		LoadedUcodeMap[0x10]=DLParser_Tri4_Conker;
-		LoadedUcodeMap[0x11]=DLParser_Tri4_Conker;
-		LoadedUcodeMap[0x12]=DLParser_Tri4_Conker;
-		LoadedUcodeMap[0x13]=DLParser_Tri4_Conker;
-		LoadedUcodeMap[0x14]=DLParser_Tri4_Conker;
-		LoadedUcodeMap[0x15]=DLParser_Tri4_Conker;
-		LoadedUcodeMap[0x16]=DLParser_Tri4_Conker;
-		LoadedUcodeMap[0x17]=DLParser_Tri4_Conker;
-		LoadedUcodeMap[0x18]=DLParser_Tri4_Conker;
-		LoadedUcodeMap[0x19]=DLParser_Tri4_Conker;
-		LoadedUcodeMap[0x1a]=DLParser_Tri4_Conker;
-		LoadedUcodeMap[0x1b]=DLParser_Tri4_Conker;
-		LoadedUcodeMap[0x1c]=DLParser_Tri4_Conker;
-		LoadedUcodeMap[0x1d]=DLParser_Tri4_Conker;
-		LoadedUcodeMap[0x1e]=DLParser_Tri4_Conker;
-		LoadedUcodeMap[0x1f]=DLParser_Tri4_Conker;
-		LoadedUcodeMap[0xdb]=DLParser_MoveWord_Conker;
-		LoadedUcodeMap[0xdc]=DLParser_MoveMem_Conker;
+		LoadedUcodeMap[0x10]=RSP_Tri4_Conker;
+		LoadedUcodeMap[0x11]=RSP_Tri4_Conker;
+		LoadedUcodeMap[0x12]=RSP_Tri4_Conker;
+		LoadedUcodeMap[0x13]=RSP_Tri4_Conker;
+		LoadedUcodeMap[0x14]=RSP_Tri4_Conker;
+		LoadedUcodeMap[0x15]=RSP_Tri4_Conker;
+		LoadedUcodeMap[0x16]=RSP_Tri4_Conker;
+		LoadedUcodeMap[0x17]=RSP_Tri4_Conker;
+		LoadedUcodeMap[0x18]=RSP_Tri4_Conker;
+		LoadedUcodeMap[0x19]=RSP_Tri4_Conker;
+		LoadedUcodeMap[0x1a]=RSP_Tri4_Conker;
+		LoadedUcodeMap[0x1b]=RSP_Tri4_Conker;
+		LoadedUcodeMap[0x1c]=RSP_Tri4_Conker;
+		LoadedUcodeMap[0x1d]=RSP_Tri4_Conker;
+		LoadedUcodeMap[0x1e]=RSP_Tri4_Conker;
+		LoadedUcodeMap[0x1f]=RSP_Tri4_Conker;
+		LoadedUcodeMap[0xdb]=RSP_MoveWord_Conker;
+		LoadedUcodeMap[0xdc]=RSP_MoveMem_Conker;
 		status.bUseModifiedUcodeMap = true;
 		break;
 	case 12: // Silicon Velley, Space Station
@@ -749,7 +764,11 @@ void DLParser_Process()
 
 	if( currentRomOptions.N64RenderToTextureEmuType != TXT_BUF_NONE && defaultRomOptions.bSaveVRAM )
 	{
+#ifdef _RICE6FB
+		g_pFrameBufferManager->CheckRenderTextureCRCInRDRAM();
+#else
 		CGraphicsContext::g_pGraphicsContext->CheckTxtrBufsCRCInRDRAM();
+#endif
 	}
 
 	
@@ -813,7 +832,7 @@ void DLParser_Process()
 
 			Gfx *pgfx = (Gfx*)&g_pRDRAMu32[(gDlistStack[gDlistStackPointer].pc>>2)];
 			gDlistStack[gDlistStackPointer].pc += 8;
-			currentUcodeMap[pgfx->words.w0 >>24](pgfx);
+			currentUcodeMap[pgfx->words.cmd0 >>24](pgfx);
 
 			if ( gDlistStackPointer >= 0 && --gDlistStack[gDlistStackPointer].countdown < 0 )
 			{
@@ -896,6 +915,35 @@ void DLParser_Process()
 //////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////
 
+void RDP_NOIMPL_Real(LPCTSTR op, uint32 word0, uint32 word1) 
+{
+#ifdef _DEBUG
+	if( logWarning )
+	{
+		TRACE0("Stack Trace");
+		for( int i=0; i<gDlistStackPointer; i++ )
+		{
+			DebuggerAppendMsg("  %08X", gDlistStack[i].pc);
+		}
+		uint32 dwPC = gDlistStack[gDlistStackPointer].pc-8;
+		DebuggerAppendMsg("PC=%08X",dwPC);
+		DebuggerAppendMsg(op, word0, word1);
+	}
+	DEBUGGER_PAUSE_AND_DUMP_COUNT_N(NEXT_UNKNOWN_OP, {TRACE0("Paused at unimplemented ucode\n");})
+#endif
+}
+
+void RDP_NOIMPL_WARN(LPCTSTR op)
+{
+#ifdef _DEBUG
+	if(logWarning)
+	{
+		TRACE0(op);
+	}
+#endif
+}
+
+
 void RSP_GBI1_Noop(Gfx *gfx)
 {
 }
@@ -949,8 +997,8 @@ void DLParser_SetKeyGB(Gfx *gfx)
 	DP_Timing(DLParser_SetKeyGB);
 
 
-	gRDP.keyB = ((gfx->words.w1)>>8)&0xFF;
-	gRDP.keyG = ((gfx->words.w1)>>24)&0xFF;
+	gRDP.keyB = ((gfx->words.cmd1)>>8)&0xFF;
+	gRDP.keyG = ((gfx->words.cmd1)>>24)&0xFF;
 	gRDP.keyA = (gRDP.keyR+gRDP.keyG+gRDP.keyB)/3;
 	gRDP.fKeyA = gRDP.keyA/255.0f;
 }
@@ -958,7 +1006,7 @@ void DLParser_SetKeyR(Gfx *gfx)
 {
 	DP_Timing(DLParser_SetKeyR);
 
-	gRDP.keyR = ((gfx->words.w1)>>8)&0xFF;
+	gRDP.keyR = ((gfx->words.cmd1)>>8)&0xFF;
 	gRDP.keyA = (gRDP.keyR+gRDP.keyG+gRDP.keyB)/3;
 	gRDP.fKeyA = gRDP.keyA/255.0f;
 }
@@ -971,23 +1019,23 @@ void DLParser_SetConvert(Gfx *gfx)
 
 	int temp;
 
-	temp = ((gfx->words.w0)>>13)&0x1FF;
+	temp = ((gfx->words.cmd0)>>13)&0x1FF;
 	g_convk0 = temp>0xFF ? -(temp-0x100) : temp;
 
-	temp = ((gfx->words.w0)>>4)&0x1FF;
+	temp = ((gfx->words.cmd0)>>4)&0x1FF;
 	g_convk1 = temp>0xFF ? -(temp-0x100) : temp;
 
-	temp = (gfx->words.w0)&0xF;
-	temp = (temp<<5)|(((gfx->words.w1)>>27)&0x1F);
+	temp = (gfx->words.cmd0)&0xF;
+	temp = (temp<<5)|(((gfx->words.cmd1)>>27)&0x1F);
 	g_convk2 = temp>0xFF ? -(temp-0x100) : temp;
 
-	temp = ((gfx->words.w1)>>18)&0x1FF;
+	temp = ((gfx->words.cmd1)>>18)&0x1FF;
 	g_convk3 = temp>0xFF ? -(temp-0x100) : temp;
 
-	temp = ((gfx->words.w1)>>9)&0x1FF;
+	temp = ((gfx->words.cmd1)>>9)&0x1FF;
 	g_convk4 = temp>0xFF ? -(temp-0x100) : temp;
 
-	temp = (gfx->words.w1)&0x1FF;
+	temp = (gfx->words.cmd1)&0x1FF;
 	g_convk5 = temp>0xFF ? -(temp-0x100) : temp;
 
 	g_convc0 = g_convk5/255.0f+1.0f;
@@ -999,8 +1047,8 @@ void DLParser_SetConvert(Gfx *gfx)
 void DLParser_SetPrimDepth(Gfx *gfx)
 {
 	DP_Timing(DLParser_SetPrimDepth);
-	uint32 dwZ  = ((gfx->words.w1) >> 16) & 0xFFFF;
-	uint32 dwDZ = ((gfx->words.w1)      ) & 0xFFFF;
+	uint32 dwZ  = ((gfx->words.cmd1) >> 16) & 0xFFFF;
+	uint32 dwDZ = ((gfx->words.cmd1)      ) & 0xFFFF;
 
 	SetPrimitiveDepth(dwZ, dwDZ);
 }
@@ -1008,28 +1056,28 @@ void DLParser_SetPrimDepth(Gfx *gfx)
 void DLParser_RDPSetOtherMode(Gfx *gfx)
 {
 	DP_Timing(DLParser_RDPSetOtherMode);
-	gRDP.otherMode._u32[1] = (gfx->words.w0);	// High
-	gRDP.otherMode._u32[0] = (gfx->words.w1);	// Low
+	gRDP.otherMode._u32[1] = (gfx->words.cmd0);	// High
+	gRDP.otherMode._u32[0] = (gfx->words.cmd1);	// Low
 
-	if( gRDP.otherModeH != ((gfx->words.w0) & 0x0FFFFFFF) )
+	if( gRDP.otherModeH != ((gfx->words.cmd0) & 0x0FFFFFFF) )
 	{
-		gRDP.otherModeH = ((gfx->words.w0) & 0x0FFFFFFF);
+		gRDP.otherModeH = ((gfx->words.cmd0) & 0x0FFFFFFF);
 
 		uint32 dwTextFilt  = (gRDP.otherModeH>>RSP_SETOTHERMODE_SHIFT_TEXTFILT)&0x3;
 		CRender::g_pRender->SetTextureFilter(dwTextFilt<<RSP_SETOTHERMODE_SHIFT_TEXTFILT);
 	}
 
-	if( gRDP.otherModeL != (gfx->words.w1) )
+	if( gRDP.otherModeL != (gfx->words.cmd1) )
 	{
-		if( (gRDP.otherModeL&ZMODE_DEC) != ((gfx->words.w1)&ZMODE_DEC) )
+		if( (gRDP.otherModeL&ZMODE_DEC) != ((gfx->words.cmd1)&ZMODE_DEC) )
 		{
-			if( ((gfx->words.w1)&ZMODE_DEC) )
+			if( ((gfx->words.cmd1)&ZMODE_DEC) == ZMODE_DEC ) //Verify?
 				CRender::g_pRender->SetZBias( 2 );
 			else
 				CRender::g_pRender->SetZBias( 0 );
 		}
 
-		gRDP.otherModeL = (gfx->words.w1);
+		gRDP.otherModeL = (gfx->words.cmd1);
 
 		BOOL bZCompare		= (gRDP.otherModeL & Z_COMPARE)			? TRUE : FALSE;
 		BOOL bZUpdate		= (gRDP.otherModeL & Z_UPDATE)			? TRUE : FALSE;
@@ -1085,11 +1133,11 @@ void DLParser_SetScissor(Gfx *gfx)
 
 	ScissorType tempScissor;
 	// The coords are all in 8:2 fixed point
-	tempScissor.x0   = ((gfx->words.w0)>>12)&0xFFF;
-	tempScissor.y0   = ((gfx->words.w0)>>0 )&0xFFF;
-	tempScissor.mode = ((gfx->words.w1)>>24)&0x03;
-	tempScissor.x1   = ((gfx->words.w1)>>12)&0xFFF;
-	tempScissor.y1   = ((gfx->words.w1)>>0 )&0xFFF;
+	tempScissor.x0   = ((gfx->words.cmd0)>>12)&0xFFF;
+	tempScissor.y0   = ((gfx->words.cmd0)>>0 )&0xFFF;
+	tempScissor.mode = ((gfx->words.cmd1)>>24)&0x03;
+	tempScissor.x1   = ((gfx->words.cmd1)>>12)&0xFFF;
+	tempScissor.y1   = ((gfx->words.cmd1)>>0 )&0xFFF;
 
 	tempScissor.left	= tempScissor.x0/4;
 	tempScissor.top		= tempScissor.y0/4;
@@ -1169,10 +1217,10 @@ void DLParser_FillRect(Gfx *gfx)
 		}
 	}
 
-	uint32 x0   = (((gfx->words.w1)>>12)&0xFFF)/4;
-	uint32 y0   = (((gfx->words.w1)>>0 )&0xFFF)/4;
-	uint32 x1   = (((gfx->words.w0)>>12)&0xFFF)/4;
-	uint32 y1   = (((gfx->words.w0)>>0 )&0xFFF)/4;
+	uint32 x0   = (((gfx->words.cmd1)>>12)&0xFFF)/4;
+	uint32 y0   = (((gfx->words.cmd1)>>0 )&0xFFF)/4;
+	uint32 x1   = (((gfx->words.cmd0)>>12)&0xFFF)/4;
+	uint32 y1   = (((gfx->words.cmd0)>>0 )&0xFFF)/4;
 
 	// Note, in some modes, the right/bottom lines aren't drawn
 
@@ -1238,25 +1286,27 @@ void DLParser_FillRect(Gfx *gfx)
 	}
 	else if( status.bHandleN64TextureBuffer )
 	{
-#ifndef _DISABLE_VID1964
-		if( !status.bCIBufferIsRendered ) CGraphicsContext::g_pGraphicsContext->FirstDrawToNewCI();
-#else
+#ifdef _DISABLE_VID1964
 		status.bCIBufferIsRendered = true;
+#elif defined(_RICE6FB)
+		if( !status.bCIBufferIsRendered ) g_pFrameBufferManager->ActiveTextureBuffer();
+#else
+		if( !status.bCIBufferIsRendered ) CGraphicsContext::g_pGraphicsContext->FirstDrawToNewCI();
 #endif
 		status.leftRendered = status.leftRendered<0 ? x0 : min((int)x0,status.leftRendered);
 		status.topRendered = status.topRendered<0 ? y0 : min((int)y0,status.topRendered);
 		status.rightRendered = status.rightRendered<0 ? x1 : max((int)x1,status.rightRendered);
 		status.bottomRendered = status.bottomRendered<0 ? y1 : max((int)y1,status.bottomRendered);
 
-		g_pTextureBufferInfo->maxUsedHeight = max(g_pTextureBufferInfo->maxUsedHeight,(int)y1);
+		g_pTxtBufferInfo->maxUsedHeight = max(g_pTxtBufferInfo->maxUsedHeight,(int)y1);
 
-		if( status.bDirectWriteIntoRDRAM || ( x0==0 && y0==0 && (x1 == g_pTextureBufferInfo->N64Width || x1 == g_pTextureBufferInfo->N64Width-1 ) ) )
+		if( status.bDirectWriteIntoRDRAM || ( x0==0 && y0==0 && (x1 == g_pTxtBufferInfo->N64Width || x1 == g_pTxtBufferInfo->N64Width-1 ) ) )
 		{
-			if( g_pTextureBufferInfo->CI_Info.dwSize == TXT_SIZE_16b )
+			if( g_pTxtBufferInfo->CI_Info.dwSize == TXT_SIZE_16b )
 			{
 				uint16 color = (uint16)gRDP.originalFillColor;
-				uint32 pitch = g_pTextureBufferInfo->N64Width<<1;
-				uint32 base = (uint32)(g_pRDRAMu8 + g_pTextureBufferInfo->CI_Info.dwAddr);
+				uint32 pitch = g_pTxtBufferInfo->N64Width<<1;
+				uint32 base = (uint32)(g_pRDRAMu8 + g_pTxtBufferInfo->CI_Info.dwAddr);
 				for( uint32 i =y0; i<y1; i++ )
 				{
 					for( uint32 j=x0; j<x1; j++ )
@@ -1268,8 +1318,8 @@ void DLParser_FillRect(Gfx *gfx)
 			else
 			{
 				uint8 color = (uint8)gRDP.originalFillColor;
-				uint32 pitch = g_pTextureBufferInfo->N64Width;
-				uint32 base = (uint32)(g_pRDRAMu8 + g_pTextureBufferInfo->CI_Info.dwAddr);
+				uint32 pitch = g_pTxtBufferInfo->N64Width;
+				uint32 base = (uint32)(g_pRDRAMu8 + g_pTxtBufferInfo->CI_Info.dwAddr);
 				for( uint32 i=y0; i<y1; i++ )
 				{
 					for( uint32 j=x0; j<x1; j++ )
@@ -1291,7 +1341,7 @@ void DLParser_FillRect(Gfx *gfx)
 		{
 			status.bFrameBufferIsDrawn = true;
 
-			//if( x0==0 && y0==0 && (x1 == g_pTextureBufferInfo->N64Width || x1 == g_pTextureBufferInfo->N64Width-1 ) && gRDP.fillColor == 0)
+			//if( x0==0 && y0==0 && (x1 == g_pTxtBufferInfo->N64Width || x1 == g_pTxtBufferInfo->N64Width-1 ) && gRDP.fillColor == 0)
 			//{
 			//	CRender::g_pRender->ClearBuffer(true,false);
 			//}
@@ -1314,10 +1364,12 @@ void DLParser_FillRect(Gfx *gfx)
 	{
 		if( frameBufferOptions.bSupportTxtBufs || frameBufferOptions.bCheckBackBufs )
 		{
-#ifndef _DISABLE_VID1964
-			if( !status.bCIBufferIsRendered ) CGraphicsContext::g_pGraphicsContext->FirstDrawToNewCI();
-#else
+#ifdef _DISABLE_VID1964
 			status.bCIBufferIsRendered = true;
+#elif defined(_RICE6FB)
+			if( !status.bCIBufferIsRendered ) g_pFrameBufferManager->ActiveTextureBuffer();
+#else
+			if( !status.bCIBufferIsRendered ) CGraphicsContext::g_pGraphicsContext->FirstDrawToNewCI();
 #endif
 			status.leftRendered = status.leftRendered<0 ? x0 : min((int)x0,status.leftRendered);
 			status.topRendered = status.topRendered<0 ? y0 : min((int)y0,status.topRendered);
@@ -1328,13 +1380,14 @@ void DLParser_FillRect(Gfx *gfx)
 #endif
 		}
 
+
 #ifdef _RICE612_FILL
 		if(1)
 #else
 		if( gRDP.otherMode.cycle_type == CYCLE_TYPE_FILL )
 #endif
 		{
-			if( !status.bHandleN64TextureBuffer || g_pTextureBufferInfo->CI_Info.dwSize == TXT_SIZE_16b )
+			if( !status.bHandleN64TextureBuffer || g_pTxtBufferInfo->CI_Info.dwSize == TXT_SIZE_16b )
 			{
 				CRender::g_pRender->FillRect(x0, y0, x1, y1, gRDP.fillColor);
 			}
@@ -1350,15 +1403,152 @@ void DLParser_FillRect(Gfx *gfx)
 	}
 }
 
+//Nintro64 uses Sprite2d 
+void RSP_RDP_Nothing(Gfx *gfx)
+{
+	SP_Timing(RSP_RDP_Nothing);
+		
+	if( options.bEnableHacks )
+		return;
+	
+	gDlistStackPointer=-1;
+}
+
+#ifdef _RICE6IM
+void RSP_RDP_InsertMatrix(Gfx *gfx)
+{
+	float fraction;
+
+	UpdateCombinedMatrix();
+
+	if ((gfx->words.cmd0) & 0x20)
+	{
+		int x = ((gfx->words.cmd0) & 0x1F) >> 1;
+		int y = x >> 2;
+		x &= 3;
+
+		fraction = ((gfx->words.cmd1)>>16)/65536.0f;
+		gRSPworldProject.m[y][x] = (float)(int)gRSPworldProject.m[y][x];
+		gRSPworldProject.m[y][x] += fraction;
+
+		fraction = ((gfx->words.cmd1)&0xFFFF)/65536.0f;
+		gRSPworldProject.m[y][x+1] = (float)(int)gRSPworldProject.m[y][x+1];
+		gRSPworldProject.m[y][x+1] += fraction;
+	}
+	else
+	{
+		int x = ((gfx->words.cmd0) & 0x1F) >> 1;
+		int y = x >> 2;
+		x &= 3;
+
+		float integer = (float)(short)((gfx->words.cmd1)>>16);
+        fraction      = (float)fabs(gRSPworldProject.m[y][x] - (int)gRSPworldProject.m[y][x]);
+
+        if(integer >= 0.0f)
+            gRSPworldProject.m[y][x] = integer + fraction;
+        else
+            gRSPworldProject.m[y][x] = integer - fraction;
+
+
+        integer  = (float)(short)((gfx->words.cmd1)&0xFFFF);
+        fraction = (float)fabs(gRSPworldProject.m[y][x+1] - (int)gRSPworldProject.m[y][x+1]);
+
+        if(integer >= 0.0f)
+            gRSPworldProject.m[y][x+1] = integer + fraction;
+        else
+            gRSPworldProject.m[y][x+1] = integer - fraction;
+	}
+
+	gRSP.bMatrixIsUpdated = false;
+	gRSP.bCombinedMatrixIsUpdated = true;
+}
+#endif
+
+#ifdef _RICE6FB
+#define STORE_CI	{g_CI.dwAddr = dwNewAddr;g_CI.dwFormat = dwFmt;g_CI.dwSize = dwSiz;g_CI.dwWidth = dwWidth;g_CI.bpl=dwBpl;}
+void DLParser_SetCImg(Gfx *gfx)
+{
+	uint32 dwFmt		= gfx->img.fmt;
+	uint32 dwSiz		= gfx->img.siz;
+	uint32 dwWidth		= gfx->img.width + 1;
+	uint32 dwNewAddr	= RSPSegmentAddr((gfx->img.addr)) & 0x00FFFFFF ;
+	uint32 dwBpl		= dwWidth << dwSiz >> 1;
+
+	if( g_CI.dwAddr == dwNewAddr && g_CI.dwFormat == dwFmt && g_CI.dwSize == dwSiz && g_CI.dwWidth == dwWidth )
+	{
+		return;
+	}
+
+	if( status.bVIOriginIsUpdated == true && currentRomOptions.screenUpdateSetting==SCREEN_UPDATE_AT_1ST_CI_CHANGE )
+	{
+		status.bVIOriginIsUpdated=false;
+		CGraphicsContext::Get()->UpdateFrame();
+	}
+
+	if( options.enableHackForGames == HACK_FOR_SUPER_BOWLING )
+	{
+		if( dwNewAddr%0x100 == 0 )
+		{
+			if( dwWidth < 320 )
+			{
+				// Left half screen
+				gRDP.scissor.left = 0;
+				gRDP.scissor.right = 160;
+				CRender::g_pRender->SetViewport(0, 0, 160, 240, 0xFFFF);
+				CRender::g_pRender->UpdateClipRectangle();
+				CRender::g_pRender->UpdateScissor();
+			}
+			else
+			{
+				gRDP.scissor.left = 0;
+				gRDP.scissor.right = 320;
+				CRender::g_pRender->SetViewport(0, 0, 320, 240, 0xFFFF);
+				CRender::g_pRender->UpdateClipRectangle();
+				CRender::g_pRender->UpdateScissor();
+			}
+		}
+		else
+		{
+			// right half screen
+			gRDP.scissor.left = 160;
+			gRDP.scissor.right = 320;
+			gRSP.nVPLeftN = 160;
+			gRSP.nVPRightN = 320;
+			CRender::g_pRender->UpdateClipRectangle();
+			CRender::g_pRender->UpdateScissor();
+			CRender::g_pRender->SetViewport(160, 0, 320, 240, 0xFFFF);
+		}
+	}
+
+
+	if( !frameBufferOptions.bUpdateCIInfo )
+	{
+		STORE_CI;
+		status.bCIBufferIsRendered = false;
+		status.bN64IsDrawingTextureBuffer = false;
+
+		return;
+	}
+
+	SetImgInfo newCI;
+	newCI.bpl = dwBpl;
+	newCI.dwAddr = dwNewAddr;
+	newCI.dwFormat = dwFmt;
+	newCI.dwSize = dwSiz;
+	newCI.dwWidth = dwWidth;
+
+	g_pFrameBufferManager->Set_CI_addr(newCI);
+}
+#endif
 
 void DLParser_SetZImg(Gfx *gfx)
 {
 	DP_Timing(DLParser_SetZImg);
 
-	uint32 dwFmt   = gfx->setimg.fmt;
-	uint32 dwSiz   = gfx->setimg.siz;
-	uint32 dwWidth = gfx->setimg.width + 1;
-	uint32 dwAddr = RSPSegmentAddr((gfx->setimg.addr));
+	uint32 dwFmt   = gfx->img.fmt;
+	uint32 dwSiz   = gfx->img.siz;
+	uint32 dwWidth = gfx->img.width + 1;
+	uint32 dwAddr = RSPSegmentAddr((gfx->img.addr));
 
 	if( dwAddr != g_ZI_saves[0].CI_Info.dwAddr )
 	{
@@ -1398,8 +1588,8 @@ bool IsUsedAsDI(uint32 addr)
 void DLParser_SetCombine(Gfx *gfx)
 {
 	DP_Timing(DLParser_SetCombine);
-	uint32 dwMux0 = (gfx->words.w0)&0x00FFFFFF;
-	uint32 dwMux1 = (gfx->words.w1);
+	uint32 dwMux0 = (gfx->words.cmd0)&0x00FFFFFF;
+	uint32 dwMux1 = (gfx->words.cmd1);
 	CRender::g_pRender->SetMux(dwMux0, dwMux1);
 }
 
@@ -1470,7 +1660,7 @@ void RDP_DLParser_Process(void)
 	{
 		Gfx *pgfx = (Gfx*)&g_pRDRAMu32[(gDlistStack[gDlistStackPointer].pc>>2)];
 		gDlistStack[gDlistStackPointer].pc += 8;
-		currentUcodeMap[pgfx->words.w0 >>24](pgfx);
+		currentUcodeMap[pgfx->words.cmd0 >>24](pgfx);
 	}
 
 	CRender::g_pRender->EndRendering();

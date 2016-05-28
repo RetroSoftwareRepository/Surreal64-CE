@@ -119,7 +119,7 @@ BOOL LoadVideoPlugin(char *libname)
 	_VIDEO_ChangeWindow_1_3					= _VIDEO_1964_11_ChangeWindow;
 	//_VIDEO_CaptureScreen					= _VIDEO_1964_11_CaptureScreen;
 	_VIDEO_ProcessRDPList					= _VIDEO_1964_11_ProcessRDPList;
-	//_VIDEO_ShowCFB						= _VIDEO_1964_11_ShowCFB;
+	_VIDEO_ShowCFB							= _VIDEO_1964_11_ShowCFB;
 	
 	_VIDEO_FrameBufferWrite					= _VIDEO_1964_11_FBWrite;
 	_VIDEO_FrameBufferWriteList				= _VIDEO_1964_11_FBWList;
@@ -293,10 +293,10 @@ BOOL LoadVideoPlugin(char *libname)
 	_VIDEO_ChangeWindow_1_3					= _VIDEO_RICE_612_ChangeWindow;
 	//_VIDEO_CaptureScreen					= _VIDEO_RICE_612_CaptureScreen;
 	_VIDEO_ProcessRDPList					= _VIDEO_RICE_612_ProcessRDPList;
-	//_VIDEO_ShowCFB						= _VIDEO_RICE_612_ShowCFB;
+	_VIDEO_ShowCFB							= _VIDEO_RICE_612_ShowCFB;
 	
 	_VIDEO_FrameBufferWrite					= _VIDEO_RICE_612_FBWrite;
-	//_VIDEO_FrameBufferWriteList				= _VIDEO_RICE_612_FBWList;
+	_VIDEO_FrameBufferWriteList				= _VIDEO_RICE_612_FBWList;
 	_VIDEO_FrameBufferRead					= _VIDEO_RICE_612_FBRead;
 	_VIDEO_GetFrameBufferInfo				= _VIDEO_RICE_612_FBGetFrameBufferInfo;
 	//_VIDEO_SetOnScreenText				= _VIDEO_RICE_612_SetOnScreenText;
@@ -926,7 +926,7 @@ void VIDEO_ProcessRDPList(void)
  */
 void VIDEO_ShowCFB(void)
 {
-#ifndef _XBOX
+//#ifndef _XBOX
 	if(_VIDEO_ShowCFB != NULL)
 	{
 		__try
@@ -939,7 +939,7 @@ void VIDEO_ShowCFB(void)
 			DisplayError("Exception in VIDEO_ShowCFB");
 		}
 	}
-#endif
+//#endif
 }
 
 /*

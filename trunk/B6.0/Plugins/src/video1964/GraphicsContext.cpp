@@ -20,9 +20,11 @@
 
 #include "stdafx.h"
 
+#ifndef _RICE6FB
 TextureBufferInfo gTextureBufferInfos[20];
 const int numOfTxtBufInfos = sizeof(gTextureBufferInfos)/sizeof(TextureBufferInfo);
-TextureBufferInfo *g_pTextureBufferInfo = NULL;
+TextureBufferInfo *g_pTxtBufferInfo = NULL;
+#endif
 
 CGraphicsContext* CGraphicsContext::g_pGraphicsContext = NULL;
 bool CGraphicsContext::m_deviceCapsIsInitialized = false;
@@ -53,15 +55,21 @@ CGraphicsContext::CGraphicsContext() :
 	m_curBackBufferIndex(-1),
 	m_curTextureBufferIndex(-1)
 {
+#ifndef _RICE6FB
 	memset(&m_textureColorBufferInfo,0,sizeof(TextureBufferShortInfo));
 	memset(&m_textureDepthBufferInfo,0,sizeof(TextureBufferShortInfo));
+#endif
 }
 CGraphicsContext::~CGraphicsContext()
 {
+#ifdef _RICE6FB
+	g_pFrameBufferManager->CloseUp();
+#else
 	for( int i=0; i<numOfTxtBufInfos; i++ )
 	{
 		SAFE_DELETE(gTextureBufferInfos[i].pTxtBuffer);
 	}
+#endif
 }
 
 HWND		CGraphicsContext::m_hWnd=NULL;
@@ -189,8 +197,11 @@ bool CGraphicsContext::Initialize(HWND hWnd, HWND hWndStatus, uint32 dwWidth, ui
 	}
 #endif
 
-
+#ifdef _RICE6FB
+	g_pFrameBufferManager->Initialize();
+#else
 	memset(&gTextureBufferInfos, 0, sizeof(TextureBufferInfo)*numOfTxtBufInfos);
+#endif
 
 	return true;
 }
@@ -212,6 +223,7 @@ void CGraphicsContext::CleanUp()
 #endif
 }
 
+#ifndef _RICE6FB
 bool FrameBufferInRDRAMCheckCRC();
 bool ProcessFrameWriteRecord();
 extern RECT frameWriteByCPURect;
@@ -281,7 +293,7 @@ void CGraphicsContext::UpdateFrameBufferBeforeUpdateFrame()
 		}
 		else
 		{
-			extern RecentCIInfo *g_uRecentCIInfoPtrs[3];
+			extern RecentCIInfo *g_uRecentCIInfoPtrs[5];
 			RecentCIInfo &p = *(g_uRecentCIInfoPtrs[0]);
 			CRender::GetRender()->DrawFrameBuffer(false, 0,0,p.dwWidth,p.dwHeight);
 			ClearFrameBufferToBlack();
@@ -295,21 +307,21 @@ uint32 ComputeCImgHeight(SetImgInfo &info, uint32 &height)
 
 	for( int i=0; i<10; i++ )
 	{
-		uint32 w0 = *(uint32 *)(g_pRDRAMu8 + dwPC + i*8);
-		uint32 w1 = *(uint32 *)(g_pRDRAMu8 + dwPC + 4 + i*8);
+		uint32 cmd0 = *(uint32 *)(g_pRDRAMu8 + dwPC + i*8);
+		uint32 cmd1 = *(uint32 *)(g_pRDRAMu8 + dwPC + 4 + i*8);
 
-		if( (w0>>24) == RDP_SETSCISSOR )
+		if( (cmd0>>24) == RDP_SETSCISSOR )
 		{
-			height   = ((w1>>0 )&0xFFF)/4;
+			height   = ((cmd1>>0 )&0xFFF)/4;
 			return RDP_SETSCISSOR;
 		}
 
-		if( (w0>>24) == RDP_FILLRECT )
+		if( (cmd0>>24) == RDP_FILLRECT )
 		{
-			uint32 x0   = ((w1>>12)&0xFFF)/4;
-			uint32 y0   = ((w1>>0 )&0xFFF)/4;
-			uint32 x1   = ((w0>>12)&0xFFF)/4;
-			uint32 y1   = ((w0>>0 )&0xFFF)/4;
+			uint32 x0   = ((cmd1>>12)&0xFFF)/4;
+			uint32 y0   = ((cmd1>>0 )&0xFFF)/4;
+			uint32 x1   = ((cmd0>>12)&0xFFF)/4;
+			uint32 y1   = ((cmd0>>0 )&0xFFF)/4;
 
 			if( x0 == 0 && y0 == 0 )
 			{
@@ -327,12 +339,12 @@ uint32 ComputeCImgHeight(SetImgInfo &info, uint32 &height)
 			}
 		}	
 
-		if( (w0>>24) == RDP_SETCIMG )
+		if( (cmd0>>24) == RDP_SETCIMG )
 		{
 			goto step2;
 		}
 
-		if( (w0>>24) == RDP_SETCIMG )
+		if( (cmd0>>24) == RDP_SETCIMG )
 		{
 			goto step2;
 		}
@@ -439,7 +451,11 @@ int CGraphicsContext::CheckTxtrBufsWithNewCI(SetImgInfo &CIinfo, uint32 height, 
 }
 
 extern RecentCIInfo *g_uRecentCIInfoPtrs[5];
+#ifdef _RICE6FB
+extern TextureBufferInfo newTextureBufInfo;
+#else
 TextureBufferInfo newTextureBufInfo;
+#endif
 int FindASlot(void)
 {
 	int idx;
@@ -619,7 +635,7 @@ int CGraphicsContext::SetTextureBuffer(SetImgInfo &CIinfo, int ciInfoIdx, bool t
 
 	if( !toSaveBackBuffer )
 	{
-		g_pTextureBufferInfo = &gTextureBufferInfos[idxToUse];
+		g_pTxtBufferInfo = &gTextureBufferInfos[idxToUse];
 
 		// Active the texture buffer
 		if( m_curTextureBufferIndex >= 0 && gTextureBufferInfos[m_curTextureBufferIndex].isUsed && gTextureBufferInfos[m_curTextureBufferIndex].pTxtBuffer )
@@ -635,11 +651,11 @@ int CGraphicsContext::SetTextureBuffer(SetImgInfo &CIinfo, int ciInfoIdx, bool t
 			//Clear(CLEAR_COLOR_AND_DEPTH_BUFFER,0x80808080,1.0f);
 			if( frameBufferOptions.bFillRectNextTextureBuffer )
 				Clear(CLEAR_COLOR_BUFFER,gRDP.fillColor,1.0f);
-			else if( options.enableHackForGames == HACK_FOR_MARIO_TENNIS && g_pTextureBufferInfo->N64Width > 64 && g_pTextureBufferInfo->N64Width < 300 )
+			else if( options.enableHackForGames == HACK_FOR_MARIO_TENNIS && g_pTxtBufferInfo->N64Width > 64 && g_pTxtBufferInfo->N64Width < 300 )
 			{
 				Clear(CLEAR_COLOR_BUFFER,0,1.0f);
 			}
-			else if( options.enableHackForGames == HACK_FOR_MARIO_TENNIS && g_pTextureBufferInfo->N64Width < 64 && g_pTextureBufferInfo->N64Width > 32 )
+			else if( options.enableHackForGames == HACK_FOR_MARIO_TENNIS && g_pTxtBufferInfo->N64Width < 64 && g_pTxtBufferInfo->N64Width > 32 )
 			{
 				Clear(CLEAR_COLOR_BUFFER,0,1.0f);
 			}
@@ -778,10 +794,10 @@ void CGraphicsContext::CloseTextureBuffer(bool toSave)
 			RestoreNormalBackBuffer();
 			StoreTextureBufferToRDRAM();
 		}
-		//g_pTextureBufferInfo->pTxtBuffer->m_pTexture->RestoreAlphaChannel();
+		//g_pTxtBufferInfo->pTxtBuffer->m_pTexture->RestoreAlphaChannel();
 
-		g_pTextureBufferInfo->crcInRDRAM = ComputeTextureBufferCRCInRDRAM(m_curTextureBufferIndex);
-		g_pTextureBufferInfo->crcCheckedAtFrame = status.gDlistCount;
+		g_pTxtBufferInfo->crcInRDRAM = ComputeTextureBufferCRCInRDRAM(m_curTextureBufferIndex);
+		g_pTxtBufferInfo->crcCheckedAtFrame = status.gDlistCount;
 	}
 
 	SetScreenMult(windowSetting.uDisplayWidth/windowSetting.fViWidth, windowSetting.uDisplayHeight/windowSetting.fViHeight);
@@ -952,6 +968,7 @@ uint32 CGraphicsContext::ComputeTextureBufferCRCInRDRAM(int infoIdx)
 	uint32 pitch = (info.N64Width << info.CI_Info.dwSize ) >> 1;
 	return CalculateRDRAMCRC(pAddr, 0, 0, info.N64Width, height, info.CI_Info.dwSize, pitch);
 }
+#endif
 
 int _cdecl SortFrequenciesCallback( const VOID* arg1, const VOID* arg2 )
 {
@@ -1052,7 +1069,7 @@ void CGraphicsContext::InitDeviceParameters(void)
 	CDXGraphicsContext::InitDeviceParameters();
 }
 
-#ifndef _DISABLE_VID1964
+#if !defined(_DISABLE_VID1964) && !defined(_RICE6FB)
 void CGraphicsContext::FirstDrawToNewCI(void)
 {
 	status.bCIBufferIsRendered = true;
@@ -1110,7 +1127,7 @@ void CGraphicsContext::FirstDrawToNewCI(void)
 		gTextureBufferInfos[idxToUse].txtEntry.pTexture = pTxtBuffer->m_pTexture;
 		gTextureBufferInfos[idxToUse].txtEntry.txtrBufIdx = idxToUse+1;
 
-		g_pTextureBufferInfo = &gTextureBufferInfos[idxToUse];
+		g_pTxtBufferInfo = &gTextureBufferInfos[idxToUse];
 
 		// Active the texture buffer
 		if( m_curTextureBufferIndex >= 0 && gTextureBufferInfos[m_curTextureBufferIndex].isUsed && gTextureBufferInfos[m_curTextureBufferIndex].pTxtBuffer )
@@ -1126,11 +1143,11 @@ void CGraphicsContext::FirstDrawToNewCI(void)
 			//Clear(CLEAR_COLOR_AND_DEPTH_BUFFER,0x80808080,1.0f);
 			if( frameBufferOptions.bFillRectNextTextureBuffer )
 				Clear(CLEAR_COLOR_BUFFER,gRDP.fillColor,1.0f);
-			else if( options.enableHackForGames == HACK_FOR_MARIO_TENNIS && g_pTextureBufferInfo->N64Width > 64 && g_pTextureBufferInfo->N64Width < 300 )
+			else if( options.enableHackForGames == HACK_FOR_MARIO_TENNIS && g_pTxtBufferInfo->N64Width > 64 && g_pTxtBufferInfo->N64Width < 300 )
 			{
 				Clear(CLEAR_COLOR_BUFFER,0,1.0f);
 			}
-			else if( options.enableHackForGames == HACK_FOR_MARIO_TENNIS && g_pTextureBufferInfo->N64Width < 64 && g_pTextureBufferInfo->N64Width > 32 )
+			else if( options.enableHackForGames == HACK_FOR_MARIO_TENNIS && g_pTxtBufferInfo->N64Width < 64 && g_pTxtBufferInfo->N64Width > 32 )
 			{
 				Clear(CLEAR_COLOR_BUFFER,0,1.0f);
 			}

@@ -143,6 +143,9 @@ void CDeviceBuilder::DeleteGraphicsContext(void)
 		delete m_pGraphicsContext;
 		CGraphicsContext::g_pGraphicsContext = m_pGraphicsContext = NULL;
 	}
+#ifdef _RICE6FB
+	SAFE_DELETE(g_pFrameBufferManager);
+#endif
 }
 
 void CDeviceBuilder::DeleteRender(void)
@@ -191,6 +194,9 @@ CGraphicsContext * OGLDeviceBuilder::CreateGraphicsContext(void)
 		CGraphicsContext::g_pGraphicsContext = m_pGraphicsContext;
 	}
 
+#ifdef _RICE6FB
+	g_pFrameBufferManager = new FrameBufferManager;
+#endif
 	return m_pGraphicsContext;
 }
 
@@ -342,6 +348,9 @@ CGraphicsContext * DirectXDeviceBuilder::CreateGraphicsContext(void)
 		CGraphicsContext::g_pGraphicsContext = m_pGraphicsContext;
 	}
 
+#ifdef _RICE6FB	
+	g_pFrameBufferManager = new DXFrameBufferManager;
+#endif
 	return m_pGraphicsContext;
 }
 

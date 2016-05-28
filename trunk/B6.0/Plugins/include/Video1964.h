@@ -19,7 +19,7 @@ DWORD	_VIDEO_1964_11_ProcessDListCountCycles (void);
 void	_VIDEO_1964_11_ProcessRDPList (void);
 void	_VIDEO_1964_11_RomClosed (void);
 void	_VIDEO_1964_11_RomOpen (void);
-//void	_VIDEO_1964_11_ShowCFB (void);
+void	_VIDEO_1964_11_ShowCFB (void);
 void	_VIDEO_1964_11_UpdateScreen (void);
 void	_VIDEO_1964_11_ViStatusChanged (void);
 void	_VIDEO_1964_11_ViWidthChanged (void);

@@ -602,7 +602,11 @@ TxtrCacheEntry * CTextureManager::GetTexture(TxtrInfo * pgti, bool fromTMEM, boo
 	int txtBufIdxToLoadFrom = -1;
 	if( (frameBufferOptions.bCheckTxtBufs&&!frameBufferOptions.bWriteBackBufToRDRAM) || (frameBufferOptions.bCheckBackBufs&&!frameBufferOptions.bWriteBackBufToRDRAM) )
 	{
+#ifdef _RICE6FB
+		txtBufIdxToLoadFrom = g_pFrameBufferManager->CheckAddrInRenderTextures(pgti->Address);
+#else
 		txtBufIdxToLoadFrom = CGraphicsContext::g_pGraphicsContext->CheckAddrInTxtrBufs(*pgti);
+#endif
 		if( txtBufIdxToLoadFrom >= 0 )
 		{
 			loadFromTextureBuffer = true;
@@ -619,13 +623,21 @@ TxtrCacheEntry * CTextureManager::GetTexture(TxtrInfo * pgti, bool fromTMEM, boo
 	}
 
 	bool loadFromBackBuffer=false;
+#ifdef _RICE6FB
+	if( frameBufferOptions.bCheckBackBufs && g_pFrameBufferManager->CheckAddrInBackBuffers(pgti->Address, pgti->HeightToLoad*pgti->Pitch) >= 0 )
+#else
 	if( frameBufferOptions.bCheckBackBufs && CheckAndSaveBackBuffer(pgti->Address, pgti->HeightToLoad*pgti->Pitch) >= 0 )
+#endif
 	{
 		if( !frameBufferOptions.bWriteBackBufToRDRAM )
 		{
 			// Load the texture from recent back buffer
 			loadFromBackBuffer = true;
+#ifdef _RICE6FB
+			txtBufIdxToLoadFrom = g_pFrameBufferManager->CheckAddrInRenderTextures(pgti->Address);
+#else
 			txtBufIdxToLoadFrom = CGraphicsContext::g_pGraphicsContext->CheckAddrInTxtrBufs(*pgti);
+#endif
 			if( txtBufIdxToLoadFrom >= 0 )
 			{
 				loadFromTextureBuffer = true;
@@ -662,7 +674,7 @@ TxtrCacheEntry * CTextureManager::GetTexture(TxtrInfo * pgti, bool fromTMEM, boo
 	int maxCI = 0;
 	if ( doCRCCheck && (pgti->Format == TXT_FMT_CI || (pgti->Format == TXT_FMT_RGBA && pgti->Size <= TXT_SIZE_8b )))
 	{
-#ifdef _RICE612		
+#ifdef _RICE6FB		
 		//maxCI = pgti->Size == TXT_SIZE_8b ? 255 : 15;
 		extern BYTE CalculateMaxCI(void *pPhysicalAddress, uint32 left, uint32 top, uint32 width, uint32 height, uint32 size, uint32 pitchInBytes );
 
@@ -691,17 +703,16 @@ TxtrCacheEntry * CTextureManager::GetTexture(TxtrInfo * pgti, bool fromTMEM, boo
 		}
 
 		pStart = (uint8*)pgti->PalAddress+dwOffset*2;
-#ifndef _RICE612
+#ifndef _RICE612_CRC
 		for (y = 0; y < dwPalSize*2; y+=4)
 		{
 			dwPalCRC = (dwPalCRC + *(uint32*)&pStart[y]);
 		}
-#else
+#endif
 		uint32 dwAsmCRCSave = dwAsmCRC;
 		//dwPalCRC = CalculateRDRAMCRC(pStart, 0, 0, dwPalSize, 1, TXT_SIZE_16b, dwPalSize*2);
 		dwPalCRC = CalculateRDRAMCRC(pStart, 0, 0, maxCI+1, 1, TXT_SIZE_16b, dwPalSize*2);
 		dwAsmCRC = dwAsmCRCSave;
-#endif
 	}
 
 	if (pEntry && doCRCCheck )
@@ -743,7 +754,7 @@ TxtrCacheEntry * CTextureManager::GetTexture(TxtrInfo * pgti, bool fromTMEM, boo
 	pEntry->dwPalCRC = dwPalCRC;
 	pEntry->maxCI = maxCI;
 
-#ifndef _RICE612
+#ifndef _RICE612_FIX
 	if( pEntry->pTexture->m_dwCreatedTextureWidth < pgti->WidthToCreate )
 	{
 		pEntry->ti.WidthToLoad = pEntry->pTexture->m_dwCreatedTextureWidth;
@@ -762,7 +773,7 @@ TxtrCacheEntry * CTextureManager::GetTexture(TxtrInfo * pgti, bool fromTMEM, boo
 	{
 		if (pEntry->pTexture != NULL)
 		{
-#ifdef _RICE612			
+#ifdef _RICE612_FIX		
 				if( pEntry->pTexture->m_dwCreatedTextureWidth < pgti->WidthToCreate )
 				{
 					pEntry->ti.WidthToLoad = pEntry->pTexture->m_dwCreatedTextureWidth;
@@ -784,15 +795,19 @@ TxtrCacheEntry * CTextureManager::GetTexture(TxtrInfo * pgti, bool fromTMEM, boo
 			{
 				if( loadFromTextureBuffer )
 				{
+#ifdef _RICE6FB
+					g_pFrameBufferManager->LoadTextureFromRenderTexture(pEntry, txtBufIdxToLoadFrom);
+#else
 					CGraphicsContext::g_pGraphicsContext->LoadTextureFromTextureBuffer(pEntry, txtBufIdxToLoadFrom);
+#endif
 
 					extern void ConvertTextureRGBAtoI(TxtrCacheEntry* pEntry, bool alpha);
-					if( g_pTextureBufferInfo->CI_Info.dwFormat == TXT_FMT_I )
+					if( g_pTxtBufferInfo->CI_Info.dwFormat == TXT_FMT_I )
 					{
 						// Convert texture from RGBA to I
 						ConvertTextureRGBAtoI(pEntry,false);
 					}
-					else if( g_pTextureBufferInfo->CI_Info.dwFormat == TXT_FMT_IA )
+					else if( g_pTxtBufferInfo->CI_Info.dwFormat == TXT_FMT_IA )
 					{
 						// Convert texture from RGBA to IA
 						ConvertTextureRGBAtoI(pEntry,true);

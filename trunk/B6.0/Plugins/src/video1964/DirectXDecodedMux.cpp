@@ -153,9 +153,9 @@ void CDirectXDecodedMux::ReformatAgainWithTwoTexels(void)
 	}
 }
 
-void CDirectXDecodedMux::Reformat(void)
+void CDirectXDecodedMux::Reformat(bool do_complement)
 {
-	DecodedMux::Reformat();
+	DecodedMux::Reformat(do_complement);
 	ReformatAgainWithTwoTexels();
 	mType = max(max(max(splitType[0], splitType[1]),splitType[2]),splitType[3]);
 }

@@ -1029,9 +1029,9 @@ void ConvertYUV(CTexture *pTexture, const TxtrInfo &tinfo)
 
 				for (x = 0; x < tinfo.WidthToLoad/2; x++)
 				{
-					int y0 = *(uint8*)&pByteSrc[(dwWordOffset  )^nFiddle]; //+2 Rice 6.12
+					int y0 = *(uint8*)&pByteSrc[(dwWordOffset+2)^nFiddle]; //+2 Rice 6.12
 					int v0 = *(uint8*)&pByteSrc[(dwWordOffset+1)^nFiddle];
-					int y1 = *(uint8*)&pByteSrc[(dwWordOffset+2)^nFiddle]; //+2 Rice 5.60 & 1964video
+					int y1 = *(uint8*)&pByteSrc[(dwWordOffset)^nFiddle]; //+2 Rice 5.60 & 1964video
 					int u0 = *(uint8*)&pByteSrc[(dwWordOffset+3)^nFiddle];
 
 					dwDst[x*2+0] = ConvertYUV16ToR8G8B8(y0,u0,v0);
@@ -1051,9 +1051,9 @@ void ConvertYUV(CTexture *pTexture, const TxtrInfo &tinfo)
 
 				for (x = 0; x < tinfo.WidthToLoad/2; x++)
 				{
-					int y0 = *(uint8*)&pByteSrc[(dwByteOffset  )]; //+2 Rice 6.12
+					int y0 = *(uint8*)&pByteSrc[(dwByteOffset+2)]; //+2 Rice 6.12
 					int v0 = *(uint8*)&pByteSrc[(dwByteOffset+1)];
-					int y1 = *(uint8*)&pByteSrc[(dwByteOffset+2)]; //+2 Rice 5.60, 1964video
+					int y1 = *(uint8*)&pByteSrc[(dwByteOffset)]; //+2 Rice 5.60, 1964video
 					int u0 = *(uint8*)&pByteSrc[(dwByteOffset+3)];
 
 					dwDst[x*2+0] = ConvertYUV16ToR8G8B8(y0,u0,v0);

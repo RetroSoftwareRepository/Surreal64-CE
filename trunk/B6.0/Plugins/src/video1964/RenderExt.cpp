@@ -201,10 +201,10 @@ void CRender::LoadTxtrBufIntoTexture(void)
 {
 	TxtrInfo gti;
 
-	gti.Format	= g_pTextureBufferInfo->CI_Info.dwFormat;
-	gti.Size	= g_pTextureBufferInfo->CI_Info.dwSize;
+	gti.Format	= g_pTxtBufferInfo->CI_Info.dwFormat;
+	gti.Size	= g_pTxtBufferInfo->CI_Info.dwSize;
 
-	gti.Address	= RSPSegmentAddr(g_pTextureBufferInfo->CI_Info.dwAddr);
+	gti.Address	= RSPSegmentAddr(g_pTxtBufferInfo->CI_Info.dwAddr);
 	gti.LeftToLoad		= 0;
 	gti.TopToLoad		= 0;
 	gti.Palette	= 0;
@@ -212,8 +212,8 @@ void CRender::LoadTxtrBufIntoTexture(void)
 	gti.PalAddress = (uint32)(&g_wRDPTlut[0]);
 	gti.bSwapped	= FALSE;
 
-	gti.WidthToCreate		= g_pTextureBufferInfo->N64Width;
-	gti.HeightToCreate		= g_pTextureBufferInfo->N64Height;
+	gti.WidthToCreate		= g_pTxtBufferInfo->N64Width;
+	gti.HeightToCreate		= g_pTxtBufferInfo->N64Height;
 	gti.TLutFmt	= TLUT_FMT_RGBA16;	//RGBA16
 
 	gti.Pitch	= gti.WidthToCreate << (gti.Size-1);
@@ -276,15 +276,17 @@ void CRender::LoadSprite2D(Sprite2DInfo &info, uint32 ucode)
 
 void CRender::DrawSprite2D(Sprite2DInfo &info, uint32 ucode)
 {
-#ifndef _DISABLE_VID1964
-	if( !status.bCIBufferIsRendered ) CGraphicsContext::g_pGraphicsContext->FirstDrawToNewCI();
-#else
+#ifdef _DISABLE_VID1964
 	status.bCIBufferIsRendered = true;
+#elif defined(_RICE6FB)
+	if( !status.bCIBufferIsRendered ) g_pFrameBufferManager->ActiveTextureBuffer();
+#else
+	if( !status.bCIBufferIsRendered ) CGraphicsContext::g_pGraphicsContext->FirstDrawToNewCI();
 #endif
 
 	if( status.bHandleN64TextureBuffer )
 	{
-		g_pTextureBufferInfo->maxUsedHeight = g_pTextureBufferInfo->N64Height;
+		g_pTxtBufferInfo->maxUsedHeight = g_pTxtBufferInfo->N64Height;
 		if( !status.bDirectWriteIntoRDRAM )	
 		{
 			status.bFrameBufferIsDrawn = true;
@@ -356,15 +358,17 @@ void CRender::DrawSprite2D(Sprite2DInfo &info, uint32 ucode)
 
 void CRender::DrawSpriteR(uObjTxSprite &sprite, bool initCombiner, uint32 tile, uint32 left, uint32 top, uint32 width, uint32 height)	// With Rotation
 {
-#ifndef _DISABLE_VID1964
-	if( !status.bCIBufferIsRendered ) CGraphicsContext::g_pGraphicsContext->FirstDrawToNewCI();
-#else
+#ifdef _DISABLE_VID1964
 	status.bCIBufferIsRendered = true;
+#elif defined(_RICE6FB)
+	if( !status.bCIBufferIsRendered ) g_pFrameBufferManager->ActiveTextureBuffer();
+#else
+	if( !status.bCIBufferIsRendered ) CGraphicsContext::g_pGraphicsContext->FirstDrawToNewCI();
 #endif
 
 	if( status.bHandleN64TextureBuffer )
 	{
-		g_pTextureBufferInfo->maxUsedHeight = g_pTextureBufferInfo->N64Height;
+		g_pTxtBufferInfo->maxUsedHeight = g_pTxtBufferInfo->N64Height;
 		if( !status.bDirectWriteIntoRDRAM )	
 		{
 			status.bFrameBufferIsDrawn = true;
@@ -469,14 +473,16 @@ void CRender::DrawFrameBuffer(bool useVIreg, uint32 left, uint32 top, uint32 wid
 
 void CRender::DrawObjBGCopy(uObjBg &info)
 {
-#ifndef _DISABLE_VID1964
-	if( !status.bCIBufferIsRendered ) CGraphicsContext::g_pGraphicsContext->FirstDrawToNewCI();
-#else
+#ifdef _DISABLE_VID1964
 	status.bCIBufferIsRendered = true;
+#elif defined(_RICE6FB)
+	if( !status.bCIBufferIsRendered ) g_pFrameBufferManager->ActiveTextureBuffer();
+#else
+	if( !status.bCIBufferIsRendered ) CGraphicsContext::g_pGraphicsContext->FirstDrawToNewCI();
 #endif
 	if( status.bHandleN64TextureBuffer )
 	{
-		g_pTextureBufferInfo->maxUsedHeight = g_pTextureBufferInfo->N64Height;
+		g_pTxtBufferInfo->maxUsedHeight = g_pTxtBufferInfo->N64Height;
 		if( !status.bDirectWriteIntoRDRAM )	
 		{
 			status.bFrameBufferIsDrawn = true;
@@ -576,10 +582,12 @@ void CRender::DrawObjBGCopy(uObjBg &info)
 
 void CRender::DrawObjBG1CYC(uObjScaleBg &bg, bool scaled)	//Without Ratation
 {
-#ifndef _DISABLE_VID1964
-	if( !status.bCIBufferIsRendered ) CGraphicsContext::g_pGraphicsContext->FirstDrawToNewCI();
-#else
+#ifdef _DISABLE_VID1964
 	status.bCIBufferIsRendered = true;
+#elif defined(_RICE6FB)
+	if( !status.bCIBufferIsRendered ) g_pFrameBufferManager->ActiveTextureBuffer();
+#else
+	if( !status.bCIBufferIsRendered ) CGraphicsContext::g_pGraphicsContext->FirstDrawToNewCI();
 #endif
 
 	if( g_curRomInfo.bDisableObjBG )
@@ -587,7 +595,7 @@ void CRender::DrawObjBG1CYC(uObjScaleBg &bg, bool scaled)	//Without Ratation
 
 	if( status.bHandleN64TextureBuffer )
 	{
-		g_pTextureBufferInfo->maxUsedHeight = g_pTextureBufferInfo->N64Height;
+		g_pTxtBufferInfo->maxUsedHeight = g_pTxtBufferInfo->N64Height;
 		if( !status.bDirectWriteIntoRDRAM )	
 		{
 			status.bFrameBufferIsDrawn = true;
@@ -628,7 +636,11 @@ void CRender::DrawObjBG1CYC(uObjScaleBg &bg, bool scaled)	//Without Ratation
 
 	SetAlphaTestEnable(FALSE);
 
+#ifdef _RICE612_HACK
+	if( options.enableHackForGames != HACK_FOR_YOSHI )
+#else
 	if( options.enableHackForGames == HACK_FOR_COMMANDCONQUER )
+#endif
 	{
 		float s1 = (x1-x0)*scaleX + s0;
 		float t1 = (y1-y0)*scaleY + t0;
@@ -676,14 +688,16 @@ void CRender::DrawObjBG1CYC(uObjScaleBg &bg, bool scaled)	//Without Ratation
 
 void CRender::DrawSprite(uObjTxSprite &sprite, bool rectR)	//Without Ratation
 {
-#ifndef _DISABLE_VID1964
-	if( !status.bCIBufferIsRendered ) CGraphicsContext::g_pGraphicsContext->FirstDrawToNewCI();
-#else
+#ifdef _DISABLE_VID1964
 	status.bCIBufferIsRendered = true;
+#elif defined(_RICE6FB)
+	if( !status.bCIBufferIsRendered ) g_pFrameBufferManager->ActiveTextureBuffer();
+#else
+	if( !status.bCIBufferIsRendered ) CGraphicsContext::g_pGraphicsContext->FirstDrawToNewCI();
 #endif
 	if( status.bHandleN64TextureBuffer )
 	{
-		g_pTextureBufferInfo->maxUsedHeight = g_pTextureBufferInfo->N64Height;
+		g_pTxtBufferInfo->maxUsedHeight = g_pTxtBufferInfo->N64Height;
 		if( !status.bDirectWriteIntoRDRAM )	
 		{
 			status.bFrameBufferIsDrawn = true;
