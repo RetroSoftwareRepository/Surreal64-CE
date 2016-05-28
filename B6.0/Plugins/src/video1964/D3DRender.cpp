@@ -583,10 +583,21 @@ void D3DRender::SetAlphaTestEnable(BOOL bAlphaTestEnable)
 	gD3DDevWrapper.SetRenderState(D3DRS_ALPHATESTENABLE,(bAlphaTestEnable));
 }
 
+extern float HackZ(float z);
 void D3DRender::SetFogMinMax(float fMin, float fMax)
 {
-	gD3DDevWrapper.SetRenderState(D3DRS_FOGSTART, *(uint32 *)(&gRSPfFogMin));
-	gD3DDevWrapper.SetRenderState(D3DRS_FOGEND,   *(uint32 *)(&gRSPfFogMax));
+	if( g_curRomInfo.bZHack )
+	{
+		float minf = HackZ(gRSPfFogMin);
+		float maxf = HackZ(gRSPfFogMax);
+		gD3DDevWrapper.SetRenderState(D3DRS_FOGSTART, *(uint32 *)(&minf));
+		gD3DDevWrapper.SetRenderState(D3DRS_FOGEND,   *(uint32 *)(&maxf));
+	}
+	else
+	{
+		gD3DDevWrapper.SetRenderState(D3DRS_FOGSTART, *(uint32 *)(&gRSPfFogMin));
+		gD3DDevWrapper.SetRenderState(D3DRS_FOGEND,   *(uint32 *)(&gRSPfFogMax));
+	}
 }
 
 void D3DRender::TurnFogOnOff(bool flag)
@@ -614,8 +625,19 @@ void D3DRender::SetFogEnable(bool bEnable)
 		if(!options.bUseLinearFog)
 			gD3DDevWrapper.SetRenderState(D3DRS_RANGEFOGENABLE, TRUE);
 #endif
-		gD3DDevWrapper.SetRenderState(D3DRS_FOGSTART, *(uint32 *)(&gRSPfFogMin));
-		gD3DDevWrapper.SetRenderState(D3DRS_FOGEND,   *(uint32 *)(&gRSPfFogMax));
+		
+		if( g_curRomInfo.bZHack )
+		{
+			float minf = HackZ(gRSPfFogMin);
+			float maxf = HackZ(gRSPfFogMax);
+			gD3DDevWrapper.SetRenderState(D3DRS_FOGSTART, *(uint32 *)(&minf));
+			gD3DDevWrapper.SetRenderState(D3DRS_FOGEND,   *(uint32 *)(&maxf));
+		}
+		else
+		{
+			gD3DDevWrapper.SetRenderState(D3DRS_FOGSTART, *(uint32 *)(&gRSPfFogMin));
+			gD3DDevWrapper.SetRenderState(D3DRS_FOGEND,   *(uint32 *)(&gRSPfFogMax));
+		}
 	}
 	else
 	{

@@ -289,18 +289,18 @@ inline void hq4x_Interp8_32(unsigned char * pc, uint32 p1, uint32 p2)
 
 
 
-inline bool Diff_16(uint16 w1, uint16 w2)
+inline bool Diff_16(uint16 cmd1, uint16 w2)
 {
-	YUV1 = RGB16toYUV(w1);
+	YUV1 = RGB16toYUV(cmd1);
 	YUV2 = RGB16toYUV(w2);
 	return ( ( abs((YUV1 & Amask) - (YUV2 & Amask)) > trA ) ||
 		( abs((YUV1 & Ymask) - (YUV2 & Ymask)) > trY ) ||
 		( abs((YUV1 & Umask) - (YUV2 & Umask)) > trU ) ||
 		( abs((YUV1 & Vmask) - (YUV2 & Vmask)) > trV ) );
 }
-inline bool Diff_32(uint32 w1, uint32 w2)
+inline bool Diff_32(uint32 cmd1, uint32 w2)
 {
-	YUV1 = RGB32toYUV(w1);
+	YUV1 = RGB32toYUV(cmd1);
 	YUV2 = RGB32toYUV(w2);
 	return ( ( abs((YUV1 & Amask) - (YUV2 & Amask)) > trA ) ||
 		( abs((YUV1 & Ymask) - (YUV2 & Ymask)) > trY ) ||
@@ -330,7 +330,7 @@ void hq4x_16( unsigned char * pIn, unsigned char * pOut, int Xres, int Yres, int
 
 	//   +----+----+----+
 	//   |    |    |    |
-	//   | w1 | w2 | w3 |
+	//   | cmd1 | w2 | w3 |
 	//   +----+----+----+
 	//   |    |    |    |
 	//   | w4 | w5 | w6 |
@@ -448,7 +448,7 @@ void hq4x_32( unsigned char * pIn, unsigned char * pOut, int Xres, int Yres, int
 
 	//   +----+----+----+
 	//   |    |    |    |
-	//   | w1 | w2 | w3 |
+	//   | cmd1 | w2 | w3 |
 	//   +----+----+----+
 	//   |    |    |    |
 	//   | w4 | w5 | w6 |

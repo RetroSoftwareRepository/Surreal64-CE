@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2003 Rice1964
+Copyright (C) 2002-2009 Rice1964
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -14,19 +14,30 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
 */
+#ifndef RSP_WRUS_H__
+#define RSP_WRUS_H__
 
-#include "DecodedMux.h"
-
-#ifndef _DIRECTX_DECODEDMUX_H_
-#define _DIRECTX_DECODEDMUX_H_
-
-class CDirectXDecodedMux : public DecodedMux
+void RSP_Vtx_WRUS(Gfx *gfx)
 {
-	void ReformatAgainWithTwoTexels(void);
-	virtual void Reformat(bool do_complement = true);
-};
+	uint32 dwAddr	 = RSPSegmentAddr(gfx->words.cmd1);
+	uint32 dwV0	 = ((gfx->words.cmd0 >>16 ) & 0xff) / 5;
+	uint32 dwN		 =  (gfx->words.cmd0 >>9  ) & 0x7f;
+	uint32 dwLength =  (gfx->words.cmd0      ) & 0x1ff;
 
-#endif
+	if (dwV0 >= 32)
+		dwV0 = 31;
+	
+	if ((dwV0 + dwN) > 32)
+	{
+		dwN = 32 - dwV0;
+	}
 
+	ProcessVertexData(dwAddr, dwV0, dwN);
 
+	status.dwNumVertices += dwN;
+	DisplayVertexInfo(dwAddr, dwV0, dwN);
+}
+
+#endif //RSP_WRUS_H__

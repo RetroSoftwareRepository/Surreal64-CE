@@ -317,6 +317,7 @@ typedef struct IniSection
 	BOOL	bDisableObjBG;
 	BOOL 	bDisableTextureCRC;
 	BOOL 	bIncTexRectEdge;
+	BOOL 	bZHack;
 	BOOL 	bTextureScaleHack;
 	BOOL 	bFastLoadTile;
 	BOOL 	bUseSmallerTexture;
@@ -389,6 +390,7 @@ typedef struct
 	BOOL	bDisableObjBG;
 	BOOL	bDisableTextureCRC;
 	BOOL	bIncTexRectEdge;
+	BOOL	bZHack;
 	BOOL	bTextureScaleHack;
 	BOOL	bFastLoadTile;
 	BOOL 	bUseSmallerTexture;

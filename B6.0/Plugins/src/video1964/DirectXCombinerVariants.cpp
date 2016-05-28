@@ -481,7 +481,7 @@ int CDirectXPixelShaderCombiner::GeneratePixelShaderFromMux(void)
 	newEntry.bPrimLOD = m.isUsed(MUX_PRIMLODFRAC) || m.isUsed(MUX_LODFRAC);
 
 	m.splitType[0] = m.splitType[1] = m.splitType[2] = m.splitType[3] = CM_FMT_TYPE_NOT_CHECKED;
-	m_pDecodedMux->Reformat();
+	m_pDecodedMux->Reformat(false);
 
 	newEntry.bFog = gRDP.bFogEnableInBlender && gRSP.bFogEnabled;
 

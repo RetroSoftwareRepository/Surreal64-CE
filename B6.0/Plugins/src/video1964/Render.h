@@ -23,6 +23,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "stdafx.h"
 #include "ExtendedRender.h"
 
+enum TextureChannel 
+{
+	TXT_RGB,
+	TXT_ALPHA,
+	TXT_RGBA,
+};
+
 class CRender : public CExtendedRender
 {
 protected:
@@ -74,7 +81,8 @@ public:
 	virtual void ApplyScissorWithClipRatio(bool force=false) {}
 	virtual void CaptureScreen(char *folder) {}
 
-	void SetTextureEnableAndScale(int dwTile, bool enable, float fScaleX, float fScaleY);
+	void SetTextureEnable(bool bEnable);
+	void SetTextureScale(int dwTile, float fScaleX, float fScaleY);
 	
 	virtual void SetFogEnable(bool bEnable) 
 	{ 
@@ -180,6 +188,7 @@ public:
 	virtual void CleanUp(void);
 	
 	virtual void SetFillMode(FillMode mode)=0;
+	virtual void SaveTextureToFile(CTexture &texture, char *filename, TextureChannel channel = TXT_RGB,  bool bShow = false, bool bWholeTexture = true, int width = -1, int height = -1);
 
 	void LoadSprite2D(Sprite2DInfo &info, uint32 ucode);
 	void LoadObjBGCopy(uObjBg &info);
@@ -239,4 +248,8 @@ protected:
 };
 
 #define ffloor(a) (((int(a))<=(a))?(float)(int(a)):((float)(int(a))-1))
+
+bool SaveRGBBufferToFile(char *filename, unsigned char *buf, int width, int height, int pitch = -1);
+bool SaveRGBABufferToPNGFile(char *filename, unsigned char *buf, int width, int height, int pitch = -1);
+
 #endif	//_RICE_RENDER_H

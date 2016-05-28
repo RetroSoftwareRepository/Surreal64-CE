@@ -555,8 +555,6 @@ void InitRenderBase()
 	gRSP.shadeMode=SHADE_SMOOTH;
 	gRDP.keyR=gRDP.keyG=gRDP.keyB=gRDP.keyA=gRDP.keyRGB=gRDP.keyRGBA = 0;
 	gRDP.fKeyA = 0;
-	gRSP.DKRCMatrixIndex = gRSP.dwDKRVtxAddr = gRSP.dwDKRMatrixAddr = 0;
-	gRSP.DKRBillBoard = false;
 
 	gRSP.fTexScaleX = 1/32.0f;
 	gRSP.fTexScaleY = 1/32.0f;
@@ -587,13 +585,6 @@ void InitRenderBase()
 	gRSP.real_clip_ratio_negy = 1;
 	gRSP.real_clip_ratio_posx = 1;
 	gRSP.real_clip_ratio_posy = 1;
-
-	gRSP.DKRCMatrixIndex=0;
-	gRSP.DKRVtxCount=0;
-	gRSP.DKRBillBoard = false;
-	gRSP.dwDKRVtxAddr=0;
-	gRSP.dwDKRMatrixAddr=0;
-
 
 	gRDP.geometryMode	= 0;
 	gRDP.otherModeL		= 0;
@@ -921,7 +912,7 @@ loopback:
 		cmp			ecx, DWORD PTR gRSPnumLights;
 		jae			breakout;
 		mov			eax,ecx;
-		imul		eax,0x28; //0x48 //Verify? //0x28 is correct. 
+		imul		eax,0x48; //0x48 //Verify? //0x28 is correct. 
 		movups		xmm5, DWORD PTR gRSPlights[eax];		// Light Dir
 		movups		xmm1, DWORD PTR gRSPlights[0x18][eax];	// Light color
 		mulps       xmm5, xmm4;					// Lightdir * normals
@@ -1197,11 +1188,27 @@ bool PrepareTriangle(uint32 dwV0, uint32 dwV1, uint32 dwV2)
 
 	gRSP.numVertices += 3;
 	status.dwNumTrisRendered++;
-
+	
 	return true;
 }
 
+bool AddTri(uint32 v0, uint32 v1, uint32 v2)
+{
+	if (IsTriangleVisible(v0, v1, v2))
+	{
+		if (CRender::g_pRender->IsTextureEnabled())
+		{
+			PrepareTextures();
+			InitVertexTextureConstants();
+		}
 
+		CRender::g_pRender->SetCombinerAndBlender();
+
+		PrepareTriangle(v0, v1, v2);
+		return true;
+	}
+	return false;
+}
 
 // Returns TRUE if it thinks the triangle is visible
 // Returns FALSE if it is clipped
@@ -1367,27 +1374,34 @@ void ModifyVertexInfo(uint32 where, uint32 vertex, uint32 val)
 	}
 }
 
+extern uint32 gDKRCMatrixIndex;
+extern uint32 gDKRVtxCount;
+extern bool gDKRBillBoard;
+
 void ProcessVertexDataDKR(uint32 dwAddr, uint32 dwV0, uint32 dwNum)
 {
 	UpdateCombinedMatrix();
 
 	uint32 pVtxBase = uint32(g_pRDRAMu8 + dwAddr);
 	g_pVtxBase = (FiddledVtx*)pVtxBase;
-
-	Matrix &matWorldProject = gRSP.DKRMatrixes[gRSP.DKRCMatrixIndex];
+#ifdef _RICE612_DKR
+	Matrix &matWorldProject(gRSP.DKRMatrixes[gDKRCMatrixIndex]);
+#else
+	Matrix &matWorldProject = gRSP.DKRMatrixes[gDKRCMatrixIndex];
+#endif
 
 	uint32 i;
 	LONG nOff;
 
 	bool addbase=false;
-	if ((!gRSP.DKRBillBoard) || (gRSP.DKRCMatrixIndex != 2) )
+	if ((!gDKRBillBoard) || (gDKRCMatrixIndex != 2) )
 		addbase = false;
 	else
 		addbase = true;
 
-	if( addbase && gRSP.DKRVtxCount == 0 && dwNum > 1 )
+	if( addbase && gDKRVtxCount == 0 && dwNum > 1 )
 	{
-		gRSP.DKRVtxCount++;
+		gDKRVtxCount++;
 	}
 
 	nOff = 0;
@@ -1405,7 +1419,7 @@ void ProcessVertexDataDKR(uint32 dwAddr, uint32 dwV0, uint32 dwNum)
 		//else
 			D3DXVec3Transform(&g_vtxTransformed[i], (D3DXVECTOR3*)&g_vtxNonTransformed[i], &matWorldProject);	// Convert to w=1
 
-		if( gRSP.DKRVtxCount == 0 && dwNum==1 )
+		if( gDKRVtxCount == 0 && dwNum==1 )
 		{
 			gRSP.DKRBaseVec.x = g_vtxTransformed[i].x;
 			gRSP.DKRBaseVec.y = g_vtxTransformed[i].y;
@@ -1425,7 +1439,7 @@ void ProcessVertexDataDKR(uint32 dwAddr, uint32 dwV0, uint32 dwNum)
 		g_vecProjected[i].y = g_vtxTransformed[i].y * g_vecProjected[i].w;
 		g_vecProjected[i].z = g_vtxTransformed[i].z * g_vecProjected[i].w;
 
-		gRSP.DKRVtxCount++;
+		gDKRVtxCount++;
 
 		RSP_Vtx_Clipping(i);
 
@@ -1853,6 +1867,8 @@ void ForceMainTextureIndex(int dwTile)
 	else
 		gRSP.curTile = dwTile;
 }
+
+
 
 //////////////////////////////////////////////////////////////////////////
 /*
@@ -2498,3 +2514,51 @@ void UpdateCombinedMatrix()
 		gRSP.bCombinedMatrixIsUpdated = false;
 	}
 }
+
+float HackZ2(float z)
+{
+	z = (z+9)/10;
+	return z;
+}
+
+float HackZ(float z)
+{
+	return HackZ2(z);
+
+	if( z < 0.1 && z >= 0 )
+		z = (.1f+z)/2;
+	else if( z < 0 )
+		//return (10+z)/100;
+		z = (expf(z)/20);
+	return z;
+}
+
+void HackZ(std::vector<D3DXVECTOR3>& points)
+{
+	int size = points.size();
+	for( int i=0; i<size; i++)
+	{
+		D3DXVECTOR3 &v = points[i];
+		v.z = (float)HackZ(v.z);
+	}
+}
+
+void HackZAll()
+{
+	if( CDeviceBuilder::m_deviceGeneralType == DIRECTX_DEVICE )
+	{
+		for( uint32 i=0; i<gRSP.numVertices; i++)
+		{
+			g_vtxBuffer[i].z = HackZ(g_vtxBuffer[i].z);
+		}
+	}
+	else
+	{
+		for( uint32 i=0; i<gRSP.numVertices; i++)
+		{
+			float w = g_vtxProjected5[i][3];
+			g_vtxProjected5[i][2] = HackZ(g_vtxProjected5[i][2]/w)*w;
+		}
+	}
+}
+

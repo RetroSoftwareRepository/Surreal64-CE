@@ -651,9 +651,19 @@ void UpdateScreenStep2 (void)
 
 	g_CritialSection.Lock();
 	if( status.bHandleN64TextureBuffer )
+#ifdef _RICE6FB
+	{
+		g_pFrameBufferManager->CloseRenderTexture(true);
+	}
+	g_pFrameBufferManager->SetAddrBeDisplayed(*g_GraphicsInfo.VI_ORIGIN_REG);
+#else
+	{
 		CGraphicsContext::g_pGraphicsContext->CloseTextureBuffer(true);
-	
+	}
 	SetAddrUsedByVIOrigin(*g_GraphicsInfo.VI_ORIGIN_REG);
+#endif
+	
+	
 
 	if( status.gDlistCount == 0 )
 	{
@@ -1062,7 +1072,11 @@ void FrameBufferReadByCPU( uint32 addr );
 
 EXPORT_TYPE(void) EXPORT_NAME(FBRead) (uint32 addr)
 {
+#ifdef _RICE6FB
+	g_pFrameBufferManager->FrameBufferReadByCPU(addr);
+#else
 	FrameBufferReadByCPU(addr);
+#endif
 }
 
 
@@ -1082,7 +1096,11 @@ EXPORT_TYPE(void) EXPORT_NAME(FBRead) (uint32 addr)
 
 EXPORT_TYPE(void) EXPORT_NAME(FBWrite) (uint32 addr, uint32 size)
 {
+#ifdef _RICE6FB
+	g_pFrameBufferManager->FrameBufferWriteByCPU(addr, size);
+#else
 	FrameBufferWriteByCPU(addr, size);
+#endif
 }
 
 

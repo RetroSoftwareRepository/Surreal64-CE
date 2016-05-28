@@ -19,15 +19,13 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 // A few ucode used in DKR and Others Special games
 
-uint32 dwConkerVtxZAddr=0;
-
-static void RDP_GFX_DumpVtxInfoDKR(uint32 dwAddr, uint32 dwV0, uint32 dwN);
+uint32 GSBlkAddrSaves[100][2];
 
 void RDP_GFX_DLInMem(Gfx *gfx)
 {
-	uint32 dwLimit = ((gfx->words.w0) >> 16) & 0xFF;
-	uint32 dwPush = RSP_DLIST_PUSH; //((gfx->words.w0) >> 16) & 0xFF;
-	uint32 dwAddr = 0x00000000 | (gfx->words.w1); //RSPSegmentAddr((gfx->words.w1));
+	uint32 dwLimit = ((gfx->words.cmd0) >> 16) & 0xFF;
+	uint32 dwPush = RSP_DLIST_PUSH; //((gfx->words.cmd0) >> 16) & 0xFF;
+	uint32 dwAddr = 0x00000000 | (gfx->words.cmd1); //RSPSegmentAddr((gfx->words.cmd1));
 
 	switch (dwPush)
 	{
@@ -45,242 +43,7 @@ void RDP_GFX_DLInMem(Gfx *gfx)
 
 }
 
-extern Matrix dkrMatrixTransposed;
-void RSP_Mtx_DKR(Gfx *gfx)
-{	
-	uint32 dwAddr = RSPSegmentAddr((gfx->words.w1));
-	uint32 dwCommand = ((gfx->words.w0)>>16)&0xFF;
-	uint32 dwLength  = ((gfx->words.w0))    &0xFFFF;
 
-	dwAddr = (gfx->words.w1)+RSPSegmentAddr(gRSP.dwDKRMatrixAddr);
-
-	//gRSP.DKRCMatrixIndex = ((gfx->words.w0)>>22)&3;
-	bool mul=false;
-	int index;
-	switch( dwCommand )
-	{
-	case 0xC0:	// DKR
-		gRSP.DKRCMatrixIndex = index = 3;
-		break;
-	case 0x80:	// DKR
-		gRSP.DKRCMatrixIndex = index = 2;
-		break;
-	case 0x40:	// DKR
-		gRSP.DKRCMatrixIndex = index = 1;
-		break;
-	case 0x20:	// DKR
-		gRSP.DKRCMatrixIndex = index = 0;
-		break;
-	case 0x00:
-		gRSP.DKRCMatrixIndex = index = 0;
-		break;
-	case 0x01:
-		//mul = true;
-		gRSP.DKRCMatrixIndex = index = 1;
-		break;
-	case 0x02:
-		//mul = true;
-		gRSP.DKRCMatrixIndex = index = 2;
-		break;
-	case 0x03:
-		//mul = true;
-		gRSP.DKRCMatrixIndex = index = 3;
-		break;
-	case 0x81:
-		index = 1;
-		mul = true;
-		break;
-	case 0x82:
-		index = 2;
-		mul = true;
-		break;
-	case 0x83:
-		index = 3;
-		mul = true;
-		break;
-	default:
-		break;
-	}
-
-	// Load matrix from dwAddr
-	Matrix &mat = gRSP.DKRMatrixes[index];
-	LoadMatrix(dwAddr);
-
-	if( mul )
-	{
-		mat = matToLoad*gRSP.DKRMatrixes[0];
-	}
-	else
-	{
-		mat = matToLoad;
-	}
-
-	if( status.isSSEEnabled )
-		D3DXMatrixTranspose(&dkrMatrixTransposed, &mat);
-}
-
-void RSP_Vtx_DKR(Gfx *gfx)
-{
-	uint32 dwAddr = RSPSegmentAddr((gfx->words.w1));
-	uint32 dwV0 = (((gfx->words.w0) >> 9 )&0x1F);
-	uint32 dwN  = (((gfx->words.w0) >>19 )&0x1F)+1;
-
-	if( gfx->words.w0 & 0x00010000 )
-	{
-		if( gRSP.DKRBillBoard )
-			gRSP.DKRVtxCount = 1;
-	}
-	else
-	{
-		gRSP.DKRVtxCount = 0;
-	}
-
-	dwV0 += gRSP.DKRVtxCount;
-
-	if (dwV0 >= 32)		dwV0 = 31;
-	
-	if ((dwV0 + dwN) > 32)
-	{
-		dwN = 32 - dwV0;
-	}
-
-	
-	//if( dwAddr == 0 || dwAddr < 0x2000)
-	{
-		dwAddr = (gfx->words.w1)+RSPSegmentAddr(gRSP.dwDKRVtxAddr);
-	}
-
-	// Check that address is valid...
-	if ((dwAddr + (dwN*16)) > g_dwRamSize)
-	{
-	}
-	else
-	{
-		ProcessVertexDataDKR(dwAddr, dwV0, dwN);
-
-		status.dwNumVertices += dwN;
-
-		RDP_GFX_DumpVtxInfoDKR(dwAddr, dwV0, dwN);
-	}
-}
-
-
-void RSP_Vtx_Gemini(Gfx *gfx)
-{
-	
-	
-
-	uint32 dwAddr = RSPSegmentAddr((gfx->words.w1));
-	uint32 dwV0 =  (((gfx->words.w0)>>9)&0x1F);
-	uint32 dwN  = (((gfx->words.w0) >>19 )&0x1F);
-
-	if (dwV0 >= 32)
-		dwV0 = 31;
-
-	if ((dwV0 + dwN) > 32)
-	{
-		dwN = 32 - dwV0;
-	}
-
-
-	//if( dwAddr == 0 || dwAddr < 0x2000)
-	{
-		dwAddr = (gfx->words.w1)+RSPSegmentAddr(gRSP.dwDKRVtxAddr);
-	}
-
-	// Check that address is valid...
-	if ((dwAddr + (dwN*16)) > g_dwRamSize)
-	{
-	}
-	else
-	{
-		ProcessVertexDataDKR(dwAddr, dwV0, dwN);
-
-		status.dwNumVertices += dwN;
-
-		RDP_GFX_DumpVtxInfoDKR(dwAddr, dwV0, dwN);
-	}
-}
-
-// DKR verts are extra 4 bytes
-void RDP_GFX_DumpVtxInfoDKR(uint32 dwAddr, uint32 dwV0, uint32 dwN)
-{
-}
-
-void DLParser_Set_Addr_Ucode6(Gfx *gfx)
-{
-	gRSP.dwDKRMatrixAddr = (gfx->words.w0)&0x00FFFFFF;
-	gRSP.dwDKRVtxAddr = (gfx->words.w1)&0x00FFFFFF;
-	gRSP.DKRVtxCount=0;
-}
-
-
-
-void RSP_Vtx_WRUS(Gfx *gfx)
-{
-	uint32 dwAddr = RSPSegmentAddr((gfx->words.w1));
-	uint32 dwLength = ((gfx->words.w0))&0xFFFF;
-
-	uint32 dwN= (dwLength + 1) / 0x210;
-	//uint32 dwN= (dwLength >> 9);
-	//uint32 dwV0 = (((gfx->words.w0)>>16)&0x3f)/5;
-	uint32 dwV0 = (((gfx->words.w0)>>16)&0xFF)/5;
-
-	if (dwV0 >= 32)
-		dwV0 = 31;
-	
-	if ((dwV0 + dwN) > 32)
-	{
-		dwN = 32 - dwV0;
-	}
-
-	ProcessVertexData(dwAddr, dwV0, dwN);
-
-	status.dwNumVertices += dwN;
-
-	DisplayVertexInfo(dwAddr, dwV0, dwN);
-}
-
-void RSP_Vtx_ShadowOfEmpire(Gfx *gfx)
-{
-
-	
-
-	uint32 dwAddr = RSPSegmentAddr((gfx->words.w1));
-	uint32 dwLength = ((gfx->words.w0))&0xFFFF;
-
-	uint32 dwN= (((gfx->words.w0) >> 4) & 0xFFF) / 33 + 1;
-	uint32 dwV0 = 0;
-
-	if (dwV0 >= 32)
-		dwV0 = 31;
-	
-	if ((dwV0 + dwN) > 32)
-	{
-		dwN = 32 - dwV0;
-	}
-
-	ProcessVertexData(dwAddr, dwV0, dwN);
-
-	status.dwNumVertices += dwN;
-
-	DisplayVertexInfo(dwAddr, dwV0, dwN);
-}
-
-
-void RSP_DL_In_MEM_DKR(Gfx *gfx)
-{
-	
-	
-
-	// This cmd is likely to execute number of ucode at the given address
-	uint32 dwAddr = (gfx->words.w1);//RSPSegmentAddr((gfx->words.w1));
-	{
-		gDlistStackPointer++;
-		gDlistStack[gDlistStackPointer].pc = dwAddr;
-		gDlistStack[gDlistStackPointer].countdown = (((gfx->words.w0)>>16)&0xFF);
-	}
-}
 uint16 ConvertYUVtoR5G5B5X1(int y, int u, int v)
 {
 	float r = y + (1.370705f * (v-128));
@@ -333,7 +96,7 @@ void TexRectToN64FrameBuffer_YUV_16b(uint32 x0, uint32 y0, uint32 width, uint32 
 extern uObjMtxReal gObjMtxReal;
 void DLParser_OgreBatter64BG(Gfx *gfx)
 {
-	uint32 dwAddr = RSPSegmentAddr((gfx->words.w1));
+	uint32 dwAddr = RSPSegmentAddr((gfx->words.cmd1));
 	uObjTxSprite *ptr = (uObjTxSprite*)(g_pRDRAMu8+dwAddr);
 	//CRender::g_pRender->LoadObjSprite(*ptr,true);
 	PrepareTextures();
@@ -351,11 +114,11 @@ void DLParser_Bomberman2TextRect(Gfx *gfx)
 	if( options.enableHackForGames == HACK_FOR_OGRE_BATTLE && gRDP.tiles[7].dwFormat == TXT_FMT_YUV )
 	{
 		TexRectToN64FrameBuffer_YUV_16b( (uint32)gObjMtxReal.X, (uint32)gObjMtxReal.Y, 16, 16);
-		//DLParser_OgreBatter64BG((gfx->words.w0), (gfx->words.w1));
+		//DLParser_OgreBatter64BG((gfx->words.cmd0), (gfx->words.cmd1));
 		return;
 	}
 
-	uint32 dwAddr = RSPSegmentAddr((gfx->words.w1));
+	uint32 dwAddr = RSPSegmentAddr((gfx->words.cmd1));
 	uObjSprite *info = (uObjSprite*)(g_pRDRAMu8+dwAddr);
 
 	uint32 dwTile	= gRSP.curTile;
@@ -370,326 +133,11 @@ void DLParser_Bomberman2TextRect(Gfx *gfx)
 }
 
 
-void RSP_MoveWord_DKR(Gfx *gfx)
-{
-	SP_Timing(RSP_GBI1_MoveWord);
-	uint32 dwNumLights;
-
-	switch ((gfx->words.w0) & 0xFF)
-	{
-	case RSP_MOVE_WORD_NUMLIGHT:
-		dwNumLights = (gfx->words.w1)&0x7;
-
-		gRSP.ambientLightIndex = dwNumLights;
-		SetNumLights(dwNumLights);
-		//gRSP.DKRBillBoard = (gfx->words.w1)&0x1 ? true : false;
-		gRSP.DKRBillBoard = (gfx->words.w1)&0x7 ? true : false;
-
-		break;
-	case RSP_MOVE_WORD_LIGHTCOL:
-		gRSP.DKRCMatrixIndex = ((gfx->words.w1)>>6)&7;
-		//gRSP.DKRCMatrixIndex = ((gfx->words.w1)>>6)&3;
-		break;
-	default:
-		RSP_GBI1_MoveWord(gfx);
-		break;
-	}
-
-}
-
-
-void RSP_DMA_Tri_DKR(Gfx *gfx)
-{
-	BOOL bTrisAdded = FALSE;
-	uint32 dwAddr = RSPSegmentAddr((gfx->words.w1));
-	uint32 flag = ((gfx->words.w0) & 0xFF0000) >> 16;
-	if (flag&1) 
-		CRender::g_pRender->SetCullMode(false,true);
-	else
-		CRender::g_pRender->SetCullMode(false,false);
-
-
-	uint32 dwNum = (((gfx->words.w0) &  0xFFF0) >>4 );
-	uint32 i;
-	uint32 * pData = (uint32*)&g_pRDRAMu32[dwAddr/4];
-
-	if( dwAddr+16*dwNum >= g_dwRamSize )
-	{
-		return;
-	}
-
-	status.primitiveType = PRIM_DMA_TRI;
-
-	for (i = 0; i < dwNum; i++)
-	{
-		uint32 dwInfo = pData[0];
-
-		uint32 dwV0 = (dwInfo >> 16) & 0x1F;
-		uint32 dwV1 = (dwInfo >>  8) & 0x1F;
-		uint32 dwV2 = (dwInfo      ) & 0x1F;
-
-		//if (IsTriangleVisible(dwV0, dwV1, dwV2))
-		{
-			if (!bTrisAdded )//&& CRender::g_pRender->IsTextureEnabled())
-			{
-				PrepareTextures();
-				InitVertexTextureConstants();
-			}
-
-			// Generate texture coordinates
-			short s0 = ((short)(pData[1]>>16));
-			short t0 = ((short)(pData[1]&0xFFFF));
-			short s1 = ((short)(pData[2]>>16));
-			short t1 = ((short)(pData[2]&0xFFFF));
-			short s2 = ((short)(pData[3]>>16));
-			short t2 = ((short)(pData[3]&0xFFFF));
-
-			CRender::g_pRender->SetVtxTextureCoord(dwV0, s0, t0);
-			CRender::g_pRender->SetVtxTextureCoord(dwV1, s1, t1);
-			CRender::g_pRender->SetVtxTextureCoord(dwV2, s2, t2);
-
-			if( !bTrisAdded )
-			{
-				CRender::g_pRender->SetCombinerAndBlender();
-			}
-
-			bTrisAdded = true;
-			PrepareTriangle(dwV0, dwV1, dwV2);
-		}
-
-		pData += 4;
-
-	}
-
-	if (bTrisAdded)	
-	{
-		CRender::g_pRender->DrawTriangles();
-	}
-	gRSP.DKRVtxCount=0;
-}
-
-uint32 dwPDCIAddr = 0;
-void ProcessVertexDataPD(uint32 dwAddr, uint32 dwV0, uint32 dwNum);
-void RSP_Vtx_PD(Gfx *gfx)
-{
-	
-	
-
-	SP_Timing(RSP_GBI0_Vtx);
-
-	uint32 dwAddr = RSPSegmentAddr((gfx->words.w1));
-	uint32 dwV0 =  ((gfx->words.w0)>>16)&0x0F;
-	uint32 dwN  = (((gfx->words.w0)>>20)&0x0F)+1;
-	uint32 dwLength = ((gfx->words.w0))&0xFFFF;
-
-	ProcessVertexDataPD(dwAddr, dwV0, dwN);
-	status.dwNumVertices += dwN;
-}
-
-void RSP_Set_Vtx_CI_PD(Gfx *gfx)
-{
-	
-	
-
-	// Color index buf address
-	dwPDCIAddr = RSPSegmentAddr((gfx->words.w1));
-}
-
-void RSP_Tri4_PD(Gfx *gfx)
-{
-	uint32 w0 = gfx->words.w0;
-	uint32 w1 = gfx->words.w1;
-
-	status.primitiveType = PRIM_TRI2;
-
-	// While the next command pair is Tri2, add vertices
-	uint32 dwPC = gDlistStack[gDlistStackPointer].pc;
-
-	BOOL bTrisAdded = FALSE;
-
-	do {
-		uint32 dwFlag = (w0>>16)&0xFF;
-
-		BOOL bVisible;
-		for( uint32 i=0; i<4; i++)
-		{
-			uint32 v0 = (w1>>(4+(i<<3))) & 0xF;
-			uint32 v1 = (w1>>(  (i<<3))) & 0xF;
-			uint32 v2 = (w0>>(  (i<<2))) & 0xF;
-			bVisible = IsTriangleVisible(v0, v2, v1);
-			if (bVisible)
-			{
-				if (!bTrisAdded && CRender::g_pRender->IsTextureEnabled())
-				{
-					PrepareTextures();
-					InitVertexTextureConstants();
-				}
-
-				if( !bTrisAdded )
-				{
-					CRender::g_pRender->SetCombinerAndBlender();
-				}
-
-				bTrisAdded = true;
-				PrepareTriangle(v0, v2, v1);
-			}
-		}
-
-		w0			= *(uint32 *)(g_pRDRAMu8 + dwPC+0);
-		w1			= *(uint32 *)(g_pRDRAMu8 + dwPC+4);
-		dwPC += 8;
-
-	} while ((w0>>24) == (uint8)RSP_TRI2);
-
-	gDlistStack[gDlistStackPointer].pc = dwPC-8;
-
-	if (bTrisAdded)	
-	{
-		CRender::g_pRender->DrawTriangles();
-	}
-}
-
-
-void DLParser_Tri4_Conker(Gfx *gfx)
-{
-	uint32 w0 = gfx->words.w0;
-	uint32 w1 = gfx->words.w1;
-
-	status.primitiveType = PRIM_TRI2;
-
-	// While the next command pair is Tri2, add vertices
-	uint32 dwPC = gDlistStack[gDlistStackPointer].pc;
-
-	BOOL bTrisAdded = FALSE;
-
-	do {
-		uint32 idx[12];
-		idx[0] = (w1   )&0x1F;
-		idx[1] = (w1>> 5)&0x1F;
-		idx[2] = (w1>>10)&0x1F;
-		idx[3] = (w1>>15)&0x1F;
-		idx[4] = (w1>>20)&0x1F;
-		idx[5] = (w1>>25)&0x1F;
-
-		idx[6] = (w0    )&0x1F;
-		idx[7] = (w0>> 5)&0x1F;
-		idx[8] = (w0>>10)&0x1F;
-
-		idx[ 9] = (((w0>>15)&0x7)<<2)|(w1>>30);
-		idx[10] = (w0>>18)&0x1F;
-		idx[11] = (w0>>23)&0x1F;
-
-		BOOL bVisible;
-		for( uint32 i=0; i<4; i++)
-		{
-			uint32 v0=idx[i*3  ];
-			uint32 v1=idx[i*3+1];
-			uint32 v2=idx[i*3+2];
-			bVisible = IsTriangleVisible(v0, v1, v2);
-			if (bVisible)
-			{
-				if (!bTrisAdded && CRender::g_pRender->IsTextureEnabled())
-				{
-					PrepareTextures();
-					InitVertexTextureConstants();
-				}
-
-				if( !bTrisAdded )
-				{
-					CRender::g_pRender->SetCombinerAndBlender();
-				}
-
-				bTrisAdded = true;
-				PrepareTriangle(v0, v1, v2);
-			}
-		}
-
-		w0			= *(uint32 *)(g_pRDRAMu8 + dwPC+0);
-		w1			= *(uint32 *)(g_pRDRAMu8 + dwPC+4);
-		dwPC += 8;
-
-	} while ((w0>>28) == 1);
-
-	gDlistStack[gDlistStackPointer].pc = dwPC-8;
-
-	if (bTrisAdded)	
-	{
-		CRender::g_pRender->DrawTriangles();
-	}
-}
-
-void RDP_GFX_Force_Vertex_Z_Conker(uint32 dwAddr)
-{
-	dwConkerVtxZAddr = dwAddr;
-}
-
-
-
-void DLParser_MoveMem_Conker(Gfx *gfx)
-{
-	uint32 dwType    = ((gfx->words.w0)     ) & 0xFE;
-	uint32 dwAddr = RSPSegmentAddr((gfx->words.w1));
-	if( dwType == RSP_GBI2_MV_MEM__MATRIX )
-	{
-		RDP_GFX_Force_Vertex_Z_Conker(dwAddr);
-	}
-	else if( dwType == RSP_GBI2_MV_MEM__LIGHT )
-	{
-		uint32 dwOffset2 = ((gfx->words.w0) >> 5) & 0x3FFF;
-		uint32 dwLight=0xFF;
-		if( dwOffset2 >= 0x30 )
-		{
-			dwLight = (dwOffset2 - 0x30)/0x30;
-			RSP_MoveMemLight(dwLight, dwAddr);
-		}
-		else
-		{
-			// fix me
-		}
-	}
-	else
-	{
-		RSP_GBI2_MoveMem(gfx);
-	}
-}
-
-extern void ProcessVertexDataConker(uint32 dwAddr, uint32 dwV0, uint32 dwNum);
-void RSP_Vtx_Conker(Gfx *gfx)
-{
-	
-	
-
-	uint32 dwAddr = RSPSegmentAddr((gfx->words.w1));
-	uint32 dwVEnd    = (((gfx->words.w0)   )&0xFFF)/2;
-	uint32 dwN      = (((gfx->words.w0)>>12)&0xFFF);
-	uint32 dwV0		= dwVEnd - dwN;
-
-	ProcessVertexDataConker(dwAddr, dwV0, dwN);
-	status.dwNumVertices += dwN;
-	DisplayVertexInfo(dwAddr, dwV0, dwN);
-}
-
-
-void DLParser_MoveWord_Conker(Gfx *gfx)
-{
-	uint32 dwType   = ((gfx->words.w0) >> 16) & 0xFF;
-	if( dwType != RSP_MOVE_WORD_NUMLIGHT )
-	{
-		RSP_GBI2_MoveWord(gfx);
-	}
-	else
-	{
-		uint32 dwNumLights = ((gfx->words.w1)/48);
-		gRSP.ambientLightIndex = dwNumLights+1;
-		SetNumLights(dwNumLights);
-	}
-}
-
 void DLParser_Ucode8_0x0(Gfx *gfx)
 {
-	if( (gfx->words.w0) == 0 && (gfx->words.w1) )
+	if( (gfx->words.cmd0) == 0 && (gfx->words.cmd1) )
 	{
-		uint32 newaddr = RSPSegmentAddr((gfx->words.w1));
+		uint32 newaddr = RSPSegmentAddr((gfx->words.cmd1));
 
 		if( newaddr && newaddr < g_dwRamSize)
 		{
@@ -711,78 +159,6 @@ void DLParser_Ucode8_0x0(Gfx *gfx)
 }
 
 
-uint32 Rogue_Squadron_Vtx_XYZ_Cmd;
-uint32 Rogue_Squadron_Vtx_XYZ_Addr;
-uint32 Rogue_Squadron_Vtx_Color_Cmd;
-uint32 Rogue_Squadron_Vtx_Color_Addr;
-uint32 GSBlkAddrSaves[100][2];
-
-void ProcessVertexData_Rogue_Squadron(uint32 dwXYZAddr, uint32 dwColorAddr, uint32 dwXYZCmd, uint32 dwColorCmd);
-
-void DLParser_RS_Color_Buffer(Gfx *gfx)
-{
-	
-	
-
-	uint32 dwPC = gDlistStack[gDlistStackPointer].pc-8;
-	uint32 dwAddr = RSPSegmentAddr((gfx->words.w1));
-
-	if( dwAddr > g_dwRamSize )
-	{
-		dwAddr = (gfx->words.w1)&(g_dwRamSize-1);
-	}
-
-	Rogue_Squadron_Vtx_Color_Cmd = (gfx->words.w0);
-	Rogue_Squadron_Vtx_Color_Addr = dwAddr;
-
-	ProcessVertexData_Rogue_Squadron(Rogue_Squadron_Vtx_XYZ_Addr, Rogue_Squadron_Vtx_Color_Addr, Rogue_Squadron_Vtx_XYZ_Cmd, Rogue_Squadron_Vtx_Color_Cmd);
-
-}
-
-
-void DLParser_RS_Vtx_Buffer(Gfx *gfx)
-{
-	
-	
-
-	uint32 dwPC = gDlistStack[gDlistStackPointer].pc-8;
-	uint32 dwAddr = RSPSegmentAddr((gfx->words.w1));
-	if( dwAddr > g_dwRamSize )
-	{
-		dwAddr = (gfx->words.w1)&(g_dwRamSize-1);
-	}
-
-	Rogue_Squadron_Vtx_XYZ_Cmd = (gfx->words.w0);
-	Rogue_Squadron_Vtx_XYZ_Addr = dwAddr;
-}
-
-
-void DLParser_RS_Block(Gfx *gfx)
-{
-	uint32 dwPC = gDlistStack[gDlistStackPointer].pc-8;
-}
-
-void DLParser_RS_MoveMem(Gfx *gfx)
-{
-	
-	
-
-	uint32 dwPC = gDlistStack[gDlistStackPointer].pc;
-	uint32 cmd1 = ((dwPC)&0x00FFFFFF)|0x80000000;
-	RSP_GBI1_MoveMem(gfx);
-}
-
-void DLParser_RS_0xbe(Gfx *gfx)
-{
-	uint32 dwPC = gDlistStack[gDlistStackPointer].pc-8;
-	dwPC+=8;
-	uint32 dwCmd2 = *(uint32 *)(g_pRDRAMu8 + dwPC);
-	uint32 dwCmd3 = *(uint32 *)(g_pRDRAMu8 + dwPC+4);
-	gDlistStack[gDlistStackPointer].pc += 8;
-
-}
-
-
 void DLParser_Ucode8_EndDL(Gfx *gfx)
 {
 	
@@ -799,13 +175,13 @@ void DLParser_Ucode8_DL(Gfx *gfx)	// DL Function Call
 
 	uint32 dwPC = gDlistStack[gDlistStackPointer].pc-8;
 
-	uint32 dwAddr = RSPSegmentAddr((gfx->words.w1));
+	uint32 dwAddr = RSPSegmentAddr((gfx->words.cmd1));
 	uint32 dwCmd2 = *(uint32 *)(g_pRDRAMu8 + dwAddr);
 	uint32 dwCmd3 = *(uint32 *)(g_pRDRAMu8 + dwAddr+4);
 
 	if( dwAddr > g_dwRamSize )
 	{
-		dwAddr = (gfx->words.w1)&(g_dwRamSize-1);
+		dwAddr = (gfx->words.cmd1)&(g_dwRamSize-1);
 	}
 
 	if( gDlistStackPointer < MAX_DL_STACK_SIZE-1 )
@@ -833,14 +209,14 @@ void DLParser_Ucode8_JUMP(Gfx *gfx)	// DL Function Call
 	
 	
 
-	if( ((gfx->words.w0)&0x00FFFFFF) == 0 )
+	if( ((gfx->words.cmd0)&0x00FFFFFF) == 0 )
 	{
 		uint32 dwPC = gDlistStack[gDlistStackPointer].pc-8;
-		uint32 dwAddr = RSPSegmentAddr((gfx->words.w1));
+		uint32 dwAddr = RSPSegmentAddr((gfx->words.cmd1));
 
 		if( dwAddr > g_dwRamSize )
 		{
-			dwAddr = (gfx->words.w1)&(g_dwRamSize-1);
+			dwAddr = (gfx->words.cmd1)&(g_dwRamSize-1);
 		}
 
 		uint32 dwCmd2 = *(uint32 *)(g_pRDRAMu8 + dwAddr);
@@ -928,7 +304,7 @@ void DLParser_Ucode8_0x05(Gfx *gfx)
 	0028E540: 00000000, 00000000 - RSP_SPNOOP
 	*/
 
-	if( (gfx->words.w1) == 0 )
+	if( (gfx->words.cmd1) == 0 )
 	{
 		return;
 	}
@@ -942,11 +318,11 @@ void DLParser_Ucode8_0xb4(Gfx *gfx)
 {
 	uint32 dwPC = gDlistStack[gDlistStackPointer].pc;
 
-	if( ((gfx->words.w0)&0xFF) == 0x06 )
+	if( ((gfx->words.cmd0)&0xFF) == 0x06 )
 		DLParser_Unknown_Skip3(gfx);
-	else if( ((gfx->words.w0)&0xFF) == 0x04 )
+	else if( ((gfx->words.cmd0)&0xFF) == 0x04 )
 		DLParser_Unknown_Skip1(gfx);
-	else if( ((gfx->words.w0)&0xFFF) == 0x600 )
+	else if( ((gfx->words.cmd0)&0xFFF) == 0x600 )
 		DLParser_Unknown_Skip3(gfx);
 	else
 	{
@@ -1045,7 +421,7 @@ void DLParser_Ucode8_0xbc(Gfx *gfx)
 	
 	
 
-	if( ((gfx->words.w0)&0xFFF) == 0x58C )
+	if( ((gfx->words.cmd0)&0xFFF) == 0x58C )
 	{
 		DLParser_Ucode8_DL(gfx);
 	}
@@ -1080,7 +456,7 @@ void DLParser_Ucode8_0xbd(Gfx *gfx)
 	00359AE8: 1A000000, 16000200 - G_NOTHING
 	 */
 
-	if( (gfx->words.w1) != 0 )
+	if( (gfx->words.cmd1) != 0 )
 	{
 		DLParser_Unknown_Skip2(gfx);
 		return;
@@ -1094,7 +470,7 @@ void DLParser_Ucode8_0xbf(Gfx *gfx)
 	
 	
 
-	if( ((gfx->words.w0)&0xFF) == 0x02 )
+	if( ((gfx->words.cmd0)&0xFF) == 0x02 )
 		DLParser_Unknown_Skip3(gfx);
 	else
 		DLParser_Unknown_Skip1(gfx);
@@ -1137,56 +513,9 @@ void PD_LoadMatrix_0xb4(uint32 addr)
 	}
 }	
 
-void DLParser_RDPHalf_1_0xb4_GoldenEye(Gfx *gfx)		
-{
-	SP_Timing(RSP_GBI1_RDPHalf_1);
-	if( ((gfx->words.w1)>>24) == 0xce )
-	{
-		PrepareTextures();
-		CRender::g_pRender->SetCombinerAndBlender();
-
-		uint32 dwPC = gDlistStack[gDlistStackPointer].pc;		// This points to the next instruction
-
-		//PD_LoadMatrix_0xb4(dwPC + 8*16 - 8);
-
-		uint32 dw1 = *(uint32 *)(g_pRDRAMu8 + dwPC+8*0+4);
-		uint32 dw2 = *(uint32 *)(g_pRDRAMu8 + dwPC+8*1+4);
-		uint32 dw3 = *(uint32 *)(g_pRDRAMu8 + dwPC+8*2+4);
-		uint32 dw4 = *(uint32 *)(g_pRDRAMu8 + dwPC+8*3+4);
-		uint32 dw5 = *(uint32 *)(g_pRDRAMu8 + dwPC+8*4+4);
-		uint32 dw6 = *(uint32 *)(g_pRDRAMu8 + dwPC+8*5+4);
-		uint32 dw7 = *(uint32 *)(g_pRDRAMu8 + dwPC+8*6+4);
-		uint32 dw8 = *(uint32 *)(g_pRDRAMu8 + dwPC+8*7+4);
-		uint32 dw9 = *(uint32 *)(g_pRDRAMu8 + dwPC+8*8+4);
-
-		uint32 r = (dw8>>16)&0xFF;
-		uint32 g = (dw8    )&0xFF;
-		uint32 b = (dw9>>16)&0xFF;
-		uint32 a = (dw9    )&0xFF;
-		uint32 color = COLOR_RGBA(r, g, b, a);
-
-		//int x0 = 0;
-		//int x1 = gRDP.scissor.right;
-		int x0 = gRSP.nVPLeftN;
-		int x1 = gRSP.nVPRightN;
-		int y0 = int(dw1&0xFFFF)/4;
-		int y1 = int(dw1>>16)/4;
-
-		float xscale = g_textures[0].m_pCTexture->m_dwWidth / (float)(x1-x0);
-		float yscale = g_textures[0].m_pCTexture->m_dwHeight / (float)(y1-y0);
-		float fs0 = (short)(dw3&0xFFFF)/32768.0f*g_textures[0].m_pCTexture->m_dwWidth;
-		float ft0 = (short)(dw3>>16)/32768.0f*256;
-		CRender::g_pRender->TexRect(x0,y0,x1,y1,0,0,xscale,yscale,true,color);
-
-		gDlistStack[gDlistStackPointer].pc += 312;
-
-
-	}
-}
-
 void DLParser_RSP_DL_WorldDriver(Gfx *gfx)
 {
-	uint32 dwAddr = RSPSegmentAddr((gfx->words.w1));
+	uint32 dwAddr = RSPSegmentAddr((gfx->words.cmd1));
 	if( dwAddr > g_dwRamSize )
 	{
 		dwAddr &= (g_dwRamSize-1);
@@ -1205,180 +534,4 @@ void DLParser_RSP_Pop_DL_WorldDriver(Gfx *gfx)
 	RDP_GFX_PopDL();
 }
 
-void DLParser_RSP_Last_Legion_0x80(Gfx *gfx)
-{
-	
-	
 
-	gDlistStack[gDlistStackPointer].pc += 16;
-}
-
-void DLParser_RSP_Last_Legion_0x00(Gfx *gfx)
-{
-	gDlistStack[gDlistStackPointer].pc += 16;
-
-	if( (gfx->words.w0) == 0 && (gfx->words.w1) )
-	{
-		uint32 newaddr = RSPSegmentAddr((gfx->words.w1));
-		if( newaddr >= g_dwRamSize )
-		{
-			RDP_GFX_PopDL();
-			return;
-		}
-
-		uint32 dw1 = *(uint32 *)(g_pRDRAMu8 + newaddr+8*0+4);
-		uint32 pc1 = *(uint32 *)(g_pRDRAMu8 + newaddr+8*1+4);
-		uint32 pc2 = *(uint32 *)(g_pRDRAMu8 + newaddr+8*4+4);
-		pc1 = RSPSegmentAddr(pc1);
-		pc2 = RSPSegmentAddr(pc2);
-
-		if( pc1 && pc1 != 0xffffff && pc1 < g_dwRamSize)
-		{
-			// Need to call both DL
-			gDlistStackPointer++;
-			gDlistStack[gDlistStackPointer].pc = pc1;
-			gDlistStack[gDlistStackPointer].countdown = MAX_DL_COUNT;
-		}
-
-		if( pc2 && pc2 != 0xffffff && pc2 < g_dwRamSize )
-		{
-			gDlistStackPointer++;
-			gDlistStack[gDlistStackPointer].pc = pc2;
-			gDlistStack[gDlistStackPointer].countdown = MAX_DL_COUNT;
-		}
-	}
-	else if( (gfx->words.w1) == 0 )
-	{
-		RDP_GFX_PopDL();
-	}
-	else
-	{
-		// (gfx->words.w0) != 0
-		RSP_RDP_Nothing(gfx);
-		RDP_GFX_PopDL();
-	}
-}
-
-void DLParser_TexRect_Last_Legion(Gfx *gfx)
-{
-#ifndef _DISABLE_VID1964
-	if( !status.bCIBufferIsRendered ) CGraphicsContext::g_pGraphicsContext->FirstDrawToNewCI();
-#else
-	status.bCIBufferIsRendered = true;
-#endif
-
-	status.primitiveType = PRIM_TEXTRECT;
-
-	// This command used 128bits, and not 64 bits. This means that we have to look one 
-	// Command ahead in the buffer, and update the PC.
-	uint32 dwPC = gDlistStack[gDlistStackPointer].pc;		// This points to the next instruction
-	uint32 dwCmd2 = *(uint32 *)(g_pRDRAMu8 + dwPC);
-	uint32 dwCmd3 = *(uint32 *)(g_pRDRAMu8 + dwPC+4);
-
-	gDlistStack[gDlistStackPointer].pc += 8;
-
-
-	uint32 dwXH		= (((gfx->words.w0)>>12)&0x0FFF)/4;
-	uint32 dwYH		= (((gfx->words.w0)    )&0x0FFF)/4;
-	uint32 tileno	= ((gfx->words.w1)>>24)&0x07;
-	uint32 dwXL		= (((gfx->words.w1)>>12)&0x0FFF)/4;
-	uint32 dwYL		= (((gfx->words.w1)    )&0x0FFF)/4;
-
-
-	if( (int)dwXL >= gRDP.scissor.right || (int)dwYL >= gRDP.scissor.bottom || (int)dwXH < gRDP.scissor.left || (int)dwYH < gRDP.scissor.top )
-	{
-		// Clipping
-		return;
-	}
-
-	uint16 uS		= (uint16)(  dwCmd2>>16)&0xFFFF;
-	uint16 uT		= (uint16)(  dwCmd2    )&0xFFFF;
-	short s16S = *(short*)(&uS);
-	short s16T = *(short*)(&uT);
-
-	uint16  uDSDX 	= (uint16)((  dwCmd3>>16)&0xFFFF);
-	uint16  uDTDY	    = (uint16)((  dwCmd3    )&0xFFFF);
-	short	 s16DSDX  = *(short*)(&uDSDX);
-	short  s16DTDY	= *(short*)(&uDTDY);
-
-	uint32 curTile = gRSP.curTile;
-	ForceMainTextureIndex(tileno);
-
-	float fS0 = s16S / 32.0f;
-	float fT0 = s16T / 32.0f;
-
-	float fDSDX = s16DSDX / 1024.0f;
-	float fDTDY = s16DTDY / 1024.0f;
-
-	uint32 cycletype = gRDP.otherMode.cycle_type;
-
-	if (cycletype == CYCLE_TYPE_COPY)
-	{
-		fDSDX /= 4.0f;	// In copy mode 4 pixels are copied at once.
-		dwXH++;
-		dwYH++;
-	}
-	else if (cycletype == CYCLE_TYPE_FILL)
-	{
-		dwXH++;
-		dwYH++;
-	}
-
-	if( fDSDX == 0 )	fDSDX = 1;
-	if( fDTDY == 0 )	fDTDY = 1;
-
-	float fS1 = fS0 + (fDSDX * (dwXH - dwXL));
-	float fT1 = fT0 + (fDTDY * (dwYH - dwYL));
-
-	float t0u0 = (fS0-gRDP.tiles[tileno].hilite_sl) * gRDP.tiles[tileno].fShiftScaleS;
-	float t0v0 = (fT0-gRDP.tiles[tileno].hilite_tl) * gRDP.tiles[tileno].fShiftScaleT;
-	float t0u1 = t0u0 + (fDSDX * (dwXH - dwXL))*gRDP.tiles[tileno].fShiftScaleS;
-	float t0v1 = t0v0 + (fDTDY * (dwYH - dwYL))*gRDP.tiles[tileno].fShiftScaleT;
-
-	if( dwXL==0 && dwYL==0 && dwXH==windowSetting.fViWidth-1 && dwYH==windowSetting.fViHeight-1 &&
-		t0u0 == 0 && t0v0==0 && t0u1==0 && t0v1==0 )
-	{
-		//Using TextRect to clear the screen
-	}
-	else
-	{
-		if( status.bHandleN64TextureBuffer && //status.bDirectWriteIntoRDRAM && 
-			g_pTextureBufferInfo->CI_Info.dwFormat == gRDP.tiles[tileno].dwFormat && 
-			g_pTextureBufferInfo->CI_Info.dwSize == gRDP.tiles[tileno].dwSize && 
-			gRDP.tiles[tileno].dwFormat == TXT_FMT_CI && gRDP.tiles[tileno].dwSize == TXT_SIZE_8b )
-		{
-			if( options.enableHackForGames == HACK_FOR_YOSHI )
-			{
-				// Hack for Yoshi background image
-				PrepareTextures();
-				TexRectToFrameBuffer_8b(dwXL, dwYL, dwXH, dwYH, t0u0, t0v0, t0u1, t0v1, tileno);
-			}
-			else
-			{
-				if( frameBufferOptions.bUpdateCIInfo )
-				{
-					PrepareTextures();
-					TexRectToFrameBuffer_8b(dwXL, dwYL, dwXH, dwYH, t0u0, t0v0, t0u1, t0v1, tileno);
-				}
-
-				if( !status.bDirectWriteIntoRDRAM )
-				{
-					CRender::g_pRender->TexRect(dwXL, dwYL, dwXH, dwYH, fS0, fT0, fDSDX, fDTDY);
-
-					status.dwNumTrisRendered += 2;
-				}
-			}
-		}
-		else
-		{
-			CRender::g_pRender->TexRect(dwXL, dwYL, dwXH, dwYH, fS0, fT0, fDSDX, fDTDY);
-			status.bFrameBufferDrawnByTriangles = true;
-
-			status.dwNumTrisRendered += 2;
-		}
-	}
-
-	if( status.bHandleN64TextureBuffer )	g_pTextureBufferInfo->maxUsedHeight = max(g_pTextureBufferInfo->maxUsedHeight,(int)dwYH);
-
-	ForceMainTextureIndex(curTile);
-}

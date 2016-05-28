@@ -109,7 +109,7 @@ public:
 	static char* FormatStr(uint8 val, char *buf);
 	void CheckCombineInCycle1(void);
 	virtual void Simplify(void);
-	virtual void Reformat(void);
+	virtual void Reformat(bool do_complement = true);
 	virtual void To_AB_Add_CD_Format(void);	// Use by TNT,Geforce
 	virtual void To_AB_Add_C_Format(void);	// Use by ATI Radeon
 	
@@ -210,6 +210,22 @@ public:
 	virtual void Simplify(void);
 	void UseTextureForConstant(void);
 };
+
+typedef struct 
+{
+	bool bFurtherFormatForOGL2;
+	bool bUseShadeForConstants;
+	bool bUseTextureForConstants;
+	bool bUseMoreThan2TextureForConstants;
+	bool bReformatToAB_CD;
+	bool bAllowHack;
+	bool bAllowComplimentary;
+	bool bCheckCombineInCycle1;
+	bool bSetLODFracTo0;
+	bool bMergeShadeWithConstants;
+	bool bSplitComplexStage;
+	bool bReformatAgainWithTwoTexels;
+}MuxConverterOptions;
 
 #endif
 

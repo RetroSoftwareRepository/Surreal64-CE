@@ -61,7 +61,7 @@
 				OmitFramePointers="TRUE"
 				OptimizeForProcessor="2"
 				AdditionalIncludeDirectories="..\..\..\Include"
-				PreprocessorDefinitions="NDEBUG;_XBOX;_LIB;_FAST_HASH;_OLDCLIPPER;_XBOX_HACK;_XBOX_HACK2"
+				PreprocessorDefinitions="NDEBUG;_XBOX;_LIB;_FAST_HASH;_OLDCLIPPER;_VID1964_FIX;_XBOX_HACK;_XBOX_HACK2;_VID1964;_RICE6FB"
 				StringPooling="TRUE"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="TRUE"
@@ -311,9 +311,6 @@
 					RelativePath=".\DeviceBuilder.h">
 				</File>
 				<File
-					RelativePath=".\FrameBuffer.h">
-				</File>
-				<File
 					RelativePath=".\GraphicsContext.cpp">
 				</File>
 				<File
@@ -335,6 +332,12 @@
 					RelativePath=".\RDP_Texture.h">
 				</File>
 				<File
+					RelativePath=".\RSP_Conker.h">
+				</File>
+				<File
+					RelativePath=".\RSP_DKR.h">
+				</File>
+				<File
 					RelativePath=".\RSP_GBI0.h">
 				</File>
 				<File
@@ -353,16 +356,37 @@
 					RelativePath=".\RSP_GBI_Sprite2D.h">
 				</File>
 				<File
+					RelativePath=".\RSP_GE.h">
+				</File>
+				<File
+					RelativePath=".\RSP_LL.h">
+				</File>
+				<File
 					RelativePath=".\RSP_Parser.cpp">
 				</File>
 				<File
 					RelativePath=".\RSP_Parser.h">
 				</File>
 				<File
+					RelativePath=".\RSP_PD.h">
+				</File>
+				<File
+					RelativePath=".\RSP_RS.h">
+				</File>
+				<File
 					RelativePath=".\RSP_S2DEX.cpp">
 				</File>
 				<File
 					RelativePath=".\RSP_S2DEX.h">
+				</File>
+				<File
+					RelativePath=".\RSP_SOTE.h">
+				</File>
+				<File
+					RelativePath=".\RSP_Turbo3D.h">
+				</File>
+				<File
+					RelativePath=".\RSP_WRUS.h">
 				</File>
 				<File
 					RelativePath=".\Timing.h">
@@ -384,6 +408,22 @@
 				</File>
 				<File
 					RelativePath=".\IColor.h">
+				</File>
+			</Filter>
+			<Filter
+				Name="FrameBuffer"
+				Filter="">
+				<File
+					RelativePath=".\FrameBuffer.cpp">
+				</File>
+				<File
+					RelativePath=".\FrameBuffer.h">
+				</File>
+				<File
+					RelativePath=".\FrameBufferDX.cpp">
+				</File>
+				<File
+					RelativePath=".\FrameBufferOLD.h">
 				</File>
 			</Filter>
 		</Filter>

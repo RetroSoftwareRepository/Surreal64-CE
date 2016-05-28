@@ -28,7 +28,7 @@ void RSP_GBI_Sprite2DBase(Gfx *gfx)
 	
 	
 
-	uint32 dwAddr = RSPSegmentAddr((gfx->words.w1));
+	uint32 dwAddr = RSPSegmentAddr((gfx->words.cmd1));
 	dwAddr &= (g_dwRamSize-1);
 
 	g_Sprite2DInfo.spritePtr = (SpriteStruct *)(g_pRDRAMs8+dwAddr);
@@ -65,7 +65,7 @@ void RSP_GBI_Sprite2D_PuzzleMaster64(Gfx *gfx)
 	
 	
 
-	uint32 dwAddr = RSPSegmentAddr((gfx->words.w1));
+	uint32 dwAddr = RSPSegmentAddr((gfx->words.cmd1));
 	dwAddr &= (g_dwRamSize-1);
 
 	g_Sprite2DInfo.spritePtr = (SpriteStruct *)(g_pRDRAMs8+dwAddr);
@@ -99,8 +99,8 @@ void RSP_GBI1_Sprite2DDraw(Gfx *gfx)
 	
 
 	// This ucode is shared by PopMtx and gSPSprite2DDraw
-	g_Sprite2DInfo.px = (short)(((gfx->words.w1)>>16)&0xFFFF)/4;
-	g_Sprite2DInfo.py = (short)((gfx->words.w1)&0xFFFF)/4;
+	g_Sprite2DInfo.px = (short)(((gfx->words.cmd1)>>16)&0xFFFF)/4;
+	g_Sprite2DInfo.py = (short)((gfx->words.cmd1)&0xFFFF)/4;
 
 	CRender::g_pRender->DrawSprite2D(g_Sprite2DInfo, 1);
 
@@ -116,8 +116,8 @@ void RSP_GBI0_Sprite2DDraw(Gfx *gfx)
 	
 
 	// This ucode is shared by PopMtx and gSPSprite2DDraw
-	g_Sprite2DInfo.px = (short)(((gfx->words.w1)>>16)&0xFFFF)/4;
-	g_Sprite2DInfo.py = (short)((gfx->words.w1)&0xFFFF)/4;
+	g_Sprite2DInfo.px = (short)(((gfx->words.cmd1)>>16)&0xFFFF)/4;
+	g_Sprite2DInfo.py = (short)((gfx->words.cmd1)&0xFFFF)/4;
 
 	CRender::g_pRender->DrawSprite2D(g_Sprite2DInfo, 0);
 }
@@ -128,16 +128,16 @@ void RSP_GBI1_Sprite2DScaleFlip(Gfx *gfx)
 
 	
 
-	g_Sprite2DInfo.scaleX = (((gfx->words.w1)>>16)&0xFFFF)/1024.0f;
-	g_Sprite2DInfo.scaleY = ((gfx->words.w1)&0xFFFF)/1024.0f;
+	g_Sprite2DInfo.scaleX = (((gfx->words.cmd1)>>16)&0xFFFF)/1024.0f;
+	g_Sprite2DInfo.scaleY = ((gfx->words.cmd1)&0xFFFF)/1024.0f;
 
-	if( ((gfx->words.w1)&0xFFFF) < 0x100 )
+	if( ((gfx->words.cmd1)&0xFFFF) < 0x100 )
 	{
 		g_Sprite2DInfo.scaleY = g_Sprite2DInfo.scaleX;
 	}
 
-	g_Sprite2DInfo.flipX = (uint8)(((gfx->words.w0)>>8)&0xFF);
-	g_Sprite2DInfo.flipY = (uint8)((gfx->words.w0)&0xFF);
+	g_Sprite2DInfo.flipX = (uint8)(((gfx->words.cmd0)>>8)&0xFF);
+	g_Sprite2DInfo.flipY = (uint8)((gfx->words.cmd0)&0xFF);
 }
 
 

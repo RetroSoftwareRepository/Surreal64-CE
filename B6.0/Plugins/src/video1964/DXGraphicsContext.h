@@ -121,9 +121,11 @@ public:
 	void Clear(ClearFlag dwFlags, uint32 color=0xFF000000, float depth=1.0f);
 	void UpdateFrame(bool swaponly=false);
 
+#ifndef _RICE6FB
 	void SaveBackBuffer(int ciInfoIdx, RECT* pRect=NULL);				// Copy the current back buffer to temp buffer
-	bool IsFSAAEnable() {return m_FSAAIsEnabled;}
 	virtual void StoreTextureBufferToRDRAM(int infoIdx = -1);
+#endif
+	bool IsFSAAEnable() {return m_FSAAIsEnabled;}
 	virtual void CopyBackToRDRAM(uint32 addr, uint32 fmt, uint32 siz, uint32 width, 
 		uint32 height, uint32 bufWidth, uint32 bufHeight, uint32 startaddr=0xFFFFFFFF, 
 		uint32 memsize=0xFFFFFFFF, uint32 pitch=0, D3DFORMAT surf_fmt=D3DFMT_A8R8G8B8, MYIDirect3DSurface *surf=NULL);
@@ -208,6 +210,9 @@ public:
 	bool SetAsRenderTarget(bool enable);
 	void LoadTexture(TxtrCacheEntry* pEntry);
 
+#ifdef _RICE6FB
+	void StoreTextureBufferToRDRAM(int infoIdx);
+#endif
 protected:
 	MYLPDIRECT3DSURFACE m_pColorBufferSave;
 	MYLPDIRECT3DSURFACE m_pDepthBufferSave;

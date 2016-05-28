@@ -20,6 +20,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #ifndef __RICE_RDP_GFX_H__
 #define __RICE_RDP_GFX_H__
+#include "ucodedefs.h"
 
 #define	RSP_SPNOOP				0	// handle 0 gracefully 
 #define	RSP_MTX					1

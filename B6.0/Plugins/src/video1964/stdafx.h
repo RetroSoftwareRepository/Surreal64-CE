@@ -146,9 +146,15 @@
 #include "glext.h"
 #endif //_XBOX //win32
 
+
+
 #include "GraphicsContext.h"
 #include "DXGraphicsContext.h"
 #include "DeviceBuilder.h"
+
+#include "FrameBuffer.h"
+
+
 #ifndef _XBOX //win32
 #include "OGLGraphicsContext.h"
 

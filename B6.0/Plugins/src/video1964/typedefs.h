@@ -206,6 +206,9 @@ typedef struct {
 	D3DCOLOR dcDiffuse;
 } FILLRECTVERTEX, *LPFILLRECTVERTEX;
 
+#include "IColor.h"
+
+
 
 typedef struct
 {
@@ -241,6 +244,36 @@ typedef struct
 		float fcolors[4];
 #if _MSC_VER > 1200
 		__m64 fcolor64[2];
+#endif
+	};
+
+	union {
+		struct {
+			float tx;
+			float ty;
+			float tz;
+			float tdummy;
+		};
+		struct {
+			D3DXVECTOR3 td;
+		};
+#if _MSC_VER > 1200
+		__m64 tdir64[2];
+#endif
+	};
+
+	union {
+		struct {
+			float ox;
+			float oy;
+			float oz;
+			float odummy;
+		};
+		struct {
+			D3DXVECTOR3 od;
+		};
+#if _MSC_VER > 1200
+		__m64 odir64[2];
 #endif
 	};
 } Light;
@@ -364,6 +397,9 @@ typedef struct
 	unsigned __int32	dwCRC;
 	unsigned __int32	lastUsedFrame;
 	unsigned __int32	bUsedByVIAtFrame;
+#ifdef _RICE6FB
+	unsigned __int32	lastSetAtUcode;
+#endif
 } RecentCIInfo;
 
 typedef struct

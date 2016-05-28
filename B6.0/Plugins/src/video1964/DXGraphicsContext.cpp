@@ -160,8 +160,10 @@ CDXGraphicsContext::CDXGraphicsContext() :
 	m_bFontIsCreated(false)
 {
 	m_strDeviceStats[0] = '\0';
+#ifndef _RICE6FB
 	memset(&m_textureColorBufferInfo, 0, sizeof(TextureBufferShortInfo));
 	memset(&m_textureDepthBufferInfo, 0, sizeof(TextureBufferShortInfo));
+#endif
 }
 
 //*****************************************************************************
@@ -209,7 +211,11 @@ void CDXGraphicsContext::UpdateFrame(bool swaponly)
 	}
 #endif
 
+#ifdef _RICE6FB
+	g_pFrameBufferManager->UpdateFrameBufferBeforeUpdateFrame();
+#else
 	CGraphicsContext::UpdateFrameBufferBeforeUpdateFrame();
+#endif
 
 	if( options.bDisplayOnscreenFPS && !status.bDisableFPS )
 	{
@@ -1961,8 +1967,10 @@ bool CDXGraphicsContext::IsResultGood(HRESULT hr, bool displayError)
 		return true;
 }
 
-extern RecentCIInfo* g_uRecentCIInfoPtrs[3];
+
+extern RecentCIInfo* g_uRecentCIInfoPtrs[5];
 extern TextureBufferInfo gTextureBufferInfos[];
+#ifndef _RICE6FB
 void CDXGraphicsContext::SaveBackBuffer(int ciInfoIdx, RECT* pSrcRect)
 {
 #ifndef _DISABLE_VID1964
@@ -2091,6 +2099,7 @@ RECT dstrect = {0,0,gTextureBufferInfos[idx].pTxtBuffer->m_pTexture->m_dwWidth,g
 	}
 #endif
 }
+#endif
 
 CDXTextureBuffer::CDXTextureBuffer(int width, int height, TextureBufferInfo* pInfo, TextureUsage usage)
 	: CTextureBuffer(width, height, pInfo, usage)
@@ -2115,7 +2124,11 @@ CDXTextureBuffer::~CDXTextureBuffer()
 {
 	if( m_beingRendered )
 	{
+#ifdef _RICE6FB
+		g_pFrameBufferManager->CloseRenderTexture(false);
+#else
 		CGraphicsContext::g_pGraphicsContext->CloseTextureBuffer(false);
+#endif
 		SetAsRenderTarget(false);
 	}
 
@@ -2243,9 +2256,13 @@ void CDXTextureBuffer::LoadTexture(TxtrCacheEntry* pEntry)
 	SAFE_RELEASE(pSourceSurface);
 }
 
-
+#ifdef _RICE6FB
+void CDXTextureBuffer::StoreTextureBufferToRDRAM(int infoIdx)
+#else
 void CDXGraphicsContext::StoreTextureBufferToRDRAM(int infoIdx)
+#endif
 {
+#ifndef _RICE6FB
 	if( infoIdx < 0 )
 		infoIdx = m_lastTextureBufferIndex;
 
@@ -2255,6 +2272,10 @@ void CDXGraphicsContext::StoreTextureBufferToRDRAM(int infoIdx)
 	}
 
 	if( gTextureBufferInfos[infoIdx].pTxtBuffer )
+#else
+	DXFrameBufferManager &FBmgr = *(DXFrameBufferManager*)g_pFrameBufferManager;
+	if(1)
+#endif
 	{
 		TextureBufferInfo &info = gTextureBufferInfos[infoIdx];
 
@@ -2283,8 +2304,13 @@ void CDXGraphicsContext::StoreTextureBufferToRDRAM(int infoIdx)
 					info.CI_Info.dwFormat = TXT_FMT_I;
 					height = info.knownHeight ? info.N64Height : info.maxUsedHeight;
 					memsize = info.N64Width*height;
+#ifdef _RICE6FB
+					FBmgr.CopyD3DSurfaceToRDRAM(info.CI_Info.dwAddr, fmt, info.CI_Info.dwSize, width, height,
+						bufWidth, bufHeight, info.CI_Info.dwAddr, memsize, info.N64Width, D3DFMT_A8R8G8B8, pSourceSurface);
+#else
 					CopyBackToRDRAM(info.CI_Info.dwAddr, fmt, info.CI_Info.dwSize, width, height,
 						bufWidth, bufHeight, info.CI_Info.dwAddr, memsize, info.N64Width, D3DFMT_A8R8G8B8, pSourceSurface);
+#endif
 					info.CI_Info.dwFormat = TXT_FMT_CI;
 				}
 				else
@@ -2293,15 +2319,25 @@ void CDXGraphicsContext::StoreTextureBufferToRDRAM(int infoIdx)
 					{
 						height = info.knownHeight ? info.N64Height : info.maxUsedHeight;
 						memsize = info.N64Width*height;
+#ifdef _RICE6FB
+						FBmgr.CopyD3DSurfaceToRDRAM(info.CI_Info.dwAddr, fmt, info.CI_Info.dwSize, width, height,
+							bufWidth, bufHeight, info.CI_Info.dwAddr, memsize, info.N64Width, D3DFMT_A8R8G8B8, pSourceSurface);
+#else
 						CopyBackToRDRAM(info.CI_Info.dwAddr, fmt, info.CI_Info.dwSize, width, height,
 							bufWidth, bufHeight, info.CI_Info.dwAddr, memsize, info.N64Width, D3DFMT_A8R8G8B8, pSourceSurface);
+#endif
 					}
 					else
 					{
 						height = info.knownHeight ? info.N64Height : info.maxUsedHeight;
-						memsize = g_pTextureBufferInfo->N64Width*height*2;
+						memsize = g_pTxtBufferInfo->N64Width*height*2;
+#ifdef _RICE6FB
+						FBmgr.CopyD3DSurfaceToRDRAM(info.CI_Info.dwAddr, fmt, info.CI_Info.dwSize, width, height,
+							bufWidth, bufHeight, info.CI_Info.dwAddr, memsize, info.N64Width, D3DFMT_X8R8G8B8, pSourceSurface);
+#else
 						CopyBackToRDRAM(info.CI_Info.dwAddr, fmt, info.CI_Info.dwSize, width, height,
 							bufWidth, bufHeight, info.CI_Info.dwAddr, memsize, info.N64Width, D3DFMT_X8R8G8B8, pSourceSurface);
+#endif
 					}
 				}
 				SAFE_RELEASE(pSourceSurface);
@@ -2597,7 +2633,11 @@ HRESULT CD3DDevWrapper::SetTextureStageState(DWORD Stage,D3DTEXTURESTAGESTATETYP
 	if( m_pD3DDev != NULL )
 #endif
 	{
+#ifndef _XBOX
 		if( m_savedTextureStageStates[Stage][Type] != Value )
+#else
+		if (m_savedTextureStageStates[Stage][Type] != Value || !m_savedTextureStageStates[Stage][Type])
+#endif
 		{
 			switch( Type )
 			{
@@ -2707,7 +2747,7 @@ HRESULT CD3DDevWrapper::SetViewport(MYD3DVIEWPORT* pViewport)
 			m_savedViewport.MaxZ	!= pViewport->MaxZ )
 #endif
 		{
-#ifdef _RICE612
+#ifdef _XBOX
 			if( pViewport->Width <= 0 )	pViewport->Width = 1;
 			if( pViewport->Height <= 0 )	pViewport->Height = 1;
 #endif

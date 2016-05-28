@@ -935,7 +935,7 @@ TxtrCacheEntry* LoadTexture(uint32 tileno)
 #endif
 
 	// Option for faster loading tiles
-#ifndef _RICE560
+#ifdef _VID1964
 	if( g_curRomInfo.bFastLoadTile && status.primitiveType == PRIM_TEXTRECT && 
 		info->bSetBy == CMD_LOADTILE && ((gti.Pitch<<1)>>gti.Size) > 128 &&
 		((gti.Pitch<<1)>>gti.Size) <= 0x400  )
@@ -1043,7 +1043,7 @@ void DLParser_LoadTLut(Gfx *gfx)
 	uint32 dwCount;
 
 	uint32 dwTMEMOffset = gRDP.tiles[tileno].dwTMem - 256;				// starting location in the palettes
-	dwCount = ((uint16)((gfx->words.w1) >> 14) & 0x03FF) + 1;		// number to copy
+	dwCount = ((uint16)((gfx->words.cmd1) >> 14) & 0x03FF) + 1;		// number to copy
 	uint32 dwRDRAMOffset = 0;
 
 
@@ -1496,10 +1496,10 @@ void DLParser_SetTImg(Gfx *gfx)
 {
 	gRDP.textureIsChanged = true;
 
-	g_TI.dwFormat 	= gfx->setimg.fmt;
-	g_TI.dwSize   	= gfx->setimg.siz;
-	g_TI.dwWidth  	= gfx->setimg.width + 1;
-	g_TI.dwAddr   	= RSPSegmentAddr((gfx->setimg.addr));
+	g_TI.dwFormat 	= gfx->img.fmt;
+	g_TI.dwSize   	= gfx->img.siz;
+	g_TI.dwWidth  	= gfx->img.width + 1;
+	g_TI.dwAddr   	= RSPSegmentAddr((gfx->img.addr));
 	g_TI.bpl		= g_TI.dwWidth << g_TI.dwSize >> 1;
 
 }
@@ -1508,10 +1508,12 @@ void DLParser_TexRect(Gfx *gfx)
 {
 	Gtexrect *gtextrect = (Gtexrect *)gfx;
 
-#ifndef _DISABLE_VID1964
-	if( !status.bCIBufferIsRendered ) CGraphicsContext::g_pGraphicsContext->FirstDrawToNewCI();
-#else
+#ifdef _DISABLE_VID1964
 	status.bCIBufferIsRendered = true;
+#elif defined(_RICE6FB)
+	if( !status.bCIBufferIsRendered ) g_pFrameBufferManager->ActiveTextureBuffer();
+#else
+	if( !status.bCIBufferIsRendered ) CGraphicsContext::g_pGraphicsContext->FirstDrawToNewCI();
 #endif
 
 	status.primitiveType = PRIM_TEXTRECT;
@@ -1556,11 +1558,11 @@ void DLParser_TexRect(Gfx *gfx)
 	}
 
 
-	uint32 dwXH		= (((gfx->words.w0)>>12)&0x0FFF)/4;
-	uint32 dwYH		= (((gfx->words.w0)    )&0x0FFF)/4;
-	uint32 tileno	= ((gfx->words.w1)>>24)&0x07;
-	uint32 dwXL		= (((gfx->words.w1)>>12)&0x0FFF)/4;
-	uint32 dwYL		= (((gfx->words.w1)    )&0x0FFF)/4;
+	uint32 dwXH		= (((gfx->words.cmd0)>>12)&0x0FFF)/4;
+	uint32 dwYH		= (((gfx->words.cmd0)    )&0x0FFF)/4;
+	uint32 tileno	= ((gfx->words.cmd1)>>24)&0x07;
+	uint32 dwXL		= (((gfx->words.cmd1)>>12)&0x0FFF)/4;
+	uint32 dwYL		= (((gfx->words.cmd1)    )&0x0FFF)/4;
 	uint16 uS		= (uint16)(  dwCmd2>>16)&0xFFFF;
 	uint16 uT		= (uint16)(  dwCmd2    )&0xFFFF;
 	uint16  uDSDX 	= (uint16)((  dwCmd3>>16)&0xFFFF);
@@ -1627,8 +1629,8 @@ void DLParser_TexRect(Gfx *gfx)
 	else
 	{
 		if( status.bHandleN64TextureBuffer && //status.bDirectWriteIntoRDRAM && 
-			g_pTextureBufferInfo->CI_Info.dwFormat == gRDP.tiles[tileno].dwFormat && 
-			g_pTextureBufferInfo->CI_Info.dwSize == gRDP.tiles[tileno].dwSize && 
+			g_pTxtBufferInfo->CI_Info.dwFormat == gRDP.tiles[tileno].dwFormat && 
+			g_pTxtBufferInfo->CI_Info.dwSize == gRDP.tiles[tileno].dwSize && 
 			gRDP.tiles[tileno].dwFormat == TXT_FMT_CI && gRDP.tiles[tileno].dwSize == TXT_SIZE_8b )
 		{
 			if( options.enableHackForGames == HACK_FOR_YOSHI )
@@ -1662,7 +1664,7 @@ void DLParser_TexRect(Gfx *gfx)
 		}
 	}
 
-	if( status.bHandleN64TextureBuffer )	g_pTextureBufferInfo->maxUsedHeight = max(g_pTextureBufferInfo->maxUsedHeight,(int)dwYH);
+	if( status.bHandleN64TextureBuffer )	g_pTxtBufferInfo->maxUsedHeight = max(g_pTxtBufferInfo->maxUsedHeight,(int)dwYH);
 
 	ForceMainTextureIndex(curTile);
 }
@@ -1682,11 +1684,11 @@ void DLParser_TexRectFlip(Gfx *gfx)
 	// Increment PC so that it points to the right place
 	gDlistStack[gDlistStackPointer].pc += 16;
 
-	uint32 dwXH		= (((gfx->words.w0)>>12)&0x0FFF)/4;
-	uint32 dwYH		= (((gfx->words.w0)    )&0x0FFF)/4;
-	uint32 tileno	= ((gfx->words.w1)>>24)&0x07;
-	uint32 dwXL		= (((gfx->words.w1)>>12)&0x0FFF)/4;
-	uint32 dwYL		= (((gfx->words.w1)    )&0x0FFF)/4;
+	uint32 dwXH		= (((gfx->words.cmd0)>>12)&0x0FFF)/4;
+	uint32 dwYH		= (((gfx->words.cmd0)    )&0x0FFF)/4;
+	uint32 tileno	= ((gfx->words.cmd1)>>24)&0x07;
+	uint32 dwXL		= (((gfx->words.cmd1)>>12)&0x0FFF)/4;
+	uint32 dwYL		= (((gfx->words.cmd1)    )&0x0FFF)/4;
 	uint32 dwS		= (  dwCmd2>>16)&0xFFFF;
 	uint32 dwT		= (  dwCmd2    )&0xFFFF;
 	LONG  nDSDX 	= (LONG)(short)((  dwCmd3>>16)&0xFFFF);
@@ -1732,7 +1734,7 @@ void DLParser_TexRectFlip(Gfx *gfx)
 	CRender::g_pRender->TexRectFlip(dwXL, dwYL, dwXH, dwYH, t0u0, t0v0, t0u1, t0v1);
 	status.dwNumTrisRendered += 2;
 
-	if( status.bHandleN64TextureBuffer )	g_pTextureBufferInfo->maxUsedHeight = max(g_pTextureBufferInfo->maxUsedHeight,int(dwYL+(dwXH-dwXL)));
+	if( status.bHandleN64TextureBuffer )	g_pTxtBufferInfo->maxUsedHeight = max(g_pTxtBufferInfo->maxUsedHeight,int(dwYL+(dwXH-dwXL)));
 
 	ForceMainTextureIndex(curTile);
 }

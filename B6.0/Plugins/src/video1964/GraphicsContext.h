@@ -63,6 +63,7 @@ public:
 	virtual int ToggleFullscreen()=0;		// return 0 as the result is windowed
 
 	// Render-To-Texture functions
+#ifndef _RICE6FB
 #ifdef _RICE560
 	virtual int SetTextureBuffer(SetImgInfo &CIinfo, int ciInfoIdx=-1, bool toSaveBackBuffer=false);
 #else
@@ -92,12 +93,13 @@ public:
 		uint32 memsize=0xFFFFFFFF, uint32 pitch=0, D3DFORMAT surf_fmt=D3DFMT_A8R8G8B8, MYIDirect3DSurface *surf=NULL) {}
 	void UpdateFrameBufferBeforeUpdateFrame();
 
+	TextureBufferShortInfo m_textureColorBufferInfo;
+	TextureBufferShortInfo m_textureDepthBufferInfo;
+#endif
 	static void InitWindowInfo();
 	static void InitDeviceParameters();
 
 	bool m_supportTextureMirror;
-	TextureBufferShortInfo m_textureColorBufferInfo;
-	TextureBufferShortInfo m_textureDepthBufferInfo;
 
 public:
 	static	HWND		m_hWnd;
@@ -178,6 +180,11 @@ class CTextureBuffer
 public:
 	friend class CGraphicsContext;
 	friend class CDXGraphicsContext;
+#ifdef _RICE6FB
+	friend class FrameBufferManager;
+	friend class DXFrameBufferManager;
+	friend class OGLFrameBufferManager;
+#endif
 	CTextureBuffer(int width, int height, TextureBufferInfo* pInfo, TextureUsage usage)
 	{
 		m_beingRendered = false;
@@ -191,7 +198,9 @@ public:
 	virtual bool SetAsRenderTarget(bool enable)=0;
 	virtual void LoadTexture(TxtrCacheEntry* pEntry)=0;
 
-	virtual void SaveToN64RDRAM(uint32 addr, int width=0, int height=0, int ci_width=0) {};
+#ifdef _RICE6FB
+	virtual void StoreTextureBufferToRDRAM(int infoIdx)=0;
+#endif
 
 	void GetDimension(int &width, int &height)
 	{
@@ -213,14 +222,14 @@ protected:
 	CTexture* m_pTexture;
 	TextureBufferInfo* m_pInfo;
 };
-
+#ifndef _RICE6FB
 extern TextureBufferInfo gTextureBufferInfos[];
 extern TextureBufferInfo newTextureBufInfo;
-
+#endif
 #define NEW_TEXTURE_BUFFER
 
 extern TextureBufferInfo g_ZI_saves[2];
-extern TextureBufferInfo *g_pTextureBufferInfo;
+extern TextureBufferInfo *g_pTxtBufferInfo;
 
 
 #endif

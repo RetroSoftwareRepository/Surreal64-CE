@@ -408,7 +408,7 @@ void DecodedMux::Simplify(void)
 	m_bTexel1IsUsed = isUsed(MUX_TEXEL1);
 }
 
-void DecodedMux::Reformat(void)
+void DecodedMux::Reformat(bool do_complement)
 {
 	if( m_dWords[N64Cycle0RGB] == m_dWords[N64Cycle1RGB] )
 	{
@@ -438,15 +438,23 @@ void DecodedMux::Reformat(void)
 		N64CombinerType &m = m_n64Combiners[i];
 		//if( m.a == MUX_0 || m.c == MUX_0 || m.a ==  m.b )	m.a = m.b = m.c = MUX_0;
 		if( m.c == MUX_0 || m.a ==  m.b )	m.a = m.b = m.c = MUX_0;
-		if( m.b == MUX_1 || m.d == MUX_1 )  m.a = m.b = m.c = MUX_0;
+		if( do_complement && (m.b == MUX_1 || m.d == MUX_1) )  m.a = m.b = m.c = MUX_0;
 		if( m.a == MUX_0 && m.b == m.d ) 
 		{
 			m.a = m.b;
 			m.b = m.d = 0;
 			//Hack for Mario Tennis
-			if( m.c == MUX_TEXEL1 )
+			if( options.enableHackForGames == HACK_FOR_MARIO_TENNIS && m.c == MUX_TEXEL1 )
 			{
-				m.c = MUX_TEXEL0|MUX_COMPLEMENT;
+				if( do_complement )
+					m.c = MUX_TEXEL0|MUX_COMPLEMENT;
+				else
+				{
+					m.a = m.c;
+					m.c = m.b;
+					m.b = m.a;
+					m.a = MUX_1;
+				}
 			}
 			//m.c ^= MUX_COMPLEMENT;
 		}
@@ -463,7 +471,7 @@ void DecodedMux::Reformat(void)
 		//A=1, C=1, D=0		= 1-B
 
 		splitType[i] = CM_FMT_TYPE_NOT_CHECKED;	//All Type 1 will be changed to = D
-		if( m.c == MUX_0 || m.a==m.b || m.d == MUX_1 || m.b==MUX_1)
+		if( m.c == MUX_0 || m.a==m.b || ( do_complement && (m.d == MUX_1 || m.b==MUX_1)) )
 		{
 			splitType[i] = CM_FMT_TYPE_D;	//All Type 1 will be changed to = D
 			m.a = m.b = m.c = MUX_0;
@@ -483,7 +491,7 @@ void DecodedMux::Reformat(void)
 			m.a =  m.b = m.c = MUX_0;
 			if( m.d == MUX_COMBINED && i>=N64Cycle1RGB )	splitType[i] = CM_FMT_TYPE_NOT_USED;
 		}
-		else if( m.a == MUX_1 && m.c == MUX_1 && m.d == MUX_0 )
+		else if( m.a == MUX_1 && m.c == MUX_1 && m.d == MUX_0 && do_complement )
 		{
 			splitType[i] = CM_FMT_TYPE_D;	//All Type 1 will be changed to = D
 			m.d = m.b^MUX_COMPLEMENT;
@@ -553,7 +561,7 @@ void DecodedMux::Reformat(void)
 			continue;
 		}
 
-		if( m.a == MUX_1 && m.d == MUX_0 )
+		if( m.a == MUX_1 && m.d == MUX_0 && do_complement )
 		{
 			m.a = m.b^MUX_COMPLEMENT;
 			m.b = MUX_0;
@@ -581,7 +589,7 @@ void DecodedMux::Reformat(void)
 			continue;
 		}
 
-		if( m.a == MUX_1 && m.b!=m.d)
+		if( m.a == MUX_1 && m.b!=m.d && do_complement )
 		{
 			m.a = m.b^MUX_COMPLEMENT;
 			m.b = MUX_0;
@@ -615,7 +623,7 @@ void DecodedMux::Reformat(void)
 			continue;
 		}
 
-		if( m.c == m.d )	// (A-B)*C+C   ==> (A + B|C ) * C
+		if( m.c == m.d && do_complement )	// (A-B)*C+C   ==> (A + B|C ) * C
 		{
 			m.d = MUX_0;
 			m.b |= MUX_COMPLEMENT;
@@ -1360,7 +1368,7 @@ void DecodedMux::Hack(void)
 			ReplaceVal(MUX_TEXEL1, MUX_TEXEL0);
 		}
 	}
-	else if( options.enableHackForGames == HACK_FOR_ZELDA )
+	else if( options.enableHackForGames == HACK_FOR_ZELDA || options.enableHackForGames == HACK_FOR_ZELDA_MM)
 	{
 		if( m_dwMux1 == 0xfffd9238 && m_dwMux0 == 0x00ffadff )
 		{

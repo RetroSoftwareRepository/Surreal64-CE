@@ -670,7 +670,6 @@ void ReadConfiguration(void)
 	status.isMMXSupported = 1;
 	status.isSSESupported = 1;
 #else
-
 	status.isMMXSupported = isMMXSupported();
 	status.isSSESupported = isSSESupported();
 #endif
@@ -911,6 +910,10 @@ void GenerateCurrentRomOptions()
 	{
 		options.enableHackForGames = HACK_FOR_NASCAR;
 	}
+	else if ((strstr(g_curRomInfo.szGameName, "ZELDA") != 0) && (strstr(g_curRomInfo.szGameName, "MASK") != 0))
+	{
+		options.enableHackForGames = HACK_FOR_ZELDA_MM;
+	}
 	else if ((strstr(g_curRomInfo.szGameName, "ZELDA") != 0))
 	{
 		options.enableHackForGames = HACK_FOR_ZELDA;
@@ -1003,6 +1006,14 @@ void GenerateCurrentRomOptions()
 	{
 		options.enableHackForGames = HACK_FOR_TOPGEARRALLY;
 	}
+	else if ((strnicmp(g_curRomInfo.szGameName, "DUKE NUKEM",10) == 0))
+	{
+		options.enableHackForGames = HACK_FOR_DUKE_NUKEM;
+	}
+	else if ((stricmp(g_curRomInfo.szGameName, "MARIOKART64") == 0))
+	{
+		options.enableHackForGames = HACK_FOR_MARIO_KART;
+	}
 	else if ((stricmp(g_curRomInfo.szGameName, "QUAKE II") == 0))
 	{
 		options.enableHackForGames = HACK_FOR_QUAKE_2;
@@ -1051,6 +1062,7 @@ void Ini_GetRomOptions(LPGAMESETTING pGameSetting)
 	pGameSetting->bDisableTextureCRC	= IniSections[i].bDisableTextureCRC;
 	pGameSetting->bDisableCulling		= IniSections[i].bDisableCulling;
 	pGameSetting->bIncTexRectEdge		= IniSections[i].bIncTexRectEdge;
+	pGameSetting->bZHack				= IniSections[i].bZHack;
 	pGameSetting->bTextureScaleHack		= IniSections[i].bTextureScaleHack;
 	pGameSetting->bPrimaryDepthHack		= IniSections[i].bPrimaryDepthHack;
 	pGameSetting->bTexture1Hack			= IniSections[i].bTexture1Hack;
@@ -1166,6 +1178,11 @@ void Ini_StoreRomOptions(LPGAMESETTING pGameSetting)
 	if( IniSections[i].bIncTexRectEdge	!= pGameSetting->bIncTexRectEdge )
 	{
 		IniSections[i].bIncTexRectEdge		=pGameSetting->bIncTexRectEdge;
+		bIniIsChanged=true;
+	}
+	if( IniSections[i].bZHack	!= pGameSetting->bZHack )
+	{
+		IniSections[i].bZHack		=pGameSetting->bZHack;
 		bIniIsChanged=true;
 	}
 	if( IniSections[i].bTextureScaleHack	!= pGameSetting->bTextureScaleHack )
@@ -1940,6 +1957,7 @@ BOOL ReadIniFile()
 				newsection.bDisableTextureCRC = FALSE;
 				newsection.bDisableCulling = FALSE;
 				newsection.bIncTexRectEdge = FALSE;
+				newsection.bZHack = FALSE;
 				newsection.bTextureScaleHack = FALSE;
 				newsection.bFastLoadTile = FALSE;
 				newsection.bUseSmallerTexture = FALSE;
@@ -1995,6 +2013,9 @@ BOOL ReadIniFile()
 
 				if (lstrcmpi(left(readinfo,14), "IncTexRectEdge")==0)
 					IniSections[sectionno].bIncTexRectEdge=true;
+
+				if (lstrcmpi(left(readinfo,5), "ZHack")==0)
+					IniSections[sectionno].bZHack=true;
 
 				if (lstrcmpi(left(readinfo,16), "TexRectScaleHack")==0)
 					IniSections[sectionno].bTextureScaleHack=true;
@@ -2233,6 +2254,9 @@ void OutputSectionDetails(uint32 i, FILE * fh)
 	if (IniSections[i].bIncTexRectEdge)
 		fprintf(fh, "IncTexRectEdge\n");
 
+	if (IniSections[i].bZHack)
+		fprintf(fh, "ZHack\n");
+
 	if (IniSections[i].bTextureScaleHack)
 		fprintf(fh, "TexRectScaleHack\n");
 
@@ -2310,6 +2334,7 @@ int FindIniEntry(uint32 dwCRC1, uint32 dwCRC2, uint8 nCountryID, LPCTSTR szName)
 	newsection.bDisableTextureCRC = FALSE;
 	newsection.bDisableCulling = FALSE;
 	newsection.bIncTexRectEdge = FALSE;
+	newsection.bZHack = FALSE;
 	newsection.bTextureScaleHack = FALSE;
 	newsection.bFastLoadTile = FALSE;
 	newsection.bUseSmallerTexture = FALSE;

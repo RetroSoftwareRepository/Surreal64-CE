@@ -129,6 +129,7 @@ void CRender::ResetMatrices(uint32 size)
 
 
 	gRSP.bMatrixIsUpdated = true;
+	//gRSP.bWorldMatrixIsUpdated = true;
 	UpdateCombinedMatrix();
 }
 
@@ -215,7 +216,7 @@ void CRender::SetWorldView(const Matrix & mat, bool bPush, bool bReplace)
 	}
 
 	gRSPmodelViewTop = gRSP.modelviewMtxs[gRSP.modelViewMtxTop];
-/*	
+	
 	if( options.enableHackForGames == HACK_REVERSE_XY_COOR )
 	{
 		gRSPmodelViewTop = gRSPmodelViewTop * reverseXY;
@@ -225,8 +226,9 @@ void CRender::SetWorldView(const Matrix & mat, bool bPush, bool bReplace)
 		gRSPmodelViewTop = gRSPmodelViewTop * reverseY;
 	}
 	D3DXMatrixTranspose(&gRSPmodelViewTopTranspose, &gRSPmodelViewTop);
-*/
+
 	gRSP.bMatrixIsUpdated = true;
+	//gRSP.bWorldMatrixIsUpdated = true;
 }
 
 
@@ -236,7 +238,6 @@ void CRender::PopWorldView()
 	{
 		gRSP.modelViewMtxTop--;
 		gRSPmodelViewTop = gRSP.modelviewMtxs[gRSP.modelViewMtxTop];
-/*
 		if( options.enableHackForGames == HACK_REVERSE_XY_COOR )
 		{
 			gRSPmodelViewTop = gRSPmodelViewTop * reverseXY;
@@ -246,8 +247,8 @@ void CRender::PopWorldView()
 			gRSPmodelViewTop = gRSPmodelViewTop * reverseY;
 		}
 		D3DXMatrixTranspose(&gRSPmodelViewTopTranspose, &gRSPmodelViewTop);
-*/
 		gRSP.bMatrixIsUpdated = true;
+		//gRSP.bWorldMatrixIsUpdated = true;
 	}
 	else
 	{
@@ -394,11 +395,14 @@ bool CRender::FillRect(LONG nX0, LONG nY0, LONG nX1, LONG nY1, uint32 dwColor)
 
 bool CRender::Line3D(uint32 dwV0, uint32 dwV1, uint32 dwWidth)
 {
-#ifndef _DISABLE_VID1964
-	if( !status.bCIBufferIsRendered ) CGraphicsContext::g_pGraphicsContext->FirstDrawToNewCI();
-#else
+#ifdef _DISABLE_VID1964
 	status.bCIBufferIsRendered = true;
+#elif defined(_RICE6FB)
+	if( !status.bCIBufferIsRendered ) g_pFrameBufferManager->ActiveTextureBuffer();
+#else
+	if( !status.bCIBufferIsRendered ) CGraphicsContext::g_pGraphicsContext->FirstDrawToNewCI();
 #endif
+
 
 	m_line3DVtx[0].z = (g_vecProjected[dwV0].z + 1.0f) * 0.5f;
 	m_line3DVtx[1].z = (g_vecProjected[dwV1].z + 1.0f) * 0.5f;
@@ -409,7 +413,7 @@ bool CRender::Line3D(uint32 dwV0, uint32 dwV1, uint32 dwWidth)
 	if( status.bHandleN64TextureBuffer && !status.bDirectWriteIntoRDRAM )	status.bFrameBufferIsDrawn = true;
 	if( status.bHandleN64TextureBuffer ) 
 	{
-		g_pTextureBufferInfo->maxUsedHeight = g_pTextureBufferInfo->N64Height;
+		g_pTxtBufferInfo->maxUsedHeight = g_pTxtBufferInfo->N64Height;
 		if( status.bHandleN64TextureBuffer && !status.bDirectWriteIntoRDRAM )	
 		{
 			status.bFrameBufferIsDrawn = true;
@@ -545,7 +549,7 @@ bool CRender::TexRect(LONG nX0, LONG nY0, LONG nX1, LONG nY1, float fS0, float f
 
 	PrepareTextures();
 
-	if( status.bHandleN64TextureBuffer && g_pTextureBufferInfo->CI_Info.dwSize == TXT_SIZE_8b )	
+	if( status.bHandleN64TextureBuffer && g_pTxtBufferInfo->CI_Info.dwSize == TXT_SIZE_8b )	
 	{
 		return true;
 	}
@@ -1028,11 +1032,14 @@ void myVec3Transform(float *vecout, float *vecin, float* m)
 	vecout[2] = (m[2]*vecin[0]+m[6]*vecin[1]+m[10]*vecin[2]+m[14])/w;
 }
 
-void CRender::SetTextureEnableAndScale(int dwTile, bool bEnable, float fScaleX, float fScaleY)
+void CRender::SetTextureEnable(bool bEnable)
 {
 	gRSP.bTextureEnabled = bEnable;
+}
 
-	if( bEnable )
+void CRender::SetTextureScale(int dwTile,  float fScaleX, float fScaleY)
+{
+	if( gRSP.bTextureEnabled )
 	{
 		if( gRSP.curTile != dwTile )
 			gRDP.textureIsChanged = true;
@@ -1107,10 +1114,12 @@ void CRender::SetViewport(int nLeft, int nTop, int nRight, int nBottom, int maxZ
 extern bool bHalfTxtScale;
 bool CRender::DrawTriangles()
 {
-#ifndef _DISABLE_VID1964
-	if( !status.bCIBufferIsRendered ) CGraphicsContext::g_pGraphicsContext->FirstDrawToNewCI();
-#else
+#ifdef _DISABLE_VID1964
 	status.bCIBufferIsRendered = true;
+#elif defined(_RICE6FB)
+	if( !status.bCIBufferIsRendered ) g_pFrameBufferManager->ActiveTextureBuffer();
+#else
+	if( !status.bCIBufferIsRendered ) CGraphicsContext::g_pGraphicsContext->FirstDrawToNewCI();
 #endif
 	if( status.bVIOriginIsUpdated == true && currentRomOptions.screenUpdateSetting==SCREEN_UPDATE_AT_1ST_PRIMITIVE )
 	{
@@ -1155,7 +1164,7 @@ bool CRender::DrawTriangles()
 	}
 
 	/*
-	if( status.bHandleN64TextureBuffer && g_pTextureBufferInfo->CI_Info.dwSize == TXT_SIZE_8b )	
+	if( status.bHandleN64TextureBuffer && g_pTxtBufferInfo->CI_Info.dwSize == TXT_SIZE_8b )	
 	{
 		gRSP.numVertices = 0;
 		return true;
@@ -1165,7 +1174,7 @@ bool CRender::DrawTriangles()
 	if (gRSP.numVertices == 0)	return true;
 	if( status.bHandleN64TextureBuffer )
 	{
-		g_pTextureBufferInfo->maxUsedHeight = g_pTextureBufferInfo->N64Height;
+		g_pTxtBufferInfo->maxUsedHeight = g_pTxtBufferInfo->N64Height;
 		if( !status.bDirectWriteIntoRDRAM )	
 		{
 			status.bFrameBufferIsDrawn = true;
@@ -1256,13 +1265,20 @@ bool CRender::DrawTriangles()
 		}
 	}
 
-	if( status.bHandleN64TextureBuffer && g_pTextureBufferInfo->CI_Info.dwSize == TXT_SIZE_8b )
+	if( status.bHandleN64TextureBuffer && g_pTxtBufferInfo->CI_Info.dwSize == TXT_SIZE_8b )
 	{
 		ZBufferEnable(FALSE);
 	}
-#ifndef _OLDCLIPPER
-	ApplyScissorWithClipRatio();
+#ifdef _OLDCLIPPER
+	ApplyScissorWithClipRatio(); //Verify
 #endif
+
+	if( g_curRomInfo.bZHack )
+	{
+		extern void HackZAll();
+		HackZAll();
+	}
+
 	bool res = RenderFlushTris();
 	g_clippedVtxCount = 0;
 
@@ -1276,6 +1292,259 @@ bool CRender::DrawTriangles()
 	return res;
 }
 
+inline int ReverseCITableLookup(uint32 *pTable, int size, uint32 val)
+{
+	for( int i=0; i<size; i++)
+	{
+		if( pTable[i] == val )
+			return i;
+	}
+
+	return 0;
+}
+
+bool SaveCITextureToFile(TxtrCacheEntry &entry, char *filename, bool bShow, bool bWholeTexture )
+{/*
+	if( !( (gRDP.otherMode.text_tlut>=2 || entry.ti.Format == TXT_FMT_CI || entry.ti.Format == TXT_FMT_RGBA) && entry.ti.Size <= TXT_SIZE_8b ) )
+	{
+		// No a CI texture
+		return false;
+	}
+	if ( entry.ti.TLutFmt != TLUT_FMT_RGBA16 && entry.ti.TLutFmt != TLUT_FMT_IA16 )
+	{
+		TRACE0("Invalid Tlut format");
+		return false;
+	}
+
+	if( !entry.pTexture )
+	{
+		TRACE0("Null texture");
+		return false;
+	}
+
+	if( _stricmp(right(filename,4),".bmp") != 0 )	strcat(filename,".bmp");
+
+	if( PathFileExists(filename) )
+	{
+		return false;
+	}
+
+	uint32 *pTable = NULL;
+	int tableSize;
+	uint16 * pPal = (uint16 *)entry.ti.PalAddress;
+
+	// Create the pallette table
+	if( entry.ti.Size == TXT_SIZE_4b )
+	{
+		// 4-bit table
+		tableSize = 16;
+		pTable = new uint32[16];
+
+		for( int i=0; i<16; i++ )
+		{
+			pTable[i] = entry.ti.TLutFmt == TLUT_FMT_RGBA16 ? Convert555ToRGBA(pPal[i^1]) : ConvertIA16ToRGBA(pPal[i^1]);
+		}
+	}
+	else
+	{
+		// 8-bit table
+		tableSize = 256;
+		pTable = new uint32[256];
+
+		for( int i=0; i<256; i++ )
+		{
+			pTable[i] = entry.ti.TLutFmt == TLUT_FMT_RGBA16 ? Convert555ToRGBA(pPal[i^1]) : ConvertIA16ToRGBA(pPal[i^1]);
+		}
+	}
+
+	// Reversely convert current texture to indexed textures
+	CTexture &texture = *entry.pTexture;
+	//int width = bWholeTexture ? texture.m_dwCreatedTextureWidth : texture.m_dwWidth;
+	//int height = bWholeTexture ? texture.m_dwCreatedTextureHeight : texture.m_dwHeight;
+	int width = bWholeTexture ? texture.m_dwCreatedTextureWidth : entry.ti.WidthToLoad;
+	int height = bWholeTexture ? texture.m_dwCreatedTextureHeight : entry.ti.HeightToLoad;
+	int bufSizePerLine = (((((width << entry.ti.Size) + 1 ) >> 1)+3) >> 2)*4;	// pad to 32bit boundary
+	int bufSize = bufSizePerLine*height;
+	BYTE *pbuf = new BYTE[bufSize];
+
+	DrawInfo srcInfo;
+	if( texture.StartUpdate(&srcInfo) )
+	{
+		int idx = 0;
+		for( int i=height-1; i>=0; i--)
+		{
+			uint32 *pSrc = (uint32*)((BYTE*)srcInfo.lpSurface+srcInfo.lPitch * i);
+			for( int j=0; j<width; j++)
+			{
+				int val = ReverseCITableLookup(pTable, tableSize, *pSrc);
+				pSrc++;
+
+				if( entry.ti.Size == TXT_SIZE_4b )
+				{
+					// 4 bits
+					if( idx%2 )
+					{
+						// 1
+						pbuf[idx>>1] = (pbuf[idx>>1]<<4) | val;
+						idx++;
+					}
+					else
+					{
+						// 0
+						pbuf[idx>>1] = (BYTE)val;
+						idx++;
+					}
+				}
+				else
+				{
+					// 8 bits
+					pbuf[idx++] = (BYTE)val;
+				}
+			}
+
+			if( entry.ti.Size == TXT_SIZE_4b )
+			{
+				if( idx%8 )	idx = (idx/8+1)*8;
+			}
+			else
+			{
+				if( idx%4 )	idx = (idx/4+1)*4;
+			}
+		}
+
+
+		texture.EndUpdate(&srcInfo);
+	}
+
+	// Create BMP color indexed file
+
+	BITMAPFILEHEADER fileHeader;
+	BITMAPINFOHEADER infoHeader;
+	HANDLE hBitmapFile;
+
+	infoHeader.biSize = sizeof( BITMAPINFOHEADER );
+	infoHeader.biWidth = width;
+	infoHeader.biHeight = height;
+	infoHeader.biPlanes = 1;
+	infoHeader.biBitCount = entry.ti.Size == TXT_SIZE_4b ? 4 : 8;
+	infoHeader.biCompression = BI_RGB;
+	infoHeader.biSizeImage = bufSize;
+	infoHeader.biXPelsPerMeter = 0;
+	infoHeader.biYPelsPerMeter = 0;
+	infoHeader.biClrUsed = 0;
+	infoHeader.biClrImportant = 0;
+
+	fileHeader.bfType = 19778;
+	fileHeader.bfSize = sizeof( BITMAPFILEHEADER ) + sizeof( BITMAPINFOHEADER ) + infoHeader.biSizeImage + tableSize*4;
+	fileHeader.bfReserved1 = fileHeader.bfReserved2 = 0;
+	fileHeader.bfOffBits = sizeof( BITMAPFILEHEADER ) + sizeof( BITMAPINFOHEADER ) + tableSize*4;
+
+
+	uint32 res;
+	hBitmapFile = CreateFile( filename, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL );
+	if( hBitmapFile != INVALID_HANDLE_VALUE )
+	{
+		WriteFile( hBitmapFile, &fileHeader, sizeof( BITMAPFILEHEADER ), (DWORD*)&res, NULL );
+		WriteFile( hBitmapFile, &infoHeader, sizeof( BITMAPINFOHEADER ), (DWORD*)&res, NULL );
+		WriteFile( hBitmapFile, pTable, tableSize*4, (DWORD*)&res, NULL );
+		WriteFile( hBitmapFile, pbuf, infoHeader.biSizeImage, (DWORD*)&res, NULL );
+
+		CloseHandle( hBitmapFile );
+		if( bShow )
+		{
+			ShellExecute(g_GraphicsInfo.hWnd, "open", filename, NULL, NULL, SW_SHOWNORMAL);
+		}
+	}
+	else
+	{
+		// Do something
+		TRACE1("Fail to create file %s", filename);
+	}
+
+	// Clean up
+	delete [] pTable;
+	delete [] pbuf;
+*/
+	return true;
+
+}
+
+void CRender::SaveTextureToFile(CTexture &texture, char *filename, TextureChannel channel, bool bShow, bool bWholeTexture, int width, int height)
+{/*
+	if( width < 0 || height < 0 )
+	{
+		width = bWholeTexture ? texture.m_dwCreatedTextureWidth : texture.m_dwWidth;
+		height = bWholeTexture ? texture.m_dwCreatedTextureHeight : texture.m_dwHeight;
+	}
+
+	BYTE *pbuf = new BYTE[width*height* (channel == TXT_RGBA ? 4 : 3)];
+	if( pbuf )
+	{
+		DrawInfo srcInfo;	
+		if( texture.StartUpdate(&srcInfo) )
+		{
+			if( channel == TXT_RGBA )
+			{
+				uint32 *pbuf2 = (uint32*)pbuf;
+				for( int i=height-1; i>=0; i--)
+				{
+					uint32 *pSrc = (uint32*)((BYTE*)srcInfo.lpSurface+srcInfo.lPitch * i);
+					for( int j=0; j<width; j++)
+					{
+						*pbuf2++ = *pSrc++;
+					}
+				}
+
+				if( SaveRGBABufferToPNGFile(filename, (BYTE*)pbuf, width, height ) )
+				//if( SaveRGBABufferToPNGFile(filename, (BYTE*)srcInfo.lpSurface, width, height, srcInfo.lPitch ) )
+				{
+					if( bShow )
+						ShellExecute(g_GraphicsInfo.hWnd, "open", filename, NULL, NULL, SW_SHOWNORMAL);
+				}
+			}
+			else
+			{
+				BYTE *pbuf2 = pbuf;
+				for( int i=height-1; i>=0; i--)
+				{
+					BYTE *pSrc = (BYTE*)srcInfo.lpSurface+srcInfo.lPitch * i;
+					for( int j=0; j<width; j++)
+					{
+						if( channel == TXT_ALPHA )
+						{
+							pbuf2[0] = pbuf2[1] = pbuf2[2] = pSrc[3];
+						}
+						else
+						{
+							pbuf2[0] = pSrc[0];
+							pbuf2[1] = pSrc[1];
+							pbuf2[2] = pSrc[2];
+						}
+
+						pbuf2 += 3;
+						pSrc += 4;
+					}
+				}
+
+				if( SaveRGBBufferToFile(filename, pbuf, width, height ) )
+				{
+					if( bShow )
+						ShellExecute(g_GraphicsInfo.hWnd, "open", filename, NULL, NULL, SW_SHOWNORMAL);
+				}
+			}
+			texture.EndUpdate(&srcInfo);
+		}
+		else
+		{
+			TRACE0("Cannot lock texture");
+		}
+		delete [] pbuf;
+	}
+	else
+	{
+		TRACE0("Out of memory");
+	}*/
+}
 extern TextureBufferInfo gTextureBufferInfos[];
 void SetVertexTextureUVCoord(TexCord &dst, float s, float t, int tile, TxtrCacheEntry *pEntry)
 {
@@ -1606,3 +1875,96 @@ void CRender::SetTextureFilter(uint32 dwFilter)
 
 	ApplyTextureFilter();
 }
+bool SaveRGBBufferToFile(char *filename, unsigned char *buf, int width, int height, int pitch)
+{/*
+	if( pitch == -1 )
+		pitch = width*3;
+
+	if( _stricmp(right(filename,3),"bmp") == 0 )
+	{
+		//if( _stricmp(right(filename,4),".bmp") != 0 )	strcat(filename,".bmp");
+
+		BITMAPFILEHEADER fileHeader;
+		BITMAPINFOHEADER infoHeader;
+		HANDLE hBitmapFile;
+
+		infoHeader.biSize = sizeof( BITMAPINFOHEADER );
+		infoHeader.biWidth = width;
+		infoHeader.biHeight = height;
+		infoHeader.biPlanes = 1;
+		infoHeader.biBitCount = 24;
+		infoHeader.biCompression = BI_RGB;
+		infoHeader.biSizeImage = width * height * 3;
+		infoHeader.biXPelsPerMeter = 0;
+		infoHeader.biYPelsPerMeter = 0;
+		infoHeader.biClrUsed = 0;
+		infoHeader.biClrImportant = 0;
+
+		fileHeader.bfType = 19778;
+		fileHeader.bfSize = sizeof( BITMAPFILEHEADER ) + sizeof( BITMAPINFOHEADER ) + infoHeader.biSizeImage;
+		fileHeader.bfReserved1 = fileHeader.bfReserved2 = 0;
+		fileHeader.bfOffBits = sizeof( BITMAPFILEHEADER ) + sizeof( BITMAPINFOHEADER );
+
+
+		uint32 res;
+		hBitmapFile = CreateFile( filename, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL );
+		if( hBitmapFile != INVALID_HANDLE_VALUE )
+		{
+			WriteFile( hBitmapFile, &fileHeader, sizeof( BITMAPFILEHEADER ), (DWORD*)&res, NULL );
+			WriteFile( hBitmapFile, &infoHeader, sizeof( BITMAPINFOHEADER ), (DWORD*)&res, NULL );
+			WriteFile( hBitmapFile, buf, infoHeader.biSizeImage, (DWORD*)&res, NULL );
+
+			CloseHandle( hBitmapFile );
+			return true;
+		}
+		else
+		{
+			// Do something
+			TRACE1("Fail to create file %s", filename);
+			return false;
+		}	
+	}
+	else
+	{
+		if( _stricmp(right(filename,4),".png") != 0 )	strcat(filename,".png");
+
+		struct BMGImageStruct img;
+		InitBMGImage(&img);
+		img.bits = buf;
+		img.bits_per_pixel = 24;
+		img.height = height;
+		img.width = width;
+		img.scan_width = pitch;
+		BMG_Error code = WritePNG(filename, img);
+
+		if( code == BMG_OK )
+			return true;
+		else
+			return false;
+	}*/
+	return true;
+}
+
+bool SaveRGBABufferToPNGFile(char *filename, unsigned char *buf, int width, int height, int pitch)
+{/*
+	if( pitch == -1 )
+		pitch = width*4;
+
+	if( _stricmp(right(filename,4),".png") != 0 )	strcat(filename,".png");
+
+	struct BMGImageStruct img;
+	InitBMGImage(&img);
+	img.bits = buf;
+	img.bits_per_pixel = 32;
+	img.height = height;
+	img.width = width;
+	img.scan_width = pitch;
+	BMG_Error code = WritePNG(filename, img);
+
+	if( code == BMG_OK )
+		return true;
+	else
+		return false;*/
+	return true;
+}
+
