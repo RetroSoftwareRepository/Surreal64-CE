@@ -63,6 +63,7 @@ extern int					g_clippedVtxCount;
 extern uint8					g_oglVtxColors[1000][4];
 extern uint32				g_clipFlag[MAX_VERTS];
 extern uint32				g_clipFlag2[MAX_VERTS];
+extern float				g_fFogCoord[MAX_VERTS];
 
 //#define INIT_VERTEX_METHOD_2
 
@@ -83,6 +84,7 @@ extern Matrix	gRSPmodelViewTop;
 extern Matrix	gRSPmodelViewTopTranspose;
 extern float	gRSPfFogMin;
 extern float	gRSPfFogMax;
+extern float	gRSPfFogDivider;
 
 /************************************************************************/
 /*      Don't move                                                      */
@@ -126,6 +128,9 @@ typedef struct
 
 	uint32	ambientLightColor;
 	uint32	ambientLightIndex;
+
+	float	fFogMul;
+	float	fFogOffset;
 
 	uint32	projectionMtxTop;
 	uint32	modelViewMtxTop;
@@ -244,7 +249,7 @@ void SetVertexXYZ(uint32 vertex, float x, float y, float z);
 void ModifyVertexInfo(uint32 where, uint32 vertex, uint32 val);
 void ProcessVertexDataDKR(uint32 dwAddr, uint32 dwV0, uint32 dwNum);
 void SetLightCol(uint32 dwLight, uint32 dwCol);
-void SetLightDirection(uint32 dwLight, float x, float y, float z);
+void SetLightDirection(uint32 dwLight, float x, float y, float z, float range);
 void ForceMainTextureIndex(int dwTile); 
 void UpdateCombinedMatrix();
 

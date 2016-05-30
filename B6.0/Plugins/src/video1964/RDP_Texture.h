@@ -935,7 +935,7 @@ TxtrCacheEntry* LoadTexture(uint32 tileno)
 #endif
 
 	// Option for faster loading tiles
-#ifdef _VID1964
+#ifdef _VID1964_TILE
 	if( g_curRomInfo.bFastLoadTile && status.primitiveType == PRIM_TEXTRECT && 
 		info->bSetBy == CMD_LOADTILE && ((gti.Pitch<<1)>>gti.Size) > 128 &&
 		((gti.Pitch<<1)>>gti.Size) <= 0x400  )
@@ -1104,7 +1104,7 @@ void DLParser_LoadBlock(Gfx *gfx)
 	TMEMLoadMapInfo &info = g_tmemLoadAddrMap[tile.dwTMem];
 
 	info.bSwapped = (dxt == 0? TRUE : FALSE);
-#if defined(_RICE560) || defined(_RICE612)
+#if defined(_RICE560_TILE) || defined(_RICE612_TILE)
 	info.sl = tile.hilite_sl = tile.sl = uls;
 	info.sh = tile.hilite_sh = tile.sh = lrs;
 	info.tl = tile.tl = ult;

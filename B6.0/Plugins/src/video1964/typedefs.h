@@ -217,7 +217,8 @@ typedef struct
 			float x;
 			float y;
 			float z;
-			float dummy;
+			float range;		// Range == 0  for directional light
+								// Range != 0  for point light, Zelda MM
 		};
 #if _MSC_VER > 1200
 		__m64 dir64[2];

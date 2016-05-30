@@ -201,11 +201,26 @@ void RSP_MoveMemLight(uint32 dwLight, uint32 dwAddr)
 	s8 * pcBase = g_pRDRAMs8 + dwAddr;
 	uint32 * pdwBase = (uint32 *)pcBase;
 
-	gRSPn64lights[dwLight].dwRGBA		= pdwBase[0];
-	gRSPn64lights[dwLight].dwRGBACopy	= pdwBase[1];
-	gRSPn64lights[dwLight].x			= pcBase[8 ^ 0x3];
-	gRSPn64lights[dwLight].y			= pcBase[9 ^ 0x3];
-	gRSPn64lights[dwLight].z			= pcBase[10 ^ 0x3];
+
+	float range = 0,x,y,z;
+	if( options.enableHackForGames == HACK_FOR_ZELDA_MM && (pdwBase[0]&0xFF) == 0x08 && (pdwBase[1]&0xFF) == 0xFF )
+	{
+		gRSPn64lights[dwLight].dwRGBA		= pdwBase[0];
+		gRSPn64lights[dwLight].dwRGBACopy	= pdwBase[1];
+		short* pdwBase16					= (short*)pcBase;
+		x			= pdwBase16[5];
+		y			= pdwBase16[4];
+		z			= pdwBase16[7];
+		range								= pdwBase16[6];
+	}
+	else
+	{
+		gRSPn64lights[dwLight].dwRGBA		= pdwBase[0];
+		gRSPn64lights[dwLight].dwRGBACopy	= pdwBase[1];
+		x		= pcBase[8 ^ 0x3];
+		y		= pcBase[9 ^ 0x3];
+		z		= pcBase[10 ^ 0x3];
+	}
 
 					
 	if (dwLight == gRSP.ambientLightIndex)
@@ -223,9 +238,10 @@ void RSP_MoveMemLight(uint32 dwLight, uint32 dwAddr)
 		{
 		}
 		SetLightDirection(dwLight, 
-			gRSPn64lights[dwLight].x,
-			gRSPn64lights[dwLight].y,
-			gRSPn64lights[dwLight].z);
+			x, 
+			y, 
+			z,
+			range);
 	}
 }
 
