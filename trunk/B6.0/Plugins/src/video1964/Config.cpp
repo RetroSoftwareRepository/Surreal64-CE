@@ -741,7 +741,7 @@ void ReadConfiguration(void)
 		windowSetting.uDisplayWidth = windowSetting.uWindowDisplayWidth;
 		windowSetting.uDisplayHeight = windowSetting.uWindowDisplayHeight;
 
-		//CDeviceBuilder::SelectDeviceType( DIRECTX_DEVICE );
+		CDeviceBuilder::SelectDeviceType( DIRECTX_DEVICE );
 #endif
 	}
 	else // TestRegistry is always false on XBOX. 

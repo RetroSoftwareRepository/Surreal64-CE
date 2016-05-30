@@ -129,6 +129,7 @@ uint32		g_dwVtxDifColor[MAX_VERTS];
 uint32		g_clipFlag[MAX_VERTS];
 uint32		g_clipFlag2[MAX_VERTS];
 RenderTexture g_textures[MAX_TEXTURES];
+float		g_fFogCoord[MAX_VERTS];
 
 TLITVERTEX			g_vtxBuffer[1000];
 TLITVERTEX			g_clippedVtxBuffer[2000];
@@ -138,6 +139,7 @@ unsigned int		g_minIndex, g_maxIndex;
 uint8				g_oglVtxColors[1000][4];
 float				gRSPfFogMin;
 float				gRSPfFogMax;
+float				gRSPfFogDivider;
 
 uint32			gRSPnumLights;
 Light	gRSPlights[16];
@@ -527,7 +529,7 @@ void InitRenderBase()
 		ProcessVertexData = ProcessVertexDataSSE;
 	}
 
-	gRSPfFogMin = gRSPfFogMax = 0.0f;
+	gRSPfFogMin = gRSP.fFogMul = gRSP.fFogOffset = gRSPfFogMax = 0.0f;
 	windowSetting.fMultX = windowSetting.fMultY = 2.0f;
 	windowSetting.vpLeftW = windowSetting.vpTopW = 0;
 	windowSetting.vpRightW = windowSetting.vpWidthW = 640;
@@ -572,15 +574,7 @@ void InitRenderBase()
 	gRSP.real_clip_scissor_top = 0;
 	gRSP.real_clip_scissor_right = 640;
 	gRSP.real_clip_scissor_bottom = 480;
-#ifndef _OLDCLIPPER
-	windowSetting.clipping.left = 0;
-	windowSetting.clipping.top = 0;
-	windowSetting.clipping.right = 640;
-	windowSetting.clipping.bottom = 480;
-	windowSetting.clipping.width = 640;
-	windowSetting.clipping.height = 480;
-	windowSetting.clipping.needToClip = false;
-#endif
+
 	gRSP.real_clip_ratio_negx = 1;
 	gRSP.real_clip_ratio_negy = 1;
 	gRSP.real_clip_ratio_posx = 1;
@@ -632,6 +626,8 @@ void SetFogMinMax(float fMin, float fMax, float fMul, float fOffset)
 		gRSPfFogMin = max(0,fMin/500-1);
 		gRSPfFogMax = fMax/500-1;
 	}
+
+	gRSPfFogDivider = 220/(gRSPfFogMax-gRSPfFogMin); //CHECKME 255 replace with 220, Aristotle claimed to of improved fog rendering and this is the only real thing that has changed?
 	CRender::g_pRender->SetFogMinMax(fMin, fMax);
 }
 
@@ -755,6 +751,18 @@ void InitVertex(uint32 dwV, uint32 vtxIndex, bool bTexture, bool openGL)
 		if( gRSP.bProcessSpecularColor )
 		{
 			v.dcSpecular = CRender::g_pRender->PostProcessSpecularColor();
+			if( gRSP.bFogEnabled && !options.bUseLinearFog )
+			{
+				v.dcSpecular &= 0x00FFFFFF;
+				uint32	fogFct = 0xFF-(uint8)((g_fFogCoord[dwV]-gRSPfFogMin)*gRSPfFogDivider);
+				v.dcSpecular |= (fogFct<<24);
+			}
+		}
+		else if( gRSP.bFogEnabled && !options.bUseLinearFog )
+		{
+			v.dcSpecular &= 0x00FFFFFF;
+			uint32	fogFct = 0xFF-(uint8)((g_fFogCoord[dwV]-gRSPfFogMin)*gRSPfFogDivider);
+			v.dcSpecular |= (fogFct<<24);
 		}
 	}
 
@@ -859,7 +867,89 @@ void InitVertex(uint32 dwV, uint32 vtxIndex, bool bTexture, bool openGL)
 
 }
 
-uint32 LightVert(D3DXVECTOR4 & norm)
+uint32 LightVert(D3DXVECTOR4 & norm, int vidx)
+{
+	float fCosT;
+
+	// Do ambient
+	register float r = gRSP.fAmbientLightR;
+	register float g = gRSP.fAmbientLightG;
+	register float b = gRSP.fAmbientLightB;
+
+	if( options.enableHackForGames != HACK_FOR_ZELDA_MM )
+	{
+		for (register unsigned int l=0; l < gRSPnumLights; l++)
+		{
+			fCosT = norm.x*gRSPlights[l].tx + norm.y*gRSPlights[l].ty + norm.z*gRSPlights[l].tz; 
+
+			if (fCosT > 0 )
+			{
+				r += gRSPlights[l].fr * fCosT;
+				g += gRSPlights[l].fg * fCosT;
+				b += gRSPlights[l].fb * fCosT;
+			}
+		}
+	}
+	else
+	{
+		D3DXVECTOR4 v;
+		bool transformed = false;
+
+		for (register unsigned int l=0; l < gRSPnumLights; l++)
+		{
+			if( gRSPlights[l].range == 0 )
+			{
+				// Regular directional light
+				fCosT = norm.x*gRSPlights[l].x + norm.y*gRSPlights[l].y + norm.z*gRSPlights[l].z; 
+
+				if (fCosT > 0 )
+				{
+					r += gRSPlights[l].fr * fCosT;
+					g += gRSPlights[l].fg * fCosT;
+					b += gRSPlights[l].fb * fCosT;
+				}
+			}
+			else //if( (gRSPlights[l].col&0x00FFFFFF) != 0x00FFFFFF )
+			{
+				// Point light
+				if( !transformed )
+				{
+					D3DXVec3Transform(&v, (D3DXVECTOR3*)&g_vtxNonTransformed[vidx], &gRSPmodelViewTop);	// Convert to w=1
+					transformed = true;
+				}
+
+				D3DXVECTOR3 dir(gRSPlights[l].x - v.x, gRSPlights[l].y - v.y, gRSPlights[l].z - v.z);
+				//D3DXVECTOR3 dir(v.x-gRSPlights[l].x, v.y-gRSPlights[l].y, v.z-gRSPlights[l].z);
+				float d2 = sqrtf(dir.x*dir.x+dir.y*dir.y+dir.z*dir.z);
+				dir.x /= d2;
+				dir.y /= d2;
+				dir.z /= d2;
+
+				fCosT = norm.x*dir.x + norm.y*dir.y + norm.z*dir.z; 
+
+				if (fCosT > 0 )
+				{
+					//float f = d2/gRSPlights[l].range*50;
+					float f = d2/15000*50;
+					f = 1 - min(f,1);
+					fCosT *= f*f;
+
+					r += gRSPlights[l].fr * fCosT;
+					g += gRSPlights[l].fg * fCosT;
+					b += gRSPlights[l].fb * fCosT;
+				}
+
+			}
+		}
+	}
+
+	if (r > 255) r = 255;
+	if (g > 255) g = 255;
+	if (b > 255) b = 255;
+	return ((0xff000000)|(((uint32)r)<<16)|(((uint32)g)<<8)|((uint32)b));
+}
+
+uint32 LightVertOld(D3DXVECTOR4 & norm)
 {
 	float fCosT;
 
@@ -1020,6 +1110,12 @@ void ProcessVertexDataSSE(uint32 dwAddr, uint32 dwV0, uint32 dwNum)
 
 		SSEVec3Transform(i);
 
+		if( gRSP.bFogEnabled && !options.bUseLinearFog )
+		{
+			g_fFogCoord[i] = g_vecProjected[i].z;
+			if( g_vecProjected[i].w < 0 || g_vecProjected[i].z < 0 || g_fFogCoord[i] < gRSPfFogMin )
+				g_fFogCoord[i] = gRSPfFogMin;
+		}
 		ReplaceAlphaWithFogFactor(i);
 
 
@@ -1032,7 +1128,10 @@ void ProcessVertexDataSSE(uint32 dwAddr, uint32 dwV0, uint32 dwNum)
 			g_normal.z = (float)vert.norma.nz;
 
 			SSEVec3TransformNormal();
-			g_dwVtxDifColor[i] = SSELightVert();
+			if( options.enableHackForGames != HACK_FOR_ZELDA_MM )
+				g_dwVtxDifColor[i] = SSELightVert();
+			else
+				g_dwVtxDifColor[i] = LightVert(g_normal,i);
 			*(((uint8*)&(g_dwVtxDifColor[i]))+3) = vert.rgba.a;	// still use alpha from the vertex
 		}
 		else
@@ -1122,6 +1221,13 @@ void ProcessVertexDataNoSSE(uint32 dwAddr, uint32 dwV0, uint32 dwNum)
 			g_vecProjected[i].z = g_vtxTransformed[i].z * g_vecProjected[i].w;
 		}
 
+		if( gRSP.bFogEnabled && !options.bUseLinearFog )
+		{
+			g_fFogCoord[i] = g_vecProjected[i].z;
+			if( g_vecProjected[i].w < 0 || g_vecProjected[i].z < 0 || g_fFogCoord[i] < gRSPfFogMin )
+				g_fFogCoord[i] = gRSPfFogMin;
+		}
+
 		RSP_Vtx_Clipping(i);
 
 		if( gRSP.bLightingEnable )
@@ -1131,7 +1237,7 @@ void ProcessVertexDataNoSSE(uint32 dwAddr, uint32 dwV0, uint32 dwNum)
 			g_normal.z = (float)vert.norma.nz;
 
 			Vec3TransformNormal(g_normal, gRSPmodelViewTop);
-			g_dwVtxDifColor[i] = LightVert(g_normal);
+			g_dwVtxDifColor[i] = LightVert(g_normal,i);
 			*(((uint8*)&(g_dwVtxDifColor[i]))+3) = vert.rgba.a;	// still use alpha from the vertex
 		}
 		else
@@ -1441,6 +1547,14 @@ void ProcessVertexDataDKR(uint32 dwAddr, uint32 dwV0, uint32 dwNum)
 
 		gDKRVtxCount++;
 
+
+		if( gRSP.bFogEnabled && !options.bUseLinearFog )
+		{
+			g_fFogCoord[i] = g_vecProjected[i].z;
+			if( g_vecProjected[i].w < 0 || g_vecProjected[i].z < 0 || g_fFogCoord[i] < gRSPfFogMin )
+				g_fFogCoord[i] = gRSPfFogMin;
+		}
+
 		RSP_Vtx_Clipping(i);
 
 		short wA = *(short*)((pVtxBase+nOff + 6) ^ 2);
@@ -1461,7 +1575,7 @@ void ProcessVertexDataDKR(uint32 dwAddr, uint32 dwV0, uint32 dwNum)
 			if( status.isSSEEnabled )
 				g_dwVtxDifColor[i] = SSELightVert();
 			else
-				g_dwVtxDifColor[i] = LightVert(g_normal);
+				g_dwVtxDifColor[i] = LightVert(g_normal,i);
 		}
 		else
 		{
@@ -1511,6 +1625,14 @@ void ProcessVertexDataPD(uint32 dwAddr, uint32 dwV0, uint32 dwNum)
 			g_vecProjected[i].z = g_vtxTransformed[i].z * g_vecProjected[i].w;
 		}
 
+		if( gRSP.bFogEnabled && !options.bUseLinearFog)
+		{
+			g_fFogCoord[i] = g_vecProjected[i].z;
+			if( g_vecProjected[i].w < 0 || g_vecProjected[i].z < 0 || g_fFogCoord[i] < gRSPfFogMin )
+				g_fFogCoord[i] = gRSPfFogMin;
+		}
+
+
 		RSP_Vtx_Clipping(i);
 
 		uint8 *addr = g_pRDRAMu8+dwPDCIAddr+ (vert.cidx&0xFF);
@@ -1533,7 +1655,7 @@ void ProcessVertexDataPD(uint32 dwAddr, uint32 dwV0, uint32 dwNum)
 			else
 			{
 				Vec3TransformNormal(g_normal, gRSPmodelViewTop);
-				g_dwVtxDifColor[i] = LightVert(g_normal);
+				g_dwVtxDifColor[i] = LightVert(g_normal,i);
 			}
 			*(((uint8*)&(g_dwVtxDifColor[i]))+3) = (uint8)a;	// still use alpha from the vertex
 		}
@@ -1603,6 +1725,15 @@ void ProcessVertexDataConker(uint32 dwAddr, uint32 dwV0, uint32 dwNum)
 			g_vecProjected[i].y = g_vtxTransformed[i].y * g_vecProjected[i].w;
 			g_vecProjected[i].z = g_vtxTransformed[i].z * g_vecProjected[i].w;
 		}
+
+		if( gRSP.bFogEnabled && !options.bUseLinearFog )
+		{
+			g_fFogCoord[i] = g_vecProjected[i].z;
+			if( g_vecProjected[i].w < 0 || g_vecProjected[i].z < 0 || g_fFogCoord[i] < gRSPfFogMin )
+				g_fFogCoord[i] = gRSPfFogMin;
+		}
+
+		
 
 		RSP_Vtx_Clipping(i);
 
@@ -1730,6 +1861,13 @@ void ProcessVertexData_Rogue_Squadron(uint32 dwXYZAddr, uint32 dwColorAddr, uint
 			g_vecProjected[i].y = g_vtxTransformed[i].y * g_vecProjected[i].w;
 			g_vecProjected[i].z = g_vtxTransformed[i].z * g_vecProjected[i].w;
 		}
+		
+		if( gRSP.bFogEnabled && !options.bUseLinearFog )
+		{
+			g_fFogCoord[i] = g_vecProjected[i].z;
+			if( g_vecProjected[i].w < 0 || g_vecProjected[i].z < 0 || g_fFogCoord[i] < gRSPfFogMin )
+				g_fFogCoord[i] = gRSPfFogMin;
+		}
 
 		RSP_Vtx_Clipping(i);
 
@@ -1747,7 +1885,7 @@ void ProcessVertexData_Rogue_Squadron(uint32 dwXYZAddr, uint32 dwColorAddr, uint
 			else
 			{
 				Vec3TransformNormal(g_normal, gRSPmodelViewTop);
-				g_dwVtxDifColor[i] = LightVert(g_normal);
+				g_dwVtxDifColor[i] = LightVert(g_normal,i);
 			}
 			*(((uint8*)&(g_dwVtxDifColor[i]))+3) = vertcolors.a;	// still use alpha from the vertex
 		}
@@ -1801,13 +1939,14 @@ void SetLightCol(uint32 dwLight, uint32 dwCol)
 	gRSPlights[dwLight].fa = 255;	// Ignore light alpha
 }
 
-void SetLightDirection(uint32 dwLight, float x, float y, float z)
+void SetLightDirection(uint32 dwLight, float x, float y, float z, float range)
 {
-	register float w = (float)sqrt(x*x+y*y+z*z);
+	register float w = range == 0 ? (float)sqrt(x*x+y*y+z*z) : 1;
 
 	gRSPlights[dwLight].x = x/w;
 	gRSPlights[dwLight].y = y/w;
 	gRSPlights[dwLight].z = z/w;
+	gRSPlights[dwLight].range = range;
 }
 
 static float maxS0, maxT0;

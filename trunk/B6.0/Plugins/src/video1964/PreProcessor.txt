@@ -1,0 +1,59 @@
+1964video preprocessor definitions descriptions
+
+--FRAMEBUFFER CHANGES--
+_DISABLE_VID1964
+ - Disables framebuffer changes made to 1964video, uses Rice 5.60 behavior
+_RICE6FB
+ - Enables FB code used in Rice 6, code is nearly identical to 1964video's, only with a good refactor
+Undefined behavior uses 1964video 1.0.0
+
+--CLIPPER CHANGES--
+_DISABLE_CLIP_FAR
+ - Rice 6 disables far plane clipping. Is this because of the new vertex clipper?
+_OLDCLIPPER
+ - Forces clipping code used in Rice 5.60
+Undefined behavior uses 1964video 1.0.0. Rice 6.12 clipper relie's on software vertex clipping that is unsupported on Xbox.
+
+--TILE CHANGES--
+_VID1964_TILE
+ - Sets stricter conditions for faster loading tiles. Fixes issues with spinning WWF logo in  WWF No Mercy 
+_RICE612_TILE -OR- _RICE560_TILE
+ - Uses Tile validification in Rice 5.60 and anything newer than Rice 6.11
+Undefined behavior uses tile validification in 1964video 1.0.0. Different from _VID1964_TILE
+_VID1964_FIX
+ - Fixes tiles in TGO splash screens
+
+--PRIMITIVECOLOR RELATED CHANGES--
+_RICE612_PRIMCOLOR
+ - Disables usage of gRDP.primitiveColor in Render.cpp
+_RICE612_FILL
+ - Disables usage of gRDP.primitiveColor in RSP_Parser.cpp by forcing a condition that usually checks if cycle_type is fill mode
+These defines may eliminate code used by video cards older than the Xbox
+
+--CLAMPING CHANGES--
+_RICE560_CLAMP
+ - Uses clamping code from Rice 5.60
+_RICE612_CLAMP
+ - Uses clamping code from Rice 6.12 XBOX
+Undefined behavior uses clamping from 1964video 1.0.0
+
+--CRC CALC CHANGES--
+_RICE612_CRC
+ - Uses PAL texture CRC calculation from Rice 6
+Undefined uses behavior in 1964video 1.0.0 and earlier
+
+--HACKS--
+_RICE612_TEXTEDGE
+ - Uses Text Edge hack from Rice 6, I don't see where this helps. Usually looks worse? Doom64
+_RICE612_HACK
+ - Forces a smaller block of code to be used for games other than Yoshi Story. Code handles calls to DrawSimple2DTexture. Need to find out if there are regressions before using this.
+_RICE612_ALPHACOMP
+ - Added alpha compares after 1964video 1.0.0. Not sure what this fixes.
+_RICE612_FIX
+ - Moves some texture width checks to be done if the texture exists. looks good.
+_RICE612_DKR
+ - Changes Matrix declaration for DKR so it works with 1964video. Not sure why this needs to be done.
+_XBOX_HACK
+ - Limits Combiner Stages to 4, and avoids creating large textures
+_XBOX_HACK2
+ -Checks format for rendertarget
