@@ -1236,10 +1236,11 @@ bool CRender::DrawTriangles()
 				}
 			}
 		}
-
+#ifndef _MUDLORD_FIX
 		for( i=0; i<gRSP.numVertices; i++ )
 		{
-			if( g_vtxBuffer[i].tcord[t].u > 1.0 || g_vtxBuffer[i].tcord[t].u < 0.0  )
+			float w = CDeviceBuilder::GetGeneralDeviceType() == OGL_DEVICE ? g_vtxProjected5[i][3] : g_vtxBuffer[i].rhw; 
+			if( w < 0 || g_vtxBuffer[i].tcord[t].u > 1.0 || g_vtxBuffer[i].tcord[t].u < 0.0  )
 			{
 				clampS = false;
 				break;
@@ -1248,7 +1249,8 @@ bool CRender::DrawTriangles()
 
 		for( i=0; i<gRSP.numVertices; i++ )
 		{
-			if( g_vtxBuffer[i].tcord[t].v > 1.0 || g_vtxBuffer[i].tcord[t].v < 0.0  )
+			float w = CDeviceBuilder::GetGeneralDeviceType() == OGL_DEVICE ? g_vtxProjected5[i][3] : g_vtxBuffer[i].rhw; 
+			if( w < 0 || g_vtxBuffer[i].tcord[t].v > 1.0 || g_vtxBuffer[i].tcord[t].v < 0.0  )
 			{
 				clampT = false;
 				break;
@@ -1263,6 +1265,7 @@ bool CRender::DrawTriangles()
 		{
 			SetTextureVFlag(TEXTURE_UV_FLAG_CLAMP, gRSP.curTile+t);
 		}
+#endif
 	}
 
 	if( status.bHandleN64TextureBuffer && g_pTxtBufferInfo->CI_Info.dwSize == TXT_SIZE_8b )

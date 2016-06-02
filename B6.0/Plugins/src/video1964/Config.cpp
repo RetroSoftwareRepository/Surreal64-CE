@@ -696,7 +696,7 @@ void ReadConfiguration(void)
 		options.OpenglDepthBufferSetting = 16;
 		options.colorQuality = TEXTURE_FMT_A4R4G4B4;
 		options.textureEnhancement = 0;
-		options.textureEnhancementControl = 1;
+		options.textureEnhancementControl = 0;
 		if((preferedemu != _1964x11)&&(FrameSkip>1))
 			FrameSkip = 0;
 		options.bSkipFrame = FrameSkip;
@@ -718,7 +718,7 @@ void ReadConfiguration(void)
 		defaultRomOptions.N64RenderToTextureEmuType = TXT_BUF_NONE;
 
 		defaultRomOptions.bNormalBlender = FALSE;
-		defaultRomOptions.bFastTexCRC=TRUE;
+		defaultRomOptions.bFastTexCRC=FALSE;
 		defaultRomOptions.bNormalCombiner = FALSE;
 		defaultRomOptions.bAccurateTextureMapping = TRUE;
 		defaultRomOptions.bInN64Resolution = TRUE;
