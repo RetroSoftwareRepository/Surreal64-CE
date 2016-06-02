@@ -744,7 +744,7 @@ uint32 CalculateRDRAMCRC(void *pPhysicalAddress, uint32 left, uint32 top, uint32
 	dwAsmCRC = 0;
 	dwAsmdwBytesPerLine = ((width<<size)+1)/2;
 
-#ifdef _FAST_HASH
+#if 1
     //Fast Hash used by default unless using a texturepack //Corn
 	dwAsmCRC = (DWORD)pPhysicalAddress;
 	register DWORD *pStart = (DWORD*)(pPhysicalAddress);

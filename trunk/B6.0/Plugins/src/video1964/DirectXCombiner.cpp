@@ -425,10 +425,10 @@ void CDirectXColorCombiner::InitCombinerCycle12(void)
 	bool combinerChanged = FindAndFillCombineMode(m_pD3DRender->m_curCombineInfo) || m_bCycleChanged;
 
 	BOOL AlphaIsEnable = (m_pD3DRender->m_curCombineInfo.blendingFunc!=DISABLE_ALPHA&&m_pD3DRender->m_curCombineInfo.blendingFunc!=DISABLE_BOTH);
-
+#ifndef _MUDLORD_ALPHA
 	if( !AlphaIsEnable ) 
 		gD3DDevWrapper.SetRenderState(D3DRS_ALPHABLENDENABLE,AlphaIsEnable);
-
+#endif
 	if( m_pD3DRender->m_curCombineInfo.blendingFunc==DISABLE_ALPHA )	//Disable Alpha Channel
 	{
 		//Alpha = 1

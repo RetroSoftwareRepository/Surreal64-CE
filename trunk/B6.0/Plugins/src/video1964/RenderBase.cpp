@@ -880,7 +880,7 @@ uint32 LightVert(D3DXVECTOR4 & norm, int vidx)
 	{
 		for (register unsigned int l=0; l < gRSPnumLights; l++)
 		{
-			fCosT = norm.x*gRSPlights[l].tx + norm.y*gRSPlights[l].ty + norm.z*gRSPlights[l].tz; 
+			fCosT = norm.x*gRSPlights[l].x + norm.y*gRSPlights[l].y + norm.z*gRSPlights[l].z; 
 
 			if (fCosT > 0 )
 			{
@@ -961,7 +961,7 @@ uint32 LightVertOld(D3DXVECTOR4 & norm)
 
 	for (register unsigned int l=0; l < gRSPnumLights; l++)
 	{
-		fCosT = norm.x*gRSPlights[l].x + norm.y*gRSPlights[l].y + norm.z*gRSPlights[l].z; 
+		fCosT = norm.x*gRSPlights[l].tx + norm.y*gRSPlights[l].ty + norm.z*gRSPlights[l].tz; 
 
 		if (fCosT > 0)
 		{

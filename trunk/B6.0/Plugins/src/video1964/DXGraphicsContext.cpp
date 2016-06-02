@@ -255,7 +255,10 @@ void CDXGraphicsContext::UpdateFrame(bool swaponly)
 	if( !g_curRomInfo.bForceScreenClear )	
 			Clear(CLEAR_DEPTH_BUFFER);
 	XboxDrawOSD();
-
+#ifndef _MUDLORD_SAVEBB		
+	m_backBufferIsSaved = false;
+#endif
+	//Unlock();
 	m_pd3dDevice->Present( NULL, NULL, NULL, NULL );
 	status.bScreenIsDrawn = false;
 	if( g_curRomInfo.bForceScreenClear )	needCleanScene = true;
@@ -315,8 +318,9 @@ void CDXGraphicsContext::UpdateFrame(bool swaponly)
 			hr = m_pd3dDevice->Present( NULL, NULL, NULL, NULL );
 		}
 
+#ifndef _MUDLORD_SAVEBB		
 		m_backBufferIsSaved = false;
-
+#endif
 	}
 
 exit:
@@ -507,7 +511,6 @@ bool CDXGraphicsContext::Initialize(HWND hWnd, HWND hWndStatus,
 	// Build a list of Direct3D adapters, modes and devices. The
     // ConfirmDevice() callback is used to confirm that only devices that
     // meet the app's requirements are considered.
-#ifdef _RICE560
     if( FAILED( hr = BuildDeviceList() ) )
     {
         if ( m_pD3D )
@@ -519,7 +522,6 @@ bool CDXGraphicsContext::Initialize(HWND hWnd, HWND hWndStatus,
         DisplayD3DErrorMsg( hr, MSGERR_APPMUSTEXIT );
 		return false;
     }
-#endif
 
 	CGraphicsContext::Initialize(hWnd, hWndStatus, dwWidth, dwHeight, bWindowed );
 	
@@ -533,11 +535,7 @@ bool CDXGraphicsContext::Initialize(HWND hWnd, HWND hWndStatus,
 			Clear(CLEAR_COLOR_AND_DEPTH_BUFFER);
 			m_pd3dDevice->BeginScene();
 			m_pd3dDevice->EndScene();
-#ifndef _XBOX
 			UpdateFrame();
-#else
-			m_pd3dDevice->Present( NULL, NULL, NULL, NULL );
-#endif
 		}
 	}
 
@@ -835,7 +833,8 @@ HRESULT CDXGraphicsContext::InitializeD3D()
 	windowSetting.uDisplayWidth = m_d3dpp.BackBufferWidth;
 	windowSetting.uDisplayHeight = m_d3dpp.BackBufferHeight;
 
-	m_desktopFormat = D3DFMT_A8R8G8B8;
+	m_desktopFormat = D3DFMT_X1R5G5B5;
+	//m_desktopFormat = D3DFMT_A8R8G8B8;
 
 	//freakdave
 	if(VertexMode == 0){
