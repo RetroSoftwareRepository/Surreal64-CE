@@ -23,8 +23,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //#include "glh_genext.h"
 
 
-CDXRenderTexture::CDXRenderTexture(int width, int height, RenderTextureInfo* pInfo, TextureUsage usage)
-: CRenderTexture(width, height, pInfo, usage)
+CDXTextureBuffer::CDXTextureBuffer(int width, int height, TextureBufferInfo* pInfo, TextureUsage usage)
+	: CTextureBuffer(width, height, pInfo, usage)
 {
 	m_pTexture = new CDirectXTexture(width, height, usage);
 	if( m_pTexture )
@@ -34,7 +34,6 @@ CDXRenderTexture::CDXRenderTexture(int width, int height, RenderTextureInfo* pIn
 	}
 	else
 	{
-		TRACE0("Error to create DX render_texture");
 		SAFE_DELETE(m_pTexture);
 	}
 
@@ -43,20 +42,24 @@ CDXRenderTexture::CDXRenderTexture(int width, int height, RenderTextureInfo* pIn
 	m_beingRendered = false;
 }
 
-CDXRenderTexture::~CDXRenderTexture()
+CDXTextureBuffer::~CDXTextureBuffer()
 {
 	if( m_beingRendered )
 	{
+#ifdef _RICE6FB
 		g_pFrameBufferManager->CloseRenderTexture(false);
+#else
+		CGraphicsContext::g_pGraphicsContext->CloseTextureBuffer(false);
+#endif
 		SetAsRenderTarget(false);
 	}
 
 	SAFE_DELETE(m_pTexture);
-
+	
 	m_beingRendered = false;
 }
 
-bool CDXRenderTexture::SetAsRenderTarget(bool enable)
+bool CDXTextureBuffer::SetAsRenderTarget(bool enable)
 {
 	if( m_usage != AS_RENDER_TARGET )	return false;
 
@@ -68,19 +71,19 @@ bool CDXRenderTexture::SetAsRenderTarget(bool enable)
 			{
 				MYLPDIRECT3DSURFACE pColorBuffer;
 
-				// save the current back buffer
-#if DIRECTX_VERSION == 8
+				// Save the current back buffer
+#if DX_VERSION == 8
 				g_pD3DDev->GetBackBuffer(0, D3DBACKBUFFER_TYPE_MONO, &m_pColorBufferSave);
-#else
+#elif DX_VERSION == 9
 				g_pD3DDev->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &m_pColorBufferSave);
 #endif
 				g_pD3DDev->GetDepthStencilSurface(&m_pDepthBufferSave);
 
-				// Activate the render_texture
+				// Activate the texture buffer
 				(MYLPDIRECT3DTEXTURE(m_pTexture->GetTexture()))->GetSurfaceLevel(0,&pColorBuffer);
-#if DIRECTX_VERSION == 8
+#if DX_VERSION == 8
 				HRESULT res = g_pD3DDev->SetRenderTarget(pColorBuffer, NULL);
-#else
+#elif DX_VERSION == 9
 				HRESULT res = g_pD3DDev->SetRenderTarget(0, pColorBuffer);
 #endif
 				SAFE_RELEASE(pColorBuffer);
@@ -108,10 +111,11 @@ bool CDXRenderTexture::SetAsRenderTarget(bool enable)
 		{
 			if( m_pColorBufferSave && m_pDepthBufferSave )
 			{
-#if DIRECTX_VERSION == 8
+#if DX_VERSION == 8
 				g_pD3DDev->SetRenderTarget(m_pColorBufferSave, m_pDepthBufferSave);
-#else
-				g_pD3DDev->SetRenderTarget(0, m_pColorBufferSave);
+#elif DX_VERSION == 9
+g_pD3DDev->SetRenderTarget(0, m_pColorBufferSave);
+				g_pD3DDev->SetDepthStencilSurface(m_pDepthBufferSave);
 #endif
 				m_beingRendered = false;
 				SAFE_RELEASE(m_pColorBufferSave);
@@ -130,13 +134,11 @@ bool CDXRenderTexture::SetAsRenderTarget(bool enable)
 	}
 }
 
-void CDXRenderTexture::LoadTexture(TxtrCacheEntry* pEntry)
+void CDXTextureBuffer::LoadTexture(TxtrCacheEntry* pEntry)
 {
 	bool IsBeingRendered = m_beingRendered;
 	if( IsBeingRendered )
 	{
-		TXTRBUF_DUMP(TRACE0("Warning, loading from render_texture while it is being rendered"));
-
 		SetAsRenderTarget(false);
 		//return;
 	}
@@ -164,7 +166,6 @@ void CDXRenderTexture::LoadTexture(TxtrCacheEntry* pEntry)
 		{
 			RECT dstrect = {0,0,ti.WidthToLoad,ti.HeightToLoad};
 			HRESULT res = D3DXLoadSurfaceFromSurface(pNewSurface,NULL,&dstrect,pSourceSurface,NULL,&srcrect,D3DX_FILTER_POINT ,0xFF000000);
-			DEBUGGER_IF_DUMP(( res != S_OK), {DebuggerAppendMsg("Error to reload texture from render_texture, res=%x", res);} );
 		}
 	}
 
@@ -175,70 +176,106 @@ void CDXRenderTexture::LoadTexture(TxtrCacheEntry* pEntry)
 
 	pSurf->SetOthersVariables();
 	SAFE_RELEASE(pSourceSurface);
-	TXTRBUF_DETAIL_DUMP(DebuggerAppendMsg("Load texture from render_texture"););
 }
 
-void CDXRenderTexture::StoreToRDRAM(int infoIdx)
+#ifdef _RICE6FB
+void CDXTextureBuffer::StoreTextureBufferToRDRAM(int infoIdx)
+#else
+void CDXGraphicsContext::StoreTextureBufferToRDRAM(int infoIdx)
+#endif
 {
-	if( !frameBufferOptions.bRenderTextureWriteBack )	return;
+#ifndef _RICE6FB
+	if( infoIdx < 0 )
+		infoIdx = m_lastTextureBufferIndex;
 
-	RenderTextureInfo &info = gRenderTextureInfos[infoIdx];
-	DXFrameBufferManager &FBmgr = *(DXFrameBufferManager*)g_pFrameBufferManager;
-
-	uint32 fmt = info.CI_Info.dwFormat;
-
-	MYLPDIRECT3DSURFACE pSourceSurface = NULL;
-	(MYLPDIRECT3DTEXTURE(m_pTexture->GetTexture()))->GetSurfaceLevel(0,&pSourceSurface);
-
-	// Ok, we are using texture render target right now
-	// Need to copy content from the texture render target back to frame buffer
-	// then reset the current render target
-
-	// Here we need to copy the content from the texture frame buffer to RDRAM memory
-
-	TXTRBUF_DUMP(TRACE2("Saving TextureBuffer %d to N64 RDRAM addr=%08X", infoIdx, info.CI_Info.dwAddr));
-
-	if( pSourceSurface )
+	if( gTextureBufferInfos[infoIdx].pTxtBuffer && gTextureBufferInfos[infoIdx].pTxtBuffer->IsBeingRendered() )
 	{
-		uint32 width, height, bufWidth, bufHeight, memsize; 
-		width = info.N64Width;
-		height = info.N64Height;
-		bufWidth = info.bufferWidth;
-		bufHeight = info.bufferHeight;
-		if( info.CI_Info.dwSize == TXT_SIZE_8b && fmt == TXT_FMT_CI )
+		return;
+	}
+
+	if( gTextureBufferInfos[infoIdx].pTxtBuffer )
+#else
+
+	if( !frameBufferOptions.bTextureBufferWriteBack )	return;
+
+	RenderTextureInfo &info = gTextueBufferInfos[infoIdx];
+	DXFrameBufferManager &FBmgr = *(DXFrameBufferManager*)g_pFrameBufferManager;
+	if(1)
+#endif
+	{
+		TextureBufferInfo &info = gTextureBufferInfos[infoIdx];
+
+		uint32 fmt = info.CI_Info.dwFormat;
+		if( frameBufferOptions.bTxtBufWriteBack )
 		{
-			info.CI_Info.dwFormat = TXT_FMT_I;
-			height = info.knownHeight ? info.N64Height : info.maxUsedHeight;
-			memsize = info.N64Width*height;
-			FBmgr.CopyD3DSurfaceToRDRAM(info.CI_Info.dwAddr, fmt, info.CI_Info.dwSize, width, height,
-				bufWidth, bufHeight, info.CI_Info.dwAddr, memsize, info.N64Width, D3DFMT_A8R8G8B8, pSourceSurface);
-			info.CI_Info.dwFormat = TXT_FMT_CI;
-		}
-		else
-		{
-			if( info.CI_Info.dwSize == TXT_SIZE_8b )
+			CDXTextureBuffer* pTxtBuffer = (CDXTextureBuffer*)(info.pTxtBuffer);
+			MYLPDIRECT3DSURFACE pSourceSurface = NULL;
+			(MYLPDIRECT3DTEXTURE(pTxtBuffer->m_pTexture->GetTexture()))->GetSurfaceLevel(0,&pSourceSurface);
+
+			// Ok, we are using texture render target right now
+			// Need to copy content from the texture render target back to frame buffer
+			// then reset the current render target
+
+			// Here we need to copy the content from the texture frame buffer to RDRAM memory
+
+			if( pSourceSurface )
 			{
-				height = info.knownHeight ? info.N64Height : info.maxUsedHeight;
-				memsize = info.N64Width*height;
-				FBmgr.CopyD3DSurfaceToRDRAM(info.CI_Info.dwAddr, fmt, info.CI_Info.dwSize, width, height,
-					bufWidth, bufHeight, info.CI_Info.dwAddr, memsize, info.N64Width, D3DFMT_A8R8G8B8, pSourceSurface);
+				uint32 width, height, bufWidth, bufHeight, memsize; 
+				width = info.N64Width;
+				height = info.N64Height;
+				bufWidth = info.bufferWidth;
+				bufHeight = info.bufferHeight;
+				if( info.CI_Info.dwSize == TXT_SIZE_8b && fmt == TXT_FMT_CI )
+				{
+					info.CI_Info.dwFormat = TXT_FMT_I;
+					height = info.knownHeight ? info.N64Height : info.maxUsedHeight;
+					memsize = info.N64Width*height;
+#ifdef _RICE6FB
+					FBmgr.CopyD3DSurfaceToRDRAM(info.CI_Info.dwAddr, fmt, info.CI_Info.dwSize, width, height,
+						bufWidth, bufHeight, info.CI_Info.dwAddr, memsize, info.N64Width, D3DFMT_A8R8G8B8, pSourceSurface);
+#else
+					CopyBackToRDRAM(info.CI_Info.dwAddr, fmt, info.CI_Info.dwSize, width, height,
+						bufWidth, bufHeight, info.CI_Info.dwAddr, memsize, info.N64Width, D3DFMT_A8R8G8B8, pSourceSurface);
+#endif
+					info.CI_Info.dwFormat = TXT_FMT_CI;
+				}
+				else
+				{
+					if( info.CI_Info.dwSize == TXT_SIZE_8b )
+					{
+						height = info.knownHeight ? info.N64Height : info.maxUsedHeight;
+						memsize = info.N64Width*height;
+#ifdef _RICE6FB
+						FBmgr.CopyD3DSurfaceToRDRAM(info.CI_Info.dwAddr, fmt, info.CI_Info.dwSize, width, height,
+							bufWidth, bufHeight, info.CI_Info.dwAddr, memsize, info.N64Width, D3DFMT_A8R8G8B8, pSourceSurface);
+#else
+						CopyBackToRDRAM(info.CI_Info.dwAddr, fmt, info.CI_Info.dwSize, width, height,
+							bufWidth, bufHeight, info.CI_Info.dwAddr, memsize, info.N64Width, D3DFMT_A8R8G8B8, pSourceSurface);
+#endif
+					}
+					else
+					{
+						height = info.knownHeight ? info.N64Height : info.maxUsedHeight;
+						memsize = g_pTxtBufferInfo->N64Width*height*2;
+#ifdef _RICE6FB
+						FBmgr.CopyD3DSurfaceToRDRAM(info.CI_Info.dwAddr, fmt, info.CI_Info.dwSize, width, height,
+							bufWidth, bufHeight, info.CI_Info.dwAddr, memsize, info.N64Width, D3DFMT_X8R8G8B8, pSourceSurface);
+#else
+						CopyBackToRDRAM(info.CI_Info.dwAddr, fmt, info.CI_Info.dwSize, width, height,
+							bufWidth, bufHeight, info.CI_Info.dwAddr, memsize, info.N64Width, D3DFMT_X8R8G8B8, pSourceSurface);
+#endif
+					}
+				}
+				SAFE_RELEASE(pSourceSurface);
 			}
 			else
 			{
-				height = info.knownHeight ? info.N64Height : info.maxUsedHeight;
-				memsize = g_pRenderTextureInfo->N64Width*height*2;
-				FBmgr.CopyD3DSurfaceToRDRAM(info.CI_Info.dwAddr, fmt, info.CI_Info.dwSize, width, height,
-					bufWidth, bufHeight, info.CI_Info.dwAddr, memsize, info.N64Width, D3DFMT_X8R8G8B8, pSourceSurface);
+				DebuggerAppendMsg("Error, cannot lock the texture buffer");
 			}
 		}
-		TXTRBUF_DUMP(TRACE2("Write back: width=%d, height=%d", width, height));	
 
-		SAFE_RELEASE(pSourceSurface);
 	}
-	else
-	{
-		TRACE0("Error, cannot lock the render_texture");
-	}
+
 }
 
 #ifdef _DEBUG

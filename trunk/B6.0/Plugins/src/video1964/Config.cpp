@@ -663,8 +663,8 @@ void ReadConfiguration(void)
 	options.bEnableHacks = TRUE;
 	options.bEnableSSE = TRUE;
 
-	defaultRomOptions.screenUpdateSetting = SCREEN_UPDATE_AT_VI_CHANGE;
-	//defaultRomOptions.screenUpdateSetting = SCREEN_UPDATE_AT_VI_UPDATE_AND_DRAWN;
+	//defaultRomOptions.screenUpdateSetting = SCREEN_UPDATE_AT_VI_CHANGE;
+	defaultRomOptions.screenUpdateSetting = SCREEN_UPDATE_AT_VI_UPDATE_AND_DRAWN;
 
 #ifdef _XBOX
 	status.isMMXSupported = 1;
@@ -700,7 +700,7 @@ void ReadConfiguration(void)
 		if((preferedemu != _1964x11)&&(FrameSkip>1))
 			FrameSkip = 0;
 		options.bSkipFrame = FrameSkip;
-		options.OpenglRenderSetting = OGL_DEVICE;
+		options.OpenglRenderSetting = NULL;
 		options.bSkipFrame = FALSE;
 		options.bDisplayTooltip = FALSE;
 		options.bHideAdvancedOptions = TRUE;

@@ -22,9 +22,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
 
-class CRenderTexture;
+class CTextureBuffer;
 typedef struct {
-	CRenderTexture *pRenderTexture;
+	CTextureBuffer *pTxtBuffer;
 	SetImgInfo	CI_Info;
 
 	uint32		bufferWidth;
@@ -45,18 +45,20 @@ typedef struct {
 	uint32		crcCheckedAtFrame;
 
 	TxtrCacheEntry txtEntry;
-} RenderTextureInfo;
+} TextureBufferInfo;
 
 
-class CRenderTexture
+class CTextureBuffer
 {
 public:
 	friend class CGraphicsContext;
 	friend class CDXGraphicsContext;
+#ifdef _RICE6FB
 	friend class FrameBufferManager;
 	friend class DXFrameBufferManager;
 	friend class OGLFrameBufferManager;
-	CRenderTexture(int width, int height, RenderTextureInfo* pInfo, TextureUsage usage)
+#endif
+	CTextureBuffer(int width, int height, TextureBufferInfo* pInfo, TextureUsage usage)
 	{
 		m_beingRendered = false;
 		m_width = m_height = 0;
@@ -64,12 +66,16 @@ public:
 		m_pInfo = pInfo;
 		m_usage = usage;
 	}
-	virtual ~CRenderTexture() {}
+	virtual ~CTextureBuffer() {}
 
 	virtual bool SetAsRenderTarget(bool enable)=0;
 	virtual void LoadTexture(TxtrCacheEntry* pEntry)=0;
 
-	virtual void StoreToRDRAM(int infoIdx) {};
+#ifdef _RICE6FB
+	virtual void StoreToRDRAM(int infoIdx)=0;
+#elif defined(_VID1964_TORDRAM)
+	virtual void StoreTextureBufferToRDRAM(int infoIdx)=0;
+#endif
 
 	void GetDimension(int &width, int &height)
 	{
@@ -96,8 +102,18 @@ protected:
 	TextureUsage m_usage;
 
 	CTexture* m_pTexture;
-	RenderTextureInfo* m_pInfo;
+	TextureBufferInfo* m_pInfo;
 };
+/*
+#ifndef _RICE6FB
+extern TextureBufferInfo gTextureBufferInfos[];
+extern TextureBufferInfo newTextureBufInfo;
+#endif
+#define NEW_TEXTURE_BUFFER
+
+extern TextureBufferInfo g_ZI_saves[2];
+extern TextureBufferInfo *g_pTxtBufferInfo;
+*/
 
 
 
