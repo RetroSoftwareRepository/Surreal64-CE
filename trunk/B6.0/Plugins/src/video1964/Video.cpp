@@ -111,7 +111,7 @@ BOOL APIENTRY DllMain(HINSTANCE hinstDLL,  // DLL module handle
 void GetPluginDir( char * Directory ) 
 {
 #ifdef _XBOX
-	strcpy(Directory, "T:\\");
+	strcpy(Directory, "D:\\");
 #else //win32
 	char path_buffer[_MAX_PATH], drive[_MAX_DRIVE] ,dir[_MAX_DIR];
 	char fname[_MAX_FNAME],ext[_MAX_EXT];

@@ -663,8 +663,8 @@ void ReadConfiguration(void)
 	options.bEnableHacks = TRUE;
 	options.bEnableSSE = TRUE;
 
-	//defaultRomOptions.screenUpdateSetting = SCREEN_UPDATE_AT_VI_CHANGE;
-	defaultRomOptions.screenUpdateSetting = SCREEN_UPDATE_AT_VI_UPDATE_AND_DRAWN;
+	defaultRomOptions.screenUpdateSetting = SCREEN_UPDATE_AT_VI_CHANGE;
+	//defaultRomOptions.screenUpdateSetting = SCREEN_UPDATE_AT_VI_UPDATE_AND_DRAWN;
 
 #ifdef _XBOX
 	status.isMMXSupported = 1;
@@ -1057,7 +1057,7 @@ void Ini_GetRomOptions(LPGAMESETTING pGameSetting)
 							  pGameSetting->romheader.nCountryID,
 							  pGameSetting->szGameName);
 
-	lstrcpyn(pGameSetting->szGameName, IniSections[i].name, 50);
+	//lstrcpyn(pGameSetting->szGameName, IniSections[i].name, 50);
 
 	pGameSetting->bDisableTextureCRC	= IniSections[i].bDisableTextureCRC;
 	pGameSetting->bDisableCulling		= IniSections[i].bDisableCulling;
@@ -1239,6 +1239,12 @@ void Ini_StoreRomOptions(LPGAMESETTING pGameSetting)
 	{
 		IniSections[i].bEnableTxtLOD	=pGameSetting->bEnableTxtLOD;
 		bIniIsChanged=true;
+	}
+
+	if( bIniIsChanged )
+	{
+		WriteIniFile();
+		//TRACE0("Rom option is changed and saved");
 	}
 }
 
@@ -1730,7 +1736,7 @@ BOOL CreateDialogTooltip(void)
 BOOL EnumChildWndTooltip(void)
 {
 #ifdef _XBOX
-    return FALSE;
+    return TRUE;
 #else //win32
 	return (!EnumChildWindows(g_hwndDlg, (WNDENUMPROC) EnumChildProc, 0));
 #endif //_XBOX
@@ -1857,10 +1863,23 @@ char * left(char * src, int nchars)
 }
 
 char * right(char *src, int nchars)
-{
+{/*
 	static char dst[300];			// BUGFIX (STRMNNRM)
 	strncpy(dst, src + strlen(src) - nchars, nchars);
 	dst[nchars]=0;
+	return dst;*/
+	static char dst[300];
+
+	int srclen = strlen(src);
+	if (nchars >= srclen)
+	{
+		strcpy(dst, src);
+	}
+	else
+	{
+		strncpy(dst, src + srclen - nchars, nchars);
+		dst[nchars]=0;
+	}
 	return dst;
 }
 
@@ -1892,8 +1911,6 @@ BOOL ReadIniFile()
 {
 	std::ifstream inifile;
 	char readinfo[100];
-	char tempreadinfo1[100];
-	char tempreadinfo2[100];
 	char trim[]="{}"; //remove first and last character
 
 	char filename[256];
@@ -1939,20 +1956,9 @@ BOOL ReadIniFile()
 			{
 				section newsection;
 
-
-#ifndef _XBOX
-				StrTrim(readinfo,trim);
-				strcpy(newsection.crccheck, readinfo);
-#else
-				memset(tempreadinfo2, 0x00, sizeof(tempreadinfo2));
-
-				strcpy(tempreadinfo1,&readinfo[1]);
-				strncpy(tempreadinfo2, tempreadinfo1,strlen(tempreadinfo1) - 1);
-				strcpy(readinfo, tempreadinfo2);
-
-				//readinfo[strlen(readinfo)-1]='\0';
+				//StrTrim(readinfo,trim);		// Fix me
+				readinfo[strlen(readinfo)-1]='\0';
 				strcpy(newsection.crccheck, readinfo+1);
-#endif
 
 				newsection.bDisableTextureCRC = FALSE;
 				newsection.bDisableCulling = FALSE;
@@ -2147,8 +2153,8 @@ void WriteIniFile()
 #ifndef _XBOX
 			StrTrim(szBuf,trim);
 #else
-			//tidy(szBuf);
-			//szBuf[strlen(szBuf)-1]='\0';
+			tidy(szBuf);
+			szBuf[strlen(szBuf)-1]='\0';
 #endif
 
 
@@ -2157,7 +2163,7 @@ void WriteIniFile()
 				if (IniSections[i].bOutput)
 					continue;
 
-				if (lstrcmpi(szBuf, IniSections[i].crccheck) == 0)
+				if (lstrcmpi(szBuf+1, IniSections[i].crccheck) == 0)
 				{
 					// Output this CRC
 					OutputSectionDetails(i, fhOut);
