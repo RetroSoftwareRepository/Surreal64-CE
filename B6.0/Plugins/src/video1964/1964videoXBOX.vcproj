@@ -55,10 +55,12 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="2"
+				GlobalOptimizations="TRUE"
 				InlineFunctionExpansion="2"
 				EnableIntrinsicFunctions="TRUE"
 				FavorSizeOrSpeed="1"
 				OmitFramePointers="TRUE"
+				EnableFiberSafeOptimizations="TRUE"
 				OptimizeForProcessor="2"
 				AdditionalIncludeDirectories="..\..\..\Include"
 				PreprocessorDefinitions="NDEBUG;_XBOX;_LIB;_VID1964_FIX;_XBOX_HACK;_DISABLE_CLIP_FAR;_OLDCLIPPER;_VID1964_TILE;_RICE612_TILE;_RICE612_PRIMCOLOR;_RICE612_FILL;_RICE612_CLAMP;_RICE612_CRC;_RICE612_TEXTEDGE;_RICE612_ALPHACOMP;_RICE612_FIX;_RICE612_HACK;_RICE612_DKR;_RICE6IM;_RICE6FB;_MUDLORD_ALPHA;_MUDLORD_SAVEBB;_MUDLORD_FIX"

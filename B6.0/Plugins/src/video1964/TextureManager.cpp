@@ -493,7 +493,7 @@ void CTextureManager::FreeTextures()
 
 TxtrCacheEntry * CTextureManager::CreateNewCacheEntry(uint32 dwAddr, uint32 dwWidth, uint32 dwHeight)
 {
-	TxtrCacheEntry * pEntry;
+	TxtrCacheEntry * pEntry = NULL;
 
 	// Find a used texture
 #ifdef _XBOX
@@ -820,7 +820,8 @@ TxtrCacheEntry * CTextureManager::GetTexture(TxtrInfo * pgti, bool fromTMEM, boo
 					else
 						ConvertTexture_16(pEntry, fromTMEM);
 					pEntry->FrameLastUpdated = status.gDlistCount;
-
+					SAFE_DELETE(pEntry->pEnhancedTexture);
+					pEntry->dwEnhancementFlag = TEXTURE_NO_ENHANCEMENT;
 				}
 			}
 
