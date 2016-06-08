@@ -1,5 +1,6 @@
 #include "mytypes.h"
 #include "audiohle.h"
+#include <mmintrin.h>
 
 static void SPNOOP () {
 	char buff[0x100];
@@ -468,21 +469,61 @@ void CLEARBUFF3 () {
 void MIXER3 () { // Needs accuracy verification...
 	u16 dmemin  = (u16)(t9 >> 0x10)  + 0x4f0;
 	u16 dmemout = (u16)(t9 & 0xFFFF) + 0x4f0;
-	u8  flags   = (u8)((k0 >> 16) & 0xff);
-	s32 gain    = (s16)(k0 & 0xFFFF)*2;
-	s32 temp;
+	//s32 temp;
+	__m64 v_gain, v28, v29, v27;
 
-	for (int x=0; x < 0x170; x+=2) { // I think I can do this a lot easier 
-		temp = (*(s16 *)(BufferSpace+dmemin+x) * gain) >> 16;
-		temp += *(s16 *)(BufferSpace+dmemout+x);
-			
-		if ((s32)temp > 32767) 
-			temp = 32767;
-		if ((s32)temp < -32768) 
-			temp = -32768;
+	s32 gain = k0 & 0xFFFF;
 
-		*(u16 *)(BufferSpace+dmemout+x) = (u16)(temp & 0xFFFF);
+
+	if( (unsigned int)gain < 0x4000 || (unsigned int)gain >= 0xC000)//better detection!
+	{
+		v_gain = _mm_set1_pi16((unsigned int)(gain+gain));
+
+		for (int x=0; x < 0x170; x+=16) {
+			v29 = *(__m64 *)(BufferSpace+dmemin+x);
+			v28 = *(__m64 *)(BufferSpace+dmemout+x);
+		
+			v27 = _mm_mulhi_pi16(v29, v_gain);
+			v27 = _mm_adds_pi16(v28, v27);
+
+			*(__m64 *)(BufferSpace+dmemout+x) = v27;
+
+			// Reduce branching...
+			v29 = *(__m64 *)(BufferSpace+dmemin+x+8);
+			v28 = *(__m64 *)(BufferSpace+dmemout+x+8);
+		
+			v27 = _mm_mulhi_pi16(v29, v_gain);
+			v27 = _mm_adds_pi16(v28, v27);
+
+			*(__m64 *)(BufferSpace+dmemout+x+8) = v27;
+		}
 	}
+	else
+	{
+		v_gain = _mm_set1_pi16((unsigned int)(gain+gain));
+
+		for (int x=0; x < 0x170; x+=16) {
+			v29 = *(__m64 *)(BufferSpace+dmemin+x);
+			v28 = *(__m64 *)(BufferSpace+dmemout+x);
+		
+			v27 = _mm_mulhi_pi16(v29, v_gain);
+			v27 = _mm_add_pi16(v27, v27);
+			v27 = _mm_adds_pi16(v28, v27);
+
+			*(__m64 *)(BufferSpace+dmemout+x) = v27;
+
+			// Reduce branching...
+			v29 = *(__m64 *)(BufferSpace+dmemin+x+8);
+			v28 = *(__m64 *)(BufferSpace+dmemout+x+8);
+		
+			v27 = _mm_mulhi_pi16(v29, v_gain);
+			v27 = _mm_add_pi16(v27, v27);
+			v27 = _mm_adds_pi16(v28, v27);
+
+			*(__m64 *)(BufferSpace+dmemout+x+8) = v27;
+		}
+	}
+	_mm_empty();
 }
 
 void LOADBUFF3 () {
@@ -531,8 +572,17 @@ void DMEMMOVE3 () { // Needs accuracy verification...
 	u32 count = ((t9+3) & 0xfffc);
 
 	//memcpy (dmem+v1, dmem+v0, count-1);
-	for (cnt = 0; cnt < count; cnt++) {
-		*(u8 *)(BufferSpace+((cnt+v1)^3)) = *(u8 *)(BufferSpace+((cnt+v0)^3));
+	if( (v1 | v0 ) & 2)
+	{
+		for (cnt = 0; cnt < count; cnt += 2) {
+			*(u16 *)(BufferSpace+((cnt+v1)^2)) = *(u16 *)(BufferSpace+((cnt+v0)^2));
+		}
+	}
+	else
+	{
+		for (cnt = 0; cnt < count; cnt+= 4) {
+			*(u32 *)(BufferSpace+ cnt + v1) = *(u32 *)(BufferSpace + cnt + v0);
+		}
 	}
 }
 
