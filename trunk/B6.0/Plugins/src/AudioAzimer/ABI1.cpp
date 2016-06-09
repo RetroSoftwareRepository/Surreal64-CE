@@ -488,6 +488,8 @@ void ENVMIXERo () { // Borrowed from RCP...
 	memcpy(rdram+addy, (u8 *)hleMixerWorkArea,80);
 }
 
+#include "AIOResample.h"
+#if 0
 void RESAMPLE () {
 	BYTE Flags=(u8)((k0>>16)&0xff);
 	DWORD Pitch=((k0&0xffff))<<1;
@@ -565,6 +567,7 @@ void RESAMPLE () {
 	//memcpy (RSWORK, src+srcPtr, 0x8);
 	*(u16 *)(rdram+addy+10) = (u16)Accum;
 }
+#endif
 
 void SETVOL () {
 // Might be better to unpack these depending on the flags...
