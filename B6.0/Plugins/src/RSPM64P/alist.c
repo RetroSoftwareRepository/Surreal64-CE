@@ -915,6 +915,7 @@ void alist_polef(
         int16_t* table,
         uint32_t address)
 {
+
     int16_t *dst = (int16_t*)(hle->alist_buffer + dmemo);
 
     const int16_t* const h1 = table;
@@ -923,14 +924,17 @@ void alist_polef(
     unsigned i;
     int16_t l1, l2;
     int16_t h2_before[8];
+	int32_t state[2];
 
     count = align(count, 16);
 
     if (init) {
         l1 = 0;
         l2 = 0;
+		state[0] = 0;
     }
     else {
+		state[0] = *dram_u32(hle, address);
         l1 = *dram_u16(hle, address + 4);
         l2 = *dram_u16(hle, address + 6);
     }
@@ -940,6 +944,58 @@ void alist_polef(
         h2[i] = (((int32_t)h2[i] * gain) >> 14);
     }
 
+	if( (*(int*)&h1[0] | *(int*)&h1[1] | *(int*)&h1[2] | *(int*)&h1[3]) == 0 )
+	{
+		do
+		{
+			int16_t frame[8];
+
+			for (i = 0; i < 8; ++i, dmemi += 2)
+			{
+				frame[i] = *alist_s16(hle, dmemi);
+			}
+
+			for (i = 0; i < 8; ++i)
+			{
+				int32_t accu = frame[i] * gain;
+				accu += h2_before[i] * l2 + rdot(i, h2, frame);
+				dst[i^S] = clamp_s16(accu >> 14);
+			}
+
+			l1 = dst[6 ^ S];
+			l2 = dst[7 ^ S];
+
+			dst += 8;
+			count -= 16;
+		} while (count != 0);
+	}
+	else
+	{
+		do
+		{
+			int16_t frame[8];
+
+			for (i = 0; i < 8; ++i, dmemi += 2)
+			{
+				frame[i] = *alist_s16(hle, dmemi);
+			}
+
+			for (i = 0; i < 8; ++i)
+			{
+				int32_t accu = frame[i] * gain;
+				accu += h1[i] * l1 + h2_before[i] * l2 + rdot(i, h2, frame);
+				dst[i^S] = clamp_s16(accu >> 14);
+			}
+
+			l1 = dst[6 ^ S];
+			l2 = dst[7 ^ S];
+
+			dst += 8;
+			count -= 16;
+		} while (count != 0);
+	}
+
+/*
     do
     {
         int16_t frame[8];
@@ -959,8 +1015,9 @@ void alist_polef(
         dst += 8;
         count -= 16;
     } while (count != 0);
-
-    dram_store_u16(hle, (uint16_t*)(dst - 4), address, 4);
+*/
+    state[1] = (l1 << 16) + l2;
+    dram_store_u32(hle, (uint32_t*)(state), address, 2);
 }
 
 void alist_iirf(
