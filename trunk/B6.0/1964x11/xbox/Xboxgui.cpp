@@ -169,6 +169,32 @@ extern "C" BOOL __EMU_AudioMute(BOOL Mute)
 	else
 		return Mute;
 }
+char gCheatTable[254][80];
+int gCheatActive[254];
+
+extern "C" int __EMU_BuildCheatList()
+{
+	CodeList_ReadCode(currentromoptions.Game_Name,cheatfilename);
+	for(int i=0; i<codegroupcount; i++)
+	{
+		sprintf(gCheatTable[i],codegrouplist[i].name);
+		gCheatActive[i]=codegrouplist[i].active;
+	}
+	return codegroupcount;
+}
+
+extern "C" void __EMU_SaveAndApplyCheats()
+{
+	for(int i=0; i<codegroupcount; i++)
+	{
+		codegrouplist[i].active = gCheatActive[i];
+	}
+	codemodified = TRUE;
+	CodeList_SaveCode();
+#ifdef CHEATCODE_LOCK_MEMORY
+	RefreshAllCheatCodeMemoryMaps();
+#endif
+}
 
 extern void loadinis();
 

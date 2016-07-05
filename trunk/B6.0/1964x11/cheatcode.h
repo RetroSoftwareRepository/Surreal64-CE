@@ -30,7 +30,7 @@ extern char *cheatfilename;
 
 
 //Option to apply cheat code and lock memory
-#define CHEATCODE_LOCK_MEMORY
+//#define CHEATCODE_LOCK_MEMORY
 
 enum APPLYCHEATMODE { INGAME, BOOTUPONCE, GSBUTTON, ONLYIN1964 };
 
@@ -59,9 +59,12 @@ extern char						current_cheatcode_rom_internal_name[30];
 
 extern void 		InitCodeListForCurrentGame(void);
 extern void 		CodeList_Clear(void);
+extern BOOL 		CodeList_SaveCode(void);
 extern void 		CodeList_GotoBeginning(void);
 extern BOOL						CodeList_ApplyAllCode(enum APPLYCHEATMODE mode);
 extern BOOL _cdecl				CodeList_ReadCode(char *intername_rom_name, char* filename);
+extern BOOL			codemodified;
+extern void			RefreshAllCheatCodeMemoryMaps(void);
 BOOL							IsCodeMatchRomCountryCode(int cheat_country_code, int rom_country_code);
 
 #ifdef CHEATCODE_LOCK_MEMORY

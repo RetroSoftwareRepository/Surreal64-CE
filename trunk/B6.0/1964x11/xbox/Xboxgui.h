@@ -108,12 +108,16 @@ extern "C" void __EMU_Get1964StateFilename(int index, char *filename, int mode);
 extern "C" void __EMU_GetPJ64StateFilename(int index, char *filename, int mode);
 extern "C" BOOL __EMU_AudioMute(BOOL Mute);
 extern "C" BOOL AUDIO_AudioMute(BOOL Mute);
+extern "C" int __EMU_BuildCheatList();
+extern "C" void __EMU_SaveAndApplyCheats();
 
 /*#define INVALID_FILE_ATTRIBUTES ((DWORD)-1)
 extern BOOL PathFileExists(const char *pszPath);
 extern BOOL TerminateThread(HANDLE hThread, DWORD dwExitCode);*/
 
 extern char g_szPathSaves[256];
+extern char gCheatTable[254][80];
+extern int	gCheatActive[254];
 
 
 #define VirtualSafeFree(ptr) {if(ptr) {VirtualFree((ptr),0,MEM_RELEASE);(ptr)=NULL;}}

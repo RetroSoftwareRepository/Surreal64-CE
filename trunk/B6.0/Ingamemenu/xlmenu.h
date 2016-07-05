@@ -88,6 +88,8 @@ void XLMenu_DeleteItem(XLMenuItem *mi);
 void XLMenu_SetMaxShow(XLMenu *m, DWORD maxshow);
 void XLMenu_SetTitle(XLMenu *m, WCHAR *string, DWORD color);
 void XLMenu_SetItemText(XLMenuItem *mi, WCHAR *string);
+void XLMenu_SetItemColor(XLMenuItem *mi, DWORD color);
+
 void XLMenu_InitGraphics();
 #define XLMenu_IsActive() (XLMenu_CurMenu||XLMenu_CurRoutine)
 

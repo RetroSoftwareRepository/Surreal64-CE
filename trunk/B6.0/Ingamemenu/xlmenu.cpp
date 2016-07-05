@@ -35,6 +35,7 @@ int isLaunchMenu = 0;
 bool isIGM = false;
 //bool g_HD_UHLE_720 = false;
 
+extern int extraCheatSlots;
 
 extern LPDIRECT3DDEVICE8 g_pd3dDevice;
 
@@ -79,9 +80,7 @@ XLMenu *XLMenu_Init(float x, float y, DWORD maxitems, DWORD flags, DWORD (*abort
 void XLMenu_Delete(XLMenu *m)
 {
     delete m;
-
-
-
+	extraCheatSlots = 0;
 }
 
 void XLMenu_SetMaxShow(XLMenu *m, DWORD maxshow)
@@ -160,6 +159,11 @@ void XLMenu_SetTitle(XLMenu *m, WCHAR *string, DWORD color)
         m->h = (float)(m->maxshow+1) * XLMenu_Font->GetFontHeight();
 }
 
+void XLMenu_SetItemColor(XLMenuItem *mi, DWORD color)
+{
+	mi->color = color;
+}
+
 void XLMenu_SetItemText(XLMenuItem *mi, WCHAR *string)
 {
 	int k;
@@ -219,6 +223,9 @@ DWORD XLMenu_GetCommand(XBGAMEPAD *gamepad)
     return command;
 }
 
+extern int gCheatActive[254];
+extern int curPage;
+extern DWORD dwCheatActiveColor;
 DWORD XLMenu_Routine(DWORD command)
 {
     float menux, menuy;
@@ -345,8 +352,10 @@ DWORD XLMenu_Routine(DWORD command)
             // set item color
             if(mi->flags&MITEM_DISABLED)
                 color = dwNullItemColor;   
-			else if(i ==m->curitem)
+			else if(i == m->curitem)
 				color = dwSelectedRomColor;
+			else if((i == gCheatActive[i-2+((curPage-1)*10)]) && (i > 2))
+				color = dwCheatActiveColor;
             else
                 color = mi->color;
     
@@ -381,8 +390,8 @@ DWORD XLMenu_Routine(DWORD command)
 
             do
             {
-                m->curitem++;
-                if(m->curitem==m->nitems)
+				m->curitem++;
+                if(m->curitem==m->nitems-extraCheatSlots)
                     if(m->flags&MENU_WRAP)
                         m->curitem = 0;
                     else
@@ -400,7 +409,7 @@ DWORD XLMenu_Routine(DWORD command)
                 m->curitem--;
                 if(m->curitem==-1)
                     if(m->flags&MENU_WRAP)
-                        m->curitem = m->nitems-1;
+                        m->curitem = m->nitems-1-extraCheatSlots;
                     else
                         m->curitem = 0;
             } while(m->items[m->curitem].flags&(MITEM_SEPARATOR|MITEM_DISABLED));

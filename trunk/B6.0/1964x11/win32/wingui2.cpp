@@ -400,7 +400,7 @@ void InitPluginData(void)
 void Set_1964_Directory(void)
 {
 #ifdef _XBOX
-	strcpy(directories.main_directory, "T:\\");
+	strcpy(directories.main_directory, "D:\\");
 
 #else //win32
 	/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
