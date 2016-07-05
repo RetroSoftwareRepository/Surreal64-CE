@@ -1770,8 +1770,6 @@ void CheatMenu(void)
 		numMenuItems = numCheats+2;
 	}
 	
-	if(curPage == numMenuPages)
-		numMenuItems = (numCheats - ((numMenuPages-1)*10))+2;
 
 	m_pSettingsMenu = XLMenu_Init((float)iIGMMenuTxtPosX,(float)iIGMMenuTxtPosY,numMenuItems, GetMenuFontAlign(iIGMMenuTxtAlign)|MENU_WRAP, NULL);
 
@@ -1790,10 +1788,8 @@ void CheatMenu(void)
 	{
 		curCheat = (i-1)+((curPage-1)*10);
 		swprintf(currentname,L"%S",gCheatTable[curCheat]);
-		//swprintf(currentname,L"Cheat %d",i);
 
 		if((curPage > 1) && (curCheat >= numCheats))
-		//swprintf(currentname,L"[Empty Slot]");
 		extraCheatSlots++;
 
 		if(gCheatActive[curCheat] == 1)
@@ -1834,7 +1830,7 @@ void CheatMenu(void)
 				break;
 		}
 	}
-
+	
 	XLMenu_Activate(m_pSettingsMenu);
 	
 	while( XLMenu_CurMenu == m_pSettingsMenu)
@@ -1876,8 +1872,7 @@ void UpdateCheatList()
 
 
 void PrevCheatPage()
-{ 
-	WCHAR currentname[120];
+{
 	if(curPage > 1)
 		curPage--;
 	XLMenu_CurRoutine = NULL;
@@ -1886,7 +1881,6 @@ void PrevCheatPage()
 
 void NextCheatPage()
 {
-	WCHAR currentname[120];
 	if(curPage < numMenuPages)
 		curPage++;
 	XLMenu_CurRoutine = NULL;
@@ -2022,6 +2016,7 @@ void ActivateCheat10()
 	XLMenu_CurRoutine = NULL;
 	UpdateCheatList();
 }
+
 
 void VideoSettingsMenu(void)
 {
