@@ -315,7 +315,7 @@ void DLParser_Init()
 
 	status.lastPurgeTimeTime = 0;		// Time textures were last purged
 
-	status.UseLargerTile[0] = status.UseLargerTile[0] = false;
+	status.UseLargerTile[0] = false;
 	status.LargerTileRealLeft[0] = status.LargerTileRealLeft[1] = 0;
 	memset(&g_ZI_saves, 0, sizeof(TextureBufferInfo)*2);
 
@@ -773,7 +773,7 @@ void DLParser_Process()
 
 	
 #ifdef _XBOX
-	//status.bScreenIsDrawn = true;
+	status.bScreenIsDrawn = true;
 #endif
 
 	status.gRDPTime = timeGetTime();
