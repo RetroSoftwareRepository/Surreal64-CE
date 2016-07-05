@@ -23,6 +23,9 @@ extern "C" void __EMU_GetStateFilename(int index, char *timestamp, int mode);
 extern "C" void __EMU_Get1964StateFilename(int index, char *timestamp, int mode);
 extern "C" void __EMU_GetPJ64StateFilename(int index, char *timestamp, int mode);
 
+extern "C" int __EMU_BuildCheatList();
+extern "C" void __EMU_SaveAndApplyCheats();
+
 void GetStateTimestamp(int index, int emulator, char *timestamp);
 void CreateSaveStatePreview(unsigned int index);
 bool LoadSaveStatePreview(unsigned int index, int emulator);
@@ -36,6 +39,7 @@ extern bool bReloadSaveState;
 extern char emuname[256];
 extern DWORD dwMenuItemColor;
 extern DWORD dwMenuTitleColor;
+extern DWORD dwCheatActiveColor;
 extern char skinname[32];
 extern int iIGMMenuTxtPosX;
 extern int iIGMMenuTxtPosY;
@@ -201,6 +205,20 @@ bool bload1964state[MAX_SAVE_STATES]; //5
 bool bloadPJ64state[MAX_SAVE_STATES]; //5
 bool bSatesUpdated = false;
 
+void CheatMenu();
+void PrevCheatPage();
+void NextCheatPage();
+void ActivateCheat1();
+void ActivateCheat2();
+void ActivateCheat3();
+void ActivateCheat4();
+void ActivateCheat5();
+void ActivateCheat6();
+void ActivateCheat7();
+void ActivateCheat8();
+void ActivateCheat9();
+void ActivateCheat10();
+
 extern void CalculateEndCredits();
 extern void DrawCredits();
 extern int defilement;
@@ -338,8 +356,11 @@ void MainMenu(void)
 		XLMenu_AddItem(m_pMainMenu,MITEM_ROUTINE,L"Load 1964 State",Load1964StateMenu);
 		XLMenu_AddItem(m_pMainMenu,MITEM_ROUTINE,L"Load PJ64 State",LoadPJ64StateMenu);
 	}
-
 	XLMenu_AddItem(m_pMainMenu,MITEM_ROUTINE,L"Save State",SaveStateMenu);
+	if(preferedemu == _1964x11)
+		XLMenu_AddItem(m_pMainMenu,MITEM_ROUTINE,L"Cheat Codes",CheatMenu);
+	if(preferedemu == _PJ64x16)
+		XLMenu_AddItem(m_pMainMenu,MITEM_ROUTINE,L"Cheat Codes",CheatMenu);
 	if (showdebug) 
 	XLMenu_AddItem(m_pMainMenu,MITEM_ROUTINE,L"Show Debug info : on",ShowDebug);
 	else
@@ -348,7 +369,8 @@ void MainMenu(void)
 	XLMenu_AddItem(m_pMainMenu,MITEM_ROUTINE,L"Controller Settings",ControllerSettingsMenu);
 	XLMenu_AddItem(m_pMainMenu,MITEM_ROUTINE,L"Controller Config",ControllerMenu);
 	XLMenu_AddItem(m_pMainMenu,MITEM_ROUTINE,L"Take a Screenshot",TakeScreenshot);
-	XLMenu_AddItem(m_pMainMenu,MITEM_DISABLED,L"------------------------",NULL);
+	if((preferedemu != _PJ64x16)&&(preferedemu != _1964x11))
+		XLMenu_AddItem(m_pMainMenu,MITEM_DISABLED,L"------------------------",NULL);
 	XLMenu_AddItem(m_pMainMenu,MITEM_ROUTINE,L"Reset Rom",ResetRom);
 	XLMenu_AddItem(m_pMainMenu,MITEM_ROUTINE,L"Quit To RomList",ExitToRomList);
 	XLMenu_AddItem(m_pMainMenu,MITEM_ROUTINE,L"Quit Surreal",ExitToDash);
@@ -1712,6 +1734,293 @@ void SaveState5()
 	// Disable Menu to exit
 	XLMenu_CurRoutine = NULL;
 	XLMenu_CurMenu = NULL;
+}
+
+extern char gCheatTable[254][80];
+extern int gCheatActive[254];
+int curCheat;
+int curPage = 1;
+int numMenuPages = 1;
+int numCheats = 0;
+int numMenuItems = 1;
+bool doOnce = 1;
+int extraCheatSlots = 0;
+void CheatMenu(void)
+{
+	DWORD dwMenuCommand = 0;
+
+	XLMenu_CurRoutine = NULL;
+	XLMenu_CurMenu = NULL;
+	XLMenu_SetFont(&m_Font);
+
+	extraCheatSlots = 0;
+	numCheats =__EMU_BuildCheatList();
+
+	if(numCheats > 10)
+	{
+		numMenuPages = numCheats/10;
+		if(numCheats % 10)
+		{
+			numMenuPages++;
+		}
+		numMenuItems = 12;
+	}
+	else
+	{
+		numMenuItems = numCheats+2;
+	}
+	
+	if(curPage == numMenuPages)
+		numMenuItems = (numCheats - ((numMenuPages-1)*10))+2;
+
+	m_pSettingsMenu = XLMenu_Init((float)iIGMMenuTxtPosX,(float)iIGMMenuTxtPosY,numMenuItems, GetMenuFontAlign(iIGMMenuTxtAlign)|MENU_WRAP, NULL);
+
+	m_pSettingsMenu->parent = m_pMainMenu;
+
+	XLMenu_SetTitle(m_pSettingsMenu,L"Cheat Codes",dwMenuTitleColor);
+
+	WCHAR currentname[256];
+
+	m_pSettingsMenu->itemcolor = dwMenuItemColor;
+	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,L"Previous Page",PrevCheatPage);
+	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,L"Next Page",NextCheatPage);
+
+
+	for(int i=1; i<=numMenuItems-2; i++)
+	{
+		curCheat = (i-1)+((curPage-1)*10);
+		swprintf(currentname,L"%S",gCheatTable[curCheat]);
+		//swprintf(currentname,L"Cheat %d",i);
+
+		if((curPage > 1) && (curCheat >= numCheats))
+		//swprintf(currentname,L"[Empty Slot]");
+		extraCheatSlots++;
+
+		if(gCheatActive[curCheat] == 1)
+			m_pSettingsMenu->itemcolor = dwCheatActiveColor;
+		else
+			m_pSettingsMenu->itemcolor = dwMenuItemColor;
+		switch(i)
+		{
+			case 1:
+				XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,currentname,ActivateCheat1);
+				break;
+			case 2:
+				XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,currentname,ActivateCheat2);
+				break;
+			case 3:
+				XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,currentname,ActivateCheat3);
+				break;
+			case 4:
+				XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,currentname,ActivateCheat4);
+				break;
+			case 5:
+				XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,currentname,ActivateCheat5);
+				break;
+			case 6:
+				XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,currentname,ActivateCheat6);
+				break;
+			case 7:
+				XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,currentname,ActivateCheat7);
+				break;
+			case 8:
+				XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,currentname,ActivateCheat8);
+				break;
+			case 9:
+				XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,currentname,ActivateCheat9);
+				break;
+			case 10:
+				XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,currentname,ActivateCheat10);
+				break;
+		}
+	}
+
+	XLMenu_Activate(m_pSettingsMenu);
+	
+	while( XLMenu_CurMenu == m_pSettingsMenu)
+	{
+		DrawLogo();
+		dwMenuCommand = getAllGamepadsCommand(&gamepad);
+		XLMenu_Routine(dwMenuCommand);
+		g_pd3dDevice->Present( NULL, NULL, NULL, NULL );
+	}
+	if (m_pSettingsMenu)
+		XLMenu_Delete(m_pSettingsMenu);
+}
+
+void UpdateCheatList()
+{
+	WCHAR currentname[120];
+	extraCheatSlots = 0;
+	for(int i=1; i<=numMenuItems-2; i++)
+	{
+		curCheat = (i-1)+((curPage-1)*10);
+		swprintf(currentname,L"%S",gCheatTable[curCheat]);
+
+		if((curPage > 1) && (curCheat >= numCheats))
+			extraCheatSlots++;
+
+		if(gCheatActive[curCheat] == 1)
+		{
+			m_pSettingsMenu->itemcolor = dwCheatActiveColor;
+			XLMenu_SetItemColor(&m_pSettingsMenu->items[i+1], dwCheatActiveColor);
+		}
+		else
+		{
+			m_pSettingsMenu->itemcolor = dwMenuItemColor;
+			XLMenu_SetItemColor(&m_pSettingsMenu->items[i+1], dwMenuItemColor);
+		}
+		XLMenu_SetItemText(&m_pSettingsMenu->items[i+1], currentname);
+	}
+}
+
+
+void PrevCheatPage()
+{ 
+	WCHAR currentname[120];
+	if(curPage > 1)
+		curPage--;
+	XLMenu_CurRoutine = NULL;
+	UpdateCheatList();
+}
+
+void NextCheatPage()
+{
+	WCHAR currentname[120];
+	if(curPage < numMenuPages)
+		curPage++;
+	XLMenu_CurRoutine = NULL;
+	UpdateCheatList();
+}
+
+void ActivateCheat1()
+{
+	if(gCheatActive[0+((curPage-1)*10)] == 1)
+		gCheatActive[0+((curPage-1)*10)]=0;
+	else
+		gCheatActive[0+((curPage-1)*10)]=1;
+	
+	__EMU_SaveAndApplyCheats();
+	__EMU_BuildCheatList();
+	XLMenu_CurRoutine = NULL;
+	UpdateCheatList();
+}
+
+void ActivateCheat2()
+{
+	if(gCheatActive[1+((curPage-1)*10)] == 1)
+		gCheatActive[1+((curPage-1)*10)]=0;
+	else
+		gCheatActive[1+((curPage-1)*10)]=1;
+	
+	__EMU_SaveAndApplyCheats();
+	__EMU_BuildCheatList();
+	XLMenu_CurRoutine = NULL;
+	UpdateCheatList();
+}
+
+void ActivateCheat3()
+{
+	if(gCheatActive[2+((curPage-1)*10)] == 1)
+		gCheatActive[2+((curPage-1)*10)]=0;
+	else
+		gCheatActive[2+((curPage-1)*10)]=1;
+	
+	__EMU_SaveAndApplyCheats();
+	__EMU_BuildCheatList();
+	XLMenu_CurRoutine = NULL;
+	UpdateCheatList();
+}
+
+void ActivateCheat4()
+{
+	if(gCheatActive[3+((curPage-1)*10)] == 1)
+		gCheatActive[3+((curPage-1)*10)]=0;
+	else
+		gCheatActive[3+((curPage-1)*10)]=1;
+	
+	__EMU_SaveAndApplyCheats();
+	__EMU_BuildCheatList();
+	XLMenu_CurRoutine = NULL;
+	UpdateCheatList();
+}
+
+void ActivateCheat5()
+{
+	if(gCheatActive[4+((curPage-1)*10)] == 1)
+		gCheatActive[4+((curPage-1)*10)]=0;
+	else
+		gCheatActive[4+((curPage-1)*10)]=1;
+	
+	__EMU_SaveAndApplyCheats();
+	__EMU_BuildCheatList();
+	XLMenu_CurRoutine = NULL;
+	UpdateCheatList();
+}
+
+void ActivateCheat6()
+{
+	if(gCheatActive[5+((curPage-1)*10)] == 1)
+		gCheatActive[5+((curPage-1)*10)]=0;
+	else
+		gCheatActive[5+((curPage-1)*10)]=1;
+	
+	__EMU_SaveAndApplyCheats();
+	__EMU_BuildCheatList();
+	XLMenu_CurRoutine = NULL;
+	UpdateCheatList();
+}
+
+void ActivateCheat7()
+{
+	if(gCheatActive[6+((curPage-1)*10)] == 1)
+		gCheatActive[6+((curPage-1)*10)]=0;
+	else
+		gCheatActive[6+((curPage-1)*10)]=1;
+	
+	__EMU_SaveAndApplyCheats();
+	__EMU_BuildCheatList();
+	XLMenu_CurRoutine = NULL;
+	UpdateCheatList();
+}
+
+void ActivateCheat8()
+{
+	if(gCheatActive[7+((curPage-1)*10)] == 1)
+		gCheatActive[7+((curPage-1)*10)]=0;
+	else
+		gCheatActive[7+((curPage-1)*10)]=1;
+	
+	__EMU_SaveAndApplyCheats();
+	__EMU_BuildCheatList();
+	XLMenu_CurRoutine = NULL;
+	UpdateCheatList();
+}
+
+void ActivateCheat9()
+{
+	if(gCheatActive[8+((curPage-1)*10)] == 1)
+		gCheatActive[8+((curPage-1)*10)]=0;
+	else
+		gCheatActive[8+((curPage-1)*10)]=1;
+	
+	__EMU_SaveAndApplyCheats();
+	__EMU_BuildCheatList();
+	XLMenu_CurRoutine = NULL;
+	UpdateCheatList();
+}
+
+void ActivateCheat10()
+{
+	if(gCheatActive[9+((curPage-1)*10)] == 1)
+		gCheatActive[9+((curPage-1)*10)]=0;
+	else
+		gCheatActive[9+((curPage-1)*10)]=1;
+	
+	__EMU_SaveAndApplyCheats();
+	__EMU_BuildCheatList();
+	XLMenu_CurRoutine = NULL;
+	UpdateCheatList();
 }
 
 void VideoSettingsMenu(void)

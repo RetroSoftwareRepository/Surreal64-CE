@@ -425,7 +425,7 @@ void InitEmu(void)
 	if(strncmp(currentromoptions.Game_Name, "DONKEY KONG 64", 14) == 0)
 		emuoptions.AllowCF1 = FALSE;
 
-	if((strncmp(currentromoptions.Game_Name, "CONKER BFD", 14) == 0) &&
+	if((strncmp(currentromoptions.Game_Name, "CONKER BFD", 10) == 0) &&
 		(currentromoptions.Link_4KB_Blocks == USE4KBLINKBLOCK_YES))
 		ConkerBFD_Link4KBlocks = 1;
 #ifdef _XBOX
@@ -477,7 +477,8 @@ void InitEmu(void)
 		CONTROLLER_RomOpen();
 		//netplay_rom_open();
 	}
-    
+
+	CodeList_ReadCode(currentromoptions.Game_Name,cheatfilename);
 
 	RefreshDynaDuringGamePlay();
     emustatus.Emu_Is_Resetting = 0;

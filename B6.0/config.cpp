@@ -171,6 +171,7 @@ DWORD dwMenuTitleColor = 0xFF8080FF;
 DWORD dwRomListColor = 0xAAEEEEEE;
 DWORD dwSelectedRomColor = 0xFFFF8000;
 DWORD dwNullItemColor = 0xEE53B77F;
+DWORD dwCheatActiveColor = 0xCC00FF00;
 
 //Launcher XLMenu Coords
 int iLaunchMenuTxtPosX = 200;
@@ -846,6 +847,10 @@ void LoadSkinFile(){
 	sprintf(szDwordBuf, "%s", ini.GetValue("Font Colors", "NullItemColor", szDwordDefBuf ));
 	dwNullItemColor = strtoul(szDwordBuf, NULL, 16);
 
+	sprintf(szDwordDefBuf, "%08X", dwCheatActiveColor);
+	sprintf(szDwordBuf, "%s", ini.GetValue("Font Colors", "CheatActiveColor", szDwordDefBuf ));
+	dwCheatActiveColor = strtoul(szDwordBuf, NULL, 16);
+
 	
 	iTitleX = ini.GetLongValue("General", "TitleX", iTitleX);
 	iTitleY = ini.GetLongValue("General", "TitleY", iTitleY);
@@ -1088,6 +1093,9 @@ void WriteSkinFile(){
 	
 	sprintf(szDwordBuf, "%08X", dwNullItemColor);
 	ini.SetValue("Font Colors", "NullItemColor", szDwordBuf); //0xEE53B77F
+
+	sprintf(szDwordBuf, "%08X", dwCheatActiveColor);
+	ini.SetValue("Font Colors", "CheatActiveColor", szDwordBuf); //0xCC00FF00
 
 	ini.SetLongValue("General", "TitleX", iTitleX);
 	ini.SetLongValue("General", "TitleY", iTitleY);

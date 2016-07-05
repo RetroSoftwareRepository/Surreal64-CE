@@ -274,7 +274,7 @@ void ReadConfiguration( void)
 	//char	tempstr[_MAX_PATH];
 	int		i;
 
-	emuoptions.auto_apply_cheat_code = FALSE;
+	emuoptions.auto_apply_cheat_code = TRUE;
 	defaultoptions.Code_Check = CODE_CHECK_PROTECT_MEMORY;
 	defaultoptions.Comments[0] = '\0';
 	defaultoptions.Alt_Title[0] = '\0';
@@ -401,7 +401,7 @@ void ReadConfiguration( void)
 	if( stricmp(gRegSettings.RSPPlugin, "none") == 0 )	gRegSettings.RSPPlugin[0]=0;
 
 	emuoptions.auto_run_rom = 1;
-	emuoptions.auto_apply_cheat_code = REGISTRY_ReadDWORD( "AutoApplyCheat", 0);
+	emuoptions.auto_apply_cheat_code = REGISTRY_ReadDWORD( "AutoApplyCheat", TRUE);
 
 	emuoptions.auto_full_screen =
 		REGISTRY_ReadDWORD( "AutoFullScreen", 0);

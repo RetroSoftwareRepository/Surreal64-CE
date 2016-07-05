@@ -5283,13 +5283,9 @@ Press L To Levitate,2="Press The L Button To Levitate & Let go to come down Agai
 Infinite Time on all other Timers,2="This cheat works on all Race Timers not the final Boss and Under Water with iron Boots etc",0,8011B9A1-0032,
 Infinite Timer Escaping From Gannons Tower,2="This cheat works only on The Final Boss",0,8011B9A5-00B4,
 Epona Max Carrots Lon Lon Raunch,2="This is For Practicing,Racing.Warning take this off before jumping the exit fence after winning Epona",0,801D8BCA-0006,801F2208-0001,801EEC88-0001,
-[Subscreen Delay Fix],2="This Fixes the Subscreen Delay.many thanks to tooie for the initial U v1.0 code",0,801DA5CB-0002,
-[Subscreen Delay Fix],1="This Fixes the Subscreen Delay.many thanks to tooie for the initial U v1.0 code",0,801DA5CB-0002,
-[Subscreen Delay Fix],4="This Fixes the Subscreen Delay.many thanks to tooie for the initial U v1.0 code",0,801D860B-0002,
-
-[Subscreen Delay Fix],2="This Fixes the Subscreen Delay.many thanks to tooie for the initial U v1.0 code",1,801DA5CB-0002,
-[Subscreen Delay Fix],1="This Fixes the Subscreen Delay.many thanks to tooie for the initial U v1.0 code",0,801DA5CB-0002,
-[Subscreen Delay Fix],4="This Fixes the Subscreen Delay.many thanks to tooie for the initial U v1.0 code",0,801D860B-0002,
+Subscreen Delay Fix,2="This Fixes the Subscreen Delay.many thanks to tooie for the initial U v1.0 code",1,801DA5CB-0002,
+Subscreen Delay Fix,1="This Fixes the Subscreen Delay.many thanks to tooie for the initial U v1.0 code",1,801DA5CB-0002,
+Subscreen Delay Fix,4="This Fixes the Subscreen Delay.many thanks to tooie for the initial U v1.0 code",1,801D860B-0002,
 
 [Tigger's Honey Hunt]
 NumberOfGroups=2
