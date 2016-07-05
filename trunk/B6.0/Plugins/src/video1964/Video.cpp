@@ -922,7 +922,11 @@ EXPORT_TYPE(void) EXPORT_NAME(CloseDLL) (void)
 { 
 	if( status.bGameIsRunning )
 	{
-		EXPORT_NAME(RomClosed)();
+#ifdef _XBOX
+		EXPORT_NAME(RomClosed());
+#else
+		RomClosed();
+#endif
 	}
 
 	if (bIniIsChanged)

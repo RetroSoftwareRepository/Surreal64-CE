@@ -2007,6 +2007,52 @@ void ForceMainTextureIndex(int dwTile)
 		gRSP.curTile = dwTile;
 }
 
+float HackZ2(float z)
+{
+	z = (z+9)/10;
+	return z;
+}
+
+float HackZ(float z)
+{
+	return HackZ2(z);
+
+	if( z < 0.1 && z >= 0 )
+		z = (.1f+z)/2;
+	else if( z < 0 )
+		//return (10+z)/100;
+		z = (expf(z)/20);
+	return z;
+}
+
+void HackZ(std::vector<D3DXVECTOR3>& points)
+{
+	int size = points.size();
+	for( int i=0; i<size; i++)
+	{
+		D3DXVECTOR3 &v = points[i];
+		v.z = (float)HackZ(v.z);
+	}
+}
+
+void HackZAll()
+{
+	if( CDeviceBuilder::m_deviceGeneralType == DIRECTX_DEVICE )
+	{
+		for( uint32 i=0; i<gRSP.numVertices; i++)
+		{
+			g_vtxBuffer[i].z = HackZ(g_vtxBuffer[i].z);
+		}
+	}
+	else
+	{
+		for( uint32 i=0; i<gRSP.numVertices; i++)
+		{
+			float w = g_vtxProjected5[i][3];
+			g_vtxProjected5[i][2] = HackZ(g_vtxProjected5[i][2]/w)*w;
+		}
+	}
+}
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -2653,51 +2699,3 @@ void UpdateCombinedMatrix()
 		gRSP.bCombinedMatrixIsUpdated = false;
 	}
 }
-
-float HackZ2(float z)
-{
-	z = (z+9)/10;
-	return z;
-}
-
-float HackZ(float z)
-{
-	return HackZ2(z);
-
-	if( z < 0.1 && z >= 0 )
-		z = (.1f+z)/2;
-	else if( z < 0 )
-		//return (10+z)/100;
-		z = (expf(z)/20);
-	return z;
-}
-
-void HackZ(std::vector<D3DXVECTOR3>& points)
-{
-	int size = points.size();
-	for( int i=0; i<size; i++)
-	{
-		D3DXVECTOR3 &v = points[i];
-		v.z = (float)HackZ(v.z);
-	}
-}
-
-void HackZAll()
-{
-	if( CDeviceBuilder::m_deviceGeneralType == DIRECTX_DEVICE )
-	{
-		for( uint32 i=0; i<gRSP.numVertices; i++)
-		{
-			g_vtxBuffer[i].z = HackZ(g_vtxBuffer[i].z);
-		}
-	}
-	else
-	{
-		for( uint32 i=0; i<gRSP.numVertices; i++)
-		{
-			float w = g_vtxProjected5[i][3];
-			g_vtxProjected5[i][2] = HackZ(g_vtxProjected5[i][2]/w)*w;
-		}
-	}
-}
-

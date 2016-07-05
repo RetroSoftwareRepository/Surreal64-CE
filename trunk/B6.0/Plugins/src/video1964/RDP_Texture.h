@@ -600,7 +600,7 @@ bool CalculateTileSizes_method_2(int tileno, TMEMLoadMapInfo *info, TxtrInfo &gt
 		if( tile.dwMaskS )	
 		{
 #ifdef _VID1964_FIX
-			if( !tile.bSizeIsValid )	
+			if( (!tile.bSizeIsValid) || ( options.enableHackForGames != HACK_FOR_TOPGEAROVERDRIVE )	)
 				loadwidth = maskwidth;
 			else
 				loadwidth = min(loadwidth, maskwidth);
@@ -613,7 +613,7 @@ bool CalculateTileSizes_method_2(int tileno, TMEMLoadMapInfo *info, TxtrInfo &gt
 		if( tile.dwMaskT )	
 		{
 #ifdef _VID1964_FIX
-			if( !tile.bSizeIsValid )	
+			if( (!tile.bSizeIsValid) || ( options.enableHackForGames != HACK_FOR_TOPGEAROVERDRIVE )	)
 				loadheight = maskheight;
 			else
 				loadheight = min(loadheight, maskheight);
@@ -1888,14 +1888,12 @@ uint32 GetValidTmemInfoIndex(uint32 tmemAddr)
 		return tmemAddr;
 	else
 	{
-		for( uint32 x=index+1; x != 0; x-- )
+		for( uint32 i=index; i>=0; i-- )
 		{
-			uint32 i = x - 1;
 			if( g_TmemFlag[i] != 0 )
 			{
-				for( uint32 y=0x20; y != 0; y-- )
+				for( uint32 j=0x1F; j>=0; j-- )
 				{
-					uint32 j = y - 1;
 					if( (g_TmemFlag[i] & (1<<j)) != 0 )
 					{
 						return ((i<<5)+j);

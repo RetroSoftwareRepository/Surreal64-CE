@@ -27,6 +27,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #define RICE_FVF_FILLRECTVERTEX ( D3DFVF_XYZRHW | D3DFVF_DIFFUSE  )
 
 extern FiddledVtx * g_pVtxBase;
+const int d3d_bias_factor = 4;
 
 inline float round( float x )
 {
@@ -281,9 +282,31 @@ bool D3DRender::RenderFillRect(uint32 dwColor, float depth)
 	return S_OK == g_pD3DDev->DrawIndexedPrimitiveUP(D3DPT_TRIANGLELIST, 0, 4, 2, wIndices, D3DFMT_INDEX16, frv, sizeof(FILLRECTVERTEX));
 }
 
+void ApplyZBias(uint32 bias)
+{
+#if DX_VERSION == 8
+	gD3DDevWrapper.SetRenderState(D3DRS_ZBIAS,bias*d3d_bias_factor);
+#else
+	float f1 = bias > 0 ? -0.002f : 0.0f;
+	float f2 = bias > 0 ? 1.0f : 0.0f;
+	gD3DDevWrapper.SetRenderState(D3DRS_DEPTHBIAS,*(DWORD*)(&f1));
+	gD3DDevWrapper.SetRenderState(D3DRS_SLOPESCALEDEPTHBIAS, *(DWORD*)(&f2));
+#endif
+}
+void D3DRender::SetZBias(int bias)
+{
+	//if (m_dwZBias != bias)
+	{
+		//DEBUGGER_IF_DUMP(pauseAtNext, TRACE1("Set zbias = %d", bias));
+
+		m_dwZBias = bias;
+		ApplyZBias(m_dwZBias);
+	}
+}
+
 bool D3DRender::RenderFlushTris()
 {
-	gD3DDevWrapper.SetRenderState(D3DRS_ZBIAS,m_dwZBias*8);
+	ApplyZBias(m_dwZBias);
 
 	gD3DDevWrapper.SetVertexShader(RICE_FVF_TLITVERTEX);
 	if( options.bForceSoftwareClipper )
@@ -446,18 +469,6 @@ void D3DRender::SetZUpdate(BOOL bZUpdate)
 		gD3DDevWrapper.SetRenderState(D3DRS_ZENABLE,  D3DZB_TRUE );
 	}
 	gD3DDevWrapper.SetRenderState(D3DRS_ZWRITEENABLE, bZUpdate );
-}
-
-void D3DRender::SetZBias(int bias)
-{
-	if (m_dwZBias != bias)
-	{
-		m_dwZBias = bias;
-		if( bias == 0 )
-			gD3DDevWrapper.SetRenderState(D3DRS_ZBIAS,0);
-		else
-			gD3DDevWrapper.SetRenderState(D3DRS_ZBIAS,16);
-	}
 }
 
 //freakdave

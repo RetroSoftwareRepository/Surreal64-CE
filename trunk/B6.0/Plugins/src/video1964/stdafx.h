@@ -34,6 +34,7 @@
 #include <commctrl.h>
 #include <ShellAPI.h>
 #include <winnt.h>			// For 32x32To64 multiplies
+#define D3DPIXELSHADERDEF DWORD;
 #endif //_XBOX
 
 #include <math.h>			// For sqrt()
@@ -48,8 +49,11 @@
 
 #include <process.h>
 
+#define USEDX8
+
 #if defined(_XBOX) || defined(USEDX8)
 #define DX_VERSION 8
+
 #else
 #define DX_VERSION 9
 #endif
@@ -59,7 +63,9 @@
 #include <d3dx8.h>
 #include <d3d8types.h>
 #include <D3dx8math.h>
+#ifdef _XBOX
 #include <xgraphics.h>
+#endif
 #elif DX_VERSION == 9
 #include <d3d9.h>
 #include <d3dx9.h>
