@@ -34,11 +34,18 @@ typedef struct
 	uint32			pageNum;
 } Frame;
 
+
+
+extern int	__EMU_BuildCheatList(void);
+extern void __EMU_SaveAndApplyCheats(void);
 extern void __EMU_GetStateFilename(int index, char *filename, int mode);
 extern void __EMU_Get1964StateFilename(int index, char *filename, int mode);
 extern void __EMU_GetPJ64StateFilename(int index, char *filename, int mode);
 extern BOOL __EMU_AudioMute(BOOL Mute);
 extern BOOL (*_AUDIO_LINK_AudioMute)(BOOL Mute);
+
+extern char gCheatTable[500][500];
+extern int gCheatActive[500];
 #pragma warning( disable : 4099 )  // Disable missing debug warnings
 //extern Frame *g_frameTable;
 //extern uint8 *g_memory;

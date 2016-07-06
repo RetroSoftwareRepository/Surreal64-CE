@@ -3,7 +3,7 @@
 #include "main.h"
 #include "stubs.h"
 #include "cpu.h"
-
+#include "cheats.h"
 #include "../Plugins.h"
 int g_iPagingMethod = _PagingXXX;
 #ifndef DEBUG
@@ -987,6 +987,35 @@ extern BOOL __EMU_AudioMute(BOOL Mute)
 		return _AUDIO_LINK_AudioMute(Mute);
 	else
 		return Mute;
+}
+
+char gCheatTable[500][500];
+int gCheatActive[500];
+extern int __EMU_BuildCheatList()
+{
+	int i;
+	char CheatName[500];
+	LoadCheats();
+	
+	for(i=0; i<NoOfCodes; i++)
+	{
+		if (!GetCheatName(i,CheatName,sizeof(CheatName))) { break; }
+		sprintf(gCheatTable[i],CheatName);
+		gCheatActive[i]=CheatActive(CheatName);
+	}
+	return NoOfCodes;
+}
+
+extern void __EMU_SaveAndApplyCheats()
+{
+	char CheatName[500];
+	int i;
+	for(i=0; i<NoOfCodes; i++)
+	{
+		if (!GetCheatName(i,CheatName,sizeof(CheatName))) { break; }
+		SaveCheat(CheatName,gCheatActive[i]);
+	}
+	LoadCheats();
 }
 
 // GogoAckman - free up 4Mb for the menu

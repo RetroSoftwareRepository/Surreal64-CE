@@ -54,7 +54,6 @@ extern char szPathSaves[256];
 //HWND hManageWindow = NULL;
 //HWND hSelectCheat, hAddCheat, hCheatTree;
 CHEAT_CODES Codes[MaxCheats];
-int NoOfCodes;
 
 
 /*******************************************************************************************
