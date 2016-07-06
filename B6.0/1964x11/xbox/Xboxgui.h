@@ -116,8 +116,8 @@ extern BOOL PathFileExists(const char *pszPath);
 extern BOOL TerminateThread(HANDLE hThread, DWORD dwExitCode);*/
 
 extern char g_szPathSaves[256];
-extern char gCheatTable[254][80];
-extern int	gCheatActive[254];
+extern "C" char gCheatTable[500][500];
+extern "C" int	gCheatActive[500];
 
 
 #define VirtualSafeFree(ptr) {if(ptr) {VirtualFree((ptr),0,MEM_RELEASE);(ptr)=NULL;}}

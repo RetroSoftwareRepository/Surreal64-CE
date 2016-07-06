@@ -223,7 +223,7 @@ DWORD XLMenu_GetCommand(XBGAMEPAD *gamepad)
     return command;
 }
 
-extern int gCheatActive[254];
+extern "C" int gCheatActive[500];
 extern int curPage;
 extern DWORD dwCheatActiveColor;
 DWORD XLMenu_Routine(DWORD command)

@@ -169,8 +169,8 @@ extern "C" BOOL __EMU_AudioMute(BOOL Mute)
 	else
 		return Mute;
 }
-char gCheatTable[254][80];
-int gCheatActive[254];
+char gCheatTable[500][500];
+int gCheatActive[500];
 
 extern "C" int __EMU_BuildCheatList()
 {
