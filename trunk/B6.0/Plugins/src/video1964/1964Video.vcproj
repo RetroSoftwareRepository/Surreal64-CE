@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="7.10"
 	Name="1964Video"
 	ProjectGUID="{1120AACC-8C31-486A-A9B8-0568DFF718F4}"
 	TargetFrameworkVersion="131072"
