@@ -39,7 +39,11 @@ typedef struct {
 	bool   bFog;
 #endif
 #ifndef _XBOX_PS
+#ifdef _XBOX
 	D3DPIXELSHADERDEF *pVS;
+#else
+	LPD3DXBUFFER pVS;
+#endif
 #endif
 	char *pShaderText;
 #if DIRECTX_VERSION > 8

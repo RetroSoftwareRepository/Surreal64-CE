@@ -684,11 +684,20 @@ void ReadConfiguration(void)
 		options.bFullTMEM = TRUE;
 		options.bUseFullTMEM = TRUE;
 		options.bForceSoftwareTnL = FALSE; // Unsupported on XBOX
+#ifdef _XBOX
 		options.bForceSoftwareClipper = (VertexMode == 1);
 		options.bUseLinearFog = (bUseLinFog && (VertexMode == 1));
+#else
+		options.bForceSoftwareClipper = TRUE;
+		options.bUseLinearFog = TRUE;
+#endif
 		options.bEnableSSE = TRUE;
 		options.RenderBufferSetting=0;
+#ifdef _XBOX
 		options.forceTextureFilter = TextureMode;
+#else
+		options.forceTextureFilter = 0;
+#endif
 		options.textureQuality = TXT_QUALITY_16BIT;
 		options.bTexRectOnly = FALSE;
 		options.bSmallTextureOnly = FALSE;
@@ -697,9 +706,13 @@ void ReadConfiguration(void)
 		options.colorQuality = TEXTURE_FMT_A4R4G4B4;
 		options.textureEnhancement = 0;
 		options.textureEnhancementControl = 0;
+#ifdef _XBOX
 		if((preferedemu != _1964x11)&&(FrameSkip>1))
 			FrameSkip = 0;
 		options.bSkipFrame = FrameSkip;
+#else
+		options.bSkipFrame = FALSE;
+#endif
 		options.OpenglRenderSetting = NULL;
 		options.bSkipFrame = FALSE;
 		options.bDisplayTooltip = FALSE;

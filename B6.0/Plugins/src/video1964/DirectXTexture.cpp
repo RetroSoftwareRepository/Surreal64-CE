@@ -95,7 +95,7 @@ bool CDirectXTexture::StartUpdate(DrawInfo *di)
 	{
 		return false;
 	}
-
+	/*
 	if( pTempbuffer )
 	{
 		delete [] pTempbuffer;
@@ -106,6 +106,7 @@ bool CDirectXTexture::StartUpdate(DrawInfo *di)
 	if( !pTempbuffer )
 		return false;
 	di->lpSurface = pTempbuffer;
+	*/
 #else
 	di->lpSurface = g_ucTempBuffer; //pTempbuffer
 	di->dwHeight = (uint16)m_dwHeight;
@@ -260,7 +261,11 @@ LPRICETEXTURE CDirectXTexture::CreateTexture(uint32 dwWidth, uint32 dwHeight, Te
 
 	// HACK - we should only assign this when m_pTexture is assigned!
 	
-	if( pf == D3DFMT_A8R8G8B8 || pf == D3DFMT_X8R8G8B8  || pf == D3DFMT_LIN_X8R8G8B8 || pf == D3DFMT_LIN_A8R8G8B8) // Add Linear modes for XBOX
+	if( pf == D3DFMT_A8R8G8B8 || pf == D3DFMT_X8R8G8B8  
+#ifdef _XBOX  // Add Linear modes for XBOX
+		|| pf == D3DFMT_LIN_X8R8G8B8 || pf == D3DFMT_LIN_A8R8G8B8
+#endif
+		)
 		m_dwTextureFmt = TEXTURE_FMT_A8R8G8B8;
 	else
 		m_dwTextureFmt = TEXTURE_FMT_A4R4G4B4;

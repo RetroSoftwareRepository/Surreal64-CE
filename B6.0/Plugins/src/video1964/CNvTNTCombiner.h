@@ -76,7 +76,7 @@ protected:
 
 	int FindCompiledMux();
 	int ParseDecodedMux();				// Compile the decodedMux into NV register combiner setting
-	virtual void ParseDecodedMuxForConstants(TNT2CombinerSaveType &res);
+	void ParseDecodedMuxForConstants(TNT2CombinerSaveType &res);
 	int SaveParserResult(TNT2CombinerSaveType &result);
 	
 	std::vector<TNT2CombinerSaveType>	m_vCompiledTNTSettings;

@@ -52,8 +52,6 @@ int FormatToSize(D3DFORMAT fmt)
 	case D3DFMT_R8G8B8:
 	case D3DFMT_A8R8G8B8:
 	case D3DFMT_X8R8G8B8:
-	case D3DFMT_A2B10G10R10:
-	case D3DFMT_G16R16:
 	case D3DFMT_INDEX32:
 	case D3DFMT_D32:
 	case D3DFMT_D24S8:
@@ -871,40 +869,20 @@ HRESULT CDXGraphicsContext::InitializeD3D()
 
 	}
 #else
-	m_d3dpp.Windowed               = pDeviceInfo->bWindowed;
+	m_d3dpp.Windowed               = m_bWindowed;
 	m_d3dpp.BackBufferCount        = DirectXRenderBufferSettings[options.RenderBufferSetting].number;
 	m_d3dpp.EnableAutoDepthStencil = TRUE; /*m_bUseDepthBuffer;*/
-	m_d3dpp.AutoDepthStencilFormat = pModeInfo->DepthStencilFormat;
+	//m_d3dpp.AutoDepthStencilFormat = pModeInfo->DepthStencilFormat;
 	m_d3dpp.AutoDepthStencilFormat = (D3DFORMAT)(DirectXDepthBufferSetting[options.DirectXDepthBufferSetting].number);
 	m_d3dpp.hDeviceWindow          = m_hWnd;
 	m_d3dpp.Flags				   = D3DPRESENTFLAG_LOCKABLE_BACKBUFFER;
 
-	m_d3dpp.MultiSampleType        = pDeviceInfo->MultiSampleType;
+	m_d3dpp.MultiSampleType        = D3DMULTISAMPLE_NONE;
 	m_FSAAIsEnabled = false;
-	if( pDeviceInfo->MultiSampleType != D3DMULTISAMPLE_NONE && m_maxFSAA > 0 )
+	if (options.DirectXAntiAliasingValue != 0)
 	{
-#if DX_VERSION == 8
-		if( SUCCEEDED(m_pD3D->CheckDeviceMultiSampleType( D3DADAPTER_DEFAULT, 
-			//D3DDEVTYPE_HAL , pAdapterInfo->d3ddmDesktop.Format, 
-			D3DDEVTYPE_HAL , pModeInfo->Format, 
-			m_bWindowed, pDeviceInfo->MultiSampleType ) ) )
-#elif DX_VERSION == 9
-		if( SUCCEEDED(m_pD3D->CheckDeviceMultiSampleType( D3DADAPTER_DEFAULT, 
-			//D3DDEVTYPE_HAL , pAdapterInfo->d3ddmDesktop.Format, 
-			D3DDEVTYPE_HAL , pModeInfo->Format, 
-			m_bWindowed, pDeviceInfo->MultiSampleType, NULL ) ) )
-#endif
-		{
-			m_FSAAIsEnabled = true;
-		}
-		else
-		{
-			m_d3dpp.MultiSampleType        = D3DMULTISAMPLE_NONE;
-		}
-	}
-	else
-	{
-		m_d3dpp.MultiSampleType        = D3DMULTISAMPLE_NONE;
+		m_d3dpp.MultiSampleType = (D3DMULTISAMPLE_TYPE)(D3DMULTISAMPLE_NONE + (int)options.DirectXAntiAliasingValue);
+		m_FSAAIsEnabled = true;
 	}
 
 	if( currentRomOptions.N64FrameBufferEmuType != FRM_BUF_NONE && m_FSAAIsEnabled )
@@ -924,7 +902,7 @@ HRESULT CDXGraphicsContext::InitializeD3D()
 		windowSetting.uDisplayWidth = windowSetting.uWindowDisplayWidth;
 		windowSetting.uDisplayHeight= windowSetting.uWindowDisplayHeight;
 
-		m_d3dpp.BackBufferFormat	= pAdapterInfo->d3ddmDesktop.Format;
+		m_d3dpp.BackBufferFormat	= D3DFMT_X8R8G8B8;
 		m_d3dpp.FullScreen_RefreshRateInHz = 0;
 
     }
@@ -937,28 +915,28 @@ HRESULT CDXGraphicsContext::InitializeD3D()
 		windowSetting.uDisplayWidth = windowSetting.uFullScreenDisplayWidth;
 		windowSetting.uDisplayHeight = windowSetting.uFullScreenDisplayHeight;
         //m_d3dpp.BackBufferFormat	= pAdapterInfo->d3ddmDesktop.Format;
-        m_d3dpp.BackBufferFormat	= pModeInfo->Format;
+        m_d3dpp.BackBufferFormat	= D3DFMT_X8R8G8B8;
 		
 		m_d3dpp.FullScreen_RefreshRateInHz = windowSetting.uFullScreenRefreshRate;
-		if( m_d3dpp.FullScreen_RefreshRateInHz > pModeInfo->RefreshRate )
+		/*if( m_d3dpp.FullScreen_RefreshRateInHz > pModeInfo->RefreshRate )
 		{
 			m_d3dpp.FullScreen_RefreshRateInHz = pModeInfo->RefreshRate;
 			windowSetting.uFullScreenRefreshRate = pModeInfo->RefreshRate;
-		}
+		}*/
     }
-	m_desktopFormat = pAdapterInfo->d3ddmDesktop.Format;
+	m_desktopFormat = D3DFMT_X8R8G8B8;
 	m_d3dpp.BackBufferWidth		= windowSetting.uDisplayWidth;
 	m_d3dpp.BackBufferHeight	= windowSetting.uDisplayHeight;
 
 	
     // Create the device
-	hr = m_pD3D->CreateDevice( m_dwAdapter, pDeviceInfo->DeviceType,m_hWnd, pModeInfo->dwBehavior, &m_d3dpp,	&m_pd3dDevice );
+	hr = m_pD3D->CreateDevice( m_dwAdapter, D3DDEVTYPE_HAL,m_hWnd, D3DCREATE_HARDWARE_VERTEXPROCESSING | D3DCREATE_PUREDEVICE, &m_d3dpp,	&m_pd3dDevice );
 	if( !SUCCEEDED(hr) && m_d3dpp.MultiSampleType == D3DMULTISAMPLE_NONE )
 	{
 		// Try again without FSAA
 		SetWindowText(g_GraphicsInfo.hStatusBar,"Can not initialize DX8, try again without FSAA");
 		m_d3dpp.MultiSampleType        = D3DMULTISAMPLE_NONE;
-		hr = m_pD3D->CreateDevice( m_dwAdapter, pDeviceInfo->DeviceType,m_hWnd, pModeInfo->dwBehavior, &m_d3dpp,	&m_pd3dDevice );
+		hr = m_pD3D->CreateDevice( m_dwAdapter, D3DDEVTYPE_HAL,m_hWnd, D3DCREATE_HARDWARE_VERTEXPROCESSING | D3DCREATE_PUREDEVICE, &m_d3dpp,	&m_pd3dDevice );
 	}
 #endif
 
@@ -997,7 +975,7 @@ HRESULT CDXGraphicsContext::InitializeD3D()
 			m_dwCreateFlags = D3DCREATE_MIXED_VERTEXPROCESSING;
 		}
 #else
-        m_dwCreateFlags = pModeInfo->dwBehavior;
+        m_dwCreateFlags = D3DCREATE_HARDWARE_VERTEXPROCESSING | D3DCREATE_PUREDEVICE;
 		
         if( m_bWindowed )
         {
@@ -1009,6 +987,7 @@ HRESULT CDXGraphicsContext::InitializeD3D()
         }
 
         // Store device description
+		/*
         if( pDeviceInfo->DeviceType == D3DDEVTYPE_REF )
             lstrcpy( m_strDeviceStats, "REF" );
         else if( pDeviceInfo->DeviceType == D3DDEVTYPE_HAL )
@@ -1048,12 +1027,14 @@ HRESULT CDXGraphicsContext::InitializeD3D()
             lstrcat( m_strDeviceStats, ": " );
             lstrcat( m_strDeviceStats, pAdapterInfo->d3dAdapterIdentifier.Description );
         }
+		
 	
 		if ( IsWindow(m_hWndStatus ) )
 		{
 			SetWindowText(m_hWndStatus, m_strDeviceStats);
 		}
 		TRACE0(m_strDeviceStats);
+		*/
 #endif
 	
 		

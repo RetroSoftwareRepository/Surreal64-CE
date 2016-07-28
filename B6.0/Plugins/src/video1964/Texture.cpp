@@ -101,7 +101,7 @@ void CTexture::ScaleImageToSurface(bool scaleS, bool scaleT)
 	{
 	case 4:
 		{
-#ifdef _XBOX
+#if 1
 			memcpy((uint8*)g_ucTempBuffer, (uint8*)(di.lpSurface), m_dwHeight*m_dwCreatedTextureWidth*4);
 #else
 			memcpy((uint8*)pTempbuffer, (uint8*)(di.lpSurface), m_dwHeight*m_dwCreatedTextureWidth*4);
@@ -117,7 +117,7 @@ void CTexture::ScaleImageToSurface(bool scaleS, bool scaleT)
 				// surfaces are created which results in  /0...
 				//ySrc = (yDst * (m_dwHeight-1)) / (d3dTextureHeight-1);
 				ySrc = (uint32)((yDst * height) / m_dwCreatedTextureHeight+0.49f);
-#ifdef _XBOX
+#if 1
 				pSrc = (uint32*)((uint8*)g_ucTempBuffer + (ySrc * m_dwCreatedTextureWidth * 4));
 #else
 				pSrc = (uint32*)((uint8*)pTempbuffer + (ySrc * m_dwCreatedTextureWidth * 4));
@@ -135,7 +135,7 @@ void CTexture::ScaleImageToSurface(bool scaleS, bool scaleT)
 		break;
 	case 2:
 		{
-#ifdef _XBOX
+#if 1
 			memcpy((uint8*)g_ucTempBuffer, (uint8*)(di.lpSurface), m_dwHeight*m_dwCreatedTextureWidth*2);
 #else
 			memcpy((uint8*)pTempbuffer, (uint8*)(di.lpSurface), m_dwHeight*m_dwCreatedTextureWidth*2);
@@ -148,7 +148,7 @@ void CTexture::ScaleImageToSurface(bool scaleS, bool scaleT)
 			{
 				// ySrc ranges from 0..m_dwHeight
 				ySrc = (yDst * height) / m_dwCreatedTextureHeight;
-#ifdef _XBOX
+#if 1
 				pSrc = (uint16*)((uint8*)g_ucTempBuffer + (ySrc * m_dwCreatedTextureWidth * 2));
 #else
 				pSrc = (uint16*)((uint8*)pTempbuffer + (ySrc * m_dwCreatedTextureWidth * 2));

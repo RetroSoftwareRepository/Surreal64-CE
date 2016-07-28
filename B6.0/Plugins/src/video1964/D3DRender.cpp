@@ -801,7 +801,7 @@ void D3DRender::CaptureScreen(char *filename)
 #ifdef _XBOX
 	XGWriteSurfaceToFile(surface, filename);
 #else
-	D3DXSaveSurfaceToFile(filename,D3DXIFF_BMP,surface,NULL,NULL);
+	//D3DXSaveSurfaceToFile(filename,D3DXIFF_BMP,surface,NULL,NULL);
 	//D3DXSaveSurfaceToFile(filename,D3DXIFF_BMP,surface,NULL,&rect);
 #endif
 
