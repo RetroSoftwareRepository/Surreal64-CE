@@ -326,7 +326,7 @@ exit:
 	
 	Unlock();
 
-	m_pd3dDevice->Present( NULL, NULL, NULL, NULL );
+	//m_pd3dDevice->Present( NULL, NULL, NULL, NULL ); // Needed? seems to cause issues in windowed mode...
 	status.bScreenIsDrawn = false;
 	if( g_curRomInfo.bForceScreenClear )	needCleanScene = true;
 

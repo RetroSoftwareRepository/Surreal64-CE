@@ -186,7 +186,7 @@ LPRICETEXTURE CDirectXTexture::CreateTexture(uint32 dwWidth, uint32 dwHeight, Te
 #endif
 			break;
 		case AS_RENDER_TARGET:
-			pf = D3DFMT_LIN_X1R5G5B5;
+			pf = D3DFMT_A4R4G4B4;
 			break;
 		default:
 			if( options.textureQuality == TXT_QUALITY_32BIT )

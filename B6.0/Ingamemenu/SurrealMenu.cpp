@@ -23,9 +23,13 @@ extern "C" void __EMU_GetStateFilename(int index, char *timestamp, int mode);
 extern "C" void __EMU_Get1964StateFilename(int index, char *timestamp, int mode);
 extern "C" void __EMU_GetPJ64StateFilename(int index, char *timestamp, int mode);
 
+#ifdef _UXLE
+int __EMU_BuildCheatList(){return 0;};
+void __EMU_SaveAndApplyCheats(){};
+#else
 extern "C" int __EMU_BuildCheatList();
 extern "C" void __EMU_SaveAndApplyCheats();
-
+#endif
 void GetStateTimestamp(int index, int emulator, char *timestamp);
 void CreateSaveStatePreview(unsigned int index);
 bool LoadSaveStatePreview(unsigned int index, int emulator);
@@ -1736,8 +1740,14 @@ void SaveState5()
 	XLMenu_CurMenu = NULL;
 }
 
+#ifdef _UXLE
+char gCheatTable[500][500];
+int gCheatActive[500];
+#else
 extern "C" char gCheatTable[500][500];
 extern "C" int gCheatActive[500];
+#endif
+
 int curCheat;
 int curPage = 1;
 int numMenuPages = 1;

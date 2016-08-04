@@ -814,7 +814,7 @@ void DLParser_Process()
 	if ( CRender::g_pRender == NULL)
 	{
 		TriggerDPInterrupt();
-		//TriggerSPInterrupt();
+		TriggerSPInterrupt();
 		return;
 	}
 
@@ -825,7 +825,7 @@ void DLParser_Process()
 		if(skipframe%2)
 		{
 			TriggerDPInterrupt();
-			//TriggerSPInterrupt();
+			TriggerSPInterrupt();
 			return;
 		}
 	}
@@ -1310,6 +1310,48 @@ void DLParser_FillRect(Gfx *gfx)
 
 	if( status.bN64IsDrawingTextureBuffer && frameBufferOptions.bIgnore )
 	{
+		return;
+	}
+
+	// Removes annoying rect that appears in Conker and fillrects that cover screen in banjo tooie
+	if (g_CI.dwFormat != TXT_FMT_RGBA)
+	{
+		return;
+	}
+
+	uint32 fill_colour = gRDP.originalFillColor;
+
+	//Always clear zBuffer if depth buffer has been selected
+	if(g_ZI.dwAddr == g_CI.dwAddr)
+	{
+		//Clear the z buffer
+		CRender::g_pRender->ClearBuffer(false,true);
+		
+		//Clear depth buffer, fixes jumpy camera in DK64, also the sun and flames glare in Zelda
+		int ix0 = (((gfx->words.cmd1)>>12)&0xFFF)/4 + 1;
+		int ix1 = (((gfx->words.cmd0)>>12)&0xFFF)/4 + 1;
+		int iy1 = (((gfx->words.cmd0)>>0 )&0xFFF)/4;
+		int iy0 = (((gfx->words.cmd1)>>0 )&0xFFF)/4;
+		
+		ix0 = min(max(ix0, gRDP.scissor.left), gRDP.scissor.right);
+		ix1 = min(max(ix1, gRDP.scissor.left), gRDP.scissor.right);
+		iy1 = min(max(iy1, gRDP.scissor.top), gRDP.scissor.bottom);
+		iy0 = min(max(iy0, gRDP.scissor.top), gRDP.scissor.bottom);
+
+		ix0 >>= 1;
+		ix1 >>= 1;
+
+		uint32 zi_width_in_dwords = g_CI.dwWidth >> 1;
+		uint32 * dst = (uint32*)(g_pRDRAMu8 + g_CI.dwAddr) + iy0 * zi_width_in_dwords;
+
+		for (int y = iy0; y < iy1; y++)
+		{
+			for (int x = ix0; x < ix1; x++)
+			{
+				dst[x] = fill_colour;
+			}
+			dst += zi_width_in_dwords;
+		}
 		return;
 	}
 

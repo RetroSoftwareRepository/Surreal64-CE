@@ -1001,6 +1001,14 @@ extern BOOL __EMU_AudioMute(BOOL Mute)
 		return Mute;
 }
 
+char gCheatTable[500][500];
+int gCheatActive[500];
+extern int __EMU_BuildCheatList()
+{
+	return 0;
+}
+extern void __EMU_SaveAndApplyCheats(){}
+
 // GogoAckman - free up 4Mb for the menu
 BOOL __fastcall ReInitVirtualDynaMemory(boolean charge)
 {

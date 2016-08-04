@@ -199,6 +199,14 @@ extern BOOL __EMU_AudioMute(BOOL Mute)
 		return Mute;
 }
 
+char gCheatTable[500][500];
+int gCheatActive[500];
+extern int __EMU_BuildCheatList()
+{
+	return 0;
+}
+extern void __EMU_SaveAndApplyCheats(){}
+
 int avail;
 MEMORYSTATUS stat;
 char buf[100];

@@ -22,6 +22,8 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "Texture.h"
 
+#define LIMIT_TEXTMEM
+
 class TxtrInfo
 {
 public:
@@ -233,7 +235,7 @@ public:
 	void RecycleAllTextures();
 	bool CleanUp();
 
-#ifdef _XBOX
+#ifdef LIMIT_TEXTMEM
 	void FreeTextures();
 #endif
 };

@@ -508,8 +508,8 @@ bool CDXGraphicsContext::Initialize(HWND hWnd, HWND hWndStatus,
 			Clear(CLEAR_COLOR_AND_DEPTH_BUFFER);
 			m_pd3dDevice->BeginScene();
 			m_pd3dDevice->EndScene();
-			//UpdateFrame();
-			m_pd3dDevice->Present( NULL, NULL, NULL, NULL );
+			UpdateFrame();
+			//m_pd3dDevice->Present( NULL, NULL, NULL, NULL );
 		}
 	}
 
@@ -798,8 +798,8 @@ HRESULT CDXGraphicsContext::InitializeD3D()
 	windowSetting.uDisplayWidth = m_d3dpp.BackBufferWidth;
 	windowSetting.uDisplayHeight = m_d3dpp.BackBufferHeight;
 
-	//m_desktopFormat = D3DFMT_LIN_R5G6B5;
-	m_desktopFormat = D3DFMT_A8R8G8B8;
+	m_desktopFormat = D3DFMT_X1R5G5B5;
+	//m_desktopFormat = D3DFMT_A8R8G8B8;
 
 	//freakdave
 	if(VertexMode == 0){

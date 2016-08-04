@@ -574,7 +574,15 @@ void InitRenderBase()
 	gRSP.real_clip_scissor_top = 0;
 	gRSP.real_clip_scissor_right = 640;
 	gRSP.real_clip_scissor_bottom = 480;
-
+#ifdef _DXCLIP
+	windowSetting.clipping.left = 0;
+	windowSetting.clipping.top = 0;
+	windowSetting.clipping.right = 640;
+	windowSetting.clipping.bottom = 480;
+	windowSetting.clipping.width = 640;
+	windowSetting.clipping.height = 480;
+	windowSetting.clipping.needToClip = false;
+#endif
 	gRSP.real_clip_ratio_negx = 1;
 	gRSP.real_clip_ratio_negy = 1;
 	gRSP.real_clip_ratio_posx = 1;
