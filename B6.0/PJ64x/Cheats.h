@@ -46,9 +46,10 @@ void LoadCheats			( void );
 void ApplyGSButton		(void);
 
 BOOL GetCheatName(int CheatNo, char *CheatName, int CheatNameLen);
-BOOL CheatActive(char *Name);
-void SaveCheat(char *CheatName, BOOL Active);
+BOOL CheatActive(char *Name, int CheatNo);
+void SaveCheat(int CheatNo, BOOL Active);
 int NoOfCodes;
+int NoOfCodes2;
 
 LRESULT CALLBACK Cheat_Proc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 

@@ -916,7 +916,7 @@ static __forceinline void SwapRomHeader(uint8 *romheader)
 
 extern float __EMU_GetVIPerSecond(void)
 {
-	return XboxVIs;// + Timers.Timer);
+	return XboxVIs*2;// + Timers.Timer);
 }
 
 extern int CurrentSaveSlot;
@@ -996,25 +996,27 @@ extern int __EMU_BuildCheatList()
 	int i;
 	char CheatName[500];
 	LoadCheats();
-	
-	for(i=0; i<NoOfCodes; i++)
+
+	for(i=0; i<NoOfCodes2; i++)
 	{
-		if (!GetCheatName(i,CheatName,sizeof(CheatName))) { break; }
+		GetCheatName(i,CheatName,sizeof(CheatName));
 		sprintf(gCheatTable[i],CheatName);
-		gCheatActive[i]=CheatActive(CheatName);
+		gCheatActive[i]=CheatActive(CheatName,i);
 	}
-	return NoOfCodes;
+	return NoOfCodes2;
 }
 
 extern void __EMU_SaveAndApplyCheats()
 {
 	char CheatName[500];
 	int i;
-	for(i=0; i<NoOfCodes; i++)
+	for(i=0; i<NoOfCodes2; i++)
 	{
-		if (!GetCheatName(i,CheatName,sizeof(CheatName))) { break; }
-		SaveCheat(CheatName,gCheatActive[i]);
+		GetCheatName(i,CheatName,sizeof(CheatName));
+		SaveCheat(i,gCheatActive[i]);
 	}
+
+	ApplyCheats();
 	LoadCheats();
 }
 
