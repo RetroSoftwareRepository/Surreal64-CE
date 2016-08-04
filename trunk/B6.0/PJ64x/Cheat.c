@@ -35,7 +35,7 @@
 #include "cpu.h"
 #include "resource.h"
 #ifdef _XBOX
-//#include "../simpleini.h" // ini parser
+#include "../Common/ini_manage.h" // ini parser
 //extern char romCRC[32];
 extern char szPathSaves[256];
 #endif
@@ -84,7 +84,7 @@ BOOL GetCheatName          ( int CheatNo, char * CheatName, int CheatNameLen );
 BOOL LoadCheatExt          ( char * CheatName, char * CheatExt, int MaxCheatExtLen);
 //void RefreshCheatManager   ( void );
 void RenameCheat           ( int CheatNo );
-void SaveCheat             ( char * CheatName, BOOL Active );
+void SaveCheat             ( int CheatNo, BOOL Active );
 void SaveCheatExt          ( char * CheatName, char * CheatExt );
 //int  _TreeView_GetCheckState(HWND hwndTreeView, HTREEITEM hItem);
 //BOOL _TreeView_SetCheckState(HWND hwndTreeView, HTREEITEM hItem, int State);
@@ -232,6 +232,7 @@ int ApplyCheatEntry (GAMESHARK_CODE * Code, BOOL Execute ) {
 	return 1;
 }
 
+extern int gCheatActive[500];
 void ApplyCheats (void) {
 	int CurrentCheat, CurrentEntry;
 
@@ -405,78 +406,38 @@ void ApplyCheats (void) {
 	False: cheat isn't active or cheat isn't found in registry
 
 ********************************************************************************************/
-BOOL CheatActive (char * Name) {
-
-
-	char *String = NULL, File[350], Identifier[100];
-	sprintf(File, "%s%08X\\Cheats\\%08X-%08X-%02X.pj64.cht", g_szPathSaves, *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x14)), *((BYTE *)(RomHeader + 0x3D)));
-	sprintf(Identifier,"%08X-%08X-C:%X",*(DWORD *)(&RomHeader[0x10]),*(DWORD *)(&RomHeader[0x14]),RomHeader[0x3D]);
-	if(PathFileExists(File)) {
-		OutputDebugString("Cheat File Found!\n");
-		sprintf(String,"%s.Active",Name);
-		_GetPrivateProfileString2(Identifier,Name,"",&String,File);
-		if (atoi(String) != 1) {
-		if (String) { free(String); }
-		return FALSE;		
-		}
-		else
-		{
-		if (String) { free(String); }
-		return TRUE;	
-		}
-	}
-
-	/*
-	CSimpleIniA ini;
-	SI_Error rc;
-	ini.SetUnicode(true);
-	ini.SetMultiKey(true);
-	ini.SetMultiLine(false);
-	ini.SetSpaces(false); // spaces before and after =
-	DWORD Active;
-
-	char szIniFilename[64];
-	sprintf(szIniFilename, "%s%s\\%s_cht.ini", szPathSaves, romCRC, romCRC);
-
-	rc = ini.LoadFile(szIniFilename);
-	if (rc < 0) 
-	{
-		OutputDebugStringA(" Failed to Load!\n");
-		return FALSE;
-	}
-	OutputDebugStringA(" Successfully Loaded!\n");
-
-	Active = ini.GetBoolValue("Cheat Activation", "Cheat Active", false);
-	return Active;
-/*
-	char String[300], Identifier[100];
-	HKEY hKeyResults = 0;
-	long lResult;
+BOOL CheatActive (char * Name, int CheatNo) {
+#ifdef CHEAT_INI
+	char File[350];
+	sprintf(File, "%s%08X\\%08X-%08X-%02X.cht", g_szPathSaves, *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x14)), *((BYTE *)(RomHeader + 0x3D)));
 	
-	sprintf(Identifier,"%08X-%08X-C:%X",*(DWORD *)(&RomHeader[0x10]),*(DWORD *)(&RomHeader[0x14]),RomHeader[0x3D]);
-	sprintf(String,"D:\\Cheats\\%s",Identifier);
-	//lResult = RegOpenKeyEx( HKEY_CURRENT_USER,String,0, KEY_ALL_ACCESS,&hKeyResults); // check is game ID excists in registry
-	//Open cheat ini, check if game exists.
-	if (lResult == ERROR_SUCCESS) {
-		DWORD Type, Bytes, Active;
-		char GameName[300];
-
-		Bytes = sizeof(GameName);
-		//lResult = RegQueryValueEx(hKeyResults,"Name",0,&Type,(LPBYTE)GameName,&Bytes); // get gamename from registry
-		//Load the Rom name...
-		Bytes = sizeof(Active);
-		lResult = RegQueryValueEx(hKeyResults,Name,0,&Type,(LPBYTE)(&Active),&Bytes); // get cheat-state from registry
-		RegCloseKey(hKeyResults);
-		if (lResult == ERROR_SUCCESS) { return Active; } // if no errors return active state
+	if(PathFileExists(File)) {
+		FILE* f;
+		f = fopen(File , "r+");
+		if(f){
+			//OutputDebugString("Cheat File Found!\n");
+			char line[100];
+			int i,j;
+			for(i = 0; i < 500; i++){
+				fgets(line,100, f);
+				if(i == CheatNo){
+					for(j = 0; j < 100; j++) {
+						if(line[j] == '=')
+							return atoi(&line[j+1]);
+					}
+				}
+			}
+			fclose(f);
+		}
 	}
-	return FALSE;
-	*/
-
-	return FALSE;
-
-    // Need to check an ini entry that says if cheats were/are active. 
-	//sprintf(File, "%s%08X\\%08X-%08X-%02X.ini", g_szPathCheats, *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x14)), *((BYTE *)(RomHeader + 0x3D)));
-
+#else
+	char FilePath[350];
+		sprintf(FilePath, "%s%08X\\Cheats\\%08X-%08X-%02X\\%d", g_szPathSaves, *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x14)), *((BYTE *)(RomHeader + 0x3D)), CheatNo);	
+		if(PathFileExists(FilePath))
+			return TRUE;
+		else
+			return FALSE;
+#endif
 }
 
 
@@ -633,7 +594,7 @@ void DisableAllCheats(void) {
 
 	for (count = 0; count < MaxCheats; count ++ ) {
 		if (!GetCheatName(count,CheatName,sizeof(CheatName))) { break; }
-		SaveCheat(CheatName,FALSE);
+		SaveCheat(count,FALSE);
 	}
 }
 
@@ -704,73 +665,21 @@ BOOL GetCheatName(int CheatNo, char * CheatName, int CheatNameLen) {
 
 ********************************************************************************************/
 BOOL LoadCheatExt(char * CheatName, char * CheatExt, int MaxCheatExtLen) {
-	
 /*
-
-	CSimpleIniA ini;
-	SI_Error rc;
-	ini.SetUnicode(true);
-	ini.SetMultiKey(true);
-	ini.SetMultiLine(false);
-	ini.SetSpaces(false); // spaces before and after =
-
-	char String[350];
-
-	char szIniFilename[64];
-	sprintf(szIniFilename, "%s%s\\%s_cht.ini", szPathSaves, romCRC, romCRC);
-
-	rc = ini.LoadFile(szIniFilename);
-	if (rc < 0) 
-	{
-		OutputDebugStringA(" Failed to Load!\n");
-		return FALSE;
-	}
-	OutputDebugStringA(" Successfully Loaded!\n");
-
-	sprintf(String,"%s.exten",CheatName);
-	CheatExt = ini.GetValue("CheatExt", String, "");
-	return TRUE;
-*/
 	char *String = NULL, Identifier[100], FilePath[350];
-	sprintf(FilePath, "%s%08X\\Cheats\\%08X-%08X-%02X.pj64.cht.ext", g_szPathSaves, *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x14)), *((BYTE *)(RomHeader + 0x3D)));
+	sprintf(FilePath, "%s%08X\\%08X-%08X-%02X.cht", g_szPathSaves, *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x14)), *((BYTE *)(RomHeader + 0x3D)));
 	sprintf(Identifier,"%08X-%08X-C:%X",*(DWORD *)(&RomHeader[0x10]),*(DWORD *)(&RomHeader[0x14]),RomHeader[0x3D]);
 	if(PathFileExists(FilePath)) {
 		OutputDebugString("Cheat Ext Exists!\n");
 		sprintf(String,"%s.exten",CheatName);
-		_GetPrivateProfileString(Identifier,CheatName,String,CheatExt,MaxCheatExtLen,FilePath);
+		_GetPrivateProfileString2(Identifier,String,"",&CheatExt,FilePath);
 		return TRUE;
 	}
 	else
 	{
 		return FALSE;
 	}
-
-/*
-
-	char String[350], Identifier[100];
-	//HKEY hKeyResults = 0;
-	long lResult;
-	
-	if (CheatName == NULL)
-	{ 
-		return FALSE;
-	}
-
-	sprintf(Identifier,"%08X-%08X-C:%X",*(DWORD *)(&RomHeader[0x10]),*(DWORD *)(&RomHeader[0x14]),RomHeader[0x3D]);
-	sprintf(String,"Software\\N64 Emulation\\%s\\Cheats\\%s",AppName,Identifier);
-
-	//lResult = RegOpenKeyEx( HKEY_CURRENT_USER,String,0, KEY_ALL_ACCESS,&hKeyResults);	 // open rom cheat ini
-	if (lResult == ERROR_SUCCESS) {		
-		DWORD Type, Bytes;
-
-		sprintf(String,"%s.exten",CheatName);
-		Bytes = MaxCheatExtLen;
-		//lResult = RegQueryValueEx(hKeyResults,String,0,&Type,(LPBYTE)CheatExt,&Bytes); // load cheat ext	
-		//RegCloseKey(hKeyResults);
-		if (lResult == ERROR_SUCCESS) { return TRUE; }
-	}
-	return FALSE;
-	*/
+*/
 	return FALSE;
 }
 
@@ -864,6 +773,7 @@ void LoadCheats (void) {
 	IniFileName = GetCheatIniFileName();
 	sprintf(Identifier,"%08X-%08X-C:%X",*(DWORD *)(&RomHeader[0x10]),*(DWORD *)(&RomHeader[0x14]),RomHeader[0x3D]);
 	NoOfCodes = 0;
+	NoOfCodes2 = 0;
 
 	LoadPermCheats();
 	
@@ -881,53 +791,94 @@ void LoadCheats (void) {
 		if (strlen(CheatName) == 0) { continue; }
 		//if (strrchr(CheatName,'\\') != NULL) {
 		//	strcpy(CheatName,strrchr(CheatName,'\\') + 1);
-		//}		
-		if (!CheatActive (CheatName)) { continue; }
+		//}	
+		NoOfCodes2++;
+		if (!CheatActive (CheatName,count)) { continue; }
 		ReadPos = strrchr(String,'"') + 2;
 		LoadCode(CheatName, ReadPos);
 	}
 	if (String) { free(String); }
 }
 
-void SaveCheat(char * CheatName, BOOL Active) {
-	
-	char *String = NULL, Identifier[100], FilePath[350];
-	sprintf(FilePath, "%s%08X\\Cheats\\%08X-%08X-%02X.pj64.cht", g_szPathSaves, *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x14)), *((BYTE *)(RomHeader + 0x3D)));
-	sprintf(Identifier,"%08X-%08X-C:%X",*(DWORD *)(&RomHeader[0x10]),*(DWORD *)(&RomHeader[0x14]),RomHeader[0x3D]);
-	if(PathFileExists(FilePath)) {
-		OutputDebugString("T:\\Cheat File Found!\n");
-		sprintf(String,"%s.Active",CheatName);
-		_WritePrivateProfileString(Identifier,String,(CONST BYTE *)(&Active),FilePath);
-		OutputDebugString("Cheat Saved!\n");
+void SaveCheat(int CheatNo, BOOL Active) {
+
+HANDLE hFile;
+#ifdef CHEAT_INI
+	FILE* f;
+	int LastActive[500], i, j;
+	char FilePath[350], DirPath[350];
+	sprintf(FilePath, "%s%08X\\%08X-%08X-%02X.cht", g_szPathSaves, *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x14)), *((BYTE *)(RomHeader + 0x3D)));
+	sprintf(DirPath, "%s%08X\\", g_szPathSaves, *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x14)), *((BYTE *)(RomHeader + 0x3D)));
+
+	if(PathFileExists(FilePath))
+	{
+		f = fopen(FilePath , "r");
+		if(f){
+			char line[100];
+			for(i = 0; i < 500; i++){
+				fgets(line,100, f);
+				if(i == CheatNo){
+					for(j = 0; j < 100; j++) {
+						if(line[j] == '=')
+							LastActive[i] = atoi(&line[j+1]);
+					}
+				}
+			}
+		fclose(f);
+		}
+		f = fopen(FilePath , "w");
+		if(f) {
+			for(i=0;i<500;i++){
+				if(i==CheatNo)
+					fprintf(f, "Cheat%d.Active=%d\n", CheatNo, Active);
+				else
+					fprintf(f, "Cheat%d.Active=0\n", i);
+			}
+			fclose(f);
+		}
 	}
 	else
 	{
-		HANDLE hFile;
 		hFile = CreateFile(FilePath,GENERIC_WRITE | GENERIC_READ, FILE_SHARE_READ,
-				NULL,OPEN_ALWAYS,FILE_ATTRIBUTE_NORMAL | FILE_FLAG_RANDOM_ACCESS, NULL);
-		if (hFile == INVALID_HANDLE_VALUE)
-		{
-			OutputDebugString("Cannot Create T:\\Cheat File!\n");
+				NULL,CREATE_NEW,FILE_ATTRIBUTE_NORMAL | FILE_FLAG_RANDOM_ACCESS, NULL);
+		CloseHandle(hFile);
+		if(!PathFileExists(FilePath)){
+			CreateDirectory(DirPath,NULL);
+			hFile = CreateFile(FilePath,GENERIC_WRITE | GENERIC_READ, FILE_SHARE_READ,
+				NULL,CREATE_NEW,FILE_ATTRIBUTE_NORMAL | FILE_FLAG_RANDOM_ACCESS, NULL);
 		}
-		OutputDebugString("T:\\Cheat File Created!\n");
-		sprintf(String,"%s.Active",CheatName);
-		_WritePrivateProfileString(Identifier,String,(CONST BYTE *)(&Active),FilePath);
-		OutputDebugString("Cheat Saved!\n");
-	}
-	/*
-	//lResult = RegCreateKeyEx( HKEY_CURRENT_USER, String,0,"", REG_OPTION_NON_VOLATILE,
-	//	KEY_ALL_ACCESS,NULL, &hKeyResults,&Disposition);
-	// Open ini file, check for rom name
-	if (lResult == ERROR_SUCCESS) {		
-		RegSetValueEx(hKeyResults,"Name",0,REG_SZ,(CONST BYTE *)RomName,strlen(RomName)); //save name							
-		if (Active) {
-			RegSetValueEx(hKeyResults,CheatName,0, REG_DWORD,(CONST BYTE *)(&Active),sizeof(DWORD));// save entry
-		} else {
-			RegDeleteValue(hKeyResults,CheatName); //delete entry
+
+		f = fopen(FilePath , "w");
+		if(f) {
+			for(i=0;i<500;i++){
+				if(i==CheatNo)
+					fprintf(f, "Cheat%d.Active=%d\n", CheatNo, Active);
+				else
+					fprintf(f, "Cheat%d.Active=0\n", i);
+			}
+			fclose(f);
 		}
-		RegCloseKey(hKeyResults); //close ini
 	}
-	*/
+
+	OutputDebugString("Cheat Saved!\n");
+#else
+	char FilePath[350], DirPath[350];
+	sprintf(FilePath, "%s%08X\\Cheats\\%08X-%08X-%02X\\%d", g_szPathSaves, *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x14)), *((BYTE *)(RomHeader + 0x3D)), CheatNo);
+	
+	if(!PathFileExists(FilePath)&& Active){
+		sprintf(DirPath, "%s%08X\\Cheats\\", g_szPathSaves, *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x14)), *((BYTE *)(RomHeader + 0x3D)));	
+		CreateDirectory(DirPath,NULL);		
+		sprintf(DirPath, "%s%08X\\Cheats\\%08X-%08X-%02X\\", g_szPathSaves, *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x14)), *((BYTE *)(RomHeader + 0x3D)));	
+		CreateDirectory(DirPath,NULL);
+		hFile = CreateFile(FilePath,GENERIC_WRITE | GENERIC_READ, FILE_SHARE_READ,
+			NULL,CREATE_NEW,FILE_ATTRIBUTE_NORMAL | FILE_FLAG_RANDOM_ACCESS, NULL);
+		CloseHandle(hFile);
+	}
+	else if(PathFileExists(FilePath) && !Active){
+		DeleteFile(FilePath);
+	}
+
+#endif
 }
 
 /********************************************************************************************
@@ -939,46 +890,32 @@ void SaveCheat(char * CheatName, BOOL Active) {
 
 ********************************************************************************************/
 void SaveCheatExt(char * CheatName, char * CheatExt) {
-	
-	char *String = NULL, Identifier[100], FilePath[350];
-	sprintf(FilePath, "%s%08X\\Cheats\\%08X-%08X-%02X.pj64.cht.ext", g_szPathSaves, *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x14)), *((BYTE *)(RomHeader + 0x3D)));
+
+	/*char *String = NULL, Identifier[100], FilePath[350];// ActiveString[500];
+	sprintf(FilePath, "%s%08X%08X-%08X-%02X.cht", g_szPathSaves, *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x10)), *((DWORD *)(RomHeader + 0x14)), *((BYTE *)(RomHeader + 0x3D)));
 	sprintf(Identifier,"%08X-%08X-C:%X",*(DWORD *)(&RomHeader[0x10]),*(DWORD *)(&RomHeader[0x14]),RomHeader[0x3D]);
 	if(PathFileExists(FilePath)) {
 		OutputDebugString("T:\\Cheat Ext File Found!\n");
 		sprintf(String,"%s.exten",CheatName);
-		_WritePrivateProfileString(Identifier,String,(CONST BYTE *)(&CheatExt),FilePath);
+		//sprintf(ActiveString,"%s",CheatExt);
+		_WritePrivateProfileString(Identifier,String,CheatExt,FilePath);
+		//_WritePrivateProfileString(Identifier,String,(CONST BYTE *)(&CheatExt),FilePath);
 		OutputDebugString("Cheat Ext Saved!\n");
 	}
 	else
 	{
 		HANDLE hFile;
 		hFile = CreateFile(FilePath,GENERIC_WRITE | GENERIC_READ, FILE_SHARE_READ,
-				NULL,OPEN_ALWAYS,FILE_ATTRIBUTE_NORMAL | FILE_FLAG_RANDOM_ACCESS, NULL);
+				NULL,CREATE_NEW,FILE_ATTRIBUTE_NORMAL | FILE_FLAG_RANDOM_ACCESS, NULL);
 		if (hFile == INVALID_HANDLE_VALUE)
 		{
 			OutputDebugString("Cannot Create T:\\Cheat Ext File!\n");
 		}
 		OutputDebugString("T:\\Cheat Ext File Created!\n");
 		sprintf(String,"%s.exten",CheatName);
-		_WritePrivateProfileString(Identifier,String,(CONST BYTE *)(&CheatExt),FilePath);
+		//sprintf(ActiveString,"%s",CheatExt);
+		_WritePrivateProfileString(Identifier,String,CheatExt,FilePath);
+		//_WritePrivateProfileString(Identifier,String,(CONST BYTE *)(&CheatExt),FilePath);
 		OutputDebugString("Cheat Ext Saved!\n");
-	}
-	/*
-	char String[300], Identifier[100];
-	DWORD Disposition = 0;
-	//HKEY hKeyResults = 0;
-	long lResult;
-	
-	sprintf(Identifier,"%08X-%08X-C:%X",*(DWORD *)(&RomHeader[0x10]),*(DWORD *)(&RomHeader[0x14]),RomHeader[0x3D]);
-	sprintf(String,"Software\\N64 Emulation\\%s\\Cheats\\%s",AppName,Identifier);
-	//lResult = RegCreateKeyEx( HKEY_CURRENT_USER, String,0,"", REG_OPTION_NON_VOLATILE,
-	//	KEY_ALL_ACCESS,NULL, &hKeyResults,&Disposition);
-	//
-	//if (lResult == ERROR_SUCCESS) {		
-		sprintf(String,"%s.exten",CheatName);
-		//RegSetValueEx(hKeyResults,"Name",0,REG_SZ,(CONST BYTE *)RomName,strlen(RomName));				 // save name
-		//RegSetValueEx(hKeyResults,String,0,REG_SZ,(CONST BYTE *)CheatExt,strlen(CheatExt));			 // save cheat ext
-		//RegCloseKey(hKeyResults);																		 // close file
-	//}
-	*/
+	}*/
 }
