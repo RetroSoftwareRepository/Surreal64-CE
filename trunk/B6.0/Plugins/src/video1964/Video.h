@@ -39,6 +39,18 @@ typedef struct {
 	int		statusBarHeight, statusBarHeightToUse, toolbarHeight, toolbarHeightToUse;
 	BOOL	screenSaverStatus;
 
+#ifdef _DXCLIP
+	struct {
+		uint32		left;
+		uint32		top;
+		uint32		right;
+		uint32		bottom;
+		uint32		width;
+		uint32		height;
+		bool		needToClip;
+	} clipping;
+#endif
+
 	int		timer;
 	float	fps;	// frame per second
 	float	dps;	// dlist per second

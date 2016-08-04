@@ -21,13 +21,12 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #ifdef _XBOX
 #include "../../../config.h"
+#endif
 
 static const DWORD MEM_KEEP_FREE = (2*1024*1024); // keep 2MB free
-
-bool g_bUseSetTextureMem = true;
 DWORD g_maxTextureMemUsage = (5*1024*1024);
 BOOL bPurgeOldBeforeIGM = FALSE;
-#endif
+bool g_bUseSetTextureMem = true;
 
 CTextureManager gTextureManager;
 extern RecentCIInfo* g_uRecentCIInfoPtrs[];
@@ -89,7 +88,7 @@ CTextureManager::CTextureManager() :
 	m_numOfCachedTxtrList(809)
 {
 	m_numOfCachedTxtrList = GetNextPrime(800);
-#ifdef _XBOX
+#if LIMIT_TEXTMEM
 	m_currentTextureMemUsage	= 0;
 	m_pYoungestTexture			= NULL;
 	m_pOldestTexture			= NULL;
@@ -111,7 +110,7 @@ CTextureManager::CTextureManager() :
 CTextureManager::~CTextureManager()
 {
 	CleanUp();
-#ifdef _XBOX
+#ifdef LIMIT_TEXTMEM
 	{
 		while (m_pHead)
 		{
@@ -155,7 +154,7 @@ bool CTextureManager::CleanUp()
 	memset(&m_LODFracTextureEntry, 0, sizeof(TxtrCacheEntry));
 	memset(&m_PrimLODFracTextureEntry, 0, sizeof(TxtrCacheEntry));
 
-#ifdef _XBOX
+#ifdef LIMIT_TEXTMEM
 	m_currentTextureMemUsage = 0;
 #endif
 	return true;
@@ -166,7 +165,7 @@ void CTextureManager::PurgeOldTextures()
 {
 	if (m_pCacheTxtrList == NULL)
 		return;
-#ifdef _XBOX
+#ifdef LIMIT_TEXTMEM
 	// PurgeOldTextures breaks OOT and possibly others
 	// Quake 2 needs it otherwise it leaks pretty bad. 
 	if(!g_bUseSetTextureMem)
@@ -227,7 +226,7 @@ void CTextureManager::PurgeOldTextures()
 			if (pPrev != NULL) pPrev->pNext        = pCurr->pNext;
 			else			   m_pHead = pCurr->pNext;
 			
-#ifdef _XBOX
+#ifdef LIMIT_TEXTMEM
 			m_currentTextureMemUsage -= (pCurr->pTexture->m_dwWidth * pCurr->pTexture->m_dwHeight * 2);
 #endif
 			delete pCurr;
@@ -249,7 +248,7 @@ void CTextureManager::RecycleAllTextures()
 	uint32 dwCount = 0;
 	uint32 dwTotalUses = 0;
 
-#ifdef _XBOX	
+#ifdef LIMIT_TEXTMEM
 	m_pYoungestTexture			= NULL;
 	m_pOldestTexture			= NULL;
 #endif
@@ -263,7 +262,7 @@ void CTextureManager::RecycleAllTextures()
 			
 			dwTotalUses += pTVictim->dwUses;
 			dwCount++;
-#ifdef _XBOX
+#ifdef LIMIT_TEXTMEM
 			m_currentTextureMemUsage -= (pTVictim->pTexture->m_dwWidth * pTVictim->pTexture->m_dwHeight * 2);
 			
 			delete pTVictim;
@@ -278,7 +277,7 @@ void CTextureManager::RecycleAllTextures()
 // Add to the recycle list
 void CTextureManager::RecycleTexture(TxtrCacheEntry *pEntry)
 {
-#ifndef _XBOX
+#ifndef LIMIT_TEXTMEM
 	if( CDeviceBuilder::GetGeneralDeviceType() == OGL_DEVICE )
 	{
 		// Fix me, why I can not reuse the texture in OpenGL,
@@ -307,7 +306,7 @@ return;
 // Search for a texture of the specified dimensions to recycle
 TxtrCacheEntry * CTextureManager::ReviveTexture( uint32 width, uint32 height )
 {
-#ifndef _XBOX
+#ifndef LIMIT_TEXTMEM
 	TxtrCacheEntry * pPrev;
 	TxtrCacheEntry * pCurr;
 	
@@ -395,7 +394,7 @@ void CTextureManager::AddTexture(TxtrCacheEntry *pEntry)
 	// Add to head (not tail, for speed - new textures are more likely to be accessed next)
 	pEntry->pNext = m_pCacheTxtrList[dwKey];
 	m_pCacheTxtrList[dwKey] = pEntry;
-#ifdef _XBOX
+#ifdef LIMIT_TEXTMEM
 	// Move the texture to the top of the age list
 	MakeTextureYoungest(pEntry);
 #endif
@@ -417,7 +416,7 @@ TxtrCacheEntry * CTextureManager::GetTxtrCacheEntry(TxtrInfo * pti)
 	{
 		if ( pEntry->ti == *pti )
 		{
-#ifdef _XBOX
+#ifdef LIMIT_TEXTMEM
 			MakeTextureYoungest(pEntry);
 #endif
 			return pEntry;
@@ -450,7 +449,7 @@ void CTextureManager::RemoveTexture(TxtrCacheEntry * pEntry)
 		{
 			if (pPrev != NULL) pPrev->pNext = pCurr->pNext;
 			else			   m_pCacheTxtrList[dwKey] = pCurr->pNext;
-#ifdef _XBOX
+#ifdef LIMIT_TEXTMEM
 			// remove the texture from the age list
 			if (pEntry->pNextYoungest != NULL)
 			{
@@ -469,12 +468,12 @@ void CTextureManager::RemoveTexture(TxtrCacheEntry * pEntry)
 		pPrev = pCurr;
 		pCurr = pCurr->pNext;
 	}
-#ifndef _XBOX
+#ifndef LIMIT_TEXTMEM
 	RecycleTexture(pEntry);
 #endif
 }
 
-#ifdef _XBOX
+#ifdef LIMIT_TEXTMEM
 void CTextureManager::FreeTextures()
 {
 	MEMORYSTATUS ms;
@@ -496,7 +495,7 @@ TxtrCacheEntry * CTextureManager::CreateNewCacheEntry(uint32 dwAddr, uint32 dwWi
 	TxtrCacheEntry * pEntry = NULL;
 
 	// Find a used texture
-#ifdef _XBOX
+#ifdef LIMIT_TEXTMEM
 	uint32 widthToCreate = dwWidth;
 	uint32 heightToCreate = dwHeight;
 
@@ -554,7 +553,7 @@ TxtrCacheEntry * CTextureManager::CreateNewCacheEntry(uint32 dwAddr, uint32 dwWi
 	// Initialize
 	pEntry->ti.Address = dwAddr;
 	pEntry->pNext = NULL;
-#ifdef _XBOX
+#ifdef LIMIT_TEXTMEM
 	pEntry->pNextYoungest = NULL;
 	pEntry->pLastYoungest = NULL;
 #endif

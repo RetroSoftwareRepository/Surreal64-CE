@@ -935,7 +935,7 @@ uint32 LightVert(D3DXVECTOR4 & norm, int vidx)
 	{
 		for (register unsigned int l=0; l < gRSPnumLights; l++)
 		{
-			fCosT = norm.x*gRSPlights[l].tx + norm.y*gRSPlights[l].ty + norm.z*gRSPlights[l].tz; 
+			fCosT = norm.x*gRSPlights[l].x + norm.y*gRSPlights[l].y + norm.z*gRSPlights[l].z; 
 
 			if (fCosT > 0 )
 			{
@@ -1016,7 +1016,7 @@ uint32 LightVertNew(D3DXVECTOR4 & norm)
 
 	for (register unsigned int l=0; l < gRSPnumLights; l++)
 	{
-		fCosT = norm.x*gRSPlights[l].x + norm.y*gRSPlights[l].y + norm.z*gRSPlights[l].z; 
+		fCosT = norm.x*gRSPlights[l].tx + norm.y*gRSPlights[l].ty + norm.z*gRSPlights[l].tz; 
 
 		if (fCosT > 0 )
 		{
@@ -1626,9 +1626,9 @@ void ModifyVertexInfo(uint32 where, uint32 vertex, uint32 val)
 		break;
 	case RSP_MV_WORD_OFFSET_POINT_XYSCREEN:		// Modify X,Y
 		{
-			uint16 x = (uint16)((val>>16) / 4.0f);
-			uint16 y = (uint16)((val & 0xFFFF) / 4.0f);
-/*
+			//uint16 x = (uint16)((val>>16) / 4.0f);
+			//uint16 y = (uint16)((val & 0xFFFF) / 4.0f);
+
 			uint16 nX = (uint16)(val>>16);
 			short x = *((short*)&nX);
 			x /= 4;
@@ -1636,7 +1636,7 @@ void ModifyVertexInfo(uint32 where, uint32 vertex, uint32 val)
 			uint16 nY = uint16(val&0xFFFF);
 			short y = *((short*)&nY);
 			y /= 4;
-*/
+
 			// Should do viewport transform
 
 			x -= windowSetting.uViWidth/2;

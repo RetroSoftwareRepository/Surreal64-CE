@@ -648,6 +648,10 @@ void GenerateCurrentRomOptions()
 	{
 		options.enableHackForGames = HACK_FOR_TOPGEARRALLY;
 	}
+	else if ((strnicmp(g_curRomInfo.szGameName, "TOP GEAR OVERDRIVE",18) == 0))
+	{
+		options.enableHackForGames = HACK_FOR_TOPGEAROVERDRIVE;
+	}
 	else if ((strnicmp(g_curRomInfo.szGameName, "DUKE NUKEM",10) == 0))
 	{
 		options.enableHackForGames = HACK_FOR_DUKE_NUKEM;

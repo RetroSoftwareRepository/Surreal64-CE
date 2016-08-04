@@ -1739,7 +1739,24 @@ void CRender::UpdateScissorWithClipRatio()
 	gRSP.real_clip_scissor_right = min(gRSP.real_clip_scissor_right,windowSetting.uViWidth-1);
 	gRSP.real_clip_scissor_bottom = min(gRSP.real_clip_scissor_bottom, windowSetting.uViHeight-1);
 
-
+#ifdef _DXCLIP	
+	WindowSettingStruct &w = windowSetting;
+	w.clipping.left = (uint32)(gRSP.real_clip_scissor_left*windowSetting.fMultX);
+	w.clipping.top	= (uint32)(gRSP.real_clip_scissor_top*windowSetting.fMultY);
+	w.clipping.bottom = (uint32)(gRSP.real_clip_scissor_bottom*windowSetting.fMultY);
+	w.clipping.right = (uint32)(gRSP.real_clip_scissor_right*windowSetting.fMultX);
+	if( w.clipping.left > 0 || w.clipping.top > 0 || w.clipping.right < (uint32)windowSetting.uWindowDisplayWidth-1 ||
+		w.clipping.bottom < (uint32)windowSetting.uWindowDisplayHeight-1 )
+	{
+		w.clipping.needToClip = true;
+	}
+	else
+	{
+		w.clipping.needToClip = false;
+	}
+	w.clipping.width = (uint32)((gRSP.real_clip_scissor_right-gRSP.real_clip_scissor_left+1)*windowSetting.fMultX);
+	w.clipping.height = (uint32)((gRSP.real_clip_scissor_bottom-gRSP.real_clip_scissor_top+1)*windowSetting.fMultY);
+#endif
 	float halfx = gRSP.nVPWidthN/2.0f;
 	float halfy = gRSP.nVPHeightN/2.0f;
 	float centerx = gRSP.nVPLeftN+halfx;

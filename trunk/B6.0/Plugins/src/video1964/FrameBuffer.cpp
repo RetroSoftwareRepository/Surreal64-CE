@@ -1411,7 +1411,7 @@ int FrameBufferManager::SetBackBufferAsRenderTexture(SetImgInfo &CIinfo, int ciI
 		if( CDeviceBuilder::m_deviceGeneralType == DIRECTX_DEVICE )
 			gTextureBufferInfos[idxToUse].pTxtBuffer = 
 				new CDXTextureBuffer(tempTxtBufferInfo.bufferWidth, tempTxtBufferInfo.bufferHeight, &gTextureBufferInfos[idxToUse], AS_BACK_BUFFER_SAVE);
-#ifndef _XBOX
+#if 0 // disable for OGL right now
 		else
 			gTextureBufferInfos[idxToUse].pTxtBuffer = 
 				new COGLRenderTexture(tempTxtBufferInfo.bufferWidth, tempTxtBufferInfo.bufferHeight, &gTextureBufferInfos[idxToUse], AS_BACK_BUFFER_SAVE);
@@ -1665,7 +1665,7 @@ void FrameBufferManager::ActiveTextureBuffer(void)
 			if( CDeviceBuilder::m_deviceGeneralType == DIRECTX_DEVICE )
 				gTextureBufferInfos[idxToUse].pTxtBuffer = 
 					new CDXTextureBuffer(w, newTextureBufInfo.bufferHeight, &gTextureBufferInfos[idxToUse], AS_RENDER_TARGET);
-#ifndef _XBOX
+#if 0 // Disable for OGL
 			else
 				gTextureBufferInfos[idxToUse].pTxtBuffer = 
 					new COGLRenderTexture(w, newTextureBufInfo.bufferHeight, &gTextureBufferInfos[idxToUse], AS_RENDER_TARGET);

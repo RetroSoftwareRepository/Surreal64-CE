@@ -158,7 +158,7 @@ bool D3DRender::InitDeviceObjects()
 	float density = 1.0f;
 	gD3DDevWrapper.SetRenderState(D3DRS_FOGDENSITY,   *(uint32 *)(&density));
 	
-#ifdef _XBOX
+#if 1
 	if(options.bUseLinearFog)
 		gD3DDevWrapper.SetRenderState( D3DRS_FOGTABLEMODE, D3DFOG_LINEAR );
 	else
@@ -258,6 +258,21 @@ bool D3DRender::InitDeviceObjects()
 	g_pD3DDev->SetFlickerFilter(FlickerFilter);
 	g_pD3DDev->SetSoftDisplayFilter(SoftDisplayFilter);
 #endif
+
+#ifdef _DXCLIP
+#if DX_VERSION == 8
+	D3DCLIPSTATUS8 clippingstatus;
+#else
+	D3DCLIPSTATUS9 clippingstatus;
+#endif
+	g_pD3DDev->GetClipStatus(&clippingstatus);
+	clippingstatus.ClipUnion = D3DCS_BACK | D3DCS_BOTTOM | D3DCS_FRONT | D3DCS_LEFT | D3DCS_RIGHT | D3DCS_TOP;
+	clippingstatus.ClipIntersection = 0xFFFFFFFF;
+	g_pD3DDev->SetClipStatus(&clippingstatus);
+	g_pD3DDev->GetClipStatus(&clippingstatus);
+	g_pD3DDev->SetRenderState(D3DRS_CLIPPING, TRUE);
+#endif
+
 	return true;	
 }
 
@@ -632,7 +647,7 @@ void D3DRender::SetFogEnable(bool bEnable)
 	{
 		gD3DDevWrapper.SetRenderState( D3DRS_FOGENABLE, TRUE);
 		gD3DDevWrapper.SetRenderState(D3DRS_FOGCOLOR, gRDP.fogColor);
-#ifdef _XBOX
+#if 1
 		if(!options.bUseLinearFog)
 			gD3DDevWrapper.SetRenderState(D3DRS_RANGEFOGENABLE, TRUE);
 #endif

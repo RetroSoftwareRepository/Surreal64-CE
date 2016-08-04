@@ -35,7 +35,11 @@ int isLaunchMenu = 0;
 bool isIGM = false;
 //bool g_HD_UHLE_720 = false;
 
+#ifdef LAUNCHER
+int extraCheatSlots = 0;
+#else
 extern int extraCheatSlots;
+#endif
 
 extern LPDIRECT3DDEVICE8 g_pd3dDevice;
 
@@ -222,9 +226,17 @@ DWORD XLMenu_GetCommand(XBGAMEPAD *gamepad)
 
     return command;
 }
-
+#ifdef LAUNCHER
+int gCheatActive[500];
+int curPage = 1;
+#else
+#ifdef _UXLE
+extern int gCheatActive[500];
+#else
 extern "C" int gCheatActive[500];
+#endif
 extern int curPage;
+#endif
 extern DWORD dwCheatActiveColor;
 DWORD XLMenu_Routine(DWORD command)
 {

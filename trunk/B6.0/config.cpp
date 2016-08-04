@@ -698,6 +698,7 @@ int ConfigAppLoad2()
 	EnableController2 = ini.GetBoolValue("Settings", "EnableController2", EnableController2 );
 	EnableController3 = ini.GetBoolValue("Settings", "EnableController3", EnableController3 );
 	EnableController4 = ini.GetBoolValue("Settings", "EnableController4", EnableController4 );
+	showdebug = ini.GetBoolValue("Settings", "ShowDebug", showdebug);
 	bReloadSaveState = ini.GetBoolValue("Settings", "ReloadSaveState", bReloadSaveState );
 	ReloadSaveType = ini.GetLongValue("Settings", "ReloadSaveType", ReloadSaveType );
 	

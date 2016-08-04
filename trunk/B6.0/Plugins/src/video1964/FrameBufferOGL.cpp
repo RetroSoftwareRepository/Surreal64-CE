@@ -46,7 +46,7 @@ void OGLFrameBufferManager::CopyBackBufferToRenderTexture(int idx, RecentCIInfo 
 	int dsttop = pDstRect ? pDstRect->top : 0;
 
 	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, ((COGLTexture*)(gRenderTextureInfos[idx].pRenderTexture->m_pTexture->GetTexture()))->m_dwTextureName);
+	//glBindTexture(GL_TEXTURE_2D, ((COGLTexture*)(gRenderTextureInfos[idx].pRenderTexture->m_pTexture->GetTexture()))->m_dwTextureName);
 	glCopyTexSubImage2D(GL_TEXTURE_2D,0,dstleft,dsttop,srcrect.left,srcrect.top,srcrect.right-srcrect.left,srcrect.bottom-srcrect.top);
 }
 
@@ -58,16 +58,12 @@ void OGLFrameBufferManager::StoreBackBufferToRDRAM(uint32 addr, uint32 fmt, uint
 	unsigned char *buffer = (unsigned char*)malloc( windowSetting.uDisplayWidth * windowSetting.uDisplayHeight * 4 +2000 );
 	if( !buffer )
 	{
-		TRACE0("No memory to save back buffer");
 		return;
 	}
 
 	glReadBuffer( GL_FRONT );
 	glReadPixels( 0, windowSetting.statusBarHeightToUse, windowSetting.uDisplayWidth, windowSetting.uDisplayHeight, GL_BGR_EXT, GL_UNSIGNED_BYTE, buffer );
 	glReadBuffer( GL_BACK );
-
-
-	TXTRBUF_DUMP(TRACE1("Saving back buffer to N64 RDRAM addr=%08X", addr));
 
 	// Save the buffer to RDRAM
 	g_pFrameBufferManager->CopyBufferToRDRAM(addr, fmt, siz, width, height, bufWidth, bufHeight, 
