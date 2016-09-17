@@ -836,7 +836,7 @@ void DLParser_Process()
 	}
 
 	
-	status.bScreenIsDrawn = true;
+	//status.bScreenIsDrawn = true;
 	
 	DebuggerPauseCountN( NEXT_DLIST );
 	status.gRDPTime = timeGetTime();

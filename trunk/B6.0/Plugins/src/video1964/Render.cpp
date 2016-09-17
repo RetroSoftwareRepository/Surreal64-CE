@@ -232,11 +232,11 @@ void CRender::SetWorldView(const Matrix & mat, bool bPush, bool bReplace)
 }
 
 
-void CRender::PopWorldView()
+void CRender::PopWorldView(DWORD num)
 {
-	if (gRSP.modelViewMtxTop > 0)
+	if (gRSP.modelViewMtxTop > (num-1))
 	{
-		gRSP.modelViewMtxTop--;
+		gRSP.modelViewMtxTop-=num;
 		gRSPmodelViewTop = gRSP.modelviewMtxs[gRSP.modelViewMtxTop];
 		if( options.enableHackForGames == HACK_REVERSE_XY_COOR )
 		{

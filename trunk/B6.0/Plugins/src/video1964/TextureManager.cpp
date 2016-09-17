@@ -88,7 +88,7 @@ CTextureManager::CTextureManager() :
 	m_numOfCachedTxtrList(809)
 {
 	m_numOfCachedTxtrList = GetNextPrime(800);
-#if LIMIT_TEXTMEM
+#ifdef LIMIT_TEXTMEM
 	m_currentTextureMemUsage	= 0;
 	m_pYoungestTexture			= NULL;
 	m_pOldestTexture			= NULL;
