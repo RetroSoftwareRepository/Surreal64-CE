@@ -569,6 +569,7 @@ void RSP_GBI2_PopMtx(uint32 word0, uint32 word1)
 	SP_Timing(RSP_GBI1_PopMtx);
 
 	BYTE nCommand = (BYTE)(word0 & 0xFF);
+	DWORD num = word1>>6;
 
 	LOG_DL("        PopMtx: 0x%02x (%s)",
 		nCommand, 
@@ -581,7 +582,7 @@ void RSP_GBI2_PopMtx(uint32 word0, uint32 word1)
 	}
 	else*/
 	{
-		CRender::g_pRender->PopWorldView();
+		CRender::g_pRender->PopWorldView(num);
 	}
 #ifdef _DEBUG
 	if( pauseAtNext && eventToPause == NEXT_MATRIX_CMD )

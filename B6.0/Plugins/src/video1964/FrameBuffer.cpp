@@ -593,7 +593,7 @@ uint32 CalculateRDRAMCRC(void *pPhysicalAddress, uint32 left, uint32 top, uint32
         }while(pStart < pEnd);
 	}
 #else
-	if( currentRomOptions.bFastTexCRC && !options.bLoadHiResTextures && (height>=32 || (dwAsmdwBytesPerLine>>2)>=16))
+	if( currentRomOptions.bFastTexCRC  && (height>=32 || (dwAsmdwBytesPerLine>>2)>=16))
 	{
 		dwAsmCRC = 0;
 		uint32 realWidthInDWORD = dwAsmdwBytesPerLine>>2;

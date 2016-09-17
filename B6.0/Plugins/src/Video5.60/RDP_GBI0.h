@@ -675,18 +675,7 @@ void RSP_GBI1_PopMtx(uint32 word0, uint32 word1)
 {
 	SP_Timing(RSP_GBI1_PopMtx);
 
-	BYTE nCommand = (BYTE)(word1 & 0xFF);
-
-	LOG_DL("    Command: 0x%02x (%s)",	nCommand,  (nCommand & RSP_MATRIX_PROJECTION) ? "Projection" : "ModelView");
-
-	// Do any of the other bits do anything?
-	// So far only Extreme-G seems to Push/Pop projection matrices
-
-	if (nCommand & RSP_MATRIX_PROJECTION)
-	{
-		CRender::g_pRender->PopProjection();
-	}
-	else
+	if(word1==0)
 	{
 		CRender::g_pRender->PopWorldView();
 	}

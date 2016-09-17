@@ -748,11 +748,7 @@ void RSP_GBI1_PopMtx(Gfx *gfx)
 	// Do any of the other bits do anything?
 	// So far only Extreme-G seems to Push/Pop projection matrices
 
-	if (gfx->popmtx.projection)
-	{
-		CRender::g_pRender->PopProjection();
-	}
-	else
+	if(gfx->words.cmd1 == 0)
 	{
 		CRender::g_pRender->PopWorldView();
 	}

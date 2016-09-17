@@ -461,16 +461,8 @@ void RSP_GBI2_PopMtx(Gfx *gfx)
 	SP_Timing(RSP_GBI1_PopMtx);
 
 	uint8 nCommand = (uint8)(gfx->words.cmd0 & 0xFF);
-
-
-/*	if (nCommand & RSP_ZELDA_MTX_PROJECTION)
-	{
-		CRender::g_pRender->PopProjection();
-	}
-	else*/
-	{
-		CRender::g_pRender->PopWorldView();
-	}
+	DWORD num = gfx->words.cmd1>>6;	
+	CRender::g_pRender->PopWorldView(num);
 }
 
 

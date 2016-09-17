@@ -541,6 +541,7 @@ void RSP_GBI2_PopMtx(Gfx *gfx)
 	SP_Timing(RSP_GBI1_PopMtx);
 
 	uint8 nCommand = (uint8)(gfx->words.cmd0 & 0xFF);
+	DWORD num = gfx->words.cmd1>>6;
 
 	LOG_UCODE("        PopMtx: 0x%02x (%s)",
 		nCommand, 
@@ -553,7 +554,7 @@ void RSP_GBI2_PopMtx(Gfx *gfx)
 	}
 	else*/
 	{
-		CRender::g_pRender->PopWorldView();
+		CRender::g_pRender->PopWorldView(num);
 	}
 #ifdef _DEBUG
 	if( pauseAtNext && eventToPause == NEXT_MATRIX_CMD )

@@ -876,40 +876,11 @@ void RSP_GBI1_MoveWord(Gfx *gfx)
 
 void RSP_GBI1_PopMtx(Gfx *gfx)
 {
-	SP_Timing(RSP_GBI1_PopMtx);
-
-	LOG_UCODE("    Command: (%s)",	gfx->popmtx.projection ? "Projection" : "ModelView");
-
-	// Do any of the other bits do anything?
-	// So far only Extreme-G seems to Push/Pop projection matrices
-
-	if (gfx->popmtx.projection)
-	{
-		CRender::g_pRender->PopProjection();
-	}
-	else
+	if(gfx->words.cmd1 == 0)
 	{
 		CRender::g_pRender->PopWorldView();
 	}
-#ifdef _DEBUG
-	if( pauseAtNext && eventToPause == NEXT_MATRIX_CMD )
-	{
-		pauseAtNext = false;
-		debuggerPause = true;
-		DebuggerAppendMsg("Pause after Pop Matrix: %s\n", gfx->popmtx.projection ? "Proj":"World");
-	}
-	else
-	{
-		if( pauseAtNext && logMatrix ) 
-		{
-			DebuggerAppendMsg("Pause after Pop Matrix: %s\n", gfx->popmtx.projection ? "Proj":"World");
-		}
-	}
-#endif
 }
-
-
-
 void RSP_GBI1_CullDL(Gfx *gfx)
 {
 	SP_Timing(RSP_GBI1_CullDL);

@@ -111,7 +111,7 @@ public:
 			gRSP.projectionMtxTop--;
 	}
 
-	void PopWorldView();
+	void PopWorldView(DWORD num = 1);
 	Matrix & GetWorldProjectMatrix(void);
 	void SetWorldProjectMatrix(Matrix &mtx);
 	
