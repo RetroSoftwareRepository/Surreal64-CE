@@ -324,11 +324,14 @@ s16 pack_signed(s32 slice)
     xmm = _mm_packs_epi32(xmm, xmm);
     return (s16)_mm_cvtsi128_si32(xmm); /* or:  return _mm_extract_epi16(xmm, 0); */
 #elif defined(MMX_SUPPORT)
+	s16 mx;
 	__m64 mmx;
 
 	mmx = _mm_cvtsi32_si64(slice);
 	mmx = _mm_packs_pi32(mmx, mmx);
-	return (s16)_mm_cvtsi64_si32(mmx);
+	mx = (s16)_mm_cvtsi64_si32(mmx);
+	_mm_empty();
+	return mx; 
 #else
 
     s32 result;
@@ -352,8 +355,10 @@ void vsats128(s16* vd, s32* vs)
 #else
     register size_t i;
 
-    for (i = 0; i < 8; i++)
+	for (i = 0; i < 8; i++){
         vd[i] = pack_signed(vs[i]);
+		_mm_empty();
+	}
 #endif
 }
 #endif

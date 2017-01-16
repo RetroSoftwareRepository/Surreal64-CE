@@ -106,7 +106,7 @@ void DXFrameBufferManager::CopyD3DSurfaceToRDRAM(uint32 addr, uint32 fmt, uint32
 
 	D3DLOCKED_RECT dlre;
 	ZeroMemory( &dlre, sizeof(D3DLOCKED_RECT) );
-	if( !SUCCEEDED(surf->LockRect(&dlre, NULL, D3DLOCK_READONLY)) )
+	//if( !SUCCEEDED(surf->LockRect(&dlre, NULL, D3DLOCK_READONLY)) )
 	{
 		D3DSURFACE_DESC desc;
 		//TRACE0("Error, cannot lock the surface");

@@ -855,13 +855,19 @@ void DLParser_Process()
 	{
 		bool Memdecommit = 0;
 		MEMORYSTATUS ms;
-		GlobalMemoryStatus(&ms);	
+		GlobalMemoryStatus(&ms);
+
+		//gTextureManager.ReInitTextureMemory(true);
 		
 		// Clear Rice's textures before loading the menu.
 		bPurgeOldBeforeIGM = TRUE;
 		gTextureManager.PurgeOldTextures();
 		gTextureManager.CleanUp();
 		RDP_Cleanup();
+		CRender::g_pRender->RenderReset();
+		CRender::g_pRender->ResetMatrices(stack_size);
+		//g_pFrameBufferManager->DisplayRenderTexture(-1);
+		g_pFrameBufferManager->CloseUp();
 				
 		// Disable any active rumble
 		_INPUT_RumblePause(true);
@@ -882,6 +888,10 @@ void DLParser_Process()
 		{
 			RunIngameMenu();
 		}
+
+		//gTextureManager.ReInitTextureMemory(false);
+		g_pFrameBufferManager->Initialize();
+		//g_pFrameBufferManager->RestoreNormalBackBuffer();
 		
 		// Restore dynablock if we previously decommitted.
 		while(Memdecommit)
@@ -1684,9 +1694,9 @@ void RDP_DLParser_Process(void)
 	gDlistStack[gDlistStackPointer].countdown = MAX_DL_COUNT;
 
 	// Check if we need to purge
-	if (status.gRDPTime - status.lastPurgeTimeTime > 5000)
+	if (status.gRDPTime - status.lastPurgeTimeTime > 30)
 	{
-		gTextureManager.PurgeOldTextures();
+		gTextureManager.CleanUp();
 		status.lastPurgeTimeTime = status.gRDPTime;
 	}
 	

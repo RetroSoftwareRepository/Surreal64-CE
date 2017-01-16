@@ -1972,7 +1972,7 @@ void FrameBufferManager::StoreRenderTextureToRDRAM(int infoIdx)
 	gRenderTextureInfos[infoIdx].pRenderTexture->StoreToRDRAM(infoIdx);
 }
 
-
+void *g_pBuffer;
 void FrameBufferManager::CopyBufferToRDRAM(uint32 addr, uint32 fmt, uint32 siz, uint32 width, uint32 height, uint32 bufWidth, uint32 bufHeight, uint32 startaddr, uint32 memsize, uint32 pitch, TextureFmt bufFmt, void *buffer, uint32 bufPitch)
 {
 	uint32 startline=0;
@@ -2036,13 +2036,16 @@ void FrameBufferManager::CopyBufferToRDRAM(uint32 addr, uint32 fmt, uint32 siz, 
 				for( uint32 j=0; j<width; j++ )
 				{
 					// Point
-					uint8 r = pS0[indexes[j]+2];
-					uint8 g = pS0[indexes[j]+1];
-					uint8 b = pS0[indexes[j]+0];
-					uint8 a = pS0[indexes[j]+3];
+					//uint8 r = pS0[indexes[j]+2];
+					//uint8 g = pS0[indexes[j]+1];
+					//uint8 b = pS0[indexes[j]+0];
+					//uint8 a = pS0[indexes[j]+3];
 
 					// Liner
-					*(pD+(j^1)) = ConvertRGBATo555( r, g, b, a);
+					//*(pD+(j^1)) = ConvertRGBATo555( r, g, b, a);
+						//__m128 _mm_load_ps(
+					uint32 rgba = *(uint32 *)&pS0[indexes[j]];
+					*(pD+(j^1)) = ConvertRGBATo555( rgba);
 
 				}
 			}

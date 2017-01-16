@@ -1921,17 +1921,27 @@ void FrameBufferManager::CopyBufferToRDRAM(uint32 addr, uint32 fmt, uint32 siz, 
 
 				uint16 *pD = frameBufferBase + i * pitch;
 				uint8 *pS0 = (uint8 *)buffer + sy0 * bufPitch;
+				char arr[0x12C000];
+				int iterate = 4;
 
 				for( uint32 j=0; j<width; j++ )
 				{
 					// Point
-					uint8 r = pS0[indexes[j]+2];
-					uint8 g = pS0[indexes[j]+1];
-					uint8 b = pS0[indexes[j]+0];
-					uint8 a = pS0[indexes[j]+3];
-
+					//uint8 r = pS0[indexes[j]+2];
+					//uint8 g = pS0[indexes[j]+1];
+					//uint8 b = pS0[indexes[j]+0];
+					//uint8 a = pS0[indexes[j]+3];
 					// Liner
-					*(pD+(j^1)) = ConvertRGBATo555( r, g, b, a);
+					//*(pD+(j^1)) = ConvertRGBATo555( r, g, b, a);
+					uint32 rgba = *(uint32 *)&pS0[indexes[j]];
+					//uint32 rgba2 = *(uint32 *)&pS0[indexes[j+1]];
+					//uint32 rgba3 = *(uint32 *)&pS0[indexes[j+2]];
+					//uint32 rgba4 = *(uint32 *)&pS0[indexes[j+3]];
+
+					//*(pD+(j^1)) = _mm_set_ps(ConvertRGBATo555( rgba1),ConvertRGBATo555( rgba2),ConvertRGBATo555( rgba3),ConvertRGBATo555( rgba4));
+					//__m128 _mm_store_ps(float * p, __m128 a);
+					*(pD+(j^1)) = ConvertRGBATo555( rgba);
+
 
 				}
 			}

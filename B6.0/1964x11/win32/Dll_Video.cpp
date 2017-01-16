@@ -1020,12 +1020,17 @@ void VIDEO_FrameBufferWriteList(FrameBufferModifyEntry *plist, DWORD size);
 			val			val
 			size		1 = BYTE, 2 = WORD, 4 = DWORD
   output:   none
-*******************************************************************/ 
+*******************************************************************/
+uint32 lastFBAddr;
 void VIDEO_FrameBufferRead(DWORD addr)
 {
 	if( _VIDEO_FrameBufferRead != NULL )
 	{
-		_VIDEO_FrameBufferRead( addr );
+		if(((float)lastFBAddr - (float)addr) >= 1024*4)
+		{
+			_VIDEO_FrameBufferRead( addr );
+			lastFBAddr = addr;
+		}
 	}
 	//TRACE0("Read from frame buffer");
 }
