@@ -121,7 +121,6 @@ void Toggle1964DynaMem(bool inc);
 void Toggle1964PagingMem(bool inc);
 void TogglePJ64DynaMem(bool inc);
 void TogglePJ64PagingMem(bool inc);
-void ToggleDisableEEPROMSaves();
 
 //Controller Settings
 void ControllerSettingsMenu();
@@ -806,7 +805,7 @@ void SettingsMenu(void)
 	// RSP Plugin Selector
 	swprintf(currentname, L"RSP Plugin : %S", GetRspPluginName(iRspPlugin).c_str());
 	XLMenu_AddItem2(m_pSettingsMenu,MITEM_ROUTINE,currentname,incRSPPlugin,decRSPPlugin);
-	/*
+	
 	// RSP Audio Enable
 	// Keep the user from modifying this.
 	if (!bUseRspAudio)
@@ -814,7 +813,7 @@ void SettingsMenu(void)
 	else
 		swprintf(currentname,L"Send ALists to Audio Plugin : No");	
 	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,currentname,ToggleRSPAudio);
-	*/
+	
 
 	// Rom Paging Method
 	/*if (usePageOriginal)
@@ -836,12 +835,6 @@ void SettingsMenu(void)
 		
 	// 1964 Settings
 	XLMenu_AddItem(m_pSettingsMenu,MITEM_DISABLED,L"1964",NULL);
-
-	if(bDisableEEPROMSaves)
-		swprintf(currentname,L"Disable EEPROM Saves : Yes");
-	else
-		swprintf(currentname,L"Disable EEPROM Saves : No");
-	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,currentname,ToggleDisableEEPROMSaves);
 
 	swprintf(currentname,L"Dynarec Memory : %d MB",dw1964DynaMem);
 	XLMenu_AddItem2(m_pSettingsMenu,MITEM_ROUTINE,currentname,inc1964DynaMem,dec1964DynaMem);
@@ -940,8 +933,8 @@ void ToggleAudioPlugin(bool inc)
 		XLMenu_SetItemText(&m_pSettingsMenu->items[(currentItem + 1)], currentname);
 
 		bUseRspAudio  = false;
-		//swprintf(currentname, L"Send ALists to Audio Plugin : Yes");
-		//XLMenu_SetItemText(&m_pSettingsMenu->items[(currentItem + 2)], currentname);
+		swprintf(currentname, L"Send ALists to Audio Plugin : Yes");
+		XLMenu_SetItemText(&m_pSettingsMenu->items[(currentItem + 2)], currentname);
 	}
 }
 
@@ -977,28 +970,10 @@ void ToggleRSPPlugin(bool inc)
 	// Disable RSP Audio if we aren't using an RSP plugin that supports it
 	if (!RspDoesAlist(iRspPlugin)) {
 		bUseRspAudio  = false;
-		//swprintf(currentname, L"Send ALists to Audio Plugin : Yes");
-		//XLMenu_SetItemText(&m_pSettingsMenu->items[(currentItem + 1)], currentname);
+		swprintf(currentname, L"Send ALists to Audio Plugin : Yes");
+		XLMenu_SetItemText(&m_pSettingsMenu->items[(currentItem + 1)], currentname);
 	}
 }
-void ToggleDisableEEPROMSaves()
-{
-	currentItem = m_pSettingsMenu->curitem;
-	
-	// Only change RSP Audio if we are using an RSP plugin that supports it
-		bDisableEEPROMSaves = !bDisableEEPROMSaves;
-	
-	XLMenu_CurRoutine = NULL;
-
-	if (bDisableEEPROMSaves)
-		XLMenu_SetItemText(&m_pSettingsMenu->items[currentItem], L"Disable EEPROM Saves : Yes");
-	else
-		XLMenu_SetItemText(&m_pSettingsMenu->items[currentItem], L"Disable EEPROM Saves : No");
-
-		
-	ConfigAppSave2();	
-}
-
 void ToggleRSPAudio()
 {
 	currentItem = m_pSettingsMenu->curitem;

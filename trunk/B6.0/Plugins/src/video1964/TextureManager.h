@@ -22,7 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "Texture.h"
 
-#define LIMIT_TEXTMEM
+//#define LIMIT_TEXTMEM
 
 class TxtrInfo
 {
@@ -218,7 +218,7 @@ protected:
 
 //#ifdef _XBOX
 	void MakeTextureYoungest(TxtrCacheEntry *pEntry);
-	DWORD m_currentTextureMemUsage;
+
 	TxtrCacheEntry *m_pYoungestTexture;
 	TxtrCacheEntry *m_pOldestTexture;
 //#endif
@@ -226,7 +226,7 @@ protected:
 public:
 	CTextureManager();
 	~CTextureManager();
-
+	DWORD m_currentTextureMemUsage;
 	TxtrCacheEntry * GetBlackTexture(void);
 	TxtrCacheEntry * GetConstantColorTexture(uint32 constant);
 	TxtrCacheEntry * GetTexture(TxtrInfo * pgti, bool fromTMEM, bool doCRCCheck=true, bool AutoExtendTexture = false);
@@ -234,6 +234,10 @@ public:
 	void PurgeOldTextures();
 	void RecycleAllTextures();
 	bool CleanUp();
+
+#ifdef _XBOX
+	bool ReInitTextureMemory(bool SaveTexture);
+#endif
 
 #ifdef LIMIT_TEXTMEM
 	void FreeTextures();

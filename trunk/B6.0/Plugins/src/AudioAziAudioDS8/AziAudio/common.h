@@ -30,7 +30,7 @@
 #endif
 
 #ifndef XAUDIO_LIBRARIES_UNAVAILABLE
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(_XBOX)
 #define USE_XAUDIO2
 #endif
 #endif

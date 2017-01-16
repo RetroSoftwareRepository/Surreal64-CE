@@ -31,6 +31,8 @@
 
 #define PluginLoaded            _AUDIO_AZIAUD_##PluginLoaded
 #define AiCallBack              _AUDIO_AZIAUD_##AiCallBack
+
+#define Dacrate              _AUDIO_AZIAUD_##Dacrate
 #endif
 
 /*

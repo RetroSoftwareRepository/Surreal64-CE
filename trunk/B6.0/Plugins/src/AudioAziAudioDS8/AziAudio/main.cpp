@@ -14,7 +14,7 @@
 
 #ifdef USE_XAUDIO2
 #include "XAudio2SoundDriver.h"
-#elif defined(_WIN32)
+#elif defined(_WIN32) || defined(_XBOX)
 #include "DirectSoundDriver.h"
 #else
 #include "SDLSoundDriver.h"
@@ -24,7 +24,7 @@
 #include "audiohle.h"
 //#include "rsp/rsp.h"
 
-#ifdef _WIN32
+#if defined(_WIN32) || defined(_XBOX)
 #include <conio.h>
 #include <io.h>
 #endif
@@ -73,7 +73,7 @@ static bool	bAbortAiUpdate = false;
 extern "C"
 #endif
 
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(_XBOX)
 BOOL WINAPI DllMain(
   HINSTANCE hinstDLL,  // handle to DLL module
   DWORD fdwReason,     // reason for calling function
@@ -140,7 +140,7 @@ EXPORT Boolean CALL InitiateAudio(AUDIO_INFO Audio_Info) {
 /*
  * To do:  We currently have no sound-playing device for Unix-based platforms.
  */
-#if !defined(LEGACY_SOUND_DRIVER) || !defined(_WIN32)
+#if !defined(LEGACY_SOUND_DRIVER) && !defined(_XBOX) && !defined(_WIN32) 
 	snd = new NoSoundDriver();
 #elif defined(USE_XAUDIO2)
 	snd = new XAudio2SoundDriver();

@@ -18,9 +18,11 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 
 #include "stdafx.h"
+#include "Config.h"
 
 #ifdef _XBOX
 #include "../../../config.h"
+#include "../../../ultraxle/IoSupport.h"
 #endif
 
 static const DWORD MEM_KEEP_FREE = (2*1024*1024); // keep 2MB free
@@ -126,8 +128,100 @@ CTextureManager::~CTextureManager()
 	delete []m_pCacheTxtrList;
 	m_pCacheTxtrList = NULL;	
 }
+#ifdef _XBOX
+//
+// Decommit textures to file
+//
+bool CTextureManager::ReInitTextureMemory(bool SaveTexture)
+{
+	FILE *fp;
+	bool isComplete = 0;
+	char TexturePath[100];
+	char InfoPath[100];
+	//int numTexts;
+	//TxtrInfo TItoLoad;
+	TxtrCacheEntry * TextureToLoad;
+	
+	if(XGetDiskSectorSize("Z:\\") == 0)
+		g_IOSupport.Mount("Z:","Harddisk0\\Partition5");
+	
+	if (SaveTexture) {
+		for ( uint32 i = 0; i <= m_numOfCachedTxtrList+1; i++ )
+		{
+			TxtrCacheEntry * pEntry;
+			
+			pEntry = m_pCacheTxtrList[i];
 
+			sprintf(TexturePath,"Z:\\Textures\\Temp\\T\\%s-%s-%s_%d.dat", g_curRomInfo.romheader.dwCRC1,
+				g_curRomInfo.romheader.dwCRC2, g_curRomInfo.romheader.nCountryID,i);
+				
+			DeleteFile(TexturePath);
+			if(pEntry != NULL){
+				fp=fopen(TexturePath,"wb");
+				if(fp){
+					fwrite(pEntry, sizeof(TxtrCacheEntry), 1, fp);
+					fclose(fp);
+				}
+			}
+			CloseHandle(TexturePath);
+				
+			if(i == m_numOfCachedTxtrList+1){
+				sprintf(InfoPath,"Z:\\Textures\\Temp\\I\\%s-%s-%s_num.dat", g_curRomInfo.romheader.dwCRC1,
+					g_curRomInfo.romheader.dwCRC2, g_curRomInfo.romheader.nCountryID);
+				DeleteFile(InfoPath);
+				fp=fopen(InfoPath,"wb");
+				if(fp){
+					fprintf(fp,"%d",i-1);
+					fclose(fp);
+				}
+				CloseHandle(InfoPath);
+				isComplete = 1;
+				break;
+			}
+		}
+	}
+	else {
+		int numTexts=0;
+		//unsigned int TextSize;
+		char Temp[100];
+		
+		sprintf(InfoPath,"Z:\\Textures\\Temp\\I\\%s-%s-%s_num.dat", g_curRomInfo.romheader.dwCRC1,
+				g_curRomInfo.romheader.dwCRC2, g_curRomInfo.romheader.nCountryID);
+		fp=fopen(InfoPath,"rb");
+		if(fp){
+		fgets(Temp,100, fp);
+		for(int i = 0; i < 100; i++) {
+			numTexts = (int) atoi(&Temp[i]);
+			break;
+		}
+		fclose(fp);
+		}
+		DeleteFile(InfoPath);
+		CloseHandle(InfoPath);
 
+		for ( int i = 0; i <= numTexts; i++ )
+		{
+			sprintf(TexturePath,"Z:\\Textures\\Temp\\T\\%s-%s-%s_%d.dat", g_curRomInfo.romheader.dwCRC1,
+				g_curRomInfo.romheader.dwCRC2, g_curRomInfo.romheader.nCountryID,i);
+			sprintf(InfoPath,"Z:\\Textures\\Temp\\I\\%s-%s-%s_%d.dat", g_curRomInfo.romheader.dwCRC1,
+				g_curRomInfo.romheader.dwCRC2, g_curRomInfo.romheader.nCountryID,i);
+			TextureToLoad = NULL;
+		
+			fp=fopen(TexturePath,"rb");
+			if(fp){
+				fread(TextureToLoad, sizeof(TxtrCacheEntry), 1, fp);
+				fclose(fp);
+			}
+			DeleteFile(TexturePath);
+			CloseHandle(TexturePath);
+
+			AddTexture(TextureToLoad);
+		}
+		isComplete = 1;
+	}
+	return isComplete;
+}
+#endif
 //
 //  Delete all textures.
 //
@@ -178,6 +272,8 @@ void CTextureManager::PurgeOldTextures()
 	else if(bPurgeOldBeforeIGM)
 	{
 		bPurgeOldBeforeIGM = FALSE;
+		//if(options.enableHackForGames == HACK_FOR_BANJO_TOOIE)
+		//	return;
 	}
 	else if(options.enableHackForGames != HACK_FOR_QUAKE_2)
 	{
@@ -221,7 +317,7 @@ void CTextureManager::PurgeOldTextures()
 	{
 		pNext = pCurr->pNext;
 		
-		if ( status.gDlistCount - pCurr->FrameLastUsed > dwFramesToDelete )
+		if (( status.gDlistCount - pCurr->FrameLastUsed > dwFramesToDelete )||(m_currentTextureMemUsage>=g_maxTextureMemUsage))
 		{
 			if (pPrev != NULL) pPrev->pNext        = pCurr->pNext;
 			else			   m_pHead = pCurr->pNext;

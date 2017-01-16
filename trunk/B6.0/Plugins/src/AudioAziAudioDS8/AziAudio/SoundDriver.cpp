@@ -28,7 +28,7 @@ void SoundDriver::AI_LenChanged(u8 *start, u32 length)
 	int targetDMABuffer;
 	int numFullBuffers = 0;
 
-#ifdef _WIN32
+#if defined(_WIN32) || defined(_XBOX)
 	WaitForSingleObject(m_hMutex, INFINITE);
 #else
 	puts("[AI_LenChanged] To do:  Working non-Win32 mutex timing.");
@@ -42,7 +42,7 @@ void SoundDriver::AI_LenChanged(u8 *start, u32 length)
 			// FIFO is full.  We either need to ditch this buffer or wait
 			if (configSyncAudio == true)
 			{
-#ifdef _WIN32
+#if defined(_WIN32) || defined(_XBOX)
 				ReleaseMutex(m_hMutex);
 				while (m_AI_DMARemaining[targetDMABuffer] > 0)
 					Sleep(1);
@@ -78,7 +78,7 @@ void SoundDriver::AI_LenChanged(u8 *start, u32 length)
 
 	if (numFullBuffers > 0) *AudioInfo.AI_STATUS_REG |= AI_STATUS_DMA_BUSY;
 	if (numFullBuffers > 1) *AudioInfo.AI_STATUS_REG |= AI_STATUS_FIFO_FULL;
-#ifdef _WIN32
+#if defined(_WIN32) || defined(_XBOX)
 	ReleaseMutex(m_hMutex);
 #endif
 #endif
@@ -102,7 +102,7 @@ u32 SoundDriver::AI_ReadLength()
 #else
 	u32 retVal;
 
-#ifdef _WIN32
+#if defined(_WIN32) || defined(_XBOX)
 	WaitForSingleObject(m_hMutex, INFINITE);
 	retVal = m_AI_DMARemaining[m_AI_CurrentDMABuffer];
 	ReleaseMutex(m_hMutex);
@@ -128,7 +128,7 @@ void SoundDriver::AI_Startup()
 	m_CurrentReadLoc = m_CurrentWriteLoc = m_BufferRemaining = 0;
 	m_DMAEnabled = false;
 
-#ifdef _WIN32
+#if defined(_WIN32) || defined(_XBOX)
 	if (m_hMutex == NULL)
 	{
 		m_hMutex = CreateMutex(NULL, FALSE, NULL);
@@ -149,7 +149,7 @@ void SoundDriver::AI_Shutdown()
 #else
 	StopAudio();
 	DeInitialize();
-#ifdef _WIN32
+#if defined(_WIN32) || defined(_XBOX)
 	if (m_hMutex != NULL)
 	{
 		CloseHandle(m_hMutex);
@@ -213,7 +213,7 @@ u32 SoundDriver::LoadAiBuffer(u8 *start, u32 length)
 		bytesToMove -= 4;
 	}
 
-#ifdef _WIN32
+#if defined(_WIN32) || defined(_XBOX)
 	WaitForSingleObject(m_hMutex, INFINITE);
 #else
 	puts("[LoadAIBuffer] To do:  non-Win32 m_hMutex");
@@ -256,7 +256,7 @@ u32 SoundDriver::LoadAiBuffer(u8 *start, u32 length)
 		}
 	}
 	*/
-#ifdef _WIN32
+#if defined(_WIN32) || defined(_XBOX)
 	ReleaseMutex(m_hMutex);
 #else
 	// to do

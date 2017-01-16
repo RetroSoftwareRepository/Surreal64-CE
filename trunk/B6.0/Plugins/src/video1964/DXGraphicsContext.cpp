@@ -246,10 +246,11 @@ void CDXGraphicsContext::UpdateFrame(bool swaponly)
 	}
 #endif
 
-#ifdef _XBOX
-	// Free Textures
+#ifdef LIMIT_TEXTMEM
+		// Free Textures
 	gTextureManager.FreeTextures();
-
+#endif
+#ifdef _XBOX
 	if( !g_curRomInfo.bForceScreenClear )	
 			Clear(CLEAR_DEPTH_BUFFER);
 	XboxDrawOSD();

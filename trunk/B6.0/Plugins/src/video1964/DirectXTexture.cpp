@@ -153,11 +153,11 @@ LPRICETEXTURE CDirectXTexture::CreateTexture(uint32 dwWidth, uint32 dwHeight, Te
 	MYLPDIRECT3DTEXTURE lpSurf = NULL;
 	unsigned int dwNumMaps = 1;
 
-#ifdef _XBOX
-	D3DFORMAT pf = D3DFMT_A4R4G4B4;
-#else
+//#ifdef _XBOX
+//	D3DFORMAT pf = D3DFMT_A4R4G4B4;
+//#else
 	D3DFORMAT pf = ((CDXGraphicsContext*)(CGraphicsContext::g_pGraphicsContext))->GetFormat();
-#endif
+//#endif
 	switch( pf )
 	{
 	case D3DFMT_R5G6B5:
@@ -198,11 +198,11 @@ LPRICETEXTURE CDirectXTexture::CreateTexture(uint32 dwWidth, uint32 dwHeight, Te
 			pf = D3DFMT_X8R8G8B8;
 			break;
 		case AS_RENDER_TARGET:
-#ifdef _XBOX
-			pf = D3DFMT_LIN_X8R8G8B8;
-#else
+//#ifdef _XBOX
+//			pf = D3DFMT_LIN_X8R8G8B8;
+//#else
 			pf = D3DFMT_A8R8G8B8;
-#endif
+//#endif
 			break;
 		default:
 			if( options.textureQuality == TXT_QUALITY_16BIT )
