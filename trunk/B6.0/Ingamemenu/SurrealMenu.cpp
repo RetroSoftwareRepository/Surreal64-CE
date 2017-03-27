@@ -167,6 +167,7 @@ void Control3();
 void Control4();
 void ControllerMenu();
 extern void ChangeControl();
+extern void ChangeTurbo();
 
 // Load-Save state
 void Load1964StateMenu();
@@ -2670,10 +2671,13 @@ extern void Drawcontrol();
 extern void DrawcontrolHD();
 extern int selectedelement;
 extern bool changebutton;
+extern bool changeturbo;
 int controller;
 extern void ControllerReset();
 extern "C" void _INPUT_LoadButtonMap(int *cfgData);
+extern "C" void _INPUT_LoadTurboButtons(int *cfgData);
 extern int ControllerConfig[76];
+extern int TurboConfig[76];
 
 void ControllerMenu(void)
 {
@@ -2759,40 +2763,67 @@ void Control()
 
 	while(!bquit)
 	{
-	if(bEnableHDTV)
-		DrawcontrolHD();
-	else
-		Drawcontrol();
-	XBInput_GetInput();
-
-	if(g_Gamepads[controller].wPressedButtons	& XINPUT_GAMEPAD_DPAD_DOWN)
-	{
-	selectedelement++;
-	if (selectedelement>18) selectedelement=0; }
-
-	if(g_Gamepads[controller].wPressedButtons	& XINPUT_GAMEPAD_DPAD_UP)
-	{
-	selectedelement--;
-	if (selectedelement<0) selectedelement=18; }
-
-    if(g_Gamepads[controller].bPressedAnalogButtons[XINPUT_GAMEPAD_A]) changebutton=true;
-
-    if(g_Gamepads[controller].bPressedAnalogButtons[XINPUT_GAMEPAD_X]) ControllerReset();
-
-	for (int i=0;i<4;i++){
-		if(g_Gamepads[i].bPressedAnalogButtons[XINPUT_GAMEPAD_B])	bquit=true;}
-
-	g_pd3dDevice->Present( NULL, NULL, NULL, NULL );
-	if (changebutton) {
 		if(bEnableHDTV)
 			DrawcontrolHD();
 		else
 			Drawcontrol();
-	g_pd3dDevice->Present( NULL, NULL, NULL, NULL );
-	ChangeControl();}
+		XBInput_GetInput();
+
+		if(g_Gamepads[controller].wPressedButtons	& XINPUT_GAMEPAD_DPAD_DOWN)
+		{
+			selectedelement++;
+			if (selectedelement>18) 
+				selectedelement=0;
+		}
+
+		if(g_Gamepads[controller].wPressedButtons	& XINPUT_GAMEPAD_DPAD_UP)
+		{
+			selectedelement--;
+			if (selectedelement<0) 
+				selectedelement=18; 
+		}
+
+		if(g_Gamepads[controller].bPressedAnalogButtons[XINPUT_GAMEPAD_A])
+			changebutton=true;
+
+		if(g_Gamepads[controller].bPressedAnalogButtons[XINPUT_GAMEPAD_X])
+			ControllerReset();
+
+		if(g_Gamepads[controller].bPressedAnalogButtons[XINPUT_GAMEPAD_Y])
+			changeturbo=true;
+
+		for (int i=0;i<4;i++)
+		{
+			if(g_Gamepads[i].bPressedAnalogButtons[XINPUT_GAMEPAD_B])
+				bquit=true;
+		}
+
+		g_pd3dDevice->Present( NULL, NULL, NULL, NULL );
+		
+		if (changebutton) 
+		{
+			if(bEnableHDTV)
+				DrawcontrolHD();
+			else
+				Drawcontrol();
+
+			g_pd3dDevice->Present( NULL, NULL, NULL, NULL );
+			ChangeControl();
+		}
+		if (changeturbo)
+		{
+			if(bEnableHDTV)
+				DrawcontrolHD();
+			else
+				Drawcontrol();
+			g_pd3dDevice->Present( NULL, NULL, NULL, NULL );
+			ChangeTurbo();
+		}
 	}
+	
 	ConfigAppSave2();
 	_INPUT_LoadButtonMap(ControllerConfig);
+	_INPUT_LoadTurboButtons(TurboConfig);
 	XLMenu_Routine(MENU_BACK);
 	if (m_pControllerMenu)
 		XLMenu_Delete(m_pControllerMenu);

@@ -85,17 +85,26 @@ public:
 	~Config(void);
 
 	bool Load(int *cfgData);
+	bool LoadTurbo(int *cfgData);
 	bool Load(string &szFilename);
 	bool Save(string &szFilename);
+
+	bool bAllowPakSwitch;
 
 	void MapN64ToXbox(DWORD controller, byte xboxButton, byte n64Button);
 
 	DWORD GetXboxButtonValue(DWORD controller, byte xboxButton);
 	DWORD GetN64ButtonValue(DWORD controller, byte n64Button);
+	DWORD CheckTurboAllow(DWORD controller, byte n64Button, DWORD actualPress);
 
 	
 private:
 	byte m_buttonMap[NUMBER_OF_CONTROLLERS][NUMBER_OF_N64_BUTTONS];
 
 	int m_cur64ThumbVal[NUMBER_OF_CONTROLLERS][4];
+
+	DWORD m_TickPressed[NUMBER_OF_CONTROLLERS][NUMBER_OF_N64_BUTTONS];
+	DWORD m_TickRefused[NUMBER_OF_CONTROLLERS][NUMBER_OF_N64_BUTTONS];
+	BOOL m_AllowPress[NUMBER_OF_CONTROLLERS][NUMBER_OF_N64_BUTTONS];
+	byte m_turboInterval[NUMBER_OF_CONTROLLERS][NUMBER_OF_N64_BUTTONS];
 };

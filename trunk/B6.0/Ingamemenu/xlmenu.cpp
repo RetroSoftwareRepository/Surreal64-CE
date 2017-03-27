@@ -10,6 +10,7 @@
 //extern void ClearIGM();
 //weinerschnitzel - Skin Control
 extern DWORD dwMenuItemColor;
+extern DWORD dwMenuItemTurboColor;
 extern DWORD dwNullItemColor;
 extern DWORD dwSelectedRomColor;
 extern char skinname[32];
@@ -209,16 +210,16 @@ DWORD XLMenu_GetCommand(XBGAMEPAD *gamepad)
     // get menu command
     if(XLMenu_CurMenu || XLMenu_CurRoutine)
     {
-        if(gamepad->bPressedAnalogButtons[XINPUT_GAMEPAD_A] || gamepad->wPressedButtons & XINPUT_GAMEPAD_DPAD_RIGHT || gamepad->fX1>0.8f)//gamepad->wPressedButtons&XINPUT_GAMEPAD_START)
+        if(gamepad->bPressedAnalogButtons[XINPUT_GAMEPAD_A] || gamepad->wPressedButtons & XINPUT_GAMEPAD_DPAD_RIGHT)//gamepad->wPressedButtons&XINPUT_GAMEPAD_START)
             command = MENU_SELECTITEM;
-		else if(gamepad->bPressedAnalogButtons[XINPUT_GAMEPAD_X] || gamepad->wPressedButtons & XINPUT_GAMEPAD_DPAD_LEFT|| gamepad->fX1<-0.8f)
+		else if(gamepad->bPressedAnalogButtons[XINPUT_GAMEPAD_X] || gamepad->wPressedButtons & XINPUT_GAMEPAD_DPAD_LEFT)
             command = MENU_SELECTITEM2;
         else if(gamepad->bPressedAnalogButtons[XINPUT_GAMEPAD_B] ||
            gamepad->wPressedButtons&XINPUT_GAMEPAD_BACK)
             command = MENU_BACK;
-        else if((gamepad->fY1>0.8f) || (gamepad->wPressedButtons & XINPUT_GAMEPAD_DPAD_UP))
+        else if(gamepad->wPressedButtons & XINPUT_GAMEPAD_DPAD_UP)
             command = MENU_PREVITEM;
-        else if((gamepad->fY1<-0.8f) || (gamepad->wPressedButtons & XINPUT_GAMEPAD_DPAD_DOWN))
+        else if(gamepad->wPressedButtons & XINPUT_GAMEPAD_DPAD_DOWN)
             command = MENU_NEXTITEM;
     }
     else if(gamepad->wPressedButtons&XINPUT_GAMEPAD_START)
