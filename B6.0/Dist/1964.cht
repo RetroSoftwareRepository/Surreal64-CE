@@ -1423,7 +1423,7 @@ Infinite Time,4=0,801A3623-0001,
 99 Stars,4=0,801A362F-0063,  
 
 [DONKEY KONG 64]
-NumberOfGroups=48
+NumberOfGroups=49
 Donkey Kong Infinite Ammo,1=0,807FCC45-0096,
 Infinite Health,1=0,817FCC4C-041F,
 Donkey Kong Infinite Musical Instrument,1=0,817FC954-0103,817FC958-00FF,
@@ -1472,6 +1472,7 @@ Infinite Crystal Coconuts,4=0,817FCB86-03E7,
 Donkey Kong Has Moves,4=0,817FC890-0103,
 Donkey Kong Have Weapon,4=0,817FC892-0103,
 Free Pass (Access All Areas),4="This is exactly what it says You can walk through Any Locked Door,Gate Or Area. Have Fun.",0,8066D167-0001,8066D262-0001,
+Fix Bone Displacement,1=0,80619632-0000,
 
 [Diddy Kong Racing]
 NumberOfGroups=132

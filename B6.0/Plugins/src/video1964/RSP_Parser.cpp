@@ -866,8 +866,9 @@ void DLParser_Process()
 		RDP_Cleanup();
 		CRender::g_pRender->RenderReset();
 		CRender::g_pRender->ResetMatrices(stack_size);
-		//g_pFrameBufferManager->DisplayRenderTexture(-1);
+#ifdef _RICE6FB
 		g_pFrameBufferManager->CloseUp();
+#endif
 				
 		// Disable any active rumble
 		_INPUT_RumblePause(true);
@@ -889,9 +890,9 @@ void DLParser_Process()
 			RunIngameMenu();
 		}
 
-		//gTextureManager.ReInitTextureMemory(false);
+#ifdef _RICE6FB
 		g_pFrameBufferManager->Initialize();
-		//g_pFrameBufferManager->RestoreNormalBackBuffer();
+#endif
 		
 		// Restore dynablock if we previously decommitted.
 		while(Memdecommit)

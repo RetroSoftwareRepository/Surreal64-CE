@@ -212,6 +212,14 @@ void _INPUT_SetRumble(int Control, BOOL on);
 *******************************************************************/ 
 void _INPUT_LoadButtonMap(int *cfgData);
 
+/******************************************************************
+  Function: _INPUT_LoadTurboButtons
+  Purpose:  Loads Turbo button configuration for the current game
+  input:    a 72byte array of cfg data
+  output:   none
+*******************************************************************/ 
+void _INPUT_LoadTurboButtons(int *cfgData);
+
 #if defined(__cplusplus)
 }
 #endif

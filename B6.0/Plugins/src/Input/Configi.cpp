@@ -51,6 +51,17 @@ Config::Config(void)
 		m_cur64ThumbVal[i][2] = 0;
 		m_cur64ThumbVal[i][3] = 0;
 	}
+	for (DWORD i = 0; i < NUMBER_OF_CONTROLLERS; i++)
+	{
+		for (int j = 0; j < NUMBER_OF_N64_BUTTONS; j++)
+		{
+			m_TickPressed[i][j] = 0;
+			m_TickRefused[i][j] = 0;
+			m_AllowPress[i][j] = true;
+		}
+	}
+
+	bAllowPakSwitch = false;
 }
 
 Config::~Config(void)
@@ -59,10 +70,18 @@ Config::~Config(void)
 
 bool Config::Load(int *cfgData)
 {
-	for (int i=0;i<4;i++) {
-		for (int j=0;j<19;j++){
+	for (int i=0;i<4;i++)
+		for (int j=0;j<19;j++)
              m_buttonMap[i][j]=cfgData[(i*19)+j];
-		}}
+	
+	return true;
+}
+
+bool Config::LoadTurbo(int *cfgData)
+{
+	for (int i=0;i<4;i++)
+		for (int j=0;j<19;j++)
+             m_turboInterval[i][j]=cfgData[(i*19)+j];
 	
 	return true;
 }
@@ -79,13 +98,23 @@ bool Config::Load(string &szFilename)
 		return false;
 	}
 
-	for (DWORD i = 0; i < NUMBER_OF_CONTROLLERS; i++)
+	for (int i = 0; i < NUMBER_OF_CONTROLLERS; i++)
 	{
-		for (DWORD j = 0; j < NUMBER_OF_N64_BUTTONS; j++)
+		for (int j = 0; j < NUMBER_OF_N64_BUTTONS; j++)
 		{
 			char temp;
 			cfgFile.read(&temp, sizeof(char));
 			m_buttonMap[i][j] = static_cast<XboxButton>(temp);
+		}
+	}
+
+	for (int i = 0; i < NUMBER_OF_CONTROLLERS; i++)
+	{
+		for (int j = 0; j < NUMBER_OF_N64_BUTTONS; j++)
+		{
+			char temp;
+			cfgFile.read(&temp, sizeof(char));
+			m_turboInterval[i][j] = static_cast<XboxButton>(temp);
 		}
 	}
 
@@ -106,11 +135,20 @@ bool Config::Save(string &szFilename)
 		return false;
 	}
 
-	for (DWORD i = 0; i < NUMBER_OF_CONTROLLERS; i++)
+	for (int i = 0; i < NUMBER_OF_CONTROLLERS; i++)
 	{
-		for (DWORD j = 0; j < NUMBER_OF_N64_BUTTONS; j++)
+		for (int j = 0; j < NUMBER_OF_N64_BUTTONS; j++)
 		{
 			char temp = m_buttonMap[i][j];
+			cfgFile.write(&temp, sizeof(char));
+		}
+	}
+
+	for (int i = 0; i < NUMBER_OF_CONTROLLERS; i++)
+	{
+		for (int j = 0; j < NUMBER_OF_N64_BUTTONS; j++)
+		{
+			char temp = m_turboInterval[i][j];
 			cfgFile.write(&temp, sizeof(char));
 		}
 	}
@@ -330,7 +368,7 @@ DWORD Config::GetN64ButtonValue(DWORD controller, byte n64Button)
 		else // if we are mapping this axis to an xbox button
 		{
 			
-			if (GetXboxButtonValue(controller, xboxButton))
+			if (CheckTurboAllow(controller, n64Button, GetXboxButtonValue(controller, xboxButton)))
 			{
 				// emulate full push on the axis when the button is down
 				m_cur64ThumbVal[controller][n64Button] = 115;
@@ -356,14 +394,55 @@ DWORD Config::GetN64ButtonValue(DWORD controller, byte n64Button)
 		// if we are mapping this button to an xbox axis
 		if (IS_XBOX_AXIS(xboxButton))
 		{
-			// if the axis is moved across greater than 30000 then its
-			// considered a button push
-			//weinerschnitzel - Button press should occur regardless of deadzone, change threshold
-			return (GetXboxButtonValue(controller, xboxButton) > ((ButtonToAxisThresh / 100) * 32768));
+			return (CheckTurboAllow(controller, n64Button, 
+				(GetXboxButtonValue(controller, xboxButton) > ((ButtonToAxisThresh / 100) * 32768))));
 		}
-		else // if we are mapping this button to an xbox button
+		// if we are mapping this button to an xbox button
+		else
 		{
-			return ((GetXboxButtonValue(controller, xboxButton))? 1:0);
+			return (CheckTurboAllow(controller, n64Button, (GetXboxButtonValue(controller, xboxButton))? 1:0));
 		}
 	}
+}
+
+DWORD Config::CheckTurboAllow(DWORD controller, byte n64Button, DWORD actualPress)
+{
+	if(actualPress && m_turboInterval[controller][n64Button])
+	{
+		DWORD CurrentTime = GetTickCount();
+		DWORD RealInterval;
+
+		switch ( m_turboInterval[controller][n64Button] )
+		{
+			case 1:
+				RealInterval = 10;
+				break;
+			case 2:
+				RealInterval = 100;
+				break;
+			case 3:
+				RealInterval = 300;
+				break;
+			default:
+				RealInterval = 10;
+				break;
+		}
+		if(CurrentTime - m_TickPressed[controller][n64Button] >= (DWORD) m_turboInterval[controller][n64Button] * 100)
+			m_AllowPress[controller][n64Button] = true;
+		else if(CurrentTime - m_TickRefused[controller][n64Button] >= (DWORD) m_turboInterval[controller][n64Button] * 100)
+			m_AllowPress[controller][n64Button] = false;
+		
+		if(m_AllowPress[controller][n64Button])
+		{
+			m_TickPressed[controller][n64Button] = CurrentTime;
+			return actualPress;
+		}
+		else
+		{
+			m_TickRefused[controller][n64Button] = CurrentTime;
+			return 0;
+		}
+	}
+	else
+		return actualPress;
 }

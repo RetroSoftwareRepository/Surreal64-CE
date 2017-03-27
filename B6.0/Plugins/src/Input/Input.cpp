@@ -68,10 +68,11 @@ void _INPUT_GetKeys(int Control, BUTTONS * Keys)
 	// update the rumble strength for this control
 	UpdateRumble(Control);
 
-	if (g_config.GetN64ButtonValue(Control, InGameMenu))
+	if (g_config.GetN64ButtonValue(0, InGameMenu))
 		g_bIngameMenu = TRUE;
 
-	if (g_config.GetXboxButtonValue(Control, XboxLeftThumbButton) && g_config.GetXboxButtonValue(Control, XboxLeftTrigger) && g_config.GetXboxButtonValue(Control, XboxRightTrigger) && GetTickCount() > dwLastChange + 1000)
+	if (g_config.GetXboxButtonValue(Control, XboxLeftThumbButton) && g_config.GetXboxButtonValue(Control, XboxLeftTrigger)
+		&& g_config.GetXboxButtonValue(Control, XboxRightTrigger) && (GetTickCount() > dwLastChange + 1000) && g_config.bAllowPakSwitch)
 	{
 		char msg[100];
 		dwLastChange = GetTickCount();
@@ -172,6 +173,11 @@ void _INPUT_SetRumble(int Control, BOOL on)
 void _INPUT_LoadButtonMap(int *cfgData)
 {
 	g_config.Load(cfgData);
+}
+
+void _INPUT_LoadTurboButtons(int *cfgData)
+{
+	g_config.LoadTurbo(cfgData);
 }
 
 HANDLE _INPUT_GetXGamepadHandle(int controller)

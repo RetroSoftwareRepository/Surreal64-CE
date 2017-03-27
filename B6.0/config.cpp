@@ -160,6 +160,23 @@ int ControllerReset[19]  =
 		   0x04,0x05,0x06,0x07,0x0C,0x10,0x12,0x16,
 		   0x0D,0x17,0x0F};
 
+int TurboConfig[CONTROLLER_CONFIG_MAX] 
+		= {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+		   0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+		   0x00,0x00,0x00,
+
+		   0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+		   0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+		   0x00,0x00,0x00,
+
+		   0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+		   0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+		   0x00,0x00,0x00,
+
+		   0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+		   0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+		   0x00,0x00,0x00,};
+
 //Skin.ini Defaults
 char BoxartName[32] = "Cbagys3DBoxCart";
 
@@ -167,6 +184,7 @@ char BoxartName[32] = "Cbagys3DBoxCart";
 DWORD dwTitleColor = 0xFF53B77F;
 DWORD dwIGMTitleColor = 0x55777777;
 DWORD dwMenuItemColor = 0xCCEEEEEE;
+DWORD dwMenuItemTurboColor = 0xCC00FF00;
 DWORD dwMenuTitleColor = 0xFF8080FF;
 DWORD dwRomListColor = 0xAAEEEEEE;
 DWORD dwSelectedRomColor = 0xFFFF8000;
@@ -595,6 +613,13 @@ int ConfigAppSave2()
 			ini.SetLongValue("Settings", var, ControllerConfig[i]);
 		}
 	}
+	// turbo controller settings
+	for (int i = 0; i < CONTROLLER_CONFIG_MAX; i++)
+	{
+		char var[22];
+		sprintf(var, "TurboConfig[%i]", i);
+		ini.SetLongValue("TurboSettings", var, TurboConfig[i]);
+	}
 		
 	ini.SetBoolValue("Settings", "EnableHDTV", bEnableHDTV);
 	ini.SetBoolValue("Settings", "FullScreen", bFullScreen);
@@ -726,7 +751,17 @@ int ConfigAppLoad2()
 		}
 	}
 
-	//HD Emu Settings
+	// Turbo controller config
+	{
+		for (int i = 0; i < CONTROLLER_CONFIG_MAX; i++)
+		{
+			char var[22];
+			sprintf(var, "TurboConfig[%i]", i);
+			TurboConfig[i] = static_cast<byte>( ini.GetLongValue("TurboSettings", var, 00 ) ); // should be byte or int? it's byte in hash
+		}
+	}
+
+	// HD Emu Settings
 	bEnableHDTV = ini.GetBoolValue("Settings", "EnableHDTV", bEnableHDTV);
 	bFullScreen = ini.GetBoolValue("Settings", "FullScreen", bFullScreen);
 

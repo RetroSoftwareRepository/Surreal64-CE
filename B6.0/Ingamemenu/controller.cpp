@@ -5,6 +5,7 @@
 #include "../config.h"
 
 extern DWORD dwMenuItemColor;
+extern DWORD dwMenuItemTurboColor;
 extern DWORD dwMenuTitleColor;
 extern DWORD dwSelectedRomColor;
 
@@ -14,6 +15,7 @@ extern CXBFont m_Font;
 typedef unsigned char byte;
 extern int controller;
 extern int ControllerConfig[76];
+extern int TurboConfig[76];
 
 WCHAR controlname[19][99] = {	
 	L"Analog Left",
@@ -91,6 +93,8 @@ extern CPanel m_ControlsPanel;
 int selectcontrol=1;
 int selectedelement=0;
 bool changebutton=false;
+bool changeturbo=false;
+
 
 void Drawcontrol()
 {
@@ -121,40 +125,65 @@ void Drawcontrol()
 	//m_Font.DrawText((float)(iIGMControlConfigCenterX+(iIGMControlConfigWidth/4)), (float)iIGMControlConfigTop-itemh-iControlsSpacingIGM, dwMenuTitleColor,L"XBOX" , XBFONT_CENTER_X);
 	
 	m_Font.End();
-	for (int j=0;j<3;j++){
+	for (int j=0;j<3;j++)
+	{
 		int y=iIGMControlConfigTop;
 		int x,align;
-	for (int i = 0;i<19;i++,y=y+itemh+iControlsSpacingIGM) {
-		switch (j){
-		case 0:  swprintf(m_currentname,L"%s",controlname[i]);
-			     x=(iIGMControlConfigCenterX-(iIGMControlConfigWidth/2))+iIGMControlConfigTxtPadLX; // Distance from center with 26 pixels for Button preview, and 2 pixels for a border
-				 align = XBFONT_LEFT;
-				 break;
-		case 1:  swprintf(m_currentname,L"");
-                 x=iIGMControlConfigCenterX; // Middle line, or centered text.
-				 align = XBFONT_CENTER_X;
-				 break;
-		case 2:  if ((i== selectedelement)&&(changebutton))
-				 swprintf(m_currentname,L"Press a Button",controlname[i]);
-		         else 
-	             swprintf(m_currentname,L"%s",controlxboxcorrect[i]);
-			     x=iIGMControlConfigCenterX+(iIGMControlConfigWidth/2); // Distance from center for right aligned menu items with 2 pixel border
-				 align = XBFONT_RIGHT;
-				 break;}
+		DWORD color;
+		for (int i = 0;i<19;i++,y=y+itemh+iControlsSpacingIGM) 
+		{
+			switch (j)
+			{
+				case 0:  swprintf(m_currentname,L"%s",controlname[i]);
+						switch (TurboConfig[(controller*19)+i])
+						{
+							case 1:
+								swprintf(m_currentname,L"%s (10)",m_currentname);
+								break;
+							case 2:
+								swprintf(m_currentname,L"%s (100)",m_currentname);
+								break;
+							case 3:
+								swprintf(m_currentname,L"%s (300)",m_currentname);
+								break;
+						}
+						x=(iIGMControlConfigCenterX-(iIGMControlConfigWidth/2))+iIGMControlConfigTxtPadLX; // Distance from center with 26 pixels for Button preview, and 2 pixels for a border
+						align = XBFONT_LEFT;
+						break;
+				case 1:  swprintf(m_currentname,L"");
+						x=iIGMControlConfigCenterX; // Middle line, or centered text.
+						align = XBFONT_CENTER_X;
+						break;
+				case 2:  if ((i== selectedelement)&&(changebutton))
+						swprintf(m_currentname,L"Press a Button",controlname[i]);
+						else 
+						swprintf(m_currentname,L"%s",controlxboxcorrect[i]);
+						x=iIGMControlConfigCenterX+(iIGMControlConfigWidth/2); // Distance from center for right aligned menu items with 2 pixel border
+						align = XBFONT_RIGHT;
+						break;
+			}
 
-	m_Font.Begin();
-	if (i== selectedelement){
-		m_Font.DrawText((float)x, (float)y, dwSelectedRomColor, m_currentname, align);}
-	else {
-	m_Font.DrawText((float)x, (float)y, dwMenuItemColor, m_currentname, align);}
-	m_Font.End();
-	}
+			m_Font.Begin();
+			if (i== selectedelement)
+			{
+				m_Font.DrawText((float)x, (float)y, dwSelectedRomColor, m_currentname, align);
+			}
+			else 
+			{
+				if(TurboConfig[(controller*19)+i])
+					m_Font.DrawText((float)x, (float)y, dwMenuItemTurboColor, m_currentname, align);
+				else
+                    m_Font.DrawText((float)x, (float)y, dwMenuItemColor, m_currentname, align);
+			}
+			m_Font.End();
+		}
 	m_ControlsPanel.Render((float)iIGMConControlsPosX, (float)iIGMConControlsPosY);
-		m_Font.Begin();
-		m_Font.DrawText((float)iIGMConControlsTxtPosX, (float)iIGMConControlsTxtPosY, dwMenuItemColor,L"\402 Reset" , GetFontAlign(iIGMConControlsTxtAlign));
-		m_Font.DrawText((float)iIGMConControlsTxtPosX, (float)(iIGMConControlsTxtPosY+itemh), dwMenuItemColor,L"\400 Change" , GetFontAlign(iIGMConControlsTxtAlign));
-		m_Font.DrawText((float)iIGMConControlsTxtPosX, (float)(iIGMConControlsTxtPosY+(2*itemh)), dwMenuItemColor,L"\401 Back" , GetFontAlign(iIGMConControlsTxtAlign));
-		m_Font.End();
+	m_Font.Begin();
+	m_Font.DrawText((float)iIGMConControlsTxtPosX, (float)iIGMConControlsTxtPosY, dwMenuItemColor,L"\402 Reset" , GetFontAlign(iIGMConControlsTxtAlign));
+	m_Font.DrawText((float)iIGMConControlsTxtPosX, (float)(iIGMConControlsTxtPosY+itemh), dwMenuItemColor,L"\400 Change" , GetFontAlign(iIGMConControlsTxtAlign));
+	m_Font.DrawText((float)iIGMConControlsTxtPosX, (float)(iIGMConControlsTxtPosY+(2*itemh)), dwMenuItemColor,L"\401 Back" , GetFontAlign(iIGMConControlsTxtAlign));
+	m_Font.DrawText((float)iIGMConControlsTxtPosX, (float)(iIGMConControlsTxtPosY+(3*itemh)), dwMenuItemColor,L"\403 Turbo" , GetFontAlign(iIGMConControlsTxtAlign));
+	m_Font.End();
 	}
 }
 
@@ -185,39 +214,66 @@ void DrawcontrolHD()
 	//m_Font.DrawText((float)(iIGMControlConfigCenterX_HD-(iIGMControlConfigWidth_HD/4)), (float)iIGMControlConfigTop_HD-itemh-iControlsSpacingIGM, dwMenuTitleColor,L"Nintendo 64" , XBFONT_CENTER_X);
 	//m_Font.DrawText((float)(iIGMControlConfigCenterX_HD+(iIGMControlConfigWidth_HD/4)), (float)iIGMControlConfigTop_HD-itemh-iControlsSpacingIGM, dwMenuTitleColor,L"XBOX" , XBFONT_CENTER_X);
 	m_Font.End();
-	for (int j=0;j<3;j++){
+	for (int j=0;j<3;j++)
+	{
 		int y=iIGMControlConfigTop_HD;
 		int x,align;
-	for (int i = 0;i<19;i++,y=y+itemh+iControlsSpacingIGM_HD) {
-		switch (j){
-		case 0:  swprintf(m_currentname,L"%s",controlname[i]);
-			     x=(iIGMControlConfigCenterX_HD-(iIGMControlConfigWidth_HD/2))+iIGMControlConfigTxtPadLX_HD;//Distance from center with 26 pixels for Button preview
-				 align = XBFONT_LEFT;
-				 break;
-		case 1:  swprintf(m_currentname,L"");
-                 x=iIGMControlConfigCenterX_HD;//
-				 align = XBFONT_CENTER_X;
-				 break;
-		case 2:  if ((i== selectedelement)&&(changebutton))
-				 swprintf(m_currentname,L"Press a Button",controlname[i]);
-		         else 
-	             swprintf(m_currentname,L"%s",controlxboxcorrect[i]);
-			     x=iIGMControlConfigCenterX_HD+(iIGMControlConfigWidth_HD/2); // Distance from center for right aligned menu items with 2 pixel border;
-				 align = XBFONT_RIGHT;
-				 break;}
+		for (int i = 0;i<19;i++,y=y+itemh+iControlsSpacingIGM_HD)
+		{
+			switch (j)
+			{
+				case 0: 
+					swprintf(m_currentname,L"%s",controlname[i]);
+					switch (TurboConfig[(controller*19)+i])
+					{
+						case 1:
+							swprintf(m_currentname,L"%s (10)",m_currentname);
+							break;
+						case 2:
+							swprintf(m_currentname,L"%s (100)",m_currentname);
+							break;
+						case 3:
+							swprintf(m_currentname,L"%s (300)",m_currentname);
+							break;
+					}
+					x=(iIGMControlConfigCenterX_HD-(iIGMControlConfigWidth_HD/2))+iIGMControlConfigTxtPadLX_HD;//Distance from center with 26 pixels for Button preview
+					align = XBFONT_LEFT;
+					break;
+				case 1: 
+					swprintf(m_currentname,L"");
+					x=iIGMControlConfigCenterX_HD;//
+					align = XBFONT_CENTER_X;
+					break;
+				case 2: 
+					if ((i== selectedelement)&&(changebutton))
+						swprintf(m_currentname,L"Press a Button",controlname[i]);
+					else 
+						swprintf(m_currentname,L"%s",controlxboxcorrect[i]);
+					x=iIGMControlConfigCenterX_HD+(iIGMControlConfigWidth_HD/2); // Distance from center for right aligned menu items with 2 pixel border;
+					align = XBFONT_RIGHT;
+					break;
+			}
 
-	m_Font.Begin();
-	if (i== selectedelement){
-		m_Font.DrawText((float)x, (float)y, dwSelectedRomColor, m_currentname, align);}
-	else {
-	m_Font.DrawText((float)x, (float)y, dwMenuItemColor, m_currentname, align);}
-	m_Font.End();
-	}
+			m_Font.Begin();
+			if (i== selectedelement)
+			{
+				m_Font.DrawText((float)x, (float)y, dwSelectedRomColor, m_currentname, align);
+			}
+			else 
+			{
+				if(TurboConfig[(controller*19)+i])
+					m_Font.DrawText((float)x, (float)y, dwMenuItemTurboColor, m_currentname, align);
+				else
+					m_Font.DrawText((float)x, (float)y, dwMenuItemColor, m_currentname, align);
+			}
+			m_Font.End();
+		}
 		m_ControlsPanel.Render((float)iIGMConControlsPosX_HD, (float)iIGMConControlsPosY_HD);
 		m_Font.Begin();
 		m_Font.DrawText((float)iIGMConControlsTxtPosX_HD, (float)iIGMConControlsTxtPosY_HD, dwMenuItemColor,L"\402 Reset" , GetFontAlign(iIGMConControlsTxtAlign_HD));
 		m_Font.DrawText((float)iIGMConControlsTxtPosX_HD, (float)(iIGMConControlsTxtPosY_HD+itemh), dwMenuItemColor,L"\400 Change" , GetFontAlign(iIGMConControlsTxtAlign_HD));
 		m_Font.DrawText((float)iIGMConControlsTxtPosX_HD, (float)(iIGMConControlsTxtPosY_HD+(2*itemh)), dwMenuItemColor,L"\401 Back" , GetFontAlign(iIGMConControlsTxtAlign_HD));
+		m_Font.DrawText((float)iIGMConControlsTxtPosX_HD, (float)(iIGMConControlsTxtPosY_HD+(3*itemh)), dwMenuItemColor,L"\403 Turbo" , GetFontAlign(iIGMConControlsTxtAlign_HD));
 		m_Font.End();
 	}
 }
@@ -333,24 +389,46 @@ void ChangeControl()
 	//XBOX_CONTROLLER_DEAD_ZONE = tempdeadzone;
 }
 
+void ChangeTurbo()
+{
+	if(TurboConfig[(controller*19)+selectedelement] > 3)
+		TurboConfig[(controller*19)+selectedelement] = 0;
+
+	switch(TurboConfig[(controller*19)+selectedelement])
+	{
+		case 3:
+			TurboConfig[(controller*19)+selectedelement] = 0;
+			break;
+		default:
+			TurboConfig[(controller*19)+selectedelement]+= 1;
+			break;
+	}
+	changeturbo = false;
+}
+
 void ControllerReset(){
-ControllerConfig[(controller*19)+0]=0x00;
-ControllerConfig[(controller*19)+1]=0x01;
-ControllerConfig[(controller*19)+2]=0x02;
-ControllerConfig[(controller*19)+3]=0x03;
-ControllerConfig[(controller*19)+4]=0x08;
-ControllerConfig[(controller*19)+5]=0x09;
-ControllerConfig[(controller*19)+6]=0x0A;
-ControllerConfig[(controller*19)+7]=0x0B;
-ControllerConfig[(controller*19)+8]=0x04;
-ControllerConfig[(controller*19)+9]=0x05;
-ControllerConfig[(controller*19)+10]=0x06;
-ControllerConfig[(controller*19)+11]=0x07;
-ControllerConfig[(controller*19)+12]=0x0C;
-ControllerConfig[(controller*19)+13]=0x10;
-ControllerConfig[(controller*19)+14]=0x12;
-ControllerConfig[(controller*19)+15]=0x16;
-ControllerConfig[(controller*19)+16]=0x0D;
-ControllerConfig[(controller*19)+17]=0x17;
-ControllerConfig[(controller*19)+18]=0x0F;
+	ControllerConfig[(controller*19)+0]=0x00;
+	ControllerConfig[(controller*19)+1]=0x01;
+	ControllerConfig[(controller*19)+2]=0x02;
+	ControllerConfig[(controller*19)+3]=0x03;
+	ControllerConfig[(controller*19)+4]=0x08;
+	ControllerConfig[(controller*19)+5]=0x09;
+	ControllerConfig[(controller*19)+6]=0x0A;
+	ControllerConfig[(controller*19)+7]=0x0B;
+	ControllerConfig[(controller*19)+8]=0x04;
+	ControllerConfig[(controller*19)+9]=0x05;
+	ControllerConfig[(controller*19)+10]=0x06;
+	ControllerConfig[(controller*19)+11]=0x07;
+	ControllerConfig[(controller*19)+12]=0x0C;
+	ControllerConfig[(controller*19)+13]=0x10;
+	ControllerConfig[(controller*19)+14]=0x12;
+	ControllerConfig[(controller*19)+15]=0x16;
+	ControllerConfig[(controller*19)+16]=0x0D;
+	ControllerConfig[(controller*19)+17]=0x17;
+	ControllerConfig[(controller*19)+18]=0x0F;
+
+	for(int i = 0; i<19; i++)
+	{
+		TurboConfig[(controller*19)+i]= 0x00;
+	}
 }
