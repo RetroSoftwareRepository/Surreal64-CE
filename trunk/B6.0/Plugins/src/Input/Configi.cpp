@@ -352,16 +352,24 @@ DWORD Config::GetN64ButtonValue(DWORD controller, byte n64Button)
 			// f(x) = 128*tan(x)/(pi/2)
 			// function for n64 control stick (0-128)
 			// x is Xbox input, starting at 0 from Deadzone value
+
+			DWORD input;
 			switch(Sensitivity)
 			{
 				case 0:		// Increasing Sensitivity as control stick aproaches edge
-					return (DWORD)( 128 * ( tan( GetXboxButtonValue(controller, xboxButton) / (32768 - XBOX_CONTROLLER_DEAD_ZONE))) / 1.57079633);
+					input = (DWORD)( 128 * ( tan( GetXboxButtonValue(controller, xboxButton) / (32768 - XBOX_CONTROLLER_DEAD_ZONE))) / 1.57079633);
+					input = CheckTurboAllow(controller, n64Button, input); 
+					return input;
 					break;
 				case 11:	// Decreasing Sensitivity as control stick aproaches edge
-					return (DWORD)( 128 * ( sin( GetXboxButtonValue(controller, xboxButton) / (32768 - XBOX_CONTROLLER_DEAD_ZONE) * 1.57079633)));
+					input = (DWORD)( 128 * ( sin( GetXboxButtonValue(controller, xboxButton) / (32768 - XBOX_CONTROLLER_DEAD_ZONE) * 1.57079633)));
+					input = CheckTurboAllow(controller, n64Button, input); 
+					return input;
 					break;
 				default:	// Linear Control Sensitivity
-					return (DWORD)((GetXboxButtonValue(controller, xboxButton) / (259 * (32768 - XBOX_CONTROLLER_DEAD_ZONE) / (32768))) * (Sensitivity * .1f));
+					input = (DWORD)((GetXboxButtonValue(controller, xboxButton) / (259 * (32768 - XBOX_CONTROLLER_DEAD_ZONE) / (32768))) * (Sensitivity * .1f));
+					input = CheckTurboAllow(controller, n64Button, input); 
+					return input;
 					break;
 			}
 		}
