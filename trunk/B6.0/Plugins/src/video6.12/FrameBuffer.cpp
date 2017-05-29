@@ -578,9 +578,9 @@ uint32 CalculateRDRAMCRC(void *pPhysicalAddress, uint32 left, uint32 top, uint32
 {
 
 	dwAsmdwBytesPerLine = ((width<<size)+1)/2;
-#if 1
+
     //Fast Hash used by default unless using a texturepack //Corn
-    if( !options.bLoadHiResTextures )
+    if( !options.bLoadHiResTextures && options.enableHackFastCrc)
     {
 	    dwAsmCRC = (uint32)pPhysicalAddress;
 		register uint32 *pStart = (uint32*)(pPhysicalAddress);
@@ -602,8 +602,8 @@ uint32 CalculateRDRAMCRC(void *pPhysicalAddress, uint32 left, uint32 top, uint32
             pStart += pinc;
         }while(pStart < pEnd);
 	}
-#else
-	if( currentRomOptions.bFastTexCRC && !options.bLoadHiResTextures && (height>=32 || (dwAsmdwBytesPerLine>>2)>=16))
+
+	if( currentRomOptions.bFastTexCRC && !options.bLoadHiResTextures && (height>=32 || (dwAsmdwBytesPerLine>>2)>=16) && !options.enableHackFastCrc)
 	{
 		dwAsmCRC = 0;
 		uint32 realWidthInDWORD = dwAsmdwBytesPerLine>>2;
@@ -677,7 +677,6 @@ endloop1:
 			pop		esi;
 		}
 	}
-#endif
 	else
 	{
 		dwAsmCRC = 0;

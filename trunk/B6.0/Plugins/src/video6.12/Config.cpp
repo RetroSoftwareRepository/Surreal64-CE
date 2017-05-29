@@ -516,6 +516,7 @@ void GenerateCurrentRomOptions()
 
 	options.enableHackForGames = NO_HACK_FOR_GAME;
 	options.enableHackTextureSeams = FALSE;
+	options.enableHackFastCrc = TRUE;
 	if ((strncmp(g_curRomInfo.szGameName, "BANJO TOOIE", 11) == 0))
 	{
 		options.enableHackForGames = HACK_FOR_BANJO_TOOIE;
@@ -664,9 +665,13 @@ void GenerateCurrentRomOptions()
 	{
 		options.enableHackForGames = HACK_FOR_QUAKE_2;
 	}
-	else if ((stricmp(g_curRomInfo.szGameName, "CALIFORNIA SPEED") == 0))
+	else if ((stricmp(g_curRomInfo.szGameName, "CAL SPEED") == 0))
 	{
 		options.enableHackTextureSeams = TRUE;
+	}
+	else if ((stricmp(g_curRomInfo.szGameName, "WONDER PROJECT J2") == 0))
+	{
+		options.enableHackFastCrc = FALSE;
 	}
 
 	if( currentRomOptions.N64FrameBufferEmuType == 0 )		currentRomOptions.N64FrameBufferEmuType = defaultRomOptions.N64FrameBufferEmuType;

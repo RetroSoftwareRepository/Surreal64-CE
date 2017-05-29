@@ -102,6 +102,7 @@ void SetDefaultOptions(void)
 	defaultoptions.RSP_RDP_Timing = USE_RSP_RDP_TIMING_NO; // Ez0n3 - etemp - unsure diff
 	defaultoptions.frame_buffer_rw = USECFBRW_NO;
 	defaultoptions.numberOfPlayers = 1;
+	defaultoptions.useAltTiming = 2;
 }
 
 /*
@@ -153,6 +154,8 @@ int GenerateCurrentRomOptions(void) // void
 	currentromoptions.Use_HLE = defaultoptions.Use_HLE;
 	currentromoptions.RSP_RDP_Timing = defaultoptions.RSP_RDP_Timing;
 	currentromoptions.frame_buffer_rw = defaultoptions.frame_buffer_rw;
+
+	currentromoptions.useAltTiming = defaultoptions.useAltTiming;
 
 	ReadRomHeaderInMemory(&currentromoptions); //surreal
 
@@ -365,6 +368,12 @@ int GenerateCurrentRomOptions(void) // void
 			if( currentromoptions.frame_buffer_rw == 0 )
 				currentromoptions.frame_buffer_rw = defaultoptions.frame_buffer_rw;
 		}
+		else if(strncmp(line, "Alt_Timing=", 11) == 0 && foundMatchingEntry)
+		{
+			currentromoptions.useAltTiming = atoi(line + 11);
+			if( currentromoptions.useAltTiming == 0 )
+				currentromoptions.useAltTiming = defaultoptions.useAltTiming;
+		}
 
 		else
 		{
@@ -492,6 +501,7 @@ void SetDefaultOptions(void)
 	defaultoptions.rspPluginName[0] = '\0';
 	defaultoptions.iconFilename[0] = '\0';
 #endif
+	defaultoptions.useAltTiming = 2;
 }
 
 /*
@@ -537,6 +547,8 @@ void GenerateCurrentRomOptions(void)
 			currentromoptions.RSP_RDP_Timing = defaultoptions.RSP_RDP_Timing;
 		if(RomListSelectedEntry()->pinientry->frame_buffer_rw == 0) 
 			currentromoptions.frame_buffer_rw = defaultoptions.frame_buffer_rw;
+		if(RomListSelectedEntry()->pinientry->useAltTiming == 0) 
+			currentromoptions.useAltTiming = defaultoptions.useAltTiming;
 		if
 			(
 			RomListSelectedEntry()->pinientry->Code_Check != CODE_CHECK_PROTECT_MEMORY
@@ -634,6 +646,7 @@ INI_ENTRY *GetNewIniEntry(void)
 	newentry->rspPluginName[0] = '\0';
 	newentry->iconFilename[0] = '\0';
 #endif
+	newentry->useAltTiming = 2;
 
 	return(newentry);
 }
@@ -861,6 +874,7 @@ BOOL ReadIniEntry(FILE *pstream, INI_ENTRY *pnewentry)
 	pnewentry->inputPluginName[0] = '\0';
 	pnewentry->rspPluginName[0] = '\0';
 	pnewentry->iconFilename[0] = '\0';
+	pnewentry->useAltTiming = 2;
 
 	/* Skip all empty lines and comments lines */
 	do
@@ -1001,6 +1015,11 @@ BOOL ReadIniEntry(FILE *pstream, INI_ENTRY *pnewentry)
 		{
 			strcpy(pnewentry->iconFilename, line + 13);
 		}
+		else if(strncmp(line, "Alt_Timing=", 11) == 0)
+		{
+			pnewentry->useAltTiming = atoi(line + 11);
+			if(pnewentry->useAltTiming > 2) pnewentry->useAltTiming = 0;
+		}
 		else
 			goodline = FALSE;
 
@@ -1093,6 +1112,8 @@ BOOL WriteIniEntry(FILE *pstream, const INI_ENTRY *p)
 	if( strlen(p->inputPluginName) > 0 )	fprintf(pstream, "InputPlugin=%s\n", p->inputPluginName);
 	if( strlen(p->rspPluginName) > 0 )		fprintf(pstream, "RSPPlugin=%s\n", p->rspPluginName);
 	if( strlen(p->iconFilename) > 0 )		fprintf(pstream, "IconFilename=%s\n", p->iconFilename);
+
+	printf(pstream, "Alt_Timing=%d\n", p->useAltTiming);
 
 	fprintf(pstream, "\n\n");
 
@@ -1193,6 +1214,7 @@ void CopyIniEntry(INI_ENTRY *dest, const INI_ENTRY *src)
 	strcpy(dest->inputPluginName, src->inputPluginName);
 	strcpy(dest->rspPluginName, src->rspPluginName);
 	strcpy(dest->iconFilename, src->iconFilename);
+	dest->useAltTiming = src->useAltTiming;
 }
 
 #endif //not xbox

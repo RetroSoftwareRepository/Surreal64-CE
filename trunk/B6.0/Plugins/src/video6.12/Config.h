@@ -199,6 +199,7 @@ enum HACK_FOR_GAMES
 	HACK_FOR_MARIO_KART,
 	HACK_FOR_QUAKE_2,
 	HACK_FOR_TEXTURE_SEAMS,
+	HACK_FOR_FAST_CRC,
 };
 
 enum {
@@ -252,6 +253,7 @@ typedef struct {
 
 	HACK_FOR_GAMES	enableHackForGames;
 	BOOL			enableHackTextureSeams;
+	BOOL			enableHackFastCrc;
 } GlobalOptions;
 
 extern GlobalOptions options;

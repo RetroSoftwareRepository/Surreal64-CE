@@ -1812,10 +1812,10 @@ void r4300i_COP0_mtc0(uint32 Instruction)
 
 
 
-
+		
 		/* Test the exception bit */
 
-		if ((gRT ^ gHWS_COP0Reg[STATUS]) & SR_FR)
+		if ((gRT ^ gHWS_COP0Reg[STATUS]) & SR_FR && !(currentromoptions.useAltTiming == 1))
 		{
 			if (!Experiment)
 			{
@@ -1868,7 +1868,7 @@ void r4300i_COP0_mtc0(uint32 Instruction)
 				gHWS_fpr32[30] = gHWS_fpr32[60];
 				gHWS_fpr32[31] = gHWS_fpr32[62];
 			}
-			else //to 64bit. no span
+			else if (!(currentromoptions.useAltTiming == 1))//to 64bit. no span
 			{
 				gHWS_fpr32[62] = gHWS_fpr32[31];
 				gHWS_fpr32[60] = gHWS_fpr32[30];
@@ -1919,9 +1919,21 @@ void r4300i_COP0_mtc0(uint32 Instruction)
 				gHWS_fpr32[29] = RememberFPRHi[14];
 				gHWS_fpr32[31] = RememberFPRHi[15];
 			}
-		}
+			else if((gRT & EXL) == 0 && ((gHWS_COP0Reg[STATUS] & EXL) == 1) && (currentromoptions.useAltTiming == 1))
+			{
+				TRACE3("EXL Bit is cleared at PC = %8X, COMPARE=%8X , PC=0x%08X", gRT, gHWS_COP0Reg[COMPARE], gHWS_pc);
 
-		if( ((gRT & EXL) == 0 && ((gHWS_COP0Reg[STATUS] & EXL) != 0))
+				/* CPU will check interrupts at the next cycle */
+				if((gHWS_COP0Reg[CAUSE] & gHWS_COP0Reg[STATUS] & 0x0000FF00))
+				{
+					CPUNeedToCheckInterrupt = TRUE;
+					CPUNeedToDoOtherTask = TRUE;
+					Set_Check_Interrupt_Timer_Event();
+				}
+			}
+		}
+		
+		if( ((gRT & EXL) == 0 && ((gHWS_COP0Reg[STATUS] & EXL) != 0) && !(currentromoptions.useAltTiming == 1))
 		||  ((gRT & IE ) == 1 && ((gHWS_COP0Reg[STATUS] & IE ) == 0)) )
 		{
 		//	TRACE3("EXL Bit is cleared at PC = %8X, COMPARE=%8X , PC=0x%08X", gRT, gHWS_COP0Reg[COMPARE], gHWS_pc);
@@ -3073,7 +3085,8 @@ void r4300i_InitHardware(HardwareState *gHWState)
 	memset(gHWState->COP0Reg, 0, sizeof(gHWState->COP0Reg));
 	memset(gHWState->COP1Con, 0, sizeof(gHWState->COP1Con));
 	memset(gHWState->fpr32, 0, sizeof(gHWState->fpr32));
-	memset(RememberFPRHi, 0, sizeof(RememberFPRHi));
+	if (!currentromoptions.useAltTiming)
+		memset(RememberFPRHi, 0, sizeof(RememberFPRHi));
 
 	r.r_.gpr[__HI].s64 = 0;
 	r.r_.gpr[__LO].s64 = 0;
@@ -3474,7 +3487,7 @@ extern uint32 AIRegK[10];	// Fake AI registers to be used when Kaillera is runni
  =======================================================================================================================
  */
 
-//BOOL screenIsUpdated = FALSE;
+BOOL screenIsUpdated = FALSE;
 void Check_SW(uint32 QuerAddr, uint32 rt_ft)
 {
 //	KAILLERA_LOG(fprintf(ktracefile, "Write reg (%08X) = %08X at compare=%08X\n", QuerAddr, (uint32)gHWS_GPR(RT_FT), gHWS_COP0Reg[COUNT]));
@@ -3519,8 +3532,11 @@ void Check_SW(uint32 QuerAddr, uint32 rt_ft)
 		break;
 
 
-	case 0xA4100000:	/* DPC_START_REG */ 
-		DPC_START_REG = DPC_CURRENT_REG = (uint32)gHWS_GPR(rt_ft);
+	case 0xA4100000:	/* DPC_START_REG */
+		if (!currentromoptions.useAltTiming)
+			DPC_START_REG = DPC_CURRENT_REG = (uint32)gHWS_GPR(rt_ft);
+		else
+			DPC_START_REG = DPC_END_REG = (uint32)gHWS_GPR(rt_ft);
 		break;
 	case 0xA4100004:	/* DPC_END_REG */	
 		DPC_END_REG = (uint32)gHWS_GPR(rt_ft);
@@ -3562,8 +3578,11 @@ void Check_SW(uint32 QuerAddr, uint32 rt_ft)
 		{
 			VI_ORIGIN_REG = (uint32)gHWS_GPR(rt_ft);
 			//TRACE1("Update screen at %08X", VI_ORIGIN_REG);
-		//	VIDEO_UpdateScreen();
-		//	screenIsUpdated = TRUE;
+			if (currentromoptions.useAltTiming)
+			{
+				VIDEO_UpdateScreen();
+				screenIsUpdated = TRUE;
+			}
 			if( emustatus.VideoPluginSupportingFrameBuffer && currentromoptions.frame_buffer_rw == USECFBRW_YES )
 			{
 				ProtectFrameBufferMemory();
