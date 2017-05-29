@@ -18,7 +18,7 @@ D3DBLEND		g_srcBlendMap[8], g_destBlendMap[8];
 D3DTEXTUREOP	g_combineOpMap[15];
 DWORD			g_combineArg1Map[15], g_combineArg2Map[15];
 
-INT g_txtLoadCount = 0, g_txtFreeCount = 0, g_txtCacheHits = 0, g_txtCacheMiss = 0, g_currentTextureMemUsage = 0;
+INT g_txtLoadCount = 0, g_txtFreeCount = 0, g_txtCacheHits = 0, g_txtCacheMiss = 0;
 
 extern int AntiAliasMode;
 BOOL g_bTempMessage = FALSE;
@@ -659,7 +659,6 @@ void rdp_freetexmem(void)
         }
         memset(&rst.txt[i],0,sizeof(HTexture));
     }
-	g_currentTextureMemUsage = 0;
     //x_cleartexmem();
 }
 
@@ -1732,7 +1731,6 @@ void txt_loaddata(HTexture *txt,Tile *t)
     txt->creation_vidframe=rst.myframe;
 
 	g_hr = g_pDevice->CreateTexture(txt->xs, txt->ys, 1, 0, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED, &txt->pTexture);
-	g_currentTextureMemUsage += (txt->xs*txt->ys*4);
 	g_txtLoadCount++;
 
 	//if (FAILED(g_hr))
@@ -5847,21 +5845,11 @@ void rdp_frameend(void)
     }
 
 	GlobalMemoryStatus(&memstat);
-	if ((memstat.dwAvailPhys / 1024 / 1024) < 4)
+	if (memstat.dwAvailPhys / 1024 / 1024 < 4)
 	{
 		rdp_freetexmem();
-		//sound_stop();
-		//sound_start(st.audiorate);
-		
-	}
-	if(g_currentTextureMemUsage > 4*1024*1024)
-	{
-		rdp_freetexmem();
-		//sound_stop();
-		//sound_start(st.audiorate);
 	}
 
-	
     if(st.dumpinfo)
     {
         print("Frame%6i: %i modes, %i newtext, %i text, %i vtx, %i prim\n",
@@ -5928,9 +5916,7 @@ void rdp_copybackground(dword base,int wid,int hig)
 		xhandle[1]=1;
 
 		g_hr = g_pDevice->CreateTexture(256, 256, 1, 0, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED, &pTexture[0]);
-		g_currentTextureMemUsage += (256*256*4);
 		g_hr = g_pDevice->CreateTexture(256, 256, 1, 0, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED, &pTexture[1]);
-		g_currentTextureMemUsage += (256*256*4);
 
 		//if (FAILED(g_hr))
 			//MessageBox(NULL, "HTexture creation failed", "Error", MB_OK);

@@ -135,6 +135,8 @@ typedef struct INI_ENTRY_STRUCT
 
 	char				iconFilename[256];
 #endif
+
+	int useAltTiming;
 } INI_ENTRY;
 
 /* Support update to 3000 entries, should be enough for all the N64 Games */
