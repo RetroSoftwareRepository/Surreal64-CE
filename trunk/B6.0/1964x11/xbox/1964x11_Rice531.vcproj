@@ -282,7 +282,7 @@
 				StackSize="65536"
 				NoLibWarn="TRUE"
 				UDCluster="3"
-				TitleID="0x64CE64CE"
+				TitleID="0x64C264C2"
 				TitleName="Surreal 64 CE - $(ProjectName)"/>
 		</Configuration>
 		<Configuration
