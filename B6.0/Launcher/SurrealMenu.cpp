@@ -908,7 +908,7 @@ void ToggleAudioPlugin(bool inc)
 			iAudioPlugin++;
 		if((iAudioPlugin == _AudioPluginM64P) && (preferedemu != _1964x11))//Skip HLE RSP when not using 1964x11
 			iAudioPlugin++;
-		if (iAudioPlugin > (_AudioPluginMissing - 1)) iAudioPlugin=0;
+		if (iAudioPlugin > (_AudioPluginMissing - 2)) iAudioPlugin=0; // Disable selecting AziAudio 0.7 for now
 	}
 	else
 	{
@@ -917,7 +917,7 @@ void ToggleAudioPlugin(bool inc)
 			iAudioPlugin--;
 		if((iAudioPlugin == _AudioPluginM64P) && (preferedemu != _1964x11))
 			iAudioPlugin--;
-		if (iAudioPlugin < 0) iAudioPlugin=(_AudioPluginMissing - 1);
+		if (iAudioPlugin < 0) iAudioPlugin=(_AudioPluginMissing - 2); // Disable selecting AziAudio 0.7 for now
 	}
 
 	XLMenu_CurRoutine = NULL;
@@ -1040,12 +1040,12 @@ void ToggleVideoPlugin(bool inc)
 	if (inc)
 	{
 		videoplugin++;
-		if (videoplugin > (_VideoPluginMissing - 1)) videoplugin=0;
+		if (videoplugin > (_VideoPluginMissing - 2)) videoplugin=0; // Disable selecting 1964video for now
 	}
 	else
 	{
 		videoplugin--;
-		if (videoplugin < 0) videoplugin=(_VideoPluginMissing - 1);
+		if (videoplugin < 0) videoplugin=(_VideoPluginMissing - 2); // Disable selecting 1964video for now
 	}
 
 	XLMenu_CurRoutine = NULL;
