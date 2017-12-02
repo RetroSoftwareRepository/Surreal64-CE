@@ -326,7 +326,7 @@ void Launch()
 			//case _AudioPluginJttl: 	sprintf(szAudioPlugin, ""); break;
 			//case _AudioPluginAzimer: 	sprintf(szAudioPlugin, ""); break;
 			case _AudioPluginMusyX: 	sprintf(szAudioPlugin, "M"); break;
-			case _AudioPluginAziDS8: 	sprintf(szAudioPlugin, "A"); break;
+			//case _AudioPluginAziDS8: 	sprintf(szAudioPlugin, "A"); break;
 			default:
 				sprintf(szAudioPlugin, ""); break;
 		}

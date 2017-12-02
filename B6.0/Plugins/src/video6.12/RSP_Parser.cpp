@@ -75,7 +75,7 @@ UcodeMap *ucodeMaps[] =
 	NULL,					// ucode 13 - modified ucode S2DEX
 	NULL,					// ucode 14 - OgreBattle Background
 	NULL,					// ucode 15 - ucode 0 with sprite2D
-	&ucodeMap16,			// ucode 16 - Star War, Shadow of Empire
+	NULL,			// ucode 16 - Star War, Shadow of Empire
 	NULL,					// ucode 17 - Star Wars - Rogue Squadron, 
 	NULL,					// ucode 18 - World Driver Championship
 	NULL,					// ucode 19 - Last Legion UX
@@ -484,9 +484,9 @@ void RDP_SetUcodeMap(int ucode)
 		status.bUseModifiedUcodeMap = true;
 		break;
 	case 16: // Star War, Shadow Of Empire
-		//memcpy( &LoadedUcodeMap, &ucodeMap0, sizeof(UcodeMap));
-		//LoadedUcodeMap[4]=RSP_Vtx_ShadowOfEmpire;
-		//status.bUseModifiedUcodeMap = true;
+		memcpy( &LoadedUcodeMap, &ucodeMap0, sizeof(UcodeMap));
+		LoadedUcodeMap[4]=RSP_Vtx_ShadowOfEmpire;
+		status.bUseModifiedUcodeMap = true;
 		break;
 	case 17:	//Indiana Jones, does not work anyway
 		memcpy( &LoadedUcodeMap, &ucodeMap1, sizeof(UcodeMap));
