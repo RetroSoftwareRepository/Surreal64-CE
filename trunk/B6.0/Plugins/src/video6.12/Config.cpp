@@ -410,15 +410,15 @@ void ReadConfiguration(void)
 		options.bEnableVertexShader = FALSE;
 		options.RenderBufferSetting=0;
 		options.forceTextureFilter = TextureMode;
-		options.textureQuality = TXT_QUALITY_16BIT; //TXT_QUALITY_DEFAULT
+		options.textureQuality = TXT_QUALITY_DEFAULT;
 		options.bTexRectOnly = FALSE;
 		options.bSmallTextureOnly = FALSE;
 		options.bLoadHiResTextures = FALSE;
 		options.bDumpTexturesToFiles = FALSE;
 		options.DirectXDepthBufferSetting = 0;
-		options.colorQuality = TEXTURE_FMT_A4R4G4B4;
+		options.colorQuality = TEXTURE_FMT_A8R8G8B8;
 		options.textureEnhancement = 0;
-		options.textureEnhancementControl = 1; //0
+		options.textureEnhancementControl = 0; //0
 		if((preferedemu != _1964x11)&&(FrameSkip>1))
 			FrameSkip = 0;
 		options.bSkipFrame = FrameSkip;
@@ -438,7 +438,7 @@ void ReadConfiguration(void)
 		defaultRomOptions.N64RenderToTextureEmuType = TXT_BUF_NONE;//TXT_BUF_NONE;
 
 		defaultRomOptions.bNormalBlender = FALSE;
-		defaultRomOptions.bFastTexCRC=FALSE; //FALSE;
+		defaultRomOptions.bFastTexCRC=FALSE;
 		defaultRomOptions.bNormalCombiner = FALSE;
 		defaultRomOptions.bAccurateTextureMapping = TRUE;
 		defaultRomOptions.bInN64Resolution = TRUE; //FALSE;
@@ -672,6 +672,15 @@ void GenerateCurrentRomOptions()
 	else if ((stricmp(g_curRomInfo.szGameName, "WONDER PROJECT J2") == 0))
 	{
 		options.enableHackFastCrc = FALSE;
+	}
+	else if ((stricmp(g_curRomInfo.szGameName, "Shadow of the Empire") == 0))
+	{
+		options.bFullTMEM = FALSE;
+		options.bUseFullTMEM = FALSE;
+
+		options.bForceSoftwareTnL = TRUE;
+		options.textureQuality = TXT_QUALITY_DEFAULT;
+		options.colorQuality = TEXTURE_FMT_A8R8G8B8;
 	}
 
 	if( currentRomOptions.N64FrameBufferEmuType == 0 )		currentRomOptions.N64FrameBufferEmuType = defaultRomOptions.N64FrameBufferEmuType;

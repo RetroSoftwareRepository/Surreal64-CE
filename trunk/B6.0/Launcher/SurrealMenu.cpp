@@ -274,7 +274,7 @@ string GetAudioPluginName(int p_iAudioPlugin)
 		case _AudioPluginAzimer : szAudioPlugin = "AziAudio 0.55"; break;
 		case _AudioPluginMusyX : szAudioPlugin = "1964Audio"; break;
 		case _AudioPluginM64P : szAudioPlugin = "BSmiles RSP"; break;
-		case _AudioPluginAziDS8 : szAudioPlugin = "AziAudio 0.7"; break;
+		//case _AudioPluginAziDS8 : szAudioPlugin = "AziAudio 0.7"; break;
 		//case _AudioPluginMissing : 
 		default : szAudioPlugin = "JttL"; break;//freakdave - set JttL plugin as default
 	}	
@@ -1712,7 +1712,7 @@ void VideoSettingsMenu(void)
 	if((videoplugin !=_VideoPluginRice612)&&(videoplugin !=_VideoPluginVid1964)){
 		VertexMode = 2;
 		swprintf(currentname,L"Force Vertex Clipper : Modern Plugin Only");
-	}else if((VertexMode<1)||(VertexMode >= 2)||(bUseLinFog)){
+	}else if((VertexMode<1)||(VertexMode >= 2)&&(!bUseLinFog)){
 		VertexMode = 2;
 		swprintf(currentname,L"Force Vertex Clipper : No");
 	}else

@@ -27,7 +27,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 //////////////////////////////////////////////////////////////////////////
 
-#ifndef _OLDCLIPPER
+#ifndef _XBOX
 
 void CopyVertexData(int oriidx, TLITVERTEX *oribuf, int dstidx, TLITVERTEX *dstbuf)
 {
@@ -1007,7 +1007,7 @@ void ClipVertexesOpenGL()
 }
 #endif
 
-#ifndef _OLDCLIPPER
+#ifndef _XBOX
 void ClipVertexesForRect()
 {
 	if( options.bForceSoftwareTnL && (windowSetting.clipping.left > 0 || windowSetting.clipping.top > 0) )

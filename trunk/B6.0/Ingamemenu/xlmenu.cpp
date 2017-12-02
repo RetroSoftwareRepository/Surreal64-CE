@@ -182,7 +182,10 @@ void XLMenu_SetItemText(XLMenuItem *mi, WCHAR *string)
 	for(k = 0; k <= MenuTrunc; k++){
 		MenuItemTrunc[k] = string[k];
 	}
-	MenuItemTrunc[(k+1)] = L'\0';
+	// Add extra blank spaces at the end of a line to remove invalid font characters. Too lazy to figure out and actually fix.
+	MenuItemTrunc[(k)] = L' ';
+	MenuItemTrunc[(k+1)] = L' ';
+	MenuItemTrunc[(k+2)] = L'\0';
 	
 	// set string
 	wcsncpy(mi->string, MenuItemTrunc, MITEM_STRINGLEN-1);
