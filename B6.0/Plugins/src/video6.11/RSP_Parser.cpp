@@ -939,9 +939,7 @@ void DLParser_Process(OSTask * pTask)
 		bPurgeOldBeforeIGM = TRUE;
 		gTextureManager.PurgeOldTextures();
 		gTextureManager.CleanUp();
-		RDP_Cleanup();
-		
-		
+
 		// Disable any active rumble
 		_INPUT_RumblePause(true);
 
