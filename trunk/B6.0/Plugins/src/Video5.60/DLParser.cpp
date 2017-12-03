@@ -1040,9 +1040,7 @@ void DLParser_Process()
 		// Clear Rice's textures before loading the menu.
 		bPurgeOldBeforeIGM = TRUE;
 		gTextureManager.PurgeOldTextures();
-		gTextureManager.CleanUp();
-		RDP_Cleanup();
-		
+		gTextureManager.CleanUp();		
 		
 		// Disable any active rumble
 		_INPUT_RumblePause(true);
