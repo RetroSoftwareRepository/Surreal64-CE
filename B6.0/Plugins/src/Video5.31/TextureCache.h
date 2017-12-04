@@ -232,8 +232,6 @@ public:
 	HRESULT InvalidateDeviceObjects();
 	
 	void FreeTextures();
-
-	int m_textDepth;
 	
 #ifdef _DEBUG
 	TextureEntry * GetCachedTexture(u32 tex);
