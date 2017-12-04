@@ -1114,6 +1114,8 @@ void GenerateCurrentRomOptions()
 	{
 		frameBufferOptions.bIgnoreRenderTextureIfHeightUnknown = true;
 	}
+
+	gTextureManager.m_textDepth					= (options.colorQuality == TEXTURE_FMT_A8R8G8B8) ? 4 : 2;
 }
 
 void Ini_GetRomOptions(LPGAMESETTING pGameSetting)

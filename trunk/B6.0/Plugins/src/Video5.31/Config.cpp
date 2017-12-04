@@ -543,6 +543,8 @@ void GenerateCurrentRomOptions()
 	else currentRomOptions.accurateTextureMapping--;
 
 	GenerateFrameBufferOptions();
+
+	gTextureCache.m_textDepth	= (options.colorQuality == TEXTURE_FMT_A8R8G8B8) ? 4 : 2;
 }
 
 extern IniFile * g_pIniFile;

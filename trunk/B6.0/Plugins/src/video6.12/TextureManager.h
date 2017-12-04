@@ -236,9 +236,9 @@ public:
 	void RecheckHiresForAllTextures();
 	bool CleanUp();
 	
-//#ifndef OLDTXTCACHE
 	void FreeTextures();
-//#endif
+
+	int m_textDepth;
 	
 #ifdef _DEBUG
 	TxtrCacheEntry * GetCachedTexture(uint32 tex);

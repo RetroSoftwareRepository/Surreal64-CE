@@ -99,7 +99,7 @@ CTextureCache::CTextureCache() :
 	
 	// Ez0n3 - old way
 	m_currentTextureMemUsage	= 0;
-	
+	m_textDepth	= (options.colorQuality == TEXTURE_FMT_A8R8G8B8) ? 4 : 2;
 	m_pYoungestTexture			= NULL;
 	m_pOldestTexture			= NULL;
 
@@ -133,6 +133,7 @@ CTextureCache::~CTextureCache()
 	}
 #endif
 	m_currentTextureMemUsage	= 0;
+	m_textDepth	= (options.colorQuality == TEXTURE_FMT_A8R8G8B8) ? 4 : 2;
 	delete []m_pTextureHash;
 	m_pTextureHash = NULL;	
 
@@ -247,7 +248,7 @@ void CTextureCache::PurgeOldTextures()
 			
 			////DBGConsole_Msg(0, "Killing old used texture (%d x %d)", pCurr->dwWidth, pCurr->dwHeight);
 			
-			m_currentTextureMemUsage -= (pCurr->pTexture->m_dwWidth * pCurr->pTexture->m_dwHeight * 2);
+			m_currentTextureMemUsage -= (pCurr->pTexture->m_dwWidth * pCurr->pTexture->m_dwHeight * m_textDepth);
 
 			delete pCurr;
 			
@@ -286,7 +287,7 @@ void CTextureCache::DropTextures()
 			dwTotalUses += pTVictim->dwUses;
 			dwCount++;
 			
-			m_currentTextureMemUsage -= (pTVictim->pTexture->m_dwWidth * pTVictim->pTexture->m_dwHeight * 2);
+			m_currentTextureMemUsage -= (pTVictim->pTexture->m_dwWidth * pTVictim->pTexture->m_dwHeight * m_textDepth);
 				
 			delete pTVictim;
 		}
@@ -438,7 +439,7 @@ void CTextureCache::RemoveTextureEntry(TextureEntry * pEntry)
 			}
 
 			// decrease the mem usage counter
-			m_currentTextureMemUsage -= (pEntry->pTexture->m_dwWidth * pEntry->pTexture->m_dwHeight * 2);
+			m_currentTextureMemUsage -= (pEntry->pTexture->m_dwWidth * pEntry->pTexture->m_dwHeight * m_textDepth);
 		
 			delete pEntry;
 
@@ -477,7 +478,7 @@ TextureEntry * CTextureCache::CreateEntry(DWORD dwAddress, DWORD dwWidth, DWORD 
 	uint32 widthToCreate = dwWidth;
 	uint32 heightToCreate = dwHeight;
 
-	DWORD freeUpSize = (widthToCreate * heightToCreate * 2);
+	DWORD freeUpSize = (widthToCreate * heightToCreate * m_textDepth);
 
 	FreeTextures();
 
@@ -506,7 +507,7 @@ TextureEntry * CTextureCache::CreateEntry(DWORD dwAddress, DWORD dwWidth, DWORD 
 	{
 		pEntry = ReviveUsedTexture(dwWidth, dwHeight);
 	}
-	m_currentTextureMemUsage += (dwWidth * dwHeight * 2);
+	m_currentTextureMemUsage += (dwWidth * dwHeight * m_textDepth);
 	
 #ifdef OLDTXTCACHE
 	if (pEntry == NULL || g_bUseSetTextureMem)
