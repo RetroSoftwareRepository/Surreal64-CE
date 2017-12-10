@@ -6946,6 +6946,33 @@ Emulate Clear=1
 Cheat0=801DAE8B 0002 //Subscreen Delay Fix
 Audio Signal=No
 
+[79DD5F06-4FC38CA4-C:45]
+Good Name=Legend of Zelda, The - Ocarina of Time (U) (V1.2) (Uncensored patch)
+Internal Name=THE LEGEND OF ZELDA
+RDRAM Size=4
+Counter Factor=2
+Save Type=First Save Type
+CPU Type=Recompiler
+Self-modifying code Method=Check Memory Advance
+Reg Cache=Yes
+Use TLB=No
+Use Large Buffer=No
+Linking=Global
+Status=Compatible
+Core Note=
+Plugin Note=
+Delay SI=No
+SP Hack=No
+Clear Frame=0
+Self Texture=1
+Primary Frame Buffer=0
+Resolution Width=-1
+Resolution Height=-1
+Culling=1
+Emulate Clear=1
+//Cheat0=801DAE8B 0002 //Subscreen Delay Fix
+Audio Signal=No
+
 [F478D8B3-9716DD6D-C:50]
 Good Name=LEGO Racers (E) (M10)
 Internal Name=LEGORacers
@@ -16111,6 +16138,33 @@ Resolution Height=-1
 Culling=1
 Emulate Clear=1
 Cheat0=801D8F4B 0002 //Subscreen Delay Fix
+Audio Signal=No
+
+[254EBAD8-76A70AA1-C:45] // Master Quest Patched
+Good Name=Legend of Zelda, The - Ocarina of Time - Master Quest (Patched)
+Internal Name=ZELDA MASTER QUEST
+RDRAM Size=4
+Counter Factor=2
+Save Type=First Save Type
+CPU Type=Recompiler
+Self-modifying code Method=Check Memory Advance
+Reg Cache=Yes
+Use TLB=No
+Use Large Buffer=No
+Linking=Global
+Status=Compatible
+Core Note=(see GameFAQ)
+Plugin Note=
+Delay SI=No
+SP Hack=No
+Clear Frame=0
+Self Texture=1
+Primary Frame Buffer=0
+Resolution Width=-1
+Resolution Height=-1
+Culling=1
+Emulate Clear=1
+//Cheat0=801D8F4B 0002 //Subscreen Delay Fix
 Audio Signal=No
 
 [BA780BA0-0F21DB34-C:45] //New entry in RDB 1.5.1
