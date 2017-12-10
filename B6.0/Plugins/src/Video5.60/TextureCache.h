@@ -230,8 +230,6 @@ public:
 	bool CleanUp();
 	
 	void FreeTextures();
-
-	int m_textDepth;
 	
 #ifdef _DEBUG
 	TextureEntry * GetCachedTexture(DWORD tex);

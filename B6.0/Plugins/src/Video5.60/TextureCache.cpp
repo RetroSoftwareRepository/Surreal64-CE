@@ -89,7 +89,6 @@ CTextureManager::CTextureManager() :
 
 	// Ez0n3 - old way
 	m_currentTextureMemUsage	= 0;
-	m_textDepth	= (options.colorQuality == TEXTURE_FMT_A8R8G8B8) ? 4 : 2;
 	
 	m_pYoungestTexture			= NULL;
 	m_pOldestTexture			= NULL;
@@ -124,8 +123,7 @@ CTextureManager::~CTextureManager()
 	}
 #endif
 
-	m_currentTextureMemUsage = 0;
-	m_textDepth	= (options.colorQuality == TEXTURE_FMT_A8R8G8B8) ? 4 : 2;
+	m_currentTextureMemUsage = 0; 
 	delete []m_pTextureHash;
 	m_pTextureHash = NULL;	
 
@@ -162,7 +160,7 @@ bool CTextureManager::CleanUp()
 		{
 			TextureEntry * pVictim = m_pFirstUsedSurface;
 			m_pFirstUsedSurface = pVictim->pNext;
-			m_currentTextureMemUsage -= (pVictim->pTexture->m_dwWidth * pVictim->pTexture->m_dwHeight * m_textDepth);			
+			m_currentTextureMemUsage -= (pVictim->pTexture->m_dwWidth * pVictim->pTexture->m_dwHeight * 2);			
 			delete pVictim;
 		}
 	}
@@ -239,7 +237,7 @@ void CTextureManager::PurgeOldTextures()
 			if (pPrev != NULL) pPrev->pNext        = pCurr->pNext;
 			else			   m_pFirstUsedSurface = pCurr->pNext;
 			
-			m_currentTextureMemUsage -= (pCurr->pTexture->m_dwWidth * pCurr->pTexture->m_dwHeight * m_textDepth);
+			m_currentTextureMemUsage -= (pCurr->pTexture->m_dwWidth * pCurr->pTexture->m_dwHeight * 2);
 
 			delete pCurr;
 			pCurr = pNext;	
@@ -276,7 +274,7 @@ void CTextureManager::DropTextures()
 			dwTotalUses += pTVictim->dwUses;
 			dwCount++;
 			
-			m_currentTextureMemUsage -= (pTVictim->pTexture->m_dwWidth * pTVictim->pTexture->m_dwHeight * m_textDepth);
+			m_currentTextureMemUsage -= (pTVictim->pTexture->m_dwWidth * pTVictim->pTexture->m_dwHeight * 2);
 			
 			delete pTVictim;
 		}
@@ -424,7 +422,7 @@ void CTextureManager::RemoveTextureEntry(TextureEntry * pEntry)
 			}
 
 			// decrease the mem usage counter
-			m_currentTextureMemUsage -= (pEntry->pTexture->m_dwWidth * pEntry->pTexture->m_dwHeight * m_textDepth);
+			m_currentTextureMemUsage -= (pEntry->pTexture->m_dwWidth * pEntry->pTexture->m_dwHeight * 2);
 		
 			delete pEntry;
 
@@ -464,7 +462,7 @@ TextureEntry * CTextureManager::CreateEntry(DWORD dwAddr, DWORD dwWidth, DWORD d
 	uint32 widthToCreate = dwWidth;
 	uint32 heightToCreate = dwHeight;
 
-	DWORD freeUpSize = (widthToCreate * heightToCreate * m_textDepth);
+	DWORD freeUpSize = (widthToCreate * heightToCreate * 2);
 
 	FreeTextures();
 
@@ -493,7 +491,7 @@ TextureEntry * CTextureManager::CreateEntry(DWORD dwAddr, DWORD dwWidth, DWORD d
 	{
 		pEntry = ReviveUsedTexture(dwWidth, dwHeight);
 	}
-	m_currentTextureMemUsage += (dwWidth * dwHeight * m_textDepth);
+	m_currentTextureMemUsage += (dwWidth * dwHeight * 2);
 	
 	if (pEntry == NULL || g_bUseSetTextureMem)
 	{

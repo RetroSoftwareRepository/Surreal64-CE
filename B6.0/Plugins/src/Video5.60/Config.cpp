@@ -656,8 +656,6 @@ void GenerateCurrentRomOptions()
 	options.bUseFullTMEM = ((options.bFullTMEM && (g_curRomInfo.dwFullTMEM == 0)) || g_curRomInfo.dwFullTMEM == 2);
 
 	GenerateFrameBufferOptions();
-
-	gTextureManager.m_textDepth	= (options.colorQuality == TEXTURE_FMT_A8R8G8B8) ? 4 : 2;
 }
 
 extern IniFile * g_pIniFile;

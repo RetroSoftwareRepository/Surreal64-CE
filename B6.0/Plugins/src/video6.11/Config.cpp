@@ -720,8 +720,8 @@ void ReadConfiguration(void)
 		options.bFullTMEM = FALSE;
 		options.bUseFullTMEM = FALSE;
 #ifdef _XBOX
-		options.bForceSoftwareTnL = TRUE;
-		options.bForceSoftwareClipper = FALSE;
+		options.bForceSoftwareTnL = TRUE; //FALSE;
+		options.bForceSoftwareClipper = TRUE;
 		options.bEnableSSE = FALSE;
 #else
 		options.bForceSoftwareTnL = TRUE;
@@ -734,16 +734,16 @@ void ReadConfiguration(void)
 		//options.forceTextureFilter = 0;
 		//freakdave - override default texture filter setting
 		options.forceTextureFilter = TextureMode;
-		options.textureQuality = TXT_QUALITY_DEFAULT;
+		options.textureQuality = TXT_QUALITY_16BIT; //TXT_QUALITY_DEFAULT;
 		options.bTexRectOnly = FALSE;
 		options.bSmallTextureOnly = FALSE;
 		options.bLoadHiResTextures = FALSE;
 		options.bDumpTexturesToFiles = FALSE;
 		options.DirectXDepthBufferSetting = 0;
 		options.OpenglDepthBufferSetting = 16;
-		options.colorQuality = TEXTURE_FMT_A8R8G8B8;
+		options.colorQuality = TEXTURE_FMT_A4R4G4B4;
 		options.textureEnhancement = 0;
-		options.textureEnhancementControl = 0;
+		options.textureEnhancementControl = 1; //0;
 		options.OpenglRenderSetting = OGL_DEVICE;
 		if((preferedemu != _1964x11)&&(FrameSkip>1))
 			FrameSkip = 0;
@@ -1114,8 +1114,6 @@ void GenerateCurrentRomOptions()
 	{
 		frameBufferOptions.bIgnoreRenderTextureIfHeightUnknown = true;
 	}
-
-	gTextureManager.m_textDepth					= (options.colorQuality == TEXTURE_FMT_A8R8G8B8) ? 4 : 2;
 }
 
 void Ini_GetRomOptions(LPGAMESETTING pGameSetting)
