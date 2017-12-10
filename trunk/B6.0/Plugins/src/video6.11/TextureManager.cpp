@@ -98,7 +98,6 @@ CTextureManager::CTextureManager() :
 	m_numOfCachedTxtrList = GetNextPrime(800);
 
 	m_currentTextureMemUsage	= 0;
-	m_textDepth					= (options.colorQuality == TEXTURE_FMT_A8R8G8B8) ? 4 : 2;
 	m_pYoungestTexture			= NULL;
 	m_pOldestTexture			= NULL;
 
@@ -120,7 +119,6 @@ CTextureManager::~CTextureManager()
 {
 	CleanUp();
 	m_currentTextureMemUsage = 0;
-	m_textDepth	= (options.colorQuality == TEXTURE_FMT_A8R8G8B8) ? 4 : 2;
 	delete []m_pCacheTxtrList;
 	m_pCacheTxtrList = NULL;	
 }
@@ -264,7 +262,7 @@ void CTextureManager::RecycleAllTextures()
 			dwTotalUses += pTVictim->dwUses;
 			dwCount++;
 
-			m_currentTextureMemUsage -= (pTVictim->pTexture->m_dwWidth * pTVictim->pTexture->m_dwHeight * m_textDepth);
+			m_currentTextureMemUsage -= (pTVictim->pTexture->m_dwWidth * pTVictim->pTexture->m_dwHeight * 2);
 
 			delete pTVictim;
 
@@ -432,7 +430,7 @@ void CTextureManager::RemoveTexture(TxtrCacheEntry * pEntry)
 			}
 
 			// decrease the mem usage counter
-			m_currentTextureMemUsage -= (pEntry->pTexture->m_dwWidth * pEntry->pTexture->m_dwHeight * m_textDepth);
+			m_currentTextureMemUsage -= (pEntry->pTexture->m_dwWidth * pEntry->pTexture->m_dwHeight * 2);
 		
 			delete pEntry;
 
@@ -487,6 +485,8 @@ TxtrCacheEntry * CTextureManager::CreateNewCacheEntry(uint32 dwAddr, uint32 dwWi
 
 			//OutputDebugString("Freeing Texture\n");
 		}
+
+		//m_currentTextureMemUsage += widthToCreate * heightToCreate * 4;
 	}
 	else if((!g_bUseSetTextureMem) && ((m_currentTextureMemUsage + freeUpSize) > g_maxTextureMemUsage) && (options.enableHackForGames != HACK_FOR_QUAKE_2))
 	{
@@ -497,7 +497,7 @@ TxtrCacheEntry * CTextureManager::CreateNewCacheEntry(uint32 dwAddr, uint32 dwWi
 	{
 		pEntry = ReviveTexture(dwWidth, dwHeight);
     }
-	m_currentTextureMemUsage += (dwWidth * dwHeight * m_textDepth);
+	m_currentTextureMemUsage += (dwWidth * dwHeight * 2);
 	
 
 #ifdef OLDTXTCACHE

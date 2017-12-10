@@ -232,8 +232,6 @@ public:
 	void RecycleAllTextures();
 	void RecheckHiresForAllTextures();
 	bool CleanUp();
-
-	int m_textDepth;
 	
 //#ifndef OLDTXTCACHE
 	void FreeTextures();
