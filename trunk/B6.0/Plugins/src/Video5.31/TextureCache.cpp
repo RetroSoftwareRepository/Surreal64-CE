@@ -189,7 +189,7 @@ void CTextureCache::PurgeOldTextures()
 	// Quake 2 needs it otherwise it leaks pretty bad. 
 	if(!g_bUseSetTextureMem)
 	{
-		gTextureManager.CleanUp();
+		gTextureCache.DropTextures();
 		m_currentTextureMemUsage = 0;
 		return;
 	}

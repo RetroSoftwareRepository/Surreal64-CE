@@ -821,6 +821,9 @@ FUNC_TYPE(void) NAME_DEFINE(UpdateScreen) (void)
 			if (bloadstate[i]) // This will never be true, unless UHLE accepts plugins. 
 			{
 				try{
+					bPurgeOldBeforeIGM = TRUE;
+					gTextureManager.PurgeOldTextures();
+					gTextureManager.CleanUp();
 					__EMU_LoadState(i);
 				}catch(...){};
 
@@ -832,6 +835,9 @@ FUNC_TYPE(void) NAME_DEFINE(UpdateScreen) (void)
 			else if (bload1964state[i]) 
 			{
 				try{
+					bPurgeOldBeforeIGM = TRUE;
+					gTextureManager.PurgeOldTextures();
+					gTextureManager.CleanUp();
 					__EMU_Load1964State(i);
 				}catch(...){};
 
@@ -843,6 +849,9 @@ FUNC_TYPE(void) NAME_DEFINE(UpdateScreen) (void)
 			else if (bloadPJ64state[i]) 
 			{
 				try{
+					bPurgeOldBeforeIGM = TRUE;
+					gTextureManager.PurgeOldTextures();
+					gTextureManager.CleanUp();
 					__EMU_LoadPJ64State(i);
 				}catch(...){};
 
