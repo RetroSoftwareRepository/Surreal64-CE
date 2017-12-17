@@ -627,7 +627,6 @@ void _VIDEO_RICE_510_UpdateScreen (void)
 				try{
 					bPurgeOldBeforeIGM = TRUE;
 					gTextureCache.PurgeOldTextures();
-					gTextureCache.DropTextures();
 					__EMU_LoadState(i);
 				}catch(...){};
 
@@ -641,8 +640,7 @@ void _VIDEO_RICE_510_UpdateScreen (void)
 				try{
 					bPurgeOldBeforeIGM = TRUE;
 					gTextureCache.PurgeOldTextures();
-					gTextureCache.DropTextures();
-					__EMU_Load1964State(i);
+					__EMU_LoadState(i);
 				}catch(...){};
 
 				sprintf(tempmsg, "Loaded 1964 State %d", i);
@@ -655,8 +653,7 @@ void _VIDEO_RICE_510_UpdateScreen (void)
 				try{
 					bPurgeOldBeforeIGM = TRUE;
 					gTextureCache.PurgeOldTextures();
-					gTextureCache.DropTextures();
-					__EMU_LoadPJ64State(i);
+					__EMU_LoadState(i);
 				}catch(...){};
 
 				sprintf(tempmsg, "Loaded PJ64 State %d", i);

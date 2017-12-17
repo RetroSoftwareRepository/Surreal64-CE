@@ -721,8 +721,7 @@ EXPORT void CALL _VIDEO_RICE_560_UpdateScreen (void)
 				try{
 					bPurgeOldBeforeIGM = TRUE;
 					gTextureManager.PurgeOldTextures();
-					gTextureManager.CleanUp();
-					__EMU_LoadState(i);
+					__EMU_Load1964State(i);
 				}catch(...){};
 
 				sprintf(tempmsg, "Loaded UHLE State %d", i);
@@ -735,7 +734,6 @@ EXPORT void CALL _VIDEO_RICE_560_UpdateScreen (void)
 				try{
 					bPurgeOldBeforeIGM = TRUE;
 					gTextureManager.PurgeOldTextures();
-					gTextureManager.CleanUp();
 					__EMU_Load1964State(i);
 				}catch(...){};
 
@@ -749,8 +747,7 @@ EXPORT void CALL _VIDEO_RICE_560_UpdateScreen (void)
 				try{
 					bPurgeOldBeforeIGM = TRUE;
 					gTextureManager.PurgeOldTextures();
-					gTextureManager.CleanUp();
-					__EMU_LoadPJ64State(i);
+					__EMU_Load1964State(i);
 				}catch(...){};
 
 				sprintf(tempmsg, "Loaded PJ64 State %d", i);
