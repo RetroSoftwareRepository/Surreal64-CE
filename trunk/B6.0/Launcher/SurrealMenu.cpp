@@ -1040,12 +1040,12 @@ void ToggleVideoPlugin(bool inc)
 	if (inc)
 	{
 		videoplugin++;
-		if (videoplugin > (_VideoPluginMissing - 2)) videoplugin=0; // Disable selecting 1964video for now
+		if (videoplugin > (_VideoPluginMissing - 1)) videoplugin=0;
 	}
 	else
 	{
 		videoplugin--;
-		if (videoplugin < 0) videoplugin=(_VideoPluginMissing - 2); // Disable selecting 1964video for now
+		if (videoplugin < 0) videoplugin=(_VideoPluginMissing - 1);
 	}
 
 	XLMenu_CurRoutine = NULL;
