@@ -822,8 +822,7 @@ FUNC_TYPE(void) NAME_DEFINE(UpdateScreen) (void)
 			{
 				try{
 					bPurgeOldBeforeIGM = TRUE;
-					gTextureManager.PurgeOldTextures();
-					gTextureManager.CleanUp();
+					gTextureManager.PurgeOldTextures();;
 					__EMU_LoadState(i);
 				}catch(...){};
 
@@ -837,7 +836,6 @@ FUNC_TYPE(void) NAME_DEFINE(UpdateScreen) (void)
 				try{
 					bPurgeOldBeforeIGM = TRUE;
 					gTextureManager.PurgeOldTextures();
-					gTextureManager.CleanUp();
 					__EMU_Load1964State(i);
 				}catch(...){};
 
@@ -851,7 +849,6 @@ FUNC_TYPE(void) NAME_DEFINE(UpdateScreen) (void)
 				try{
 					bPurgeOldBeforeIGM = TRUE;
 					gTextureManager.PurgeOldTextures();
-					gTextureManager.CleanUp();
 					__EMU_LoadPJ64State(i);
 				}catch(...){};
 

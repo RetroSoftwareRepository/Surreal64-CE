@@ -772,7 +772,9 @@ EXPORT_TYPE(void) EXPORT_NAME(UpdateScreen) (void)
 			if (bloadstate[i]) // This will never be true, unless UHLE accepts plugins. 
 			{
 				try{
-					__EMU_LoadState(i);
+					bPurgeOldBeforeIGM = TRUE;
+					gTextureManager.PurgeOldTextures();
+					__EMU_Load1964State(i);
 				}catch(...){};
 
 				sprintf(tempmsg, "Loaded UHLE State %d", i);
@@ -783,6 +785,8 @@ EXPORT_TYPE(void) EXPORT_NAME(UpdateScreen) (void)
 			else if (bload1964state[i]) 
 			{
 				try{
+					bPurgeOldBeforeIGM = TRUE;
+					gTextureManager.PurgeOldTextures();
 					__EMU_Load1964State(i);
 				}catch(...){};
 
@@ -794,7 +798,9 @@ EXPORT_TYPE(void) EXPORT_NAME(UpdateScreen) (void)
 			else if (bloadPJ64state[i]) 
 			{
 				try{
-					__EMU_LoadPJ64State(i);
+					bPurgeOldBeforeIGM = TRUE;
+					gTextureManager.PurgeOldTextures();
+					__EMU_Load1964State(i);
 				}catch(...){};
 
 				sprintf(tempmsg, "Loaded PJ64 State %d", i);
