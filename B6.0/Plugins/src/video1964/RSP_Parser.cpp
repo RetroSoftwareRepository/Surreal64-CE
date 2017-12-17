@@ -862,13 +862,6 @@ void DLParser_Process()
 		// Clear Rice's textures before loading the menu.
 		bPurgeOldBeforeIGM = TRUE;
 		gTextureManager.PurgeOldTextures();
-		gTextureManager.CleanUp();
-		RDP_Cleanup();
-		CRender::g_pRender->RenderReset();
-		CRender::g_pRender->ResetMatrices(stack_size);
-#ifdef _RICE6FB
-		g_pFrameBufferManager->CloseUp();
-#endif
 				
 		// Disable any active rumble
 		_INPUT_RumblePause(true);
