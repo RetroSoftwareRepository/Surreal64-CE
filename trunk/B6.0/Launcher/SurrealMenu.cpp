@@ -103,6 +103,7 @@ void ToggleVertexMode(bool inc);
 void ToggleTextureFilter(bool inc);
 void ToggleAAMode(bool inc);
 void ToggleSoftDisplayFilter();
+void ToggleForceClearMemory();
 void ToggleFrameSkip(bool inc);
 void ToggleAutoCF(bool inc);
 void ToggleFogMode();
@@ -1728,6 +1729,13 @@ void VideoSettingsMenu(void)
 		swprintf(currentname,L"Fog Mode : Modern Plugin Only");
 	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,currentname,ToggleFogMode);
 
+	//Clear Texture memory
+	if (!bForceClearTextures)
+	swprintf(currentname,L"Force Clear Textures : No");
+	else 
+	swprintf(currentname,L"Force Clear Textures : Yes");
+	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,currentname,ToggleForceClearMemory);
+
 	XLMenu_Activate(m_pSettingsMenu);
 
 	bool bLaunchFromMenu = false;
@@ -2133,6 +2141,24 @@ void ToggleSoftDisplayFilter()
 
 	ConfigAppSave2();
 }
+
+void ToggleForceClearMemory()
+{
+    WCHAR currentname[120];
+	currentItem = m_pSettingsMenu->curitem;
+	bForceClearTextures =! bForceClearTextures;
+
+	XLMenu_CurRoutine = NULL;
+	
+  	if (!bForceClearTextures)
+	swprintf(currentname,L"Force Clear Textures : No");
+	else 
+	swprintf(currentname,L"Force Clear Textures : Yes");
+	XLMenu_SetItemText(&m_pSettingsMenu->items[currentItem], currentname);
+
+	ConfigAppSave2();
+}
+
 void ToggleAutoCF(bool inc)
 {
     WCHAR currentname[120];

@@ -72,6 +72,7 @@ enum D3D_PresentationIntervals
 };
 
 bool bDisableEEPROMSaves = false; // hack for 1964 saves
+bool bForceClearTextures = false;
 
 int dw1964DynaMem=4;//8
 int dw1964PagingMem=4;
@@ -386,6 +387,7 @@ void ResetDefaults()
 	dwMaxVideoMem=4; //reinstate max free mem //5
 	bUseRspAudio=false; // control a listing
 	bDisableEEPROMSaves = false;
+	bForceClearTextures = false;
 
 	// ultrahle mem settings
 	dwUltraCodeMem=5;
@@ -557,6 +559,7 @@ int ConfigAppSave2()
 	ini.SetLongValue("Settings", "dwMaxVideoMem", dwMaxVideoMem); // reinstate max video mem
 	ini.SetBoolValue("Settings", "bUseRspAudio", bUseRspAudio); // control a listing
 	ini.SetBoolValue("Settings", "bDisableEEPROMSaves", bDisableEEPROMSaves);
+	ini.SetBoolValue("Settings", "bForceClearTextures", bForceClearTextures);
 
 	// ultrahle mem settings
 	ini.SetLongValue("Settings", "dwUltraCodeMem", dwUltraCodeMem);
@@ -693,6 +696,7 @@ int ConfigAppLoad2()
 	
 	bUseRspAudio = ini.GetBoolValue("Settings", "bUseRspAudio", bUseRspAudio ); // control a listing
 	bDisableEEPROMSaves = ini.GetBoolValue("Settings", "bDisableEEPROMSaves", bDisableEEPROMSaves);
+	bForceClearTextures = ini.GetBoolValue("Settings", "bForceClearTextures", bForceClearTextures);
 	// ultrahle mem settings
 	dwUltraCodeMem = ini.GetLongValue("Settings", "dwUltraCodeMem", dwUltraCodeMem );
 	dwUltraGroupMem = ini.GetLongValue("Settings", "dwUltraGroupMem", dwUltraGroupMem );
@@ -1364,6 +1368,7 @@ int loaddwPJ64DynaMem(){ return dwPJ64DynaMem;}
 int loaddw1964PagingMem(){ return dw1964PagingMem;}
 int loaddw1964DynaMem(){ return dw1964DynaMem;}
 int loadbDisableEEPROMSaves(){ return bDisableEEPROMSaves;}
+int loadbForceClearTextures() { return bForceClearTextures; }
 int loaddwMaxVideoMem(){ return dwMaxVideoMem;} //reinstate max video mem
 
 //int loadbUseLLERSP(){ return bUseLLERsp;}

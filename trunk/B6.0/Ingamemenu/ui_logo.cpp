@@ -198,11 +198,12 @@ void DestroyLogo()
 	m_BgPanel.Create(g_pd3dDevice,	bgTexture, true);
 	m_BgPanel.Render(0,0);
 
-	/*m_BgPanel.Destroy();
 	m_RenderPanel.Destroy();
-	bgTexture->Release();
-	texture->Release();*/
-	//ClearIGM();
+	m_ControlConfigPanel.Destroy();
+	m_MenuBgPanel.Destroy();
+	m_MenuBg2Panel.Destroy();
+	m_BgPanel.Destroy();
+	m_ControlsPanel.Destroy();
 }
 
 //weinerschnitzel - function to clear skin resources when returning to game
@@ -215,7 +216,6 @@ void ClearIGM(){
 	m_MenuBg2Panel.Destroy();
 	m_BgPanel.Destroy();
 	m_ControlsPanel.Destroy();
-	
 	
 	// Clear the viewport for any artifacts
 	g_pd3dDevice->Clear(0,NULL,D3DCLEAR_TARGET,0x00000000,0,0);
