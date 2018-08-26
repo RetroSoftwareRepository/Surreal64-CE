@@ -142,6 +142,7 @@ void ToggleFlickerFilter(bool inc);
 void VideoSettingsMenu();
 void ToggleTextureFilter(bool inc);
 void ToggleSoftDisplayFilter();
+void ToggleForceClearMemory();
 void ToggleFrameSkip(bool inc);
 void ToggleAutoCF(bool inc);
 void ToggleCF5toCF3StepUp(bool inc);
@@ -1416,6 +1417,7 @@ void LoadState1()
 		pStateTexture->Release();
 		pStateTexture = NULL;
 	}
+	DestroyLogo();
 	ClearIGM();
 
 	// Seed a Load State
@@ -1435,6 +1437,7 @@ void LoadState2()
 		pStateTexture->Release();
 		pStateTexture = NULL;
 	}
+	DestroyLogo();
 	ClearIGM();
 
 	// Seed a Load State
@@ -1454,6 +1457,7 @@ void LoadState3()
 		pStateTexture->Release();
 		pStateTexture = NULL;
 	}
+	DestroyLogo();
 	ClearIGM();
 
 	// Seed a Load State
@@ -1473,6 +1477,7 @@ void LoadState4()
 		pStateTexture->Release();
 		pStateTexture = NULL;
 	}
+	DestroyLogo();
 	ClearIGM();
 
 	// Seed a Load State
@@ -1492,6 +1497,7 @@ void LoadState5()
 		pStateTexture->Release();
 		pStateTexture = NULL;
 	}
+	DestroyLogo();
 	ClearIGM();
 
 	// Seed a Load State
@@ -1642,6 +1648,7 @@ void SaveState1()
 		pStateTexture->Release();
 		pStateTexture = NULL;
 	}
+	DestroyLogo();
 	ClearIGM();
 	
 	// Seed a Save State
@@ -1664,6 +1671,7 @@ void SaveState2()
 		pStateTexture->Release();
 		pStateTexture = NULL;
 	}
+	DestroyLogo();
 	ClearIGM();
 	
 	// Seed a Save State
@@ -1686,6 +1694,7 @@ void SaveState3()
 		pStateTexture->Release();
 		pStateTexture = NULL;
 	}
+	DestroyLogo();
 	ClearIGM();
 	
 	// Seed a Save State
@@ -1708,6 +1717,7 @@ void SaveState4()
 		pStateTexture->Release();
 		pStateTexture = NULL;
 	}
+	DestroyLogo();
 	ClearIGM();
 	
 	// Seed a Save State
@@ -1730,6 +1740,7 @@ void SaveState5()
 		pStateTexture->Release();
 		pStateTexture = NULL;
 	}
+	DestroyLogo();
 	ClearIGM();
 	
 	// Seed a Save State
@@ -2086,6 +2097,13 @@ void VideoSettingsMenu(void)
 		case 2 : 	swprintf(currentname,L"Frame Skip : Auto");
 			break;	}
 	XLMenu_AddItem2(m_pSettingsMenu,MITEM_ROUTINE,currentname,incFrameSkip,decFrameSkip);
+
+	//Clear Texture memory
+	if (!bForceClearTextures)
+	swprintf(currentname,L"Force Clear Textures : No");
+	else 
+	swprintf(currentname,L"Force Clear Textures : Yes");
+	XLMenu_AddItem(m_pSettingsMenu,MITEM_ROUTINE,currentname,ToggleForceClearMemory);
 	
 	if(preferedemu == _1964x11){
 		
@@ -2197,6 +2215,23 @@ void ToggleSoftDisplayFilter()
 	swprintf(currentname,L"Soft Display Filter : No");
 	else 
 	swprintf(currentname,L"Soft Display Filter : Yes");
+	XLMenu_SetItemText(&m_pSettingsMenu->items[currentItem], currentname);
+
+	ConfigAppSave2();
+}
+
+void ToggleForceClearMemory()
+{
+    WCHAR currentname[120];
+	currentItem = m_pSettingsMenu->curitem;
+	bForceClearTextures =! bForceClearTextures;
+
+	XLMenu_CurRoutine = NULL;
+	
+  	if (!bForceClearTextures)
+	swprintf(currentname,L"Force Clear Textures : No");
+	else 
+	swprintf(currentname,L"Force Clear Textures : Yes");
 	XLMenu_SetItemText(&m_pSettingsMenu->items[currentItem], currentname);
 
 	ConfigAppSave2();

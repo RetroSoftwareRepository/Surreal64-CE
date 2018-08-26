@@ -22,7 +22,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "ucode.h"
 //#include "menu/menumain.h"
 extern void RunIngameMenu();
-
+extern int loadbForceClearTextures();
 extern BOOL _INPUT_IsIngameMenuWaiting();
 extern BOOL _INPUT_UpdatePaks();
 extern BOOL _INPUT_UpdateControllerStates();
@@ -1141,8 +1141,11 @@ void DLParser_Process(OSTask * pTask)
 		GlobalMemoryStatus(&ms);	
 		
 		// Clear Rice's textures before loading the menu.
-		bPurgeOldBeforeIGM = TRUE;
-		gTextureCache.PurgeOldTextures();		
+		if (loadbForceClearTextures())
+		{
+			bPurgeOldBeforeIGM = TRUE;
+			gTextureCache.PurgeOldTextures();		
+		}
 		
 		// Disable any active rumble
 		_INPUT_RumblePause(true);

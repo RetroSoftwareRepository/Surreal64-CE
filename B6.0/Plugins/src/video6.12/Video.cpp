@@ -65,6 +65,7 @@ extern bool g_bUseSetTextureMem;
 extern DWORD g_maxTextureMemUsage;
 
 #include "../../../config.h"
+extern int loadbForceClearTextures();
 extern bool bloadstate[MAX_SAVE_STATES];
 extern bool bsavestate[MAX_SAVE_STATES];
 extern bool bload1964state[MAX_SAVE_STATES];
@@ -819,8 +820,11 @@ FUNC_TYPE(void) NAME_DEFINE(UpdateScreen) (void)
 			if (bloadstate[i]) // This will never be true, unless UHLE accepts plugins. 
 			{
 				try{
-					bPurgeOldBeforeIGM = TRUE;
-					gTextureManager.PurgeOldTextures();
+					if(loadbForceClearTextures())
+					{
+						bPurgeOldBeforeIGM = TRUE;
+						gTextureManager.PurgeOldTextures();
+					}
 					__EMU_Load1964State(i);
 				}catch(...){};
 
@@ -832,8 +836,11 @@ FUNC_TYPE(void) NAME_DEFINE(UpdateScreen) (void)
 			else if (bload1964state[i]) 
 			{
 				try{
-					bPurgeOldBeforeIGM = TRUE;
-					gTextureManager.PurgeOldTextures();
+					if(loadbForceClearTextures())
+					{
+						bPurgeOldBeforeIGM = TRUE;
+						gTextureManager.PurgeOldTextures();
+					}
 					__EMU_Load1964State(i);
 				}catch(...){};
 
@@ -845,8 +852,11 @@ FUNC_TYPE(void) NAME_DEFINE(UpdateScreen) (void)
 			else if (bloadPJ64state[i]) 
 			{
 				try{
-					bPurgeOldBeforeIGM = TRUE;
-					gTextureManager.PurgeOldTextures();
+					if(loadbForceClearTextures())
+					{
+						bPurgeOldBeforeIGM = TRUE;
+						gTextureManager.PurgeOldTextures();
+					}
 					__EMU_Load1964State(i);
 				}catch(...){};
 

@@ -38,6 +38,7 @@ extern int iAudioPlugin; //use iAudioPlugin instead to determine if basic audio 
 extern int iRspPlugin;
 extern bool bUseRspAudio; // control a listing
 extern bool bDisableEEPROMSaves;
+extern bool bForceClearTextures;
 extern int iPagingMethod;
 extern bool bReloadSaveState;
 extern int ReloadSaveType;

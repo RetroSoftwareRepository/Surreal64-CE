@@ -862,6 +862,7 @@ extern BOOL _INPUT_UpdateControllerStates();
 extern void _INPUT_RumblePause(bool bPause);
 extern "C" BOOL __EMU_AudioMute(BOOL Mute);
 extern "C" BOOL ReInitVirtualDynaMemory(boolean charge);
+extern int loadbForceClearTextures();
 extern int TextureMode;
 extern bool FrameSkip;
 extern BOOL bReadyToLoad;
@@ -1034,8 +1035,11 @@ void DLParser_Process(OSTask * pTask)
 		GlobalMemoryStatus(&ms);	
 		
 		// Clear Rice's textures before loading the menu.
-		bPurgeOldBeforeIGM = TRUE;
-		gTextureCache.PurgeOldTextures();	
+		if(loadbForceClearTextures())
+		{
+			bPurgeOldBeforeIGM = TRUE;
+			gTextureCache.PurgeOldTextures();	
+		}
 		
 		// Disable any active rumble
 		_INPUT_RumblePause(true);

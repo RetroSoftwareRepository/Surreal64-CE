@@ -75,6 +75,7 @@ extern bool g_bUseSetTextureMem;
 extern DWORD g_maxTextureMemUsage;
 
 #include "../../../config.h"
+extern int loadbForceClearTextures();
 extern bool bloadstate[MAX_SAVE_STATES];
 extern bool bsavestate[MAX_SAVE_STATES];
 extern bool bload1964state[MAX_SAVE_STATES];
@@ -645,8 +646,11 @@ EXPORT void CALL _VIDEO_RICE_531_UpdateScreen (void)
 			if (bloadstate[i]) // This will never be true, unless UHLE accepts plugins. 
 			{
 				try{
-					bPurgeOldBeforeIGM = TRUE;
-					gTextureCache.PurgeOldTextures();
+					if (loadbForceClearTextures())
+					{
+						bPurgeOldBeforeIGM = TRUE;
+						gTextureCache.PurgeOldTextures();
+					}
 					__EMU_LoadState(i);
 				}catch(...){};
 
@@ -658,8 +662,11 @@ EXPORT void CALL _VIDEO_RICE_531_UpdateScreen (void)
 			else if (bload1964state[i]) 
 			{
 				try{
-					bPurgeOldBeforeIGM = TRUE;
-					gTextureCache.PurgeOldTextures();
+					if (loadbForceClearTextures())
+					{
+						bPurgeOldBeforeIGM = TRUE;
+						gTextureCache.PurgeOldTextures();
+					}
 					__EMU_LoadState(i);
 				}catch(...){};
 
@@ -671,8 +678,11 @@ EXPORT void CALL _VIDEO_RICE_531_UpdateScreen (void)
 			else if (bloadPJ64state[i]) 
 			{
 				try{
-					bPurgeOldBeforeIGM = TRUE;
-					gTextureCache.PurgeOldTextures();
+					if (loadbForceClearTextures())
+					{
+						bPurgeOldBeforeIGM = TRUE;
+						gTextureCache.PurgeOldTextures();
+					}
 					__EMU_LoadState(i);
 				}catch(...){};
 
